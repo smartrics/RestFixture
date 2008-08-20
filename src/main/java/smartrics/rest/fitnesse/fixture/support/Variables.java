@@ -2,8 +2,6 @@ package smartrics.rest.fitnesse.fixture.support;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Variables {
 	private static Map<String, String> locals = new HashMap<String, String>();

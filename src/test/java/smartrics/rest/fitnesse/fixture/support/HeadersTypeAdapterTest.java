@@ -7,8 +7,6 @@ import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
 
 import org.junit.Test;
 
@@ -46,6 +44,7 @@ public class HeadersTypeAdapterTest {
 		assertFalse(adapter.equals(expected, actualSubset));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldParseHeadersInHtmlFormatAsProperListOfHeaders(){
 		try{

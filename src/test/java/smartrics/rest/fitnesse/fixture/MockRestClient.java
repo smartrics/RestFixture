@@ -1,6 +1,3 @@
-/**
- * (c) British Telecommunications plc, 2008, All Rights Reserved
- */
 package smartrics.rest.fitnesse.fixture;
 
 import org.apache.commons.httpclient.HttpClient;

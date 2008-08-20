@@ -29,7 +29,6 @@ import smartrics.rest.fitnesse.fixture.support.Url;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import fit.ActionFixture;
 import fit.Parse;
-import fit.TypeAdapter;
 import fit.exception.FitFailureException;
 
 public class RestFixture extends ActionFixture {

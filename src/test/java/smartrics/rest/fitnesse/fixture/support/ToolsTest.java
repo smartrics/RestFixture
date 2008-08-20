@@ -1,18 +1,16 @@
 package smartrics.rest.fitnesse.fixture.support;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.junit.Test;
-import org.w3c.dom.NodeList;
-
-import smartrics.rest.fitnesse.fixture.support.Tools;
 
 public class ToolsTest {
 	@Test

@@ -1,9 +1,5 @@
 package smartrics.rest.test.fitnesse.fixture;
 
-import org.mortbay.jetty.HandlerContainer;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
-
 import fit.ActionFixture;
 
 public class HttpServerFixture extends ActionFixture{
