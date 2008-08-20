@@ -127,7 +127,7 @@ public class HttpServer {
 	}
 
 	public void addServlet(HttpServlet servlet, String ctxRoot){
-        Context ctx = new Context( getContextHandlerCollection(), ctxRoot, Context.SESSIONS );
+        Context ctx = new Context( server, ctxRoot, Context.SESSIONS );
         ctx.addServlet( new ServletHolder( servlet ), "/*" );
 	}
 

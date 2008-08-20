@@ -1,5 +1,9 @@
 package smartrics.rest.test.fitnesse.fixture;
 
+import org.mortbay.jetty.HandlerContainer;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
+
 import fit.ActionFixture;
 
 public class HttpServerFixture extends ActionFixture{
@@ -38,12 +42,12 @@ public class HttpServerFixture extends ActionFixture{
 	}
 
 	public void resetResourcesDatabase(){
-		//Resources.getInstance().reset();
+		Resources.getInstance().reset();
 	}
 
 	public static void main(String[] args) throws Exception{
 		HttpServerFixture f = new HttpServerFixture();
-		f.start(9876);
-		//f.join();
+		f.start(8765);
+		f.join();
 	}
 }

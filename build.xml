@@ -1,4 +1,4 @@
-<project name="RestFixture" default="fitnesse-run-and-format" basedir=".">
+<project name="RestFixture" default="fitnesse-test" basedir=".">
 	<record name="${basedir}/${ant.project.name}.build.log" loglevel="verbose" />
 
     <property file="build.properties" />
@@ -82,15 +82,6 @@
 		<jar destfile="${build}/${ant.project.name}_fitnesse.jar" basedir="${build}/classes/cat" includes="**/*" excludes="**/*.jar" />
 	</target>
 
-	<target name="fitnesse-run-and-format" depends="fitnesse-format">
-		<condition property="fitnesse.fail">
-			<not>
-				<equals arg1="0" arg2="${fitnesse.result}" />
-			</not>
-		</condition>
-		<fail if="fitnesse.fail" message="FitNesse tests failed, see reports for details" />
-	</target>
-
 	<target name="fitnesse-copy" depends="package">
 		<delete dir="${fitnesse.test.root}" />
 		<mkdir dir="${fitnesse.test.root}/lib" />
@@ -112,49 +103,47 @@
 	</target>
 
 	<target name="fitnesse-test" depends="fitnesse-copy">
-		<copy todir="${fitnesse.home}" overwrite="true" file="${etc}/templates/saml/samltemplate.xml" />
-
-		<mkdir dir="${build}/fitnesse" />
+        <property name="fitnesse.reports" value="${reports}/fitnesse" />
+        <property name="fitnesse.suite.root" value="${fitnesse.path}.BasicTests" />
+		<mkdir dir="${fitnesse.reports}" />
 		<java classname="fitnesse.runner.TestRunner" fork="true" resultproperty="fitnesse.result">
 			<arg value="${fitnesse.host}" />
 			<arg value="${fitnesse.port}" />
-			<arg value="${fitnesse.path}" />
+            <arg value="${fitnesse.suite.root}" />
 			<arg value="-nopath" />
 			<arg value="-v" />
 			<arg value="-debug" />
 			<arg value="-nopath" />
 			<arg value="-results" />
-			<arg value="${build}/fitnesse/results.raw" />
+			<arg value="${fitnesse.reports}/results.raw" />
 			<classpath>
-				<pathelement location="${build}/${APP_NAME}_fitnesse.jar" />
+                <pathelement location="${build}/${ant.project.name}.jar" />
+                <pathelement location="${build}/${ant.project.name}_fitnesse.jar" />
 				<path refid="project.classpath" />
 			</classpath>
 		</java>
-	</target>
+		<!-- format data in html -->
+        <java classname="fitnesse.runner.FormattingOption" fork="true">
+            <arg value="${fitnesse.reports}/results.raw" />
+            <arg value="html" />
+            <arg value="${fitnesse.reports}/results.html" />
+            <arg value="${fitnesse.host}" />
+            <arg value="${fitnesse.port}" />
+            <arg value="${fitnesse.suite.root}" />
+            <classpath>
+                <pathelement location="${build}/${ant.project.name}.jar" />
+                <pathelement location="${build}/${ant.project.name}_fitnesse.jar" />
+                <path refid="project.classpath" />
+            </classpath>
+        </java>
+        <!-- check if build needs to fail -->
+		<condition property="fitnesse.fail">
+            <not>
+                <equals arg1="0" arg2="${fitnesse.result}" />
+            </not>
+        </condition>
+        <fail if="fitnesse.fail" message="FitNesse tests failed, see reports in '${fitnesse.reports}/results.html' for details." />
 
-	<target name="fitnesse-format" depends="fitnesse-test">
-		<java classname="fitnesse.runner.FormattingOption" fork="true">
-			<arg value="${build}/fitnesse/results.raw" />
-			<arg value="xml" />
-			<arg value="${build}/fitnesse/results.xml" />
-			<arg value="${fitnesse.host}" />
-			<arg value="${fitnesse.port}" />
-			<arg value="${fitnesse.path}" />
-			<classpath>
-				<path refid="project.classpath" />
-			</classpath>
-		</java>
-		<java classname="fitnesse.runner.FormattingOption" fork="true">
-			<arg value="${build}/fitnesse/results.raw" />
-			<arg value="html" />
-			<arg value="${build}/fitnesse/results.html" />
-			<arg value="${fitnesse.host}" />
-			<arg value="${fitnesse.port}" />
-			<arg value="${fitnesse.path}" />
-			<classpath>
-				<path refid="project.classpath" />
-			</classpath>
-		</java>
 	</target>
 
 </project>
