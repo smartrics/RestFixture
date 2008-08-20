@@ -10,7 +10,8 @@
 	<property name="src.cat" value="${basedir}/src/test/fitnesse" />
 	<property name="src" value="${basedir}/src/main/java" />
 	<property name="resources" value="${basedir}/src/main/resources" />
-	<property name="build" value="${basedir}/build" />
+    <property name="build" value="${basedir}/build" />
+    <property name="dist" value="${basedir}/dist" />
     <property name="lib" value="${basedir}/lib" />
     <property name="reports" value="${build}/reports" />
 
@@ -38,7 +39,8 @@
 	</target>
 
 	<target name="clean">
-		<delete dir="${build}" />
+        <delete dir="${build}" />
+        <delete dir="${dist}" />
 	</target>
 
 	<target name="compile" depends="init">
@@ -144,6 +146,24 @@
         </condition>
         <fail if="fitnesse.fail" message="FitNesse tests failed, see reports in '${fitnesse.reports}/results.html' for details." />
 
+	</target>
+
+	<target name="dist" >
+		<delete dir="${dist}"/>
+		<property name="artifacts" value="${dist}/artifacts" />
+	    <mkdir dir="${artifacts}" />
+        <copy todir="${artifacts}" file="${build}/${ant.project.name}.jar"/>
+        <copy todir="${artifacts}/lib" flatten="true">
+            <fileset dir="lib" includes="**/*.jar" excludes="test/**/*.jar, fitnesse/**/*.jar"/>
+        </copy>
+        <copy tofile="${artifacts}/docs/docs.html" file="${reports}/fitnesse/results.html" />
+        <copy todir="${artifacts}" file="license.txt" />
+        <copy todir="${artifacts}" file="readme.txt" />
+		<tstamp>
+		    <format property="TS" pattern="yyyyMMdd" locale="en,UK"/>
+		 </tstamp>
+        <zip destfile="dist/RestFixture-nodep-${TS}.zip" basedir="${artifacts}" casesensitive="true" compress="true" includes="**/*.*" excludes="lib/**/*.jar" />
+	    <zip destfile="dist/RestFixture-${TS}.zip" basedir="${artifacts}" casesensitive="true" compress="true" includes="**/*.*" />
 	</target>
 
 </project>
