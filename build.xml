@@ -1,0 +1,160 @@
+<project name="RestFixture" default="fitnesse-run-and-format" basedir=".">
+	<record name="${basedir}/${ant.project.name}.build.log" loglevel="verbose" />
+
+    <property file="build.properties" />
+
+	<property name="fitnesse.root" value="${fitnesse.home}/FitNesseRoot" />
+	<property name="fitnesse.path" value="${ant.project.name}Tests" />
+	<property name="fitnesse.test.root" value="${fitnesse.root}/${fitnesse.path}" />
+	<property name="src.unit" value="${basedir}/src/test/java" />
+	<property name="src.cat" value="${basedir}/src/test/fitnesse" />
+	<property name="src" value="${basedir}/src/main/java" />
+	<property name="resources" value="${basedir}/src/main/resources" />
+	<property name="build" value="${basedir}/build" />
+    <property name="lib" value="${basedir}/lib" />
+    <property name="reports" value="${build}/reports" />
+
+	<filterset id="fitnesse">
+		<filter token="FITNESSE_HOME" value="${fitnesse.home}" />
+		<filter token="FITNESSE_TEST_ROOT" value="${fitnesse.test.root}" />
+	</filterset>
+
+	<path id="project.classpath">
+		<pathelement location="${src.resources}" />
+		<fileset dir="${lib}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="test.classpath">
+		<path refid="project.classpath" />
+        <pathelement location="${build}/classes/main" />
+        <pathelement location="${build}/classes/unit" />
+	</path>
+
+	<target name="init">
+        <mkdir dir="${build}" />
+        <mkdir dir="${reports}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<mkdir dir="${build}/classes/main" />
+		<javac includes="**/*.java" debug="${build.debug}" destdir="${build}/classes/main">
+			<src path="${src}" />
+			<classpath refid="project.classpath" />
+		</javac>
+	</target>
+
+	<target name="test" depends="compile">
+        <mkdir dir="${build}/classes/unit" />
+        <mkdir dir="${reports}/unit" />
+		<javac debug="${build.debug}" destdir="${build}/classes/unit">
+            <classpath refid="test.classpath" />
+			<src path="${src.unit}" />
+			<include name="**/*.java" />
+		</javac>
+		<junit errorproperty="test.failed">
+			<classpath refid="test.classpath" />
+			<formatter type="plain" />
+			<batchtest fork="yes" todir="${reports}/unit">
+				<fileset dir="${src.unit}">
+					<include name="**/*Test.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+		<fail if="test.failed"/>
+	</target>
+
+	<target name="compile-cat" depends="compile">
+		<mkdir dir="${build}/classes/cat" />
+		<javac includes="**/*.java" debug="${build.debug}" destdir="${build}/classes/cat">
+			<src path="${src.cat}" />
+			<classpath refid="test.classpath" />
+		</javac>
+	</target>
+
+	<target name="package" depends="compile,compile-cat">
+		<jar destfile="${build}/${ant.project.name}.jar" basedir="${build}/classes/main" includes="**/*" />
+		<jar destfile="${build}/${ant.project.name}_fitnesse.jar" basedir="${build}/classes/cat" includes="**/*" excludes="**/*.jar" />
+	</target>
+
+	<target name="fitnesse-run-and-format" depends="fitnesse-format">
+		<condition property="fitnesse.fail">
+			<not>
+				<equals arg1="0" arg2="${fitnesse.result}" />
+			</not>
+		</condition>
+		<fail if="fitnesse.fail" message="FitNesse tests failed, see reports for details" />
+	</target>
+
+	<target name="fitnesse-copy" depends="package">
+		<delete dir="${fitnesse.test.root}" />
+		<mkdir dir="${fitnesse.test.root}/lib" />
+		<copy todir="${fitnesse.test.root}/lib" flatten="true">
+			<fileset dir="build">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="lib">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${resources}">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+		<copy todir="${fitnesse.test.root}" overwrite="true">
+			<filterset refid="fitnesse" />
+			<fileset dir="fitdocs/${fitnesse.path}" />
+		</copy>
+	</target>
+
+	<target name="fitnesse-test" depends="fitnesse-copy">
+		<copy todir="${fitnesse.home}" overwrite="true" file="${etc}/templates/saml/samltemplate.xml" />
+
+		<mkdir dir="${build}/fitnesse" />
+		<java classname="fitnesse.runner.TestRunner" fork="true" resultproperty="fitnesse.result">
+			<arg value="${fitnesse.host}" />
+			<arg value="${fitnesse.port}" />
+			<arg value="${fitnesse.path}" />
+			<arg value="-nopath" />
+			<arg value="-v" />
+			<arg value="-debug" />
+			<arg value="-nopath" />
+			<arg value="-results" />
+			<arg value="${build}/fitnesse/results.raw" />
+			<classpath>
+				<pathelement location="${build}/${APP_NAME}_fitnesse.jar" />
+				<path refid="project.classpath" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="fitnesse-format" depends="fitnesse-test">
+		<java classname="fitnesse.runner.FormattingOption" fork="true">
+			<arg value="${build}/fitnesse/results.raw" />
+			<arg value="xml" />
+			<arg value="${build}/fitnesse/results.xml" />
+			<arg value="${fitnesse.host}" />
+			<arg value="${fitnesse.port}" />
+			<arg value="${fitnesse.path}" />
+			<classpath>
+				<path refid="project.classpath" />
+			</classpath>
+		</java>
+		<java classname="fitnesse.runner.FormattingOption" fork="true">
+			<arg value="${build}/fitnesse/results.raw" />
+			<arg value="html" />
+			<arg value="${build}/fitnesse/results.html" />
+			<arg value="${fitnesse.host}" />
+			<arg value="${fitnesse.port}" />
+			<arg value="${fitnesse.path}" />
+			<classpath>
+				<path refid="project.classpath" />
+			</classpath>
+		</java>
+	</target>
+
+</project>

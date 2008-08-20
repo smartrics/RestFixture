@@ -1,0 +1,51 @@
+!1 Rest Fixture Acceptance Test Suite
+
+!contents -g
+
+!3 GET
+
+Get an existing resource should return the resource
+Note: there's a pre loaded resource in !-smartrics.rest.text.fitnesse.fixture.ResourcesServlet-!
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/0 | 200 | |!-
+ /resource/name[text()='a funky name'] <br/>
+ /resource/data[text()='an important message']
+-!|
+
+Get a non existing resource should not find it
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/20 | 404 | | no-body |
+
+!3 POST
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|setBody|<resource><name>test post</name><data>some data</data></resource>|
+|POST   | /resources/ | 201 | | no-body |
+|let    | id | header | Location:/resources/(.+) | |
+
+Variables are global
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/%id% | 200 | |!-
+ /resource/name[text()='test post']<br/>
+ /resource/data[text()='some data']
+-! |
+|let    | name | body | /resource/name/text() | |
+
+!3 PUT
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|setBody|<resource><name>name being updated</name><data>data being updated</data></resource>|
+|setHeader|Echo-Header : echoed|
+|PUT | /resources/0 | 200 | Echo-Header : echoed | no-body |
+|GET | /resources/0 | 200 | Echo-Header : echoed |!-
+ /resource/name[text()='name being updated'] <br/>
+ /resource/data[text()='data being updated']
+-!|
+
+!3 DELETE
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|DELETE | /resources/0 | 204 | | no-body |
+|GET    | /resources/0 | 404 | | no-body |

@@ -1,0 +1,27 @@
+!3 GET
+
+Get an existing resource should return the resource. There's a pre loaded resource in !-smartrics.rest.text.fitnesse.fixture.ResourcesServlet-!.
+
+!**** Notes
+A GET request is performed on the resource whose URI is specified in the second cell.
+The following cell indicate:
+1) the expected return HTTP code,
+2) a subset of headers - regular expressions are allowed
+3) a list of XPaths to be executed in the body. Each XPath is run and it suceedes only if the result of the execution
+returns at least one node
+****!
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/0 | 200 | Content-Length : [\d]+ |!-
+ /resource/name[text()='a funky name'] <br/>
+ /resource/data[text()='an important message']
+-!|
+
+Get a non existing resource should not find it
+
+!**** Note
+Instead of XPaths you can specify 'no-body' if the operation is expected to return an empty body
+****!
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/20 | 404 | Content-Length : 0 | no-body |
