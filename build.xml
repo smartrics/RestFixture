@@ -161,7 +161,7 @@
 	    <mkdir dir="${artifacts}" />
         <copy todir="${artifacts}" file="${build}/${ant.project.name}.jar"/>
         <copy todir="${artifacts}/lib" flatten="true">
-            <fileset dir="lib" includes="**/*.jar" excludes="test/**/*.jar, fitnesse/**/*.jar"/>
+            <fileset dir="lib" includes="**/*.jar" excludes="test/**/*.jar, fitnesse/**/*.jar, log4j/**/*.jar"/>
         </copy>
         <copy todir="${artifacts}" file="COPYING" />
         <copy todir="${artifacts}" file="COPYING.LESSER" />
@@ -171,8 +171,10 @@
 		    <format property="TS" pattern="yyyyMMdd" locale="en,UK"/>
 		 </tstamp>
 		<antcall target="dist-doc" />
-        <zip destfile="dist/RestFixture-nodep-${TS}.zip" basedir="${artifacts}" casesensitive="true" compress="true" includes="**/*.*" excludes="lib/**/*.jar" />
-	    <zip destfile="dist/RestFixture-${TS}.zip" basedir="${artifacts}" casesensitive="true" compress="true" includes="**/*.*" />
+        <zip destfile="dist/RestFixture-nodep-${TS}.zip" basedir="${artifacts}"
+        	casesensitive="true" compress="true" includes="**/*" excludes="lib/**/*.jar" />
+	    <zip destfile="dist/RestFixture-${TS}.zip" basedir="${artifacts}"
+	    	casesensitive="true" compress="true" includes="**/*" />
 	</target>
 
 </project>
