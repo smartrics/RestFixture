@@ -1,4 +1,4 @@
-<project name="RestFixture" default="fitnesse-test" basedir=".">
+<project name="RestFixture" default="full" basedir=".">
 	<record name="${basedir}/${ant.project.name}.build.log" loglevel="verbose" />
 
     <property file="build.properties" />
@@ -14,6 +14,7 @@
     <property name="dist" value="${basedir}/dist" />
     <property name="lib" value="${basedir}/lib" />
     <property name="reports" value="${build}/reports" />
+    <property name="artifacts" value="${dist}/artifacts" />
 
 	<filterset id="fitnesse">
 		<filter token="FITNESSE_HOME" value="${fitnesse.home}" />
@@ -32,6 +33,8 @@
         <pathelement location="${build}/classes/main" />
         <pathelement location="${build}/classes/unit" />
 	</path>
+
+	<target name="full" depends="clean, package, fitnesse-test, dist" />
 
 	<target name="init">
         <mkdir dir="${build}" />
@@ -84,7 +87,7 @@
 		<jar destfile="${build}/${ant.project.name}_fitnesse.jar" basedir="${build}/classes/cat" includes="**/*" excludes="**/*.jar" />
 	</target>
 
-	<target name="fitnesse-copy" depends="package">
+	<target name="fitnesse-copy" depends="package" if="execute.cat">
 		<delete dir="${fitnesse.test.root}" />
 		<mkdir dir="${fitnesse.test.root}/lib" />
 		<copy todir="${fitnesse.test.root}/lib" flatten="true">
@@ -104,7 +107,7 @@
 		</copy>
 	</target>
 
-	<target name="fitnesse-test" depends="fitnesse-copy">
+	<target name="fitnesse-test" depends="fitnesse-copy" if="execute.cat">
         <property name="fitnesse.reports" value="${reports}/fitnesse" />
         <property name="fitnesse.suite.root" value="${fitnesse.path}.BasicTests" />
 		<mkdir dir="${fitnesse.reports}" />
@@ -148,20 +151,26 @@
 
 	</target>
 
-	<target name="dist" >
+	<target name="dist-doc" if="execute.cat">
+        <copy tofile="${artifacts}/docs/docs.html" file="${reports}/fitnesse/results.html"  failonerror="false"/>
+        <replace file="${artifacts}/docs/docs.html" token="${fitnesse.host}:${fitnesse.port}" value="fitnesse.org" />
+	</target>
+
+	<target name="dist">
 		<delete dir="${dist}"/>
-		<property name="artifacts" value="${dist}/artifacts" />
 	    <mkdir dir="${artifacts}" />
         <copy todir="${artifacts}" file="${build}/${ant.project.name}.jar"/>
         <copy todir="${artifacts}/lib" flatten="true">
             <fileset dir="lib" includes="**/*.jar" excludes="test/**/*.jar, fitnesse/**/*.jar"/>
         </copy>
-        <copy tofile="${artifacts}/docs/docs.html" file="${reports}/fitnesse/results.html" />
-        <copy todir="${artifacts}" file="license.txt" />
-        <copy todir="${artifacts}" file="readme.txt" />
+        <copy todir="${artifacts}" file="COPYING" />
+        <copy todir="${artifacts}" file="COPYING.LESSER" />
+        <copy todir="${artifacts}" file="COPYRIGHT" />
+        <copy todir="${artifacts}" file="README" />
 		<tstamp>
 		    <format property="TS" pattern="yyyyMMdd" locale="en,UK"/>
 		 </tstamp>
+		<antcall target="dist-doc" />
         <zip destfile="dist/RestFixture-nodep-${TS}.zip" basedir="${artifacts}" casesensitive="true" compress="true" includes="**/*.*" excludes="lib/**/*.jar" />
 	    <zip destfile="dist/RestFixture-${TS}.zip" basedir="${artifacts}" casesensitive="true" compress="true" includes="**/*.*" />
 	</target>
