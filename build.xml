@@ -160,6 +160,7 @@
 		<delete dir="${dist}"/>
 	    <mkdir dir="${artifacts}" />
         <copy todir="${artifacts}" file="${build}/${ant.project.name}.jar"/>
+        <copy todir="${artifacts}" file="${build}/${ant.project.name}_fitnesse.jar"/>
         <copy todir="${artifacts}/lib" flatten="true">
             <fileset dir="lib" includes="**/*.jar" excludes="test/**/*.jar, fitnesse/**/*.jar, log4j/**/*.jar"/>
         </copy>
