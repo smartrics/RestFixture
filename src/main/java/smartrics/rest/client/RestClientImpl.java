@@ -33,7 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A generic REST client based on HttpClient
+ * A generic REST client based on {@code HttpClient}.
  */
 public class RestClientImpl implements RestClient {
 
@@ -43,55 +43,66 @@ public class RestClientImpl implements RestClient {
 
 	private String baseUrl;
 
+	/**
+	 * Constructor allowing the injection of an {@code org.apache.commons.httpclient.HttpClient}.
+	 *
+	 * @param client
+	 *            the client
+	 * @see org.apache.commons.httpclient.HttpClient
+	 */
 	public RestClientImpl(HttpClient client) {
 		if (client == null)
 			throw new IllegalArgumentException("Null HttpClient instance");
 		this.client = client;
 	}
 
-	/* (non-Javadoc)
-	 * @see smartrics.rest.client.RestClient#setBaseUrl(java.lang.String)
+	/**
+	 * @see {@link smartrics.rest.client.RestClient#setBaseUrl(java.lang.String)}
 	 */
-	public void setBaseUrl(String bUrl){
+	public void setBaseUrl(String bUrl) {
 		this.baseUrl = bUrl;
 	}
 
-	/* (non-Javadoc)
-	 * @see smartrics.rest.client.RestClient#getBaseUrl()
+	/**
+	 * @see {@link smartrics.rest.client.RestClient#getBaseUrl()}
 	 */
 	public String getBaseUrl() {
 		return baseUrl;
 	}
 
-	/* (non-Javadoc)
-	 * @see smartrics.rest.client.RestClient#getClient()
+	/**
+	 * Returns the Http client instance used by this implementation.
+	 *
+	 * @return the instance of HttpClient
+	 * @see org.apache.commons.httpclient.HttpClient
+	 * @see {@link smartrics.rest.client.RestClientImpl(org.apache.commons.httpclient.HttpClient)}
 	 */
-	public HttpClient getClient(){
+	public HttpClient getClient() {
 		return client;
 	}
 
-	/* (non-Javadoc)
-	 * @see smartrics.rest.client.RestClient#execute(smartrics.rest.client.RestRequest)
+	/**
+	 * @see {@link smartrics.rest.client.RestClient#execute(smartrics.rest.client.RestRequest)}
 	 */
 	public RestResponse execute(RestRequest request) {
 		return execute(getBaseUrl(), request);
 	}
 
-	/* (non-Javadoc)
-	 * @see smartrics.rest.client.RestClient#execute(java.lang.String, smartrics.rest.client.RestRequest)
+	/**
+	 * @see {@link smartrics.rest.client.RestClient#execute(java.lang.String, smartrics.rest.client.RestRequest)}
 	 */
 	public RestResponse execute(String hostAddr, RestRequest request) {
 		if (request == null || !request.isValid())
 			throw new IllegalArgumentException("Invalid request " + request);
-		if(request.getTransactionId() == null)
+		if (request.getTransactionId() == null)
 			request.setTransactionId(Long.valueOf(System.currentTimeMillis()));
 		LOG.debug(request);
 		HttpMethod m = createHttpClientMethod(request);
 		addHeaders(m, request);
 		setUri(m, hostAddr, request);
 		m.setQueryString(request.getQuery());
-		if(m instanceof EntityEnclosingMethod){
-			((EntityEnclosingMethod)m).setRequestBody(request.getBody());
+		if (m instanceof EntityEnclosingMethod) {
+			((EntityEnclosingMethod) m).setRequestBody(request.getBody());
 		}
 		RestResponse resp = new RestResponse();
 		resp.setTransactionId(request.getTransactionId());
@@ -120,14 +131,18 @@ public class RestClientImpl implements RestClient {
 	}
 
 	private void setUri(HttpMethod m, String hostAddr, RestRequest request) {
-		String host = hostAddr == null ? client.getHostConfiguration().getHost() : hostAddr;
-		if(host==null)
-			throw new IllegalStateException("hostAddress is null: please config httpClient host configuration or pass a valid host address or config a baseUrl on this client");
+		String host = hostAddr == null ? client.getHostConfiguration()
+				.getHost() : hostAddr;
+		if (host == null)
+			throw new IllegalStateException(
+					"hostAddress is null: please config httpClient host configuration or "
+							+ "pass a valid host address or config a baseUrl on this client");
 		String uriString = host + request.getResource();
 		try {
 			m.setURI(new URI(uriString, false));
 		} catch (URIException e) {
-			throw new IllegalStateException("Problem when building URI: " + uriString, e);
+			throw new IllegalStateException("Problem when building URI: "
+					+ uriString, e);
 		} catch (NullPointerException e) {
 			throw new IllegalStateException("Building URI with null string", e);
 		}
@@ -139,20 +154,34 @@ public class RestClientImpl implements RestClient {
 		}
 	}
 
+	/**
+	 * Utility method that creates an instance of {@code org.apache.commons.httpclient.HttpMethod}.
+	 *
+	 * @param request
+	 *            the rest request
+	 * @return the instance of {@code org.apache.commons.httpclient.HttpMethod}
+	 *         matching the method in RestRequest.
+	 */
 	@SuppressWarnings("unchecked")
 	protected HttpMethod createHttpClientMethod(RestRequest request) {
 		String mName = request.getMethod().toString();
-		String className = String.format("org.apache.commons.httpclient.methods.%sMethod", mName);
+		String className = String.format(
+				"org.apache.commons.httpclient.methods.%sMethod", mName);
 		try {
-			Class<HttpMethod> clazz = (Class<HttpMethod>) Class.forName(className);
+			Class<HttpMethod> clazz = (Class<HttpMethod>) Class
+					.forName(className);
 			HttpMethod m = clazz.newInstance();
 			return m;
 		} catch (ClassNotFoundException e) {
-			throw new IllegalStateException(className + " not found: you may be using a too old or very new version of HttpClient", e);
+			throw new IllegalStateException(className
+					+ " not found: you may be using a too old or "
+					+ "too new version of HttpClient", e);
 		} catch (InstantiationException e) {
-			throw new IllegalStateException("An object of type " + className + " cannot be instantiated", e);
+			throw new IllegalStateException("An object of type " + className
+					+ " cannot be instantiated", e);
 		} catch (IllegalAccessException e) {
-			throw new IllegalStateException("The default ctor for type " + className + " cannot be invoked", e);
+			throw new IllegalStateException("The default ctor for type "
+					+ className + " cannot be invoked", e);
 		}
 
 	}

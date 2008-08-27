@@ -26,38 +26,50 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Base class for holding shared data between RestRequest and RestResponse
+ * Base class for holding shared data between {@code RestRequest} and {@code RestResponse}.
  */
 public abstract class RestData {
-	public final static String LINE_SEPARATOR = System.getProperty("line.separator");
+	public final static String LINE_SEPARATOR = System
+			.getProperty("line.separator");
 
 	/**
-	 * Holds the Http Header
+	 * Holds an Http Header.
 	 */
-	public static class Header{
+	public static class Header {
 		private String name;
 		private String value;
-		public Header(String name, String value){
-			if(name==null||value==null)
+
+		public Header(String name, String value) {
+			if (name == null || value == null)
 				throw new IllegalArgumentException("Name or Value is null");
 			this.name = name;
 			this.value = value;
 		}
-		public String getName() {return name;}
-		public String getValue() {return value;}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
 		@Override
-		public int hashCode(){
+		public int hashCode() {
 			return getName().hashCode() + 37 * getValue().hashCode();
 		}
+
 		@Override
-		public boolean equals(Object o){
-			if(!(o instanceof Header))
+		public boolean equals(Object o) {
+			if (!(o instanceof Header))
 				return false;
-			Header h = (Header)o;
-			return getName().equals(h.getName()) && getValue().equals(h.getValue());
+			Header h = (Header) o;
+			return getName().equals(h.getName())
+					&& getValue().equals(h.getValue());
 		}
+
 		@Override
-		public String toString(){
+		public String toString() {
 			return String.format("%s:%s", getName(), getValue());
 		}
 	}
@@ -67,64 +79,124 @@ public abstract class RestData {
 	private String resource;
 	private Long transactionId;
 
+	/**
+	 * @return the body of this http request/response
+	 */
 	public String getBody() {
 		return body;
 	}
 
+	/**
+	 * @param body
+	 *            the body
+	 * @return this RestData
+	 */
 	public RestData setBody(String body) {
 		this.body = body;
 		return this;
 	}
 
+	/**
+	 * @return the resource type (for example {@code /resource-type}) for this
+	 *         request/response
+	 */
 	public String getResource() {
 		return resource;
 	}
 
+	/**
+	 * @param resource
+	 *            the resource type
+	 * @return this RestData
+	 */
 	public RestData setResource(String resource) {
 		this.resource = resource;
 		return this;
 	}
 
-	public RestData setTransactionId(Long txId){
+	/**
+	 * @param txId
+	 *            the transaction id
+	 * @return this RestData
+	 */
+	public RestData setTransactionId(Long txId) {
 		this.transactionId = txId;
 		return this;
 	}
 
-	public Long getTransactionId(){
+	/**
+	 * A transaction Id is a unique long for this transaction.
+	 *
+	 * It can be used to tie request and response, especially when debugging or parsing logs.
+	 *
+	 * @return the unique value that ties request and response.
+	 */
+	public Long getTransactionId() {
 		return transactionId;
 	}
 
+	/**
+	 * @return the list of headers for this request/response
+	 */
 	public List<Header> getHeaders() {
 		return Collections.unmodifiableList(headers);
 	}
 
-	public Header getHeader(String name) {
-		for(Header h : headers){
-			if(h.getName().equalsIgnoreCase(name)){
-				return h;
+	/**
+	 *
+	 * @param name
+	 *            the header name
+	 * @return the sub-list of headers with the same name
+	 */
+	public List<Header> getHeader(String name) {
+		List<Header> headersWithTheSameName = new ArrayList<Header>();
+		for (Header h : headers) {
+			if (h.getName().equalsIgnoreCase(name)) {
+				headersWithTheSameName.add(h);
 			}
 		}
-		return null;
+		return headersWithTheSameName;
 	}
 
-	public RestData addHeader(String name, String value){
+	/**
+	 * Adds an HTTP header to the current list.
+	 *
+	 * @param name
+	 *            the header name
+	 * @param value
+	 *            the header value
+	 * @return this RestData
+	 */
+	public RestData addHeader(String name, String value) {
 		this.headers.add(new Header(name, value));
 		return this;
 	}
 
-	public RestData addHeaders(Map<String, String> headers){
-		for(Map.Entry<String, String> e : headers.entrySet()){
+	/**
+	 * Adds a collection of HTTP headers to the current list of headers.
+	 *
+	 * @param headers
+	 *            the collection of headers
+	 * @return this RestData
+	 */
+	public RestData addHeaders(Map<String, String> headers) {
+		for (Map.Entry<String, String> e : headers.entrySet()) {
 			addHeader(e.getKey(), e.getValue());
 		}
 		return this;
 	}
 
+	/**
+	 * A visually easy to read representation of this {@code RestData}.
+	 *
+	 * It tryes to match the typical Http Request/Response
+	 */
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		for(Header h : getHeaders()){
+		for (Header h : getHeaders()) {
 			builder.append(h).append(LINE_SEPARATOR);
 		}
-		if(body!=null){
+		if (body != null) {
 			builder.append(LINE_SEPARATOR);
 			builder.append(this.getBody());
 		} else {

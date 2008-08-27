@@ -31,7 +31,6 @@ import fit.Parse;
 public class BodyTypeAdapter extends RestDataTypeAdapter {
 
 	public BodyTypeAdapter() {
-//		super(actual);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -53,6 +52,20 @@ public class BodyTypeAdapter extends RestDataTypeAdapter {
 		return "".equals(value.trim()) || "no-body".equals(value.trim());
 	}
 
+	/**
+	 * Equality check for bodies.
+	 *
+	 * Expected body is a {@code List<String>} of XPaths - as parsed by {@see smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter#parse(String)} -
+	 * to be executed in the actual body.
+	 * The check is true if all XPaths executed in the actual body return a node list not null or empty.
+	 *
+	 * A special case is dedicated to {@code no-body}. If the expected body is {@code no-body},
+	 * the equality check is true if the actual body returned by the REST response is empty or null.
+	 *
+	 * @param expected the expected body, it's a string with XPaths separated by {@code System.getProperty("line.separator")}
+	 * @param actual the body of the RESR response returned by the call in the current test row
+	 * @see fit.TypeAdapter
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean equals(Object expected, Object actual) {
@@ -79,6 +92,14 @@ public class BodyTypeAdapter extends RestDataTypeAdapter {
 		return getErrors().size()==0;
 	}
 
+	/**
+	 * Parses the expected body in the current test.
+	 *
+	 * A body is a String containing XPaths one for each new line. Empty body would result in an empty {@code List<String>}.
+	 * A body containing the value {@code no-body} is especially treated separately.
+	 *
+	 * @param expectedListOfXpathsAsString
+	 */
 	@Override
 	public Object parse(String expectedListOfXpathsAsString) throws Exception {
 		// expected values are parsed as a list of XPath expressions
@@ -99,6 +120,12 @@ public class BodyTypeAdapter extends RestDataTypeAdapter {
 		return expectedXPathAsList;
 	}
 
+	/**
+	 * This renders the actual body - expected as a String containing XML - as HTML to be displayed in the test page.
+	 *
+	 * @param the {@code List<String>} actual body, or an empty/null body rendered as HTML
+	 * @return the string representation
+	 */
 	@Override
 	public String toString(Object obj) {
 		if(obj==null || obj.toString().trim().equals(""))

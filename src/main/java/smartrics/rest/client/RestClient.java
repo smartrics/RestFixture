@@ -20,18 +20,59 @@
  */
 package smartrics.rest.client;
 
-import org.apache.commons.httpclient.HttpClient;
-
+/**
+ * A Rest Client offers a simplified interface to an underlying implementation of an Http client.
+ *
+ * A Rest Client is geared to operate of REST resources.
+ */
 public interface RestClient {
 
+	/**
+	 * Sets the base URL.
+	 * It is the portion of the full Url not part of the
+	 * resource type. For example if a resource type full Url is
+	 * {@code http://host:8888/domain/resourcetype} and the resource type is
+	 * {@code /resourcetype}, the base Url is {@code http://host:8888/domain}.
+	 * It is meant to serve as a default value to be appended to compose the
+	 * full Url when
+	 * {@link smartrics.rest.client.RestClient.execute(smartrics.rest.client.RestRequest)}
+	 * is used.
+	 *
+	 * @param bUrl
+	 *            a string with the base Url.
+	 * @see smartrics.rest.client.RestClient#execute(smartrics.rest.client.RestRequest)
+	 */
 	void setBaseUrl(String bUrl);
 
+	/**
+	 * Retrieves the previously set base Url.
+	 *
+	 * @return the base Url
+	 * @see smartrics.rest.client.RestClient#setBaseUrl(java.lang.String)
+	 */
 	String getBaseUrl();
 
-	HttpClient getClient();
-
+	/**
+	 * Executes a rest request using the underlying Http client implementation.
+	 *
+	 * @param request
+	 *            the request to be executed
+	 * @return the response of the rest request
+	 */
 	RestResponse execute(RestRequest request);
 
-	RestResponse execute(String hostAddr, RestRequest request);
+	/**
+	 * Executes the rest request.
+	 *
+	 * This method offers the possibility to override the base Url set on this client.
+	 *
+	 * @param baseUrl
+	 *            the base Url
+	 * @param request
+	 *            the request to be executed
+	 * @return the response of the rest request.
+	 * @see smartrics.rest.client.RestClient#setBaseUrl(java.lang.String)
+	 */
+	RestResponse execute(String baseUrl, RestRequest request);
 
 }

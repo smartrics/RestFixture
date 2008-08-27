@@ -21,38 +21,67 @@
 package smartrics.rest.client;
 
 /**
- * Wraps a REST request/response object
+ * Wraps a REST request object.
  */
 public class RestRequest extends RestData{
 	/**
-	 * an http verb
+	 * An http verb (those supported).
 	 */
 	public enum Method {Get, Post, Put, Delete};
 	private String query;
 	private Method method;
 
+	/**
+	 * @return the method for this request
+	 */
 	public Method getMethod() {
 		return method;
 	}
 
+	/**
+	 * Sets the method for this request.
+	 * @param method the method
+	 * @return this request
+	 * @see smartrics.rest.client.RestRequest.Method
+	 */
 	public RestRequest setMethod(Method method) {
 		this.method = method;
 		return this;
 	}
 
+	/**
+	 * @return the query for this request
+	 */
 	public String getQuery() {
 		return query;
 	}
 
+	/**
+	 * Sets the query for this request.
+	 * @param query the query
+	 * @return this request
+	 */
 	public RestRequest setQuery(String query) {
 		this.query = query;
 		return this;
 	}
 
+	/**
+	 * Checks validity of this request.
+	 *
+	 * In this implementation a request is valid if both the method and the resource Uri not null
+	 *
+	 * @return true if valid
+	 */
 	public boolean isValid(){
 		return getMethod()!=null && getResource()!=null;
 	}
 
+	/**
+	 * String representation of this request.
+	 *
+	 * @return the string representation
+	 */
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		if(getMethod()!=null)
