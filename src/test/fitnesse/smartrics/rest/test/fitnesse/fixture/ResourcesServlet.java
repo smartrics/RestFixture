@@ -31,37 +31,50 @@ import javax.servlet.http.HttpServletResponse;
 public class ResourcesServlet extends HttpServlet {
 	public static String CONTEXT_ROOT = "/resources";
 	private static final long serialVersionUID = -7012866414216034826L;
-	private Resources resources = Resources.getInstance();
+	private final Resources resources = Resources.getInstance();
 
-	public ResourcesServlet(){
+	public ResourcesServlet() {
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
 		String uri = req.getRequestURI();
 		echoHeader(req, resp);
 		if (uri.endsWith("/"))
 			uri = uri.substring(0, uri.length() - 1);
 		try {
 			int pos = uri.lastIndexOf("/");
-			String sId = uri.substring(pos + 1);
+			String sId = uri.substring(pos + 1, pos + 2);
 			int id = Integer.parseInt(sId);
 			if (id >= resources.size()) {
 				notFound(resp);
 			} else {
-				String resource = resources.get(id);
-				if("-deleted-".equals(resource)){
+				Resource resource = resources.get(id);
+				if (resource.isDeleted()) {
 					notFound(resp);
 				} else {
-					resp.getOutputStream().write(resource.getBytes());
+					int extensionPoint = uri.lastIndexOf(".");
+					if (extensionPoint != -1) {
+						String extension = uri.substring(extensionPoint + 1);
+						if ("json".equals(extension)) {
+							resp.getOutputStream().write(
+									resource.toJson().getBytes());
+							resp.setStatus(HttpServletResponse.SC_OK);
+							resp.addHeader("Content-Type", "application/json");							
+							return;
+						}
+					}
+					resp.getOutputStream().write(resource.toXml().getBytes());
 					resp.setStatus(HttpServletResponse.SC_OK);
+					resp.addHeader("Content-Type", "application/xml");
+
 				}
 			}
 		} catch (RuntimeException e) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}
-
 
 	private void notFound(HttpServletResponse resp) throws IOException {
 		resp.getOutputStream().write("".getBytes());
@@ -70,18 +83,18 @@ public class ResourcesServlet extends HttpServlet {
 
 	private void echoHeader(HttpServletRequest req, HttpServletResponse resp) {
 		String s = req.getHeader("Echo-Header");
-		if(s!=null)
+		if (s != null)
 			resp.setHeader("Echo-Header", s);
 	}
-
 
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		echoHeader(req, resp);
 		int id = getId(req);
-		resources.remove(id);
-		resources.add(id, "-deleted-");
+		Resource resource = resources.remove(id);
+		resource.setDeleted(true);
+		resources.add(id, resource);
 		resp.getOutputStream().write("".getBytes());
 		resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
 	}
@@ -93,11 +106,10 @@ public class ResourcesServlet extends HttpServlet {
 		int id = getId(req);
 		String content = getContent(req);
 		resources.remove(id);
-		resources.add(id, content);
+		resources.add(id, new Resource(content));
 		resp.getOutputStream().write("".getBytes());
 		resp.setStatus(HttpServletResponse.SC_OK);
 	}
-
 
 	private int getId(HttpServletRequest req) {
 		String uri = req.getRequestURI();
@@ -112,17 +124,15 @@ public class ResourcesServlet extends HttpServlet {
 			throws ServletException, IOException {
 		echoHeader(req, resp);
 		String content = getContent(req);
-		if(content.trim().startsWith("<"))
-		{
-			resources.add(content);
+		if (content.trim().startsWith("<")) {
+			resources.add(new Resource(content));
 			// todo: should put the ID in
 			resp.setStatus(HttpServletResponse.SC_CREATED);
-			resp.addHeader("Location", "/resources/" + (resources.size()-1));
+			resp.addHeader("Location", "/resources/" + (resources.size() - 1));
 		} else {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}
-
 
 	private String getContent(HttpServletRequest req) throws IOException {
 		InputStream is = req.getInputStream();

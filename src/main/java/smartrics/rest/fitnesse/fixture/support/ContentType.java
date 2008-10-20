@@ -1,4 +1,4 @@
-/*  Copyright 2008 Fabrizio Cannizzo
+/*  Copyright 2008 Andrew Ochsner
  *
  *  This file is part of RestFixture.
  *
@@ -18,51 +18,33 @@
  *  If you want to contact the author please leave a comment here
  *  http://smartrics.blogspot.com/2008/08/get-fitnesse-with-some-rest.html
  */
-package smartrics.rest.test.fitnesse.fixture;
+package smartrics.rest.fitnesse.fixture.support;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class Resources {
-	private final List<Resource> resources = new ArrayList<Resource>();
-	private static Resources instance = new Resources();
-	public static Resources getInstance(){
-		return instance;
+import smartrics.rest.client.RestData.Header;
+
+public enum ContentType {
+	XML("application/xml"), JSON("application/json"), UNKNOWN(null);
+
+	String contentTypeString;
+	
+	ContentType(String contentTypeString) {
+		this.contentTypeString = contentTypeString;
 	}
 
-	public void clear(){
-		resources.clear();
+	public static ContentType parse(List<Header> contentTypeHeaders) {
+		if (contentTypeHeaders.size() != 1
+				|| !"Content-Type".equals(contentTypeHeaders.get(0).getName()))
+			return UNKNOWN;
+		String typeString = contentTypeHeaders.get(0).getValue();
+		if (XML.contentTypeString.equals(typeString))
+			return XML;
+		else if (JSON.contentTypeString.equals(typeString))
+			return JSON;
+		else
+			return UNKNOWN;
 	}
-
-	public void add(Resource r) {
-		resources.add(r);
-	}
-
-	public Resource get(int i) {
-		return resources.get(i);
-	}
-
-	public int size(){
-		return resources.size();
-	}
-
-	public void add(int index, Resource element) {
-		resources.add(index, element);
-	}
-
-	public Resource remove(int index) {
-		return resources.remove(index);
-	}
-
-	public boolean remove(Object o) {
-		return resources.remove(o);
-	}
-
-	public void reset() {
-		resources.clear();
-		resources.add(new Resource("a funky name", "an important message"));
-	}
-
-
+	
+	
 }
-

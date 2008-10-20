@@ -50,10 +50,11 @@ public class MockRestClient implements RestClient {
 		this.baseUrl = url;
 	}
 
-	private RestResponse createRestResponse(RestRequest request) {
+	protected RestResponse createRestResponse(RestRequest request) {
 		RestResponse rr = new RestResponse();
 		rr.addHeader("h1", "v1");
 		rr.addHeader("h2", "v2");
+		rr.addHeader("Content-Type", "application/xml");
 		if(!request.getMethod().name().toUpperCase().equals("DELETE")){
 			rr.setBody("<body>text</body>");
 		}

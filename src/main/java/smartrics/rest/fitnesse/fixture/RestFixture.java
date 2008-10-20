@@ -39,7 +39,8 @@ import smartrics.rest.client.RestClientImpl;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.client.RestData.Header;
-import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
+import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory;
+import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StatusCodeTypeAdapter;
@@ -65,7 +66,7 @@ public class RestFixture extends ActionFixture {
 	protected static final Map<String, String> DEF_REQUEST_HEADERS = new HashMap<String, String>();
 	private static final Pattern FIND_VARS_PATTERN = Pattern.compile("\\%([a-zA-Z0-9]+)\\%");
 	private static Log LOG = LogFactory.getLog(RestFixture.class);
-	private Variables variables = new Variables();
+	private final Variables variables = new Variables();
 
 	public RestFixture(){
 		displayActualOnRight = true;
@@ -92,6 +93,7 @@ public class RestFixture extends ActionFixture {
 		return client;
 	}
 
+	@Override
 	public void doCells(Parse parse) {
 		cells = parse;
 		if (args.length != 1) {
@@ -355,7 +357,10 @@ public class RestFixture extends ActionFixture {
 		cells.more.body = "<a href='" + u + "'>" + lastResponse.getResource() +"</a>";
 		process(cells.more.more, lastResponse.getStatusCode().toString(), new StatusCodeTypeAdapter());
 		process(cells.more.more.more, lastResponse.getHeaders(), new HeadersTypeAdapter());
-		process(cells.more.more.more.more, lastResponse.getBody(), new BodyTypeAdapter());
+		ContentType content = ContentType.parse(lastResponse
+				.getHeader("Content-Type"));
+		process(cells.more.more.more.more, lastResponse.getBody(),
+				BodyTypeAdapterFactory.getBodyTypeAdapter(content));
 	}
 
 	private void process(Parse expected, Object actual, RestDataTypeAdapter ta) {
