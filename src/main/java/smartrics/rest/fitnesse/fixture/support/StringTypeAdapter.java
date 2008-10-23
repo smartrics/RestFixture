@@ -26,7 +26,6 @@ public class StringTypeAdapter extends RestDataTypeAdapter {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean equals(Object expected, Object actual) {
 		String se = "null";
 		if(expected!=null)

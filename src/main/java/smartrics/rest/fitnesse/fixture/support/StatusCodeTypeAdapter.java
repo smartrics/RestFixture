@@ -25,7 +25,6 @@ import fit.Parse;
 public class StatusCodeTypeAdapter extends RestDataTypeAdapter{
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean equals(Object r1, Object r2) {
 		if (r1 == null || r2 == null)
 			return false;
@@ -48,7 +47,6 @@ public class StatusCodeTypeAdapter extends RestDataTypeAdapter{
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public String toString(Object obj) {
 		if(obj==null)
 			return "null";
