@@ -24,6 +24,11 @@ import java.util.List;
 
 import smartrics.rest.client.RestData.Header;
 
+/**
+ * Supported content types.
+ * 
+ * @author fabrizio
+ */
 public enum ContentType {
 	XML("application/xml"), JSON("application/json"), UNKNOWN(null);
 
