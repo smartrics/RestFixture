@@ -26,45 +26,45 @@ import fit.Parse;
 
 public abstract class BodyTypeAdapter extends RestDataTypeAdapter {
 
-    public BodyTypeAdapter() {
-	super();
-    }
-
-    @SuppressWarnings("unchecked")
-    protected boolean checkNoBody(Object value) {
-	boolean res = value == null;
-	if (!res && (value instanceof String)) {
-	    res = checkNoBodyForString(value.toString());
+	public BodyTypeAdapter() {
+		super();
 	}
-	if (!res && (value instanceof Collection)) {
-	    res = ((Collection) value).size() == 0;
-	}
-	if (!res && (value instanceof Parse)) {
-	    res = checkNoBodyForString(((Parse) value).text().trim());
-	}
-	return res;
-    }
 
-    private boolean checkNoBodyForString(String value) {
-	return "".equals(value.trim()) || "no-body".equals(value.trim());
-    }
+	@SuppressWarnings("unchecked")
+	protected boolean checkNoBody(Object value) {
+		boolean res = value == null;
+		if (!res && (value instanceof String)) {
+			res = checkNoBodyForString(value.toString());
+		}
+		if (!res && (value instanceof Collection)) {
+			res = ((Collection) value).size() == 0;
+		}
+		if (!res && (value instanceof Parse)) {
+			res = checkNoBodyForString(((Parse) value).text().trim());
+		}
+		return res;
+	}
 
-    /**
-     * This renders the actual body - expected as a String containing XML - as
-     * HTML to be displayed in the test page.
-     * 
-     * @param the
-     *            {@code List<String>} actual body, or an empty/null body
-     *            rendered as HTML
-     * @return the string representation
-     */
-    @Override
-    public String toString(Object obj) {
-        if (obj == null || obj.toString().trim().equals(""))
-            return "no-body";
-        // the actual value is passed as an xml string
-        // todo: pretty print?
-        return Tools.toHtml(obj.toString());
-    }
+	private boolean checkNoBodyForString(String value) {
+		return "".equals(value.trim()) || "no-body".equals(value.trim());
+	}
+
+	/**
+	 * This renders the actual body - expected as a String containing XML - as
+	 * HTML to be displayed in the test page.
+	 * 
+	 * @param the
+	 *            {@code List<String>} actual body, or an empty/null body
+	 *            rendered as HTML
+	 * @return the string representation
+	 */
+	@Override
+	public String toString(Object obj) {
+		if (obj == null || obj.toString().trim().equals(""))
+			return "no-body";
+		// the actual value is passed as an xml string
+		// todo: pretty print?
+		return Tools.toHtml(obj.toString());
+	}
 
 }

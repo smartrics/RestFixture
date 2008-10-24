@@ -20,7 +20,6 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-
 public class BodyTypeAdapterFactory {
 
 	public static BodyTypeAdapter getBodyTypeAdapter(ContentType content) {
