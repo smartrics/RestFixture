@@ -27,11 +27,7 @@ Instead of XPaths you can specify 'no-body' if the operation is expected to retu
 |GET    | /resources/20 | 404 | Content-Length : 0 | no-body |
 
 !**** Json
-A GET request is performed on the resource whose URI is specified in the second cell.
-The following cell indicate:
-1) the expected return HTTP code,
-2) a subset of headers - regular expressions are allowed
-3) a json string representation
+Expectations can be asserted also in json format for responses whose content type is 'application/json'
 ****!
 
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
