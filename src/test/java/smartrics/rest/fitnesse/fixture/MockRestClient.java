@@ -58,6 +58,9 @@ public class MockRestClient implements RestClient {
 		if(!request.getMethod().name().toUpperCase().equals("DELETE")){
 			rr.setBody("<body>text</body>");
 		}
+		if (request.getMethod().name().toUpperCase().equals("POST")) {
+			rr.addHeader("Location", "/resource/1");
+		}
 		rr.setStatusCode(200);
 		rr.setStatusText("a text");
 		rr.setResource(request.getResource());

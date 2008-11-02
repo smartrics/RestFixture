@@ -3,7 +3,8 @@
 
     <property file="build.properties" />
 
-	<property name="fitnesse.root" value="${fitnesse.home}/FitNesseRoot" />
+	<property name="fitnesse.root.name" value="FitNesseRoot" />
+	<property name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
 	<property name="fitnesse.path" value="${ant.project.name}Tests" />
 	<property name="fitnesse.test.root" value="${fitnesse.root}/${fitnesse.path}" />
 	<property name="src.unit" value="${basedir}/src/test/java" />
@@ -148,9 +149,13 @@
             </not>
         </condition>
         <fail if="fitnesse.fail" message="FitNesse tests failed, see reports in '${fitnesse.reports}/results.html' for details." />
-
+		<!-- FitNesseRoot/files is hardcoded in the RestFixtureWithSeq -->
+		<move todir="${fitnesse.reports}">
+			<fileset dir="${fitnesse.root.name}" includes="**/*.*"/>
+		</move>
+		<delete dir="${fitnesse.root.name}" />
 	</target>
-
+	
 	<target name="dist-doc" if="execute.cat">
         <copy tofile="${artifacts}/docs/docs.html" file="${reports}/fitnesse/results.html"  failonerror="false"/>
         <replace file="${artifacts}/docs/docs.html" token="${fitnesse.host}:${fitnesse.port}" value="fitnesse.org" />

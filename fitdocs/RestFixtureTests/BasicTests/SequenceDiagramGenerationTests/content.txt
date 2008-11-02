@@ -1,0 +1,26 @@
+!3 Sequence Diagrams Generation
+
+ !define COMMAND_PATTERN {java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -cp %p %m}
+
+!*** Note
+A sequence diagram is generated for the fixture below. The diagram can be displayed anywhere using the \!img wiki command.
+The filename for the diagram is the second parameter of the fixture. 
+Accepted formats for the files are {{{.gif}}} and {{{.png}}}
+Files are generated in the directory {{{FITNESSE_HOME/files/restfixture}}}
+***!
+!*** Sequence diagram
+!img files/restfixture/SequenceDiag.gif
+***!
+|!-smartrics.rest.fitnesse.fixture.RestFixtureWithSeq-!|http://${jettyHost}:${jettyPort}|!-SequenceDiag.gif-!|
+|setBody|<resource><name>test post</name><data>some data</data></resource>|
+|POST   | /resources/ | 201 | | |
+|let    | id1 | header | Location:/resources/(.+) | |
+|GET    | /resources/%id1% | 200 | | |
+|POST   | /resources/ | 201 | | |
+|let    | id2 | header | Location:/resources/(.+) | |
+|PUT    | /resources/%id1% | 200 | | |
+|PUT    | /resources/%id2% | 200 | | |
+|GET    | /resources/%id2% | 200 | | |
+|PUT    | /resources/%id1% | 200 | | |
+|DELETE    | /resources/%id1% | 204 | | |
+|DELETE    | /resources/%id2% | 204 | | |

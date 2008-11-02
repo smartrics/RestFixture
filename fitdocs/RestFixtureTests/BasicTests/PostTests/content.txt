@@ -9,7 +9,6 @@ The follwoing cell indicates where to get the data from. That is either the _hea
 Then the expression to extract the value to be assigned to he variable. For _header_ it has to be a regular expression, for _body_ it
 has to be an XPath whose execution must return a String node.
 ***!
-
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
 |setBody|<resource><name>test post</name><data>some data</data></resource>|
 |POST   | /resources/ | 201 | | no-body |

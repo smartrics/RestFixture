@@ -7,3 +7,7 @@ http://smartrics.blogspot.com/2008/08/get-fitnesse-with-some-rest.html
 
 To build RestFixture edit the build.properties and set the values of the 
 properties to reflect your environment. Then use ant to run the default target
+
+Note: RestFixture distribution contains the file etc/restfixture/sequence.pic 
+part of UMLGraph (http://www.umlgraph.org), distributed under BSD license (see 
+etc/restfixture/BSDLICENSE)
