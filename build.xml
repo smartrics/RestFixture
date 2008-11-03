@@ -158,11 +158,12 @@
 	
 	<target name="dist-doc" if="execute.cat">
         <copy tofile="${artifacts}/docs/docs.html" file="${reports}/fitnesse/results.html"  failonerror="false"/>
-        <copy todir="${artifacts}/docs">
+        <copy todir="${artifacts}/docs" flatten="true">
 			<fileset dir="${fitnesse.reports}" includes="**/*.*" excludes="results.*" />
         </copy>
-        <replace file="${artifacts}/docs/docs.html" token="${fitnesse.host}:${fitnesse.port}" value="fitnesse.org" />
+        <replace file="${artifacts}/docs/docs.html" token="base href" value="xbase href" />
         <replace file="${artifacts}/docs/docs.html" token="/files" value="http://fitnesse.org/files" />
+        <replace file="${artifacts}/docs/docs.html" token="files/restfixture/" value="" />
 	</target>
 
 	<target name="dist">
@@ -187,6 +188,8 @@
         <zip destfile="dist/RestFixture-nodep-${TS}.zip" basedir="${artifacts}"
         	casesensitive="true" compress="true" includes="**/*" excludes="lib/**/*.jar" />
 	    <zip destfile="dist/RestFixture-${TS}.zip" basedir="${artifacts}"
+	    	casesensitive="true" compress="true" includes="**/*" />
+	    <zip destfile="dist/RestFixture-docs-${TS}.zip" basedir="${artifacts}/docs"
 	    	casesensitive="true" compress="true" includes="**/*" />
 	</target>
 
