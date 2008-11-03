@@ -15,6 +15,7 @@
     <property name="dist" value="${basedir}/dist" />
     <property name="lib" value="${basedir}/lib" />
     <property name="reports" value="${build}/reports" />
+    <property name="fitnesse.reports" value="${reports}/fitnesse" />
     <property name="artifacts" value="${dist}/artifacts" />
 
 	<filterset id="fitnesse">
@@ -109,7 +110,6 @@
 	</target>
 
 	<target name="fitnesse-test" depends="fitnesse-copy" if="execute.cat">
-        <property name="fitnesse.reports" value="${reports}/fitnesse" />
         <property name="fitnesse.suite.root" value="${fitnesse.path}.BasicTests" />
 		<mkdir dir="${fitnesse.reports}" />
 		<java classname="fitnesse.runner.TestRunner" fork="true" resultproperty="fitnesse.result">
@@ -153,12 +153,16 @@
 		<move todir="${fitnesse.reports}">
 			<fileset dir="${fitnesse.root.name}" includes="**/*.*"/>
 		</move>
-		<delete dir="${fitnesse.root.name}" />
+		<delete dir="${fitnesse.reports}" />
 	</target>
 	
 	<target name="dist-doc" if="execute.cat">
         <copy tofile="${artifacts}/docs/docs.html" file="${reports}/fitnesse/results.html"  failonerror="false"/>
+        <copy todir="${artifacts}/docs">
+			<fileset dir="${fitnesse.reports}" includes="**/*.*" excludes="results.*" />
+        </copy>
         <replace file="${artifacts}/docs/docs.html" token="${fitnesse.host}:${fitnesse.port}" value="fitnesse.org" />
+        <replace file="${artifacts}/docs/docs.html" token="/files" value="http://fitnesse.org/files" />
 	</target>
 
 	<target name="dist">
@@ -169,7 +173,10 @@
         <copy todir="${artifacts}/lib" flatten="true">
             <fileset dir="lib" includes="**/*.jar" excludes="test/**/*.jar, fitnesse/**/*.jar, log4j/**/*.jar"/>
         </copy>
-        <copy todir="${artifacts}" file="COPYING" />
+		<copy todir="${artifacts}/etc">
+			<fileset dir="etc" includes="**/*.*" />
+		</copy>
+		<copy todir="${artifacts}" file="COPYING" />
         <copy todir="${artifacts}" file="COPYING.LESSER" />
         <copy todir="${artifacts}" file="COPYRIGHT" />
         <copy todir="${artifacts}" file="README" />
