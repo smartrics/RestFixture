@@ -45,12 +45,17 @@ public class Url {
 		}
 	}
 
-	public String getBaseUrl() {
-		return baseUrl.toExternalForm();
+	public URL getBaseUrl() {
+		return baseUrl;
 	}
 
+	// public String getBaseUrl() {
+	// return baseUrl.toExternalForm();
+	// }
+
+	@Override
 	public String toString() {
-		return getBaseUrl();
+		return getBaseUrl().toExternalForm();
 	}
 
 	public URL buildURL(String file) {

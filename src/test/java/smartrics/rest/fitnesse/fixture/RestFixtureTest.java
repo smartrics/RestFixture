@@ -21,13 +21,17 @@
 package smartrics.rest.fitnesse.fixture;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
+import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import fit.Parse;
 import fit.exception.FitFailureException;
@@ -39,35 +43,75 @@ public class RestFixtureTest {
 	private RestFixture fixture;
 	private final Variables variables = new Variables();
 	private RestFixtureTestHelper helper;
-
+	private Config config;
+	
 	@Before
 	public void setUp() {
+		config = new Config();
 		helper = new RestFixtureTestHelper();
 		fixture = new RestFixture() {
 			{
 				super.args = new String[] { BASE_URL };
 			}
+
+			@Override
+			public RestClient buildRestClient() {
+				return new MockRestClient();
+			}
 		};
-		fixture.setRestClient(new MockRestClient());
 		variables.clearAll();
 	}
 
+	@After
+	public void tearDown() {
+		config.clear();
+	}
+	
 	@Test(expected = FitFailureException.class)
-	public void mustNotifyCallerThatBaseUrlAsFixtureArgIsMandatory()
-			throws FitParseException {
+	public void mustNotifyCallerThatBaseUrlAsFixtureArgIsMandatory() {
 		fixture = new RestFixture() {
 			{
 				super.args = new String[] {};
 			}
 		};
-		fixture.doCells(new Parse("<table><tr><td></td></tr></table>"));
+		fixture.doCells(buildEmptyParse());
+	}
+
+	@Test
+	public void shouldHaveConfigNameAsOptionalSecondParameterToDefaultWhenNotSpecified() {
+		Parse parse = buildEmptyParse();
+		fixture.doCells(parse);
+		assertEquals(Config.DEFAULT_CONFIG_NAME, fixture.getConfig().getName());
+	}
+
+	@Test
+	public void shouldHaveConfigNameAsOptionalSecondParameterToBeSetToSpecifiedValue() {
+		fixture = new RestFixture() {
+			{
+				super.args = new String[] { BASE_URL, "configName" };
+			}
+		};
+		fixture.doCells(buildEmptyParse());
+		assertEquals("configName", fixture.getConfig().getName());
+	}
+
+	@Test
+	public void mustSetTheDisplayActualOnRightFlagFromConfigFile() {
+		setDisplayActualOnRight(false);
+		fixture.doCells(buildEmptyParse());
+		assertFalse(fixture.isDisplayActualOnRight());
+	}
+
+	@Test
+	public void mustSetTheDisplayActualOnRightFlagDefaultValueToTrue() {
+		fixture.doCells(buildEmptyParse());
+		assertTrue(fixture.isDisplayActualOnRight());
 	}
 
 	@Test
 	public void mustNotifyClientIfHTTPVerbInFirstCellIsNotSupported() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow(
-				"IDONTEXIST", "/uri",
-				"", "", ""));
+				"IDONTEXIST", "/uri", "", "", ""));
 		fixture.doCells(t);
 		assertTrue(extractCell1(t).contains("IDONTEXIST"));
 		assertTrue(extractCell1(t)
@@ -78,9 +122,7 @@ public class RestFixtureTest {
 	@Test
 	public void mustExecuteVerbOnAUriWithNoExcpectationsOnRestResponseParts() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
-				"/uri",
-				"", "",
-				""));
+				"/uri", "", "", ""));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -94,9 +136,7 @@ public class RestFixtureTest {
 	@Test
 	public void mustExecuteAnyVerbOnAnyUri() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
-				"/uri",
-				"", "",
-				""));
+				"/uri", "", "", ""));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -110,9 +150,7 @@ public class RestFixtureTest {
 	@Test
 	public void mustMatchRequestsWithNoBodyExpressedAsNoBodyString() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow(
-				"DELETE",
-				"/uri",
-				"200", "", "no-body"));
+				"DELETE", "/uri", "200", "", "no-body"));
 		fixture.body("<delete/>");
 		fixture.doCells(t);
 		assertAllCells(
@@ -129,9 +167,7 @@ public class RestFixtureTest {
 		// when statusCode expected matches exactly the actual, no 'actual' is
 		// displayed
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
-				"/uri",
-				"200",
-				"", ""));
+				"/uri", "200", "", ""));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -143,8 +179,7 @@ public class RestFixtureTest {
 		// when statusCode expected matches exactly the actual as regex,
 		// 'actual' is displayed...
 		t = helper.createFitTestInstance(helper.createFitTestRow("GET", "/uri",
-				"20\\d", "",
-				""));
+				"20\\d", "", ""));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -154,10 +189,9 @@ public class RestFixtureTest {
 				"<span class=\"fit_grey\">h1&nbsp;:&nbsp;v1<br/>h2&nbsp;:&nbsp;v2<br/>Content-Type&nbsp;:&nbsp;application/xml</span>",
 				"<span class=\"fit_grey\">&lt;body&gt;text&lt;/body&gt;</span>");
 		// ... unless displayActualOnRight is false
-		fixture.setDisplayActualOnRight(false);
+		setDisplayActualOnRight(false);
 		t = helper.createFitTestInstance(helper.createFitTestRow("GET", "/uri",
-				"20\\d", "",
-				""));
+				"20\\d", "", ""));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -175,9 +209,7 @@ public class RestFixtureTest {
 	@Test
 	public void mustExecuteVerbOnAUriWithExcpectationsSetOnHeaders() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
-				"/uri",
-				"200",
-				"h1 : v1", ""));
+				"/uri", "200", "h1 : v1", ""));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -188,8 +220,7 @@ public class RestFixtureTest {
 				"<span class=\"fit_grey\">&lt;body&gt;text&lt;/body&gt;</span>");
 		// header values should be matched using regexes
 		t = helper.createFitTestInstance(helper.createFitTestRow("GET", "/uri",
-				"200",
-				"h1 : \\w\\d", ""));
+				"200", "h1 : \\w\\d", ""));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -199,10 +230,9 @@ public class RestFixtureTest {
 				"h1 : \\w\\d <span class=\"fit_label\">expected</span><hr>h1&nbsp;:&nbsp;v1<br/>h2&nbsp;:&nbsp;v2<br/>Content-Type&nbsp;:&nbsp;application/xml <span class=\"fit_label\">actual</span>",
 				"<span class=\"fit_grey\">&lt;body&gt;text&lt;/body&gt;</span>");
 		// actual value is displayed unless displayActualOnRight is false
-		fixture.setDisplayActualOnRight(false);
+		setDisplayActualOnRight(false);
 		t = helper.createFitTestInstance(helper.createFitTestRow("GET", "/uri",
-				"200",
-				"h1 : \\w\\d", ""));
+				"200", "h1 : \\w\\d", ""));
 		fixture.doCells(t);
 		assertAllCells(t, "GET", buildResUriLink("/uri"), "200", "h1 : \\w\\d",
 				"<span class=\"fit_grey\">&lt;body&gt;text&lt;/body&gt;</span>");
@@ -216,9 +246,7 @@ public class RestFixtureTest {
 	@Test
 	public void mustExecuteVerbOnAUriWithExcpectationsSetOnBody() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
-				"/uri",
-				"200",
-				"", "/body[text()='text']"));
+				"/uri", "200", "", "/body[text()='text']"));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -229,10 +257,8 @@ public class RestFixtureTest {
 				"/body[text()='text'] <span class=\"fit_label\">expected</span><hr>&lt;body&gt;text&lt;/body&gt; <span class=\"fit_label\">actual</span>");
 		// multiple xpaths can be passed separated by line.separator
 		t = helper.createFitTestInstance(helper.createFitTestRow("GET", "/uri",
-				"200",
-				"",
-				"/body[text()='text']" + System.getProperty("line.separator")
-						+ "/body"));
+				"200", "", "/body[text()='text']"
+						+ System.getProperty("line.separator") + "/body"));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -244,11 +270,9 @@ public class RestFixtureTest {
 						+ System.getProperty("line.separator")
 						+ "/body <span class=\"fit_label\">expected</span><hr>&lt;body&gt;text&lt;/body&gt; <span class=\"fit_label\">actual</span>");
 		// actual value is displayed unless displayActualOnRight is false
-		fixture.setDisplayActualOnRight(false);
+		setDisplayActualOnRight(false);
 		t = helper.createFitTestInstance(helper.createFitTestRow("GET", "/uri",
-				"200",
-				"",
-				"/body[text()='text']"));
+				"200", "", "/body[text()='text']"));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -265,7 +289,7 @@ public class RestFixtureTest {
 	 */
 	@Test
 	public void mustExecuteVerbOnAUriWithExcpectationsSetOnBodyInJSON() {
-		MockRestClient client = new MockRestClient() {
+		final MockRestClient client = new MockRestClient() {
 			@Override
 			protected RestResponse createRestResponse(RestRequest request) {
 				RestResponse rr = new RestResponse();
@@ -280,11 +304,18 @@ public class RestFixtureTest {
 			}
 
 		};
-		fixture.setRestClient(client);
+		fixture = new RestFixture() {
+			{
+				super.args = new String[] { BASE_URL };
+			}
+
+			@Override
+			protected RestClient buildRestClient() {
+				return client;
+			}
+		};
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
-				"/uri",
-				"200",
-				"", "{\"test\":\"me\"}"));
+				"/uri", "200", "", "{\"test\":\"me\"}"));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -294,11 +325,9 @@ public class RestFixtureTest {
 				"<span class=\"fit_grey\">h1&nbsp;:&nbsp;v1<br/>h2&nbsp;:&nbsp;v2<br/>Content-Type&nbsp;:&nbsp;application/json</span>",
 				"{\"test\":\"me\"}");
 		// actual value is displayed unless displayActualOnRight is false
-		fixture.setDisplayActualOnRight(false);
+		setDisplayActualOnRight(false);
 		t = helper.createFitTestInstance(helper.createFitTestRow("GET", "/uri",
-				"200",
-				"",
-				"{\"test\":\"me\"}"));
+				"200", "", "{\"test\":\"me\"}"));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -312,25 +341,20 @@ public class RestFixtureTest {
 	@Test
 	public void shoudlExecuteVerbOnAUriWithExcpectationsSetOnHeaders() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
-				"/uri",
-				"", "",
-				""));
+				"/uri", "", "", ""));
 		fixture.doCells(t);
 		assertEquals("GET", extractCell1(t));
 		t = helper.createFitTestInstance(helper.createFitTestRow("POST",
-				"/uri", "",
-				"", ""));
+				"/uri", "", "", ""));
 		fixture.body("<post/>");
 		fixture.doCells(t);
 		assertEquals("POST", extractCell1(t));
 		t = helper.createFitTestInstance(helper.createFitTestRow("DELETE",
-				"/uri", "",
-				"", ""));
+				"/uri", "", "", ""));
 		fixture.doCells(t);
 		assertEquals("DELETE", extractCell1(t));
 		t = helper.createFitTestInstance(helper.createFitTestRow("PUT", "/uri",
-				"",
-				"", ""));
+				"", "", ""));
 		fixture.doCells(t);
 		fixture.body("<put/>");
 		assertEquals("PUT", extractCell1(t));
@@ -339,9 +363,7 @@ public class RestFixtureTest {
 	@Test
 	public void mustCaptureErrorsOnExpectationsAndDisplayThemInTheSameCell() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
-				"/uri",
-				"404",
-				"", ""));
+				"/uri", "404", "", ""));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -358,14 +380,10 @@ public class RestFixtureTest {
 	@Test
 	public void mustAllowStorageInVariablesOfValuesExtractedViaXPathFromBody() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
-				"/uri",
-				"", "",
-				""));
+				"/uri", "", "", ""));
 		fixture.doCells(t);
 		t = helper.createFitTestInstance(helper.createFitTestRow("let",
-				"content",
-				"body",
-				"/body/text()", "text"));
+				"content", "body", "/body/text()", "text"));
 		fixture.doCells(t);
 		assertAllCells(t, "let", "content", "body", "/body/text()", "text");
 		assertEquals("text", new Variables().get("content"));
@@ -377,13 +395,10 @@ public class RestFixtureTest {
 	@Test
 	public void mustAllowStorageInVariablesOfValuesExtractedViaRegexFromHeader() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
-				"/uri",
-				"", "",
-				""));
+				"/uri", "", "", ""));
 		fixture.doCells(t);
 		t = helper.createFitTestInstance(helper.createFitTestRow("let", "val",
-				"header",
-				"h1:(\\w\\d)", "v1"));
+				"header", "h1:(\\w\\d)", "v1"));
 		fixture.doCells(t);
 		assertAllCells(t, "let", "val", "header", "h1:(\\w\\d)", "v1");
 		assertEquals("v1", new Variables().get("val"));
@@ -396,6 +411,18 @@ public class RestFixtureTest {
 		assertEquals(c3, extractCell3(t).trim());
 		assertEquals(c4, extractCell4(t).trim());
 		assertEquals(c5, extractcell5(t).trim());
+	}
+
+	private void setDisplayActualOnRight(boolean b) {
+		config.add("restfixure.display.actual.on.right", Boolean.toString(b));
+	}
+	
+	private Parse buildEmptyParse() {
+		try {
+			return new Parse("<table><tr><td></td></tr></table>");
+		} catch (FitParseException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private String buildResUriLink(String resUri) {
@@ -422,6 +449,5 @@ public class RestFixtureTest {
 		System.out.println(p.more.more.more.more.body);
 		return p.more.more.more.more.body;
 	}
-
 
 }

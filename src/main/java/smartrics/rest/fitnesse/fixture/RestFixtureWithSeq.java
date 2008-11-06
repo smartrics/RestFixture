@@ -3,6 +3,7 @@ package smartrics.rest.fitnesse.fixture;
 import java.io.File;
 
 import smartrics.rest.client.RestData.Header;
+import smartrics.rest.config.Config;
 import smartrics.sequencediagram.Builder;
 import smartrics.sequencediagram.Create;
 import smartrics.sequencediagram.GraphGenerator;
@@ -13,6 +14,7 @@ import smartrics.sequencediagram.Return;
 import fit.Counts;
 import fit.FixtureListener;
 import fit.Parse;
+import fit.exception.FitFailureException;
 
 /**
  * An extension of RestFixture that generates a sequence diagrams for a table
@@ -26,17 +28,15 @@ public class RestFixtureWithSeq extends RestFixture {
 
 	/**
 	 * directory where the support files needed to generate the seuqence
-	 * diagrams are. The default value is <code>new File("pic")</code>,
-	 * implying that the location is relative to the fitnesse server default
-	 * directory.
+	 * diagrams are. The default value is <code>new File("pic")</code>, implying
+	 * that the location is relative to the fitnesse server default directory.
 	 */
-	public static final File SUPPORT_FILES_DIR = new File(
-			"etc/restfixture");
+	public static final File SUPPORT_FILES_DIR = new File("etc/restfixture");
 
 	/**
 	 * default directory where the diagrams are generated. The value is
-	 * <code>new File("restfixture")</code>, a directory relative to the
-	 * default fitnesse root directory.
+	 * <code>new File("restfixture")</code>, a directory relative to the default
+	 * fitnesse root directory.
 	 */
 	public static final File GRAPH_FILES_DIR = new File(
 			"FitNesseRoot/files/restfixture");
@@ -53,11 +53,46 @@ public class RestFixtureWithSeq extends RestFixture {
 
 	private Builder builder;
 
+	private String pictureName;
+
 	public RestFixtureWithSeq() {
 		super();
 		create(new PicDiagram(), new Model());
 		setFixtureListener(new MyFixtureListener(this, builder,
 				SUPPORT_FILES_DIR, GRAPH_FILES_DIR));
+	}
+
+	@Override
+	protected void processArguments() {
+		super.processArguments();
+		if (args.length == 2) {
+			pictureName = args[1];
+			config = new Config();
+		}
+		if (args.length == 3) {
+			config = new Config(args[1]);
+			pictureName = args[2];
+		}
+	}
+
+	/**
+	 * State of the RestFixtureWithSeq is valid (or true) if both the baseUrl
+	 * and picture name are not null. These parameters are the first and second
+	 * in input to the fixture.
+	 * 
+	 * @return true if valid.
+	 */
+	@Override
+	protected boolean validateState() {
+		return baseUrl != null && getPictureName() != null;
+	}
+	
+	@Override
+	protected void notifyInvalidState(boolean state) {
+		if (!state) {
+			throw new FitFailureException(
+					"Both baseUrl and picture name need to be passed to the fixture");
+		}
 	}
 
 	void create(PicDiagram d, Model m) {
@@ -69,8 +104,8 @@ public class RestFixtureWithSeq extends RestFixture {
 	/**
 	 * Method invoked to start processing the current table. Action fixtures
 	 * seem not to cope correctly with overriding the default
-	 * <code>fit.FixtureListener</code>. The need for overriding this method
-	 * is to make sure that the listener set in <code>this.listener</code> is
+	 * <code>fit.FixtureListener</code>. The need for overriding this method is
+	 * to make sure that the listener set in <code>this.listener</code> is
 	 * correctly invoked to complete the sequence diagram generation.
 	 */
 	@Override
@@ -106,8 +141,8 @@ public class RestFixtureWithSeq extends RestFixture {
 	/**
 	 * a POST generates a message to the resource type, which in turn generates
 	 * a create to the resource just created. The resource uri must be defined
-	 * in the <code>Location</code> header in the POST response. A return
-	 * arrow is then generated.
+	 * in the <code>Location</code> header in the POST response. A return arrow
+	 * is then generated.
 	 */
 	@Override
 	public void POST() {
@@ -146,7 +181,7 @@ public class RestFixtureWithSeq extends RestFixture {
 	 * @return the picture name
 	 */
 	String getPictureName() {
-		return args[1];
+		return pictureName;
 	}
 
 	void setModel(Model m) {
@@ -164,9 +199,8 @@ public class RestFixtureWithSeq extends RestFixture {
 }
 
 /**
- * A <code>fit.FixtureListener</code> that listens for a table being
- * completed. the action performed on table completion is the actual graph
- * generation.
+ * A <code>fit.FixtureListener</code> that listens for a table being completed.
+ * the action performed on table completion is the actual graph generation.
  * 
  * @author fabrizio
  */

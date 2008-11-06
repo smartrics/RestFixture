@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import smartrics.rest.client.RestClient;
+import smartrics.rest.config.Config;
 import smartrics.sequencediagram.Create;
 import smartrics.sequencediagram.Event;
 import smartrics.sequencediagram.Message;
@@ -13,6 +15,8 @@ import smartrics.sequencediagram.Return;
 import fit.Counts;
 import fit.FixtureListener;
 import fit.Parse;
+import fit.exception.FitFailureException;
+import fit.exception.FitParseException;
 
 public class RestFixtureWithSeqTest {
 	
@@ -27,8 +31,44 @@ public class RestFixtureWithSeqTest {
 				super.args = new String[] { "http://localhost:8080",
 						"sequence.gif" };
 			}
+			
+			@Override
+			protected RestClient buildRestClient() {
+				return new MockRestClient();
+			}
 		};
-		fixture.setRestClient(new MockRestClient());		
+	}
+
+	@Test
+	public void shouldHaveConfigNameAsOptionalSecondParameterToDefaultWhenNotSpecified()
+			throws FitParseException {
+		fixture.doCells(new Parse("<table><tr><td></td></tr></table>"));
+		assertEquals(Config.DEFAULT_CONFIG_NAME, fixture.getConfig().getName());
+	}
+
+	@Test
+	public void shouldHaveConfigNameAsOptionalSecondParameterToBeSetToSpecifiedValue()
+			throws FitParseException {
+		fixture = new RestFixtureWithSeq() {
+			{
+				super.args = new String[] { "http://localhost:8080",
+						"configName", "sequence.gif" };
+			}
+		};
+		fixture.doCells(new Parse("<table><tr><td></td></tr></table>"));
+		assertEquals("configName", fixture.getConfig().getName());
+		assertEquals("sequence.gif", fixture.getPictureName());
+	}
+
+	@Test(expected = FitFailureException.class)
+	public void mustNotifyCallerThatPictureNameIsMandatory()
+			throws FitParseException {
+		fixture = new RestFixtureWithSeq() {
+			{
+				super.args = new String[] { "http://localhost:8080" };
+			}
+		};
+		fixture.doCells(new Parse("<table><tr><td></td></tr></table>"));
 	}
 
 	@Test

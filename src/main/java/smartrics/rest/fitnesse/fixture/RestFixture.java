@@ -39,9 +39,11 @@ import smartrics.rest.client.RestClientImpl;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.client.RestData.Header;
+import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
+import smartrics.rest.fitnesse.fixture.support.HttpClientBuilder;
 import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StatusCodeTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
@@ -61,19 +63,62 @@ import fit.exception.FitFailureException;
  * <ul>
  * <li>show what the resource URI looks like. For example
  * <code>/resource-a/123/resource-b/234</code>
- * <li>show what HTTP operation is being executed on that resource.
- * Specifically which one fo the main HTTP verbs where under test (GET, POST,
- * PUT, DELETE, HEAD, OPTIONS).
+ * <li>show what HTTP operation is being executed on that resource. Specifically
+ * which one fo the main HTTP verbs where under test (GET, POST, PUT, DELETE,
+ * HEAD, OPTIONS).
  * <li>have the ability to set headers and body in the request
  * <li>check expectations on the return code of the call in order to document
  * the behaviour of the API
- * <li>check expectation on the HTTP headers and body in the response. Again,
- * to document the behaviour
+ * <li>check expectation on the HTTP headers and body in the response. Again, to
+ * document the behaviour
  * </ul>
  * <li>should work without the need to write/maintain java code: tests are
  * written in wiki syntax.
  * <li>tests should be easy to write and above all read.
  * </ul>
+ * 
+ * <b>Configuring RestFixture</b><br/>
+ * RestFixture can be configured by using the {@link RestFixtureConfig}. A
+ * {@code RestFixtureConfig} can define named maps with configuration key/value
+ * pairs. The name of the map is passed as second parameter to the {@code
+ * RestFixture}. Using a named configuration is optional: if no name is passed,
+ * the default configuration map is used. See {@link RestFixtureConfig} for more
+ * details.
+ * <p/>
+ * The following list of configuration parameters can be used.
+ * <p/>
+ * Configuring the behaviour of the underlying {@link RestClient}.
+ * <table border="1">
+ * <tr>
+ * <td>smartrics.rest.fitnesse.fixture.RestFixtureConfig</td>
+ * <td><i>optional named config</i></td>
+ * </tr>
+ * <tr>
+ * <td>http.proxy.host</td>
+ * <td><i>http proxy host name</i></td>
+ * </tr>
+ * <tr>
+ * <td>http.proxy.port</td>
+ * <td><i>http proxy host port</i></td>
+ * </tr>
+ * <tr>
+ * <td>http.basicauth.username</td>
+ * <td><i>username for basic authentication</i></td>
+ * </tr>
+ * <tr>
+ * <td>http.basicauth.password</td>
+ * <td><i>password for basic authentication</i></td>
+ * </tr>
+ * <tr>
+ * <td>http.client.connection.timeout</td>
+ * <td><i>client timeout for http connection (default 3s)</i></td>
+ * </tr>
+ * <tr>
+ * <td>restfixure.display.actual.on.right</td>
+ * <td><i>boolean value. if true, the actual value of the header or body in an
+ * expectation cell is displayed even when the expectation is met.</i></td>
+ * </tr>
+ * </table>
  * 
  * @author fabrizio
  */
@@ -87,52 +132,63 @@ public class RestFixture extends ActionFixture {
 
 	private Map<String, String> requestHeaders;
 
-	private RestClient client;
+	protected RestClient restClient;
+
+	protected Config config;
 
 	private boolean displayActualOnRight;
 
+	/**
+	 * the headers passed to each request by default.
+	 */
 	protected static final Map<String, String> DEF_REQUEST_HEADERS = new HashMap<String, String>();
+
 	private static final Pattern FIND_VARS_PATTERN = Pattern
 			.compile("\\%([a-zA-Z0-9]+)\\%");
 	private static Log LOG = LogFactory.getLog(RestFixture.class);
 	private final Variables variables = new Variables();
+
+	protected Object baseUrl;
 
 	public RestFixture() {
 		super();
 		displayActualOnRight = true;
 	}
 
-	public void setRestClient(RestClient rClient) {
-		client = rClient;
+	public Config getConfig() {
+		return config;
 	}
 
+	/**
+	 * The value of the flag controlling the display of the actual header or
+	 * body in the cell containing the expectations.
+	 * 
+	 * @return true if the actual value of the headers or body is displayed when
+	 *         expectation is true
+	 */
 	public boolean isDisplayActualOnRight() {
 		return displayActualOnRight;
 	}
 
-	public void setDisplayActualOnRight(boolean displayActualOnRight) {
-		this.displayActualOnRight = displayActualOnRight;
-	}
-
-	public RestClient getRestClient() {
-		if (client == null) {
-			// TODO: provide config for HttpClient (wikiwidget)
-			HttpClient httpClient = new HttpClient();
-			setRestClient(new RestClientImpl(httpClient));
-		}
-		return client;
+	/**
+	 * Overrideable method that allows to redefine the rest client
+	 * implementation.
+	 */
+	protected RestClient buildRestClient() {
+		HttpClient httpClient = new HttpClientBuilder()
+				.createHttpClient(config);
+		return new RestClientImpl(httpClient);
 	}
 
 	@Override
 	public void doCells(Parse parse) {
 		cells = parse;
-		if (args.length < 1) {
-			throw new FitFailureException(
-					"You must specify a base url in the |start|, after the fixture to start");
-		}
-		// parses the baseUrl to
-		Url baseUrl = new Url(args[0]);
-		getRestClient().setBaseUrl(baseUrl.getBaseUrl());
+		processArguments();
+		boolean state = validateState();
+		notifyInvalidState(state);
+		configFixture();
+		restClient = buildRestClient();
+		configRestClient();
 		try {
 			Method method1 = getClass().getMethod(parse.text());
 			method1.invoke(this);
@@ -142,9 +198,62 @@ public class RestFixture extends ActionFixture {
 	}
 
 	/**
-	 * <code>| setBody | body text goes here |</code> <p/> body text can
-	 * either be a kvp or a xml. The <code>ClientHelper</code> will figure it
-	 * out
+	 * Configure the fixture with data from {@link RestFixtureConfig}.
+	 */
+	protected void configFixture() {
+		displayActualOnRight = config.getAsBoolean(
+				"restfixure.display.actual.on.right", true);
+	}
+
+	/**
+	 * Overrideable method that allows to config the rest client implementation.
+	 * the method shoudl configure the instance attribute
+	 * {@link RestFixture#restClient} created by the
+	 * {@link RestFixture#buildRestClient()}.
+	 */
+	protected void configRestClient() {
+		restClient.setBaseUrl(baseUrl.toString());
+	}
+
+	/**
+	 * Overrideable method to validate the state of the instance in execution. A
+	 * {@link RestFixture} is valid if the baseUrl is not null.
+	 * 
+	 * @return true if the state is valid, false otherwise
+	 */
+	protected boolean validateState() {
+		return baseUrl != null;
+	}
+
+	/**
+	 * Method invoked to notify that the state of the RestFixture is invalid. It
+	 * throws a {@link FitFailureException} with a message displayed in the
+	 * fitnesse page.
+	 * 
+	 * @param state
+	 *            as returned by {@link RestFixture#validateState()}
+	 */
+	protected void notifyInvalidState(boolean state) {
+		if (!state)
+			throw new FitFailureException(
+					"You must specify a base url in the |start|, after the fixture to start");
+	}
+
+	protected void processArguments() {
+		if (args.length > 0) {
+			baseUrl = new Url(args[0]);
+			config = new Config();
+		}
+		if (args.length == 2) {
+			config = new Config(args[1]);
+		}
+	}
+
+	/**
+	 * <code>| setBody | body text goes here |</code>
+	 * <p/>
+	 * body text can either be a kvp or a xml. The <code>ClientHelper</code>
+	 * will figure it out
 	 */
 	public void setBody() {
 		if (cells.more == null)
@@ -153,9 +262,10 @@ public class RestFixture extends ActionFixture {
 	}
 
 	/**
-	 * <code>| setHeader | http headers go here as nvp |</code> <p/> header
-	 * text must be nvp. name and value must be separated by ':' and each header
-	 * is in its own line
+	 * <code>| setHeader | http headers go here as nvp |</code>
+	 * <p/>
+	 * header text must be nvp. name and value must be separated by ':' and each
+	 * header is in its own line
 	 */
 	public void setHeader() {
 		if (cells.more == null)
@@ -165,15 +275,17 @@ public class RestFixture extends ActionFixture {
 	}
 
 	/**
-	 * <code> | PUT | uri | ?ret | ?headers | ?body |</code> <p/> executes a
-	 * PUT on the uri and checks the return (a string repr the operation return
-	 * code), the http response headers and the http response body
+	 * <code> | PUT | uri | ?ret | ?headers | ?body |</code>
+	 * <p/>
+	 * executes a PUT on the uri and checks the return (a string repr the
+	 * operation return code), the http response headers and the http response
+	 * body
 	 * 
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
 	 * 
-	 * the http request headers can be set via <code>setHeaders()</code>. If
-	 * not set, the list of default headers will be set. See
+	 * the http request headers can be set via <code>setHeaders()</code>. If not
+	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
 	 */
 	public void PUT() {
@@ -183,15 +295,17 @@ public class RestFixture extends ActionFixture {
 	}
 
 	/**
-	 * <code> | GET | uri | ?ret | ?headers | ?body |</code> <p/> executes a
-	 * GET on the uri and checks the return (a string repr the operation return
-	 * code), the http response headers and the http response body
+	 * <code> | GET | uri | ?ret | ?headers | ?body |</code>
+	 * <p/>
+	 * executes a GET on the uri and checks the return (a string repr the
+	 * operation return code), the http response headers and the http response
+	 * body
 	 * 
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
 	 * 
-	 * the http request headers can be set via <code>setHeaders()</code>. If
-	 * not set, the list of default headers will be set. See
+	 * the http request headers can be set via <code>setHeaders()</code>. If not
+	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
 	 */
 	public void GET() {
@@ -201,15 +315,17 @@ public class RestFixture extends ActionFixture {
 	}
 
 	/**
-	 * <code> | DELETE | uri | ?ret | ?headers | ?body |</code> <p/> executes a
-	 * DELETE on the uri and checks the return (a string repr the operation
-	 * return code), the http response headers and the http response body
+	 * <code> | DELETE | uri | ?ret | ?headers | ?body |</code>
+	 * <p/>
+	 * executes a DELETE on the uri and checks the return (a string repr the
+	 * operation return code), the http response headers and the http response
+	 * body
 	 * 
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
 	 * 
-	 * the http request headers can be set via <code>setHeaders()</code>. If
-	 * not set, the list of default headers will be set. See
+	 * the http request headers can be set via <code>setHeaders()</code>. If not
+	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
 	 */
 	public void DELETE() {
@@ -219,17 +335,19 @@ public class RestFixture extends ActionFixture {
 	}
 
 	/**
-	 * <code> | POST | uri | ?ret | ?headers | ?body |</code> <p/> executes a
-	 * POST on the uri and checks the return (a string repr the operation return
-	 * code), the http response headers and the http response body
+	 * <code> | POST | uri | ?ret | ?headers | ?body |</code>
+	 * <p/>
+	 * executes a POST on the uri and checks the return (a string repr the
+	 * operation return code), the http response headers and the http response
+	 * body
 	 * 
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
 	 * 
 	 * post requires a body that can be set via <code>setBody()</code>.
 	 * 
-	 * the http request headers can be set via <code>setHeaders()</code>. If
-	 * not set, the list of default headers will be set. See
+	 * the http request headers can be set via <code>setHeaders()</code>. If not
+	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
 	 */
 	public void POST() {
@@ -239,9 +357,10 @@ public class RestFixture extends ActionFixture {
 	}
 
 	/**
-	 * <code> | let | label | type | loc | expr |</code> <p/> allows to
-	 * associate a value to a label. values are extracted from the body of the
-	 * last successful http response.
+	 * <code> | let | label | type | loc | expr |</code>
+	 * <p/>
+	 * allows to associate a value to a label. values are extracted from the
+	 * body of the last successful http response.
 	 * <ul>
 	 * <li/><code>label</code> is the label identifier
 	 * 
@@ -249,30 +368,41 @@ public class RestFixture extends ActionFixture {
 	 * http response. At the moment only XPaths and Regexes are supported. In
 	 * case of regular expressions, the expression must contain only one group
 	 * match, if multiple groups are matched the label will be assigned to the
-	 * first found <code>type</code> only allowed values are
-	 * <code>xpath</code> and <code>regex</code>
+	 * first found <code>type</code> only allowed values are <code>xpath</code>
+	 * and <code>regex</code>
 	 * 
-	 * <li/><code>loc</code> where to apply the <code>expr</code> of the
-	 * given <code>type</code>. Currently only <code>header</code> and
-	 * <code>body</code> are supported. If type is <code>xpath</code> by
-	 * default the expression is matched against the body and the value in loc
-	 * is ignored.
+	 * <li/><code>loc</code> where to apply the <code>expr</code> of the given
+	 * <code>type</code>. Currently only <code>header</code> and
+	 * <code>body</code> are supported. If type is <code>xpath</code> by default
+	 * the expression is matched against the body and the value in loc is
+	 * ignored.
 	 * 
-	 * <li/><code>expr</code> is the expression of type <code>type</code>
-	 * to be executed on the last http response to extract the content to be
+	 * <li/><code>expr</code> is the expression of type <code>type</code> to be
+	 * executed on the last http response to extract the content to be
 	 * associated to the label.
 	 * </ul>
-	 * <p/> <code>label</code>s can be retrieved after they have been defined
-	 * and their scope is the fixture instance under execution. They are stored
-	 * in a map so multiple calls to <code>let()</code> with the same label
-	 * will override the current value of that label. <p/> Labels are resolved
-	 * in <code>uri</code>s, <code>header</code>s and <code>body</code>es.
-	 * <p/> In order to be resolved a label must be between <code>%</code>,
-	 * e.g. <code>%id%</code>. <p/> The test row must have an empy cell at
-	 * the end that will display the value extracted and assigned to the label.
-	 * <p/> Example: <br/> <code>| GET | /services | 200 | | |</code><br/>
+	 * <p/>
+	 * <code>label</code>s can be retrieved after they have been defined and
+	 * their scope is the fixture instance under execution. They are stored in a
+	 * map so multiple calls to <code>let()</code> with the same label will
+	 * override the current value of that label.
+	 * <p/>
+	 * Labels are resolved in <code>uri</code>s, <code>header</code>s and
+	 * <code>body</code>es.
+	 * <p/>
+	 * In order to be resolved a label must be between <code>%</code>, e.g.
+	 * <code>%id%</code>.
+	 * <p/>
+	 * The test row must have an empy cell at the end that will display the
+	 * value extracted and assigned to the label.
+	 * <p/>
+	 * Example: <br/>
+	 * <code>| GET | /services | 200 | | |</code><br/>
 	 * <code>| let | id |  body | /services/id[0]/text() | |</code><br/>
-	 * <code>| GET | /services/%id% | 200 | | |</code><p/> or<p/>
+	 * <code>| GET | /services/%id% | 200 | | |</code>
+	 * <p/>
+	 * or
+	 * <p/>
 	 * <code>| POST | /services | 201 | | |</code><br/>
 	 * <code>| let  | id | header | /services/([.]+) | |</code><br/>
 	 * <code>| GET  | /services/%id% | 200 | | |</code>
@@ -388,13 +518,12 @@ public class RestFixture extends ActionFixture {
 			String rBody = resolve(FIND_VARS_PATTERN, body);
 			getLastRequest().setBody(rBody);
 		}
-		setLastResponse(getRestClient().execute(getLastRequest()));
+		setLastResponse(restClient.execute(getLastRequest()));
 		completeHttpMethodExecution();
 	}
 
 	private void completeHttpMethodExecution() {
-		String u = getRestClient().getBaseUrl()
-				+ getLastResponse().getResource();
+		String u = restClient.getBaseUrl() + getLastResponse().getResource();
 		cells.more.body = "<a href='" + u + "'>"
 				+ getLastResponse().getResource() + "</a>";
 		process(cells.more.more, getLastResponse().getStatusCode().toString(),

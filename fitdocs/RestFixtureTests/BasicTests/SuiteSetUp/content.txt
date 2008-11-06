@@ -4,3 +4,6 @@
 | enter | start | ${jettyPort} |
 | check | isStarted | true |
 
+| !-smartrics.rest.fitnesse.fixture.RestFixtureConfig-! |
+| http.client.connection.timeout | 5000 |
+| restfixure.display.actual.on.right | true |

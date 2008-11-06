@@ -126,14 +126,22 @@ public class ResourcesServlet extends HttpServlet {
 		String content = getContent(req);
 		if (content.trim().startsWith("<")) {
 			resources.add(new Resource(content));
-			// todo: should put the ID in
+			// TODO: should put the ID in
 			resp.setStatus(HttpServletResponse.SC_CREATED);
-			resp.addHeader("Location", "/resources/" + (resources.size() - 1));
+			final String contextRoot = getContextRoot(req);
+			resp.addHeader("Location", contextRoot + "/"
+					+ (resources.size() - 1));
 		} else {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
 	}
 
+	private String getContextRoot(HttpServletRequest req) {
+		if (req.getContextPath().indexOf(CONTEXT_ROOT) >= 0)
+			return CONTEXT_ROOT;
+		return "";
+	}
+	
 	private String getContent(HttpServletRequest req) throws IOException {
 		InputStream is = req.getInputStream();
 		StringBuffer sBuff = new StringBuffer();

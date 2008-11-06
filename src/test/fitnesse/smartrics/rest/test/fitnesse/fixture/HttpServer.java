@@ -28,7 +28,6 @@ import org.apache.log4j.BasicConfigurator;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 
@@ -36,7 +35,6 @@ public class HttpServer {
 
 	private static Log LOG = LogFactory.getLog(HttpServer.class);
 	private Server server = null;
-	private ContextHandlerCollection contexts = null;
 	private int port;
 
 	public HttpServer(int port) {
@@ -44,10 +42,6 @@ public class HttpServer {
 		server = new Server();
 		server.setStopAtShutdown(true);
 		setPort(port);
-	}
-
-	protected ContextHandlerCollection getContextHandlerCollection() {
-		return contexts;
 	}
 
 	protected Server getServer() {
@@ -103,7 +97,7 @@ public class HttpServer {
 		connector.setPort(port);
 		return connector;
 	}
-
+	
 	public int getPort() {
 		return port;
 	}
