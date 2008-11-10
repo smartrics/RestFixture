@@ -236,7 +236,6 @@ class MyFixtureListener implements FixtureListener {
 	/**
 	 * generates the sequence diagram with the events collected in the model.
 	 */
-	@Override
 	public void tableFinished(Parse parse) {
 		sequenceBuilder.build();
 		String diag = sequenceBuilder.getDiagram().toString();
@@ -274,7 +273,6 @@ class MyFixtureListener implements FixtureListener {
 	/**
 	 * not used.
 	 */
-	@Override
 	public void tablesFinished(Counts counts) {
 	}
 

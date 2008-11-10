@@ -138,12 +138,10 @@ public class RestFixtureWithSeqTest {
 	private static class MockFixtureListener implements FixtureListener {
 		boolean called = false;
 
-		@Override
 		public void tableFinished(Parse table) {
 			called = true;
 		}
 
-		@Override
 		public void tablesFinished(Counts count) {
 			// TODO Auto-generated method stub
 
