@@ -24,11 +24,13 @@ public class Resource {
 	String name;
 	String data;
 	boolean deleted;
+	int id;
 
-	public Resource(String name, String data) {
+	public Resource(int id, String name, String data) {
 		super();
 		this.name = name;
 		this.data = data;
+		this.id = id;
 	}
 
 	public Resource(String xmlContent) {
@@ -52,6 +54,14 @@ public class Resource {
 		this.data = data;
 	}
 
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public boolean isDeleted() {
 		return deleted;
 	}
@@ -62,6 +72,8 @@ public class Resource {
 
 	public String toXml() {
 		return "<resource>" + System.getProperty("line.separator")
+				+ "   <id>"
+				+ getId() + "</id>" + System.getProperty("line.separator")
 				+ "   <name>" + getName() + "</name>"
 				+ System.getProperty("line.separator")
 				+ "   <data>"
@@ -70,8 +82,8 @@ public class Resource {
 	}
 
 	public String toJson() {
-		return "{ \"resource\" : { \"name\" : \"" + getName()
-				+ "\", \"data\" : \"" + getData() + "\" } }";
+		return "{ \"resource\" : { \"id\" : \"" + getId() + "\", \"name\" : \""
+				+ getName() + "\", \"data\" : \"" + getData() + "\" } }";
 	}
 	
 	

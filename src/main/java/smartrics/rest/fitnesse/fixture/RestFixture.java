@@ -532,6 +532,8 @@ public class RestFixture extends ActionFixture {
 				new HeadersTypeAdapter());
 		ContentType content = ContentType.parse(getLastResponse().getHeader(
 				"Content-Type"));
+		cells.more.more.more.more.body = resolve(FIND_VARS_PATTERN,
+				cells.more.more.more.more.body);
 		process(cells.more.more.more.more, getLastResponse().getBody(),
 				BodyTypeAdapterFactory.getBodyTypeAdapter(content));
 	}

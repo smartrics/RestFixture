@@ -106,7 +106,9 @@ public class ResourcesServlet extends HttpServlet {
 		int id = getId(req);
 		String content = getContent(req);
 		resources.remove(id);
-		resources.add(id, new Resource(content));
+		Resource resource = new Resource(content);
+		resource.setId(id);
+		resources.add(id, resource);
 		resp.getOutputStream().write("".getBytes());
 		resp.setStatus(HttpServletResponse.SC_OK);
 	}
@@ -125,12 +127,14 @@ public class ResourcesServlet extends HttpServlet {
 		echoHeader(req, resp);
 		String content = getContent(req);
 		if (content.trim().startsWith("<")) {
-			resources.add(new Resource(content));
+			Resource newResource = new Resource(content);
+			resources.add(newResource);
+			newResource.setId(resources.size() - 1);
 			// TODO: should put the ID in
 			resp.setStatus(HttpServletResponse.SC_CREATED);
 			final String contextRoot = getContextRoot(req);
 			resp.addHeader("Location", contextRoot + "/"
-					+ (resources.size() - 1));
+					+ newResource.getId());
 		} else {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}

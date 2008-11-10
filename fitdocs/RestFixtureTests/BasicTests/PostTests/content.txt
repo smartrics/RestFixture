@@ -17,11 +17,20 @@ has to be an XPath whose execution must return a String node.
 !*** Note
 Variables are global: here the GET op is executed on an URI containing '''%id%''' where the label 'id' is defined in the test above.
 The test succeedes only if the resulting XPath match the XML used for the creation of the resource.
+You can also put variables in the expected result
 The subsequent '''let''' operation shows how to use XPaths in the body.
 ***!
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
 |GET    | /resources/%id% | 200 | |!-
+ /resource/id[text()=%id%]<br/>
  /resource/name[text()='test post']<br/>
  /resource/data[text()='some data']
 -! |
 |let    | name | body | /resource/name/text() | |
+
+!**** Json
+Expectations can be asserted also in json format for responses whose content type is 'application/json'
+Variables may be substitued in the expected result
+****!
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/%id%.json | 200 |Content-Type : application/json |!- { "resource" : { "id" : "%id%", "name" : "test post", "data" : "some data" } } -!|

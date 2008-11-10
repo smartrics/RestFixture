@@ -60,7 +60,7 @@ public class Resources {
 
 	public void reset() {
 		resources.clear();
-		resources.add(new Resource("a funky name", "an important message"));
+		resources.add(new Resource(0, "a funky name", "an important message"));
 	}
 
 
