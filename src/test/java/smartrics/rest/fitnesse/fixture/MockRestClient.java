@@ -30,6 +30,8 @@ public class MockRestClient implements RestClient {
 
 	private String baseUrl;
 
+	protected RestResponse restResponse;
+
 	public RestResponse execute(RestRequest request) {
 		return createRestResponse(request);
 	}
@@ -50,21 +52,25 @@ public class MockRestClient implements RestClient {
 		this.baseUrl = url;
 	}
 
+	public RestResponse getRestResponse() {
+		return restResponse;
+	}
+
 	protected RestResponse createRestResponse(RestRequest request) {
-		RestResponse rr = new RestResponse();
-		rr.addHeader("h1", "v1");
-		rr.addHeader("h2", "v2");
-		rr.addHeader("Content-Type", "application/xml");
+		restResponse = new RestResponse();
+		restResponse.addHeader("h1", "v1");
+		restResponse.addHeader("h2", "v2");
+		restResponse.addHeader("Content-Type", "application/xml");
 		if(!request.getMethod().name().toUpperCase().equals("DELETE")){
-			rr.setBody("<body>text</body>");
+			restResponse.setBody("<body>text</body>");
 		}
 		if (request.getMethod().name().toUpperCase().equals("POST")) {
-			rr.addHeader("Location", "/resource/1");
+			restResponse.addHeader("Location", "/resource/1");
 		}
-		rr.setStatusCode(200);
-		rr.setStatusText("a text");
-		rr.setResource(request.getResource());
-		return rr;
+		restResponse.setStatusCode(200);
+		restResponse.setStatusText("a text");
+		restResponse.setResource(request.getResource());
+		return restResponse;
 	}
 
 }

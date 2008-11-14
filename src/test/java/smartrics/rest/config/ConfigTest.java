@@ -22,6 +22,7 @@ package smartrics.rest.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,7 +38,7 @@ public class ConfigTest {
 		defaultNamedConfig = new Config();
 		namedConfig.add("key", "value");
 	}
-	
+
 	@After
 	public void tearDown(){
 		namedConfig.clear();
@@ -50,15 +51,20 @@ public class ConfigTest {
 		assertEquals("value1", namedConfig.get("key1"));
 	}
 
-	@Test 
+	@Test
 	public void mustAddConfigDataToDefaultConfigIfConfigNameIsNull(){
 		defaultNamedConfig.add("key1", "value1");
 		assertEquals("value1", defaultNamedConfig.get("key1"));
 	}
-	
+
 	@Test
 	public void mustReturnNullForRequestsOnExistentNamedConfigsWithNonExistentKey() {
 		assertNull(namedConfig.get("non.existent.key"));
+	}
+
+	@Test
+	public void mustReturnDefaultForRequestsOnExistentNamedConfigsWithNonExistentKey() {
+		assertEquals("val", namedConfig.get("non.existent.key", "val"));
 	}
 
 	@Test
@@ -79,7 +85,7 @@ public class ConfigTest {
 		assertEquals("value.in.default", defaultNamedConfig
 				.get("key.in.default"));
 	}
-	
+
 	@Test
 	public void mustReturnNullForRequestsOnDefaultNamedConfigsWithNonExistentKey() {
 		assertNull(defaultNamedConfig.get("non.existent.key"));
@@ -89,6 +95,48 @@ public class ConfigTest {
 	public void mustClearDefaultConfig(){
 		defaultNamedConfig.clear();
 		assertNull(defaultNamedConfig.get("key"));
+	}
+
+	@Test
+	public void mustGetDataParsedAsLong() {
+		defaultNamedConfig.add("long", "100");
+		defaultNamedConfig.add("long-x", "x");
+		assertEquals(Long.valueOf(100), defaultNamedConfig
+				.getAsLong("long", Long.valueOf(10)));
+		assertEquals(Long.valueOf(10), defaultNamedConfig.getAsLong(
+				"long-not-there", Long.valueOf(10)));
+		assertEquals(Long.valueOf(10), defaultNamedConfig.getAsLong("long-x",
+				Long.valueOf(10)));
+	}
+
+	@Test
+	public void mustGetDataParsedAsBoolean() {
+		defaultNamedConfig.add("bool", "false");
+		defaultNamedConfig.add("bool-x", "x");
+		assertEquals(Boolean.FALSE, defaultNamedConfig.getAsBoolean("bool",
+				Boolean.TRUE));
+		assertEquals(Boolean.TRUE, defaultNamedConfig.getAsBoolean(
+				"bool-not-there", Boolean.TRUE));
+		// note that "x" parsed as Boolean is FALSE
+		assertEquals(Boolean.FALSE, defaultNamedConfig.getAsBoolean("bool-x",
+				Boolean.TRUE));
+	}
+
+	@Test
+	public void mustGetDataParsedAsInteger() {
+		defaultNamedConfig.add("int", "19");
+		defaultNamedConfig.add("int-x", "x");
+		assertEquals(Integer.valueOf(19), defaultNamedConfig.getAsInteger(
+				"int", Integer.valueOf(10)));
+		assertEquals(Integer.valueOf(10), defaultNamedConfig.getAsInteger(
+				"int-not-there", Integer.valueOf(10)));
+		assertEquals(Integer.valueOf(10), defaultNamedConfig.getAsInteger(
+				"int-x", Integer.valueOf(10)));
+	}
+
+	@Test
+	public void mustContainAtLeastNameInStringRepresentation() {
+		assertTrue("Does not contain name", defaultNamedConfig.toString().contains(namedConfig.getName()));
 	}
 
 }

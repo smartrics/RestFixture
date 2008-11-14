@@ -36,8 +36,8 @@ public abstract class RestData {
 	 * Holds an Http Header.
 	 */
 	public static class Header {
-		private String name;
-		private String value;
+		private final String name;
+		private final String value;
 
 		public Header(String name, String value) {
 			if (name == null || value == null)
@@ -74,7 +74,7 @@ public abstract class RestData {
 		}
 	}
 
-	private List<Header> headers = new ArrayList<Header>();
+	private final List<Header> headers = new ArrayList<Header>();
 	private String body;
 	private String resource;
 	private Long transactionId;
@@ -187,10 +187,25 @@ public abstract class RestData {
 	}
 
 	/**
+	 * Adds a collection of HTTP headers to the current list of headers.
+	 * 
+	 * @param headers
+	 *            the list of headers
+	 * @return this RestData
+	 */
+	public RestData addHeaders(List<Header> headers) {
+		for (Header e : headers) {
+			addHeader(e.getName(), e.getValue());
+		}
+		return this;
+	}
+
+	/**
 	 * A visually easy to read representation of this {@code RestData}.
-	 *
+	 * 
 	 * It tryes to match the typical Http Request/Response
 	 */
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		for (Header h : getHeaders()) {

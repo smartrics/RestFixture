@@ -62,7 +62,7 @@ public final class Config {
 	public String getName() {
 		return name;
 	}
-	
+
 	/**
 	 * creates a config with a given name.
 	 * 
@@ -100,6 +100,20 @@ public final class Config {
 	}
 
 	/**
+	 * Returns a key/value from a named config.
+	 * 
+	 * @param key
+	 *            the key
+	 * @return the value, Returns the default if the key is not found in the map
+	 */
+	public String get(String key, String def) {
+		String v = get(key);
+		if (v == null)
+			v = def;
+		return v;
+	}
+
+	/**
 	 * returns a key/value from a named config, parsed as Long
 	 * 
 	 * @param key
@@ -130,13 +144,9 @@ public final class Config {
 	 */
 	public Boolean getAsBoolean(String key, Boolean def) {
 		String val = get(key);
-		try {
-			if(val==null)
-				return def;
-			return Boolean.parseBoolean(val);
-		} catch (NumberFormatException e) {
+		if (val == null)
 			return def;
-		}
+		return Boolean.parseBoolean(val);
 	}
 
 	/**
@@ -172,7 +182,7 @@ public final class Config {
 	private Map<String, String> getNamedConfig() {
 		return CONFIGURATIONS.get(name);
 	}
-	
+
 	private Map<String, String> lazyCreateNamedConfig() {
 		Map<String, String> namedConfig = CONFIGURATIONS.get(name);
 		if (namedConfig == null) {

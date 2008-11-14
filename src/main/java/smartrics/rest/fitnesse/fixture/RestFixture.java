@@ -76,7 +76,7 @@ import fit.exception.FitFailureException;
  * written in wiki syntax.
  * <li>tests should be easy to write and above all read.
  * </ul>
- * 
+ *
  * <b>Configuring RestFixture</b><br/>
  * RestFixture can be configured by using the {@link RestFixtureConfig}. A
  * {@code RestFixtureConfig} can define named maps with configuration key/value
@@ -118,8 +118,15 @@ import fit.exception.FitFailureException;
  * <td><i>boolean value. if true, the actual value of the header or body in an
  * expectation cell is displayed even when the expectation is met.</i></td>
  * </tr>
+ * <tr>
+ * <td>restfixure.default.headers</td>
+ * <td><i>comma separated list of key value pairs representing the default list
+ * of headers to be passed for each request. key and values are separated by a
+ * colon. Entries are sepatated by {@code System.getProperty("line.separator")}.
+ * {@link RestFixture#setHeader()} will override this value. </i></td>
+ * </tr>
  * </table>
- * 
+ *
  * @author fabrizio
  */
 public class RestFixture extends ActionFixture {
@@ -141,7 +148,7 @@ public class RestFixture extends ActionFixture {
 	/**
 	 * the headers passed to each request by default.
 	 */
-	protected static final Map<String, String> DEF_REQUEST_HEADERS = new HashMap<String, String>();
+	private Map<String, String> defaultHeaders = new HashMap<String, String>();
 
 	private static final Pattern FIND_VARS_PATTERN = Pattern
 			.compile("\\%([a-zA-Z0-9]+)\\%");
@@ -162,7 +169,7 @@ public class RestFixture extends ActionFixture {
 	/**
 	 * The value of the flag controlling the display of the actual header or
 	 * body in the cell containing the expectations.
-	 * 
+	 *
 	 * @return true if the actual value of the headers or body is displayed when
 	 *         expectation is true
 	 */
@@ -203,6 +210,8 @@ public class RestFixture extends ActionFixture {
 	protected void configFixture() {
 		displayActualOnRight = config.getAsBoolean(
 				"restfixure.display.actual.on.right", true);
+		String str = config.get("restfixure.default.headers", "");
+		defaultHeaders = parseHeaders(str);
 	}
 
 	/**
@@ -218,7 +227,7 @@ public class RestFixture extends ActionFixture {
 	/**
 	 * Overrideable method to validate the state of the instance in execution. A
 	 * {@link RestFixture} is valid if the baseUrl is not null.
-	 * 
+	 *
 	 * @return true if the state is valid, false otherwise
 	 */
 	protected boolean validateState() {
@@ -229,7 +238,7 @@ public class RestFixture extends ActionFixture {
 	 * Method invoked to notify that the state of the RestFixture is invalid. It
 	 * throws a {@link FitFailureException} with a message displayed in the
 	 * fitnesse page.
-	 * 
+	 *
 	 * @param state
 	 *            as returned by {@link RestFixture#validateState()}
 	 */
@@ -280,10 +289,10 @@ public class RestFixture extends ActionFixture {
 	 * executes a PUT on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers and the http response
 	 * body
-	 * 
+	 *
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
-	 * 
+	 *
 	 * the http request headers can be set via <code>setHeaders()</code>. If not
 	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
@@ -300,10 +309,10 @@ public class RestFixture extends ActionFixture {
 	 * executes a GET on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers and the http response
 	 * body
-	 * 
+	 *
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
-	 * 
+	 *
 	 * the http request headers can be set via <code>setHeaders()</code>. If not
 	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
@@ -320,10 +329,10 @@ public class RestFixture extends ActionFixture {
 	 * executes a DELETE on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers and the http response
 	 * body
-	 * 
+	 *
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
-	 * 
+	 *
 	 * the http request headers can be set via <code>setHeaders()</code>. If not
 	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
@@ -340,12 +349,12 @@ public class RestFixture extends ActionFixture {
 	 * executes a POST on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers and the http response
 	 * body
-	 * 
+	 *
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
-	 * 
+	 *
 	 * post requires a body that can be set via <code>setBody()</code>.
-	 * 
+	 *
 	 * the http request headers can be set via <code>setHeaders()</code>. If not
 	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
@@ -363,20 +372,20 @@ public class RestFixture extends ActionFixture {
 	 * body of the last successful http response.
 	 * <ul>
 	 * <li/><code>label</code> is the label identifier
-	 * 
+	 *
 	 * <li/><code>type</code> is the type of operation to perform on the last
 	 * http response. At the moment only XPaths and Regexes are supported. In
 	 * case of regular expressions, the expression must contain only one group
 	 * match, if multiple groups are matched the label will be assigned to the
 	 * first found <code>type</code> only allowed values are <code>xpath</code>
 	 * and <code>regex</code>
-	 * 
+	 *
 	 * <li/><code>loc</code> where to apply the <code>expr</code> of the given
 	 * <code>type</code>. Currently only <code>header</code> and
 	 * <code>body</code> are supported. If type is <code>xpath</code> by default
 	 * the expression is matched against the body and the value in loc is
 	 * ignored.
-	 * 
+	 *
 	 * <li/><code>expr</code> is the expression of type <code>type</code> to be
 	 * executed on the last http response to extract the content to be
 	 * associated to the label.
@@ -499,7 +508,7 @@ public class RestFixture extends ActionFixture {
 		if (requestHeaders != null) {
 			headers = requestHeaders;
 		} else {
-			headers = DEF_REQUEST_HEADERS;
+			headers = defaultHeaders;
 		}
 		return headers;
 	}
@@ -616,8 +625,7 @@ public class RestFixture extends ActionFixture {
 	}
 
 	void headers(String header) {
-		requestHeaders = Tools.convertStringToMap(header, ":", System
-				.getProperty("line.separator"));
+		requestHeaders = parseHeaders(header);
 	}
 
 	protected RestResponse getLastResponse() {
@@ -634,6 +642,11 @@ public class RestFixture extends ActionFixture {
 
 	private void setLastRequest(RestRequest lastRequest) {
 		this.lastRequest = lastRequest;
+	}
+
+	private Map<String, String> parseHeaders(String str) {
+		return Tools.convertStringToMap(str, ":", System
+				.getProperty("line.separator"));
 	}
 
 }

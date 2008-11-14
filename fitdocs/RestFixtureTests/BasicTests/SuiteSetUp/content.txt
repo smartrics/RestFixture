@@ -4,6 +4,13 @@
 | enter | start | ${jettyPort} |
 | check | isStarted | true |
 
+Default configuration parameters for each !-RestFixture-! instance
+ * '''http.client.connection.timeout''' the client http timeout
+ * '''restfixure.display.actual.on.right''' wether the actual value of headers and body are displayed when an expectation is met
+ * '''restfixure.default.headers''' list of http headers passed to each REST request (overridden by '''setHeader''')
 | !-smartrics.rest.fitnesse.fixture.RestFixtureConfig-! |
 | http.client.connection.timeout | 5000 |
 | restfixure.display.actual.on.right | true |
+| restfixure.default.headers | !-defHeader : 1
+anotherDefHeader : 2
+-!|

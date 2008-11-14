@@ -39,7 +39,7 @@ public class RestClientImpl implements RestClient {
 
 	private static Log LOG = LogFactory.getLog(RestClientImpl.class);
 
-	private HttpClient client;
+	private final HttpClient client;
 
 	private String baseUrl;
 
@@ -154,6 +154,11 @@ public class RestClientImpl implements RestClient {
 		}
 	}
 
+	protected String getMethodClassnameFromMethodName(String mName) {
+		return String.format("org.apache.commons.httpclient.methods.%sMethod",
+				mName);
+	}
+
 	/**
 	 * Utility method that creates an instance of {@code org.apache.commons.httpclient.HttpMethod}.
 	 *
@@ -165,8 +170,7 @@ public class RestClientImpl implements RestClient {
 	@SuppressWarnings("unchecked")
 	protected HttpMethod createHttpClientMethod(RestRequest request) {
 		String mName = request.getMethod().toString();
-		String className = String.format(
-				"org.apache.commons.httpclient.methods.%sMethod", mName);
+		String className = getMethodClassnameFromMethodName(mName);
 		try {
 			Class<HttpMethod> clazz = (Class<HttpMethod>) Class
 					.forName(className);

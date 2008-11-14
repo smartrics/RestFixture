@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpMethodBase;
 
 public class MockRestClient extends RestClientImpl{
 
@@ -41,4 +42,25 @@ public class MockRestClient extends RestClientImpl{
 		assertTrue("method is not a PostMethod", m instanceof org.apache.commons.httpclient.methods.PostMethod);
 	}
 
+}
+
+class HttpMethodClassCannotBeInstantiated extends HttpMethodBase{
+	private HttpMethodClassCannotBeInstantiated() {
+
+	}
+	@Override
+	public String getName() {
+		return "Name";
+	}
+}
+
+class HttpMethodClassFailsWhenCreating extends HttpMethodBase {
+	public HttpMethodClassFailsWhenCreating() {
+		throw new RuntimeException("Exception when instantiating");
+	}
+
+	@Override
+	public String getName() {
+		return "Name";
+	}
 }

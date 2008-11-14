@@ -44,7 +44,7 @@ public class RestFixtureTest {
 	private final Variables variables = new Variables();
 	private RestFixtureTestHelper helper;
 	private Config config;
-	
+
 	@Before
 	public void setUp() {
 		config = new Config();
@@ -66,7 +66,7 @@ public class RestFixtureTest {
 	public void tearDown() {
 		config.clear();
 	}
-	
+
 	@Test(expected = FitFailureException.class)
 	public void mustNotifyCallerThatBaseUrlAsFixtureArgIsMandatory() {
 		fixture = new RestFixture() {
@@ -106,6 +106,37 @@ public class RestFixtureTest {
 	public void mustSetTheDisplayActualOnRightFlagDefaultValueToTrue() {
 		fixture.doCells(buildEmptyParse());
 		assertTrue(fixture.isDisplayActualOnRight());
+	}
+
+	@Test
+	public void shoudlUseDefaultHeadersIfDefinedOnNamedConfig() {
+		config = new Config("config.with.headers");
+		config.add("restfixure.default.headers", "added1 : 1"
+				+ System.getProperty("line.separator") + "added2 : 2");
+		final MockRestClient rClient = new MockRestClient() {
+			@Override
+			protected RestResponse createRestResponse(RestRequest request) {
+				restResponse = new RestResponse();
+				restResponse.addHeaders(request.getHeaders());
+				return restResponse;
+			}
+		};
+		fixture = new RestFixture() {
+			{
+				super.args = new String[] { BASE_URL, "config.with.headers" };
+			}
+			@Override
+			public RestClient buildRestClient() {
+				return rClient;
+			}
+		};
+		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
+				"/uri", "", "", ""));
+		fixture.doCells(t);
+		assertEquals("added1:1 does not exist", "added1:1", rClient
+				.getRestResponse().getHeader("added1").get(0).toString());
+		assertEquals("added2:2 does not exist", "added2:2", rClient
+				.getRestResponse().getHeader("added2").get(0).toString());
 	}
 
 	@Test
@@ -416,7 +447,7 @@ public class RestFixtureTest {
 	private void setDisplayActualOnRight(boolean b) {
 		config.add("restfixure.display.actual.on.right", Boolean.toString(b));
 	}
-	
+
 	private Parse buildEmptyParse() {
 		try {
 			return new Parse("<table><tr><td></td></tr></table>");

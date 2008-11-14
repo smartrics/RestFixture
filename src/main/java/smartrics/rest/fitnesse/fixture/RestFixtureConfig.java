@@ -105,6 +105,8 @@ public class RestFixtureConfig extends Fixture {
 
 	private Config config;
 
+	private String currentKey;
+
 	/**
 	 * processes each row in the config fixture table and loads the key/value
 	 * pairs. The fixture optional first argument is the config name. If not
@@ -113,11 +115,16 @@ public class RestFixtureConfig extends Fixture {
 	@Override
 	public void doRow(Parse p) {
 		Config c = getConfig();
+		Parse cells = p.parts;
 		try {
-			String key = p.text();
-			String value = p.more.text();
+			String key = cells.text();
+			String value = cells.more.text();
 			c.add(key, value);
+			right(cells);
+			right(cells.more);
 		} catch (Exception e) {
+			System.err.println("Exception for " + p.text());
+			e.printStackTrace();
 			exception(p, e);
 		}
 	}
