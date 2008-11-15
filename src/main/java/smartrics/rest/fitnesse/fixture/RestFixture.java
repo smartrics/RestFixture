@@ -51,6 +51,7 @@ import smartrics.rest.fitnesse.fixture.support.Tools;
 import smartrics.rest.fitnesse.fixture.support.Url;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import fit.ActionFixture;
+import fit.Fixture;
 import fit.Parse;
 import fit.exception.FitFailureException;
 
@@ -608,7 +609,13 @@ public class RestFixture extends ActionFixture {
 			if (gc == 1) {
 				String g0 = m.group(0);
 				String g1 = m.group(1);
-				replacements.put(g0, variables.get(g1));
+				String value = variables.get(g1);
+				if (null == value) {
+					Object o = Fixture.getSymbol(g1);
+					if (null != o)
+						value = o.toString();
+				}
+				replacements.put(g0, value);
 			}
 		}
 		String newText = text;

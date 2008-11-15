@@ -33,6 +33,7 @@ import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.support.Variables;
+import fit.Fixture;
 import fit.Parse;
 import fit.exception.FitFailureException;
 import fit.exception.FitParseException;
@@ -367,6 +368,15 @@ public class RestFixtureTest {
 				"200",
 				"<span class=\"fit_grey\">h1&nbsp;:&nbsp;v1<br/>h2&nbsp;:&nbsp;v2<br/>Content-Type&nbsp;:&nbsp;application/json</span>",
 				"{\"test\":\"me\"}");
+	}
+
+	@Test
+	public void shouldUseValueOnSymbolMapIfNoVariableIsFoundInTheLocalMap() {
+		Fixture.setSymbol("fred", "bloggs");
+		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
+				"/uri/%fred%", "", "", ""));
+		fixture.doCells(t);
+		assertTrue(extractCell2(t).contains("/uri/bloggs"));
 	}
 
 	@Test
