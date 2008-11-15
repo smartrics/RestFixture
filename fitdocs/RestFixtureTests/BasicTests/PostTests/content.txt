@@ -4,9 +4,9 @@ Posting an XML should create a resource
 
 !*** Note
 You set the body for the POST operation with the setBody.
-Here you can see how '''let''' is used. The first cell is the _label_ of the variable.
-The follwoing cell indicates where to get the data from. That is either the _header_ or the _body_ of the last successful HTTP response
-Then the expression to extract the value to be assigned to he variable. For _header_ it has to be a regular expression, for _body_ it
+Here you can see how '''let''' is used. The first cell is the ''label'' of the variable.
+The follwoing cell indicates where to get the data from. That is either the ''header'' or the _body_ of the last successful HTTP response
+Then the expression to extract the value to be assigned to he variable. For ''header'' it has to be a regular expression, for _body_ it
 has to be an XPath whose execution must return a String node.
 ***!
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
@@ -19,6 +19,8 @@ Variables are global: here the GET op is executed on an URI containing '''%id%''
 The test succeedes only if the resulting XPath match the XML used for the creation of the resource.
 You can also put variables in the expected result
 The subsequent '''let''' operation shows how to use XPaths in the body.
+
+Note also that labels are risolved in '''fit.Fixture.getSymbol()''' if not found in the local label value store.
 ***!
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
 |GET    | /resources/%id% | 200 | |!-
