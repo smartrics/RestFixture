@@ -21,6 +21,9 @@
 package smartrics.rest.client;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.List;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -29,6 +32,7 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -91,7 +95,7 @@ public class RestClientImpl implements RestClient {
 	/**
 	 * @see {@link smartrics.rest.client.RestClient#execute(java.lang.String, smartrics.rest.client.RestRequest)}
 	 */
-	public RestResponse execute(String hostAddr, RestRequest request) {
+	public RestResponse execute(String hostAddr, final RestRequest request) {
 		if (request == null || !request.isValid())
 			throw new IllegalArgumentException("Invalid request " + request);
 		if (request.getTransactionId() == null)
@@ -102,7 +106,32 @@ public class RestClientImpl implements RestClient {
 		setUri(m, hostAddr, request);
 		m.setQueryString(request.getQuery());
 		if (m instanceof EntityEnclosingMethod) {
-			((EntityEnclosingMethod) m).setRequestBody(request.getBody());
+			final String data = request.getBody();
+			RequestEntity requestEntity = new RequestEntity() {
+				public boolean isRepeatable() {
+					return true;
+				}
+
+				public void writeRequest(OutputStream out) throws IOException {
+					PrintWriter printer = new PrintWriter(out);
+					printer.print(data);
+					printer.flush();
+				}
+
+				public long getContentLength() {
+					return data.getBytes().length;
+				}
+
+				public String getContentType() {
+				 List<smartrics.rest.client.RestData.Header> values = request
+							.getHeader("Content-Type");
+					String v = "text/xml";
+					if (values.size() != 0)
+						v = values.get(0).getValue();
+					return v;
+				}
+			};
+			((EntityEnclosingMethod) m).setRequestEntity(requestEntity);
 		}
 		RestResponse resp = new RestResponse();
 		resp.setTransactionId(request.getTransactionId());
@@ -186,6 +215,9 @@ public class RestClientImpl implements RestClient {
 		} catch (IllegalAccessException e) {
 			throw new IllegalStateException("The default ctor for type "
 					+ className + " cannot be invoked", e);
+		} catch (RuntimeException e) {
+			throw new IllegalStateException("Exception when instantiating: "
+					+ className, e);
 		}
 
 	}

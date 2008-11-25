@@ -16,7 +16,7 @@ public class RestFixtureConfigTest {
 	private static final String CONFIG_NAME = "configName";
 	private Config namedConfig;
 	private Config defaultNamedConfig;
-	
+
 	@Before
 	public void setUp(){
 		defaultNamedConfig = new Config();
@@ -28,7 +28,7 @@ public class RestFixtureConfigTest {
 		namedConfig.clear();
 		defaultNamedConfig.clear();
 	}
-	
+
 	@Test
 	public void mustStoreDataInNamedConfigWhoseNameIsPassedAsFirstArgToTheFixture() {
 		RestFixtureConfig fixture = new RestFixtureConfig() {
@@ -64,7 +64,7 @@ public class RestFixtureConfigTest {
 		rBuff.append("</table>");
 		try {
 			t = new Parse(rBuff.toString(), new String[] { "table", "row",
-					"col" }, 2, 0);
+					"col" }, 1, 0);
 		} catch (FitParseException e) {
 			fail("Unable to build Parse object");
 		}
