@@ -48,9 +48,9 @@
 
 	<target name="compile" depends="init">
 		<mkdir dir="${build}/classes/main" />
-		<javac includes="**/*.java" debug="${build.debug}" 
+		<javac includes="**/*.java" debug="${build.debug}"
 			destdir="${build}/classes/main"
-			target="1.5">
+			target="${build.target}">
 			<src path="${src}" />
 			<classpath refid="project.classpath" />
 		</javac>
@@ -59,7 +59,7 @@
 	<target name="test" depends="compile">
 		<mkdir dir="${build}/classes/unit" />
 		<mkdir dir="${reports}/unit" />
-		<javac debug="${build.debug}" destdir="${build}/classes/unit">
+		<javac debug="${build.debug}" destdir="${build}/classes/unit" target="${build.target}">
 			<classpath refid="test.classpath" />
 			<src path="${src.unit}" />
 			<include name="**/*.java" />
@@ -78,9 +78,9 @@
 
 	<target name="compile-cat" depends="compile">
 		<mkdir dir="${build}/classes/cat" />
-		<javac includes="**/*.java" 
-			debug="${build.debug}" 
-			target="1.5"
+		<javac includes="**/*.java"
+			debug="${build.debug}"
+			target="${build.target}"
 			destdir="${build}/classes/cat">
 			<src path="${src.cat}" />
 			<classpath refid="test.classpath" />
