@@ -105,8 +105,6 @@ public class RestFixtureConfig extends Fixture {
 
 	private Config config;
 
-	private String currentKey;
-
 	/**
 	 * processes each row in the config fixture table and loads the key/value
 	 * pairs. The fixture optional first argument is the config name. If not
