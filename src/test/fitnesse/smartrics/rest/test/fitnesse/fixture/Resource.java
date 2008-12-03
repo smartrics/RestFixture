@@ -34,6 +34,7 @@ public class Resource {
 	}
 
 	public Resource(String xmlContent) {
+		this.id = -1;
 		this.name = xmlContent.split("<name>")[1].split("</name>")[0];
 		this.data = xmlContent.split("<data>")[1].split("</data>")[0];
 	}
@@ -85,6 +86,6 @@ public class Resource {
 		return "{ \"resource\" : { \"id\" : \"" + getId() + "\", \"name\" : \""
 				+ getName() + "\", \"data\" : \"" + getData() + "\" } }";
 	}
-	
-	
+
+
 }

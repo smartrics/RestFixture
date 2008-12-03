@@ -154,7 +154,7 @@ public class RestFixture extends ActionFixture {
 	private static final Pattern FIND_VARS_PATTERN = Pattern
 			.compile("\\%([a-zA-Z0-9]+)\\%");
 	private static Log LOG = LogFactory.getLog(RestFixture.class);
-	private final Variables variables = new Variables();
+	private final static Variables variables = new Variables();
 
 	protected Object baseUrl;
 

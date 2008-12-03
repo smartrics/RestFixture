@@ -20,49 +20,54 @@
  */
 package smartrics.rest.test.fitnesse.fixture;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Resources {
-	private final List<Resource> resources = new ArrayList<Resource>();
+	private final Map<Integer, Resource> resources = Collections
+			.synchronizedMap(new HashMap<Integer, Resource>());
 	private static Resources instance = new Resources();
-	public static Resources getInstance(){
+	private static int counter = 0;
+
+	public static Resources getInstance() {
 		return instance;
 	}
 
-	public void clear(){
+	public void clear() {
 		resources.clear();
 	}
 
 	public void add(Resource r) {
-		resources.add(r);
+		if (r.getId() == -1) {
+			r.setId(newCounter());
+		}
+		resources.put(r.getId(), r);
 	}
 
 	public Resource get(int i) {
 		return resources.get(i);
 	}
 
-	public int size(){
+	public int size() {
 		return resources.size();
-	}
-
-	public void add(int index, Resource element) {
-		resources.add(index, element);
 	}
 
 	public Resource remove(int index) {
 		return resources.remove(index);
 	}
 
-	public boolean remove(Object o) {
-		return resources.remove(o);
+	public void remove(Resource o) {
+		resources.remove(o.getId());
 	}
 
 	public void reset() {
 		resources.clear();
-		resources.add(new Resource(0, "a funky name", "an important message"));
+		add(new Resource(0, "a funky name", "an important message"));
 	}
 
+	private static synchronized int newCounter() {
+		return counter++;
+	}
 
 }
-

@@ -8,7 +8,7 @@
     <property name="fitnesse.path" value="${ant.project.name}Tests" />
     <property name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
 	<property name="src.unit" value="${basedir}/src/test/java" />
-	<property name="src.cat" value="${basedir}/src/test/fitnesse" />
+    <property name="src.cat" value="${basedir}/src/test/fitnesse" />
 	<property name="src" value="${basedir}/src/main/java" />
 	<property name="resources" value="${basedir}/src/main/resources" />
 	<property name="build" value="${basedir}/build" />
@@ -22,7 +22,7 @@
 	<property name="artifacts" value="${dist}/artifacts" />
 
 	<path id="project.classpath">
-		<pathelement location="${src.resources}" />
+		<pathelement location="${resources}" />
 		<fileset dir="${lib}">
 			<include name="**/*.jar" />
 		</fileset>
