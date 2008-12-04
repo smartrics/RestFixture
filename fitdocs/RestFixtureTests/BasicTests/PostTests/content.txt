@@ -24,7 +24,6 @@ Note also that labels are risolved in '''fit.Fixture.getSymbol()''' if not found
 ***!
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
 |GET    | /resources/%id% | 200 | |!-
- /resource/id[text()=%id%]<br/>
  /resource/name[text()='test post']<br/>
  /resource/data[text()='some data']
 -! |
@@ -35,4 +34,9 @@ Expectations can be asserted also in json format for responses whose content typ
 Variables may be substitued in the expected result
 ****!
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
-|GET    | /resources/%id%.json | 200 |Content-Type : application/json |!- { "resource" : { "id" : "%id%", "name" : "test post", "data" : "some data" } } -!|
+|setBody|!- { "resource" : { "name" : "test post", "data" : "some data" } } -!|
+|POST   | /resources/ | 201 | | no-body |
+|let    | id | header | Location:/resources/(.+) | |
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/%id%.json | 200 |Content-Type : application/json |!- { "resource" : { "name" : "test post", "data" : "some data" } } -!|

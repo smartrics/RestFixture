@@ -34,7 +34,7 @@ public class HttpServerFixture extends ActionFixture{
 	public void start(int port){
 		if(server==null){
 			server = new HttpServer(port);
-			server.addServlet(new ResourcesServlet(), ResourcesServlet.CONTEXT_ROOT);
+			server.addServlet(new ResourcesServlet(), "/");
 			server.start();
 		}
 	}

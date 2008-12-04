@@ -20,7 +20,6 @@
 	<classpathentry kind="lib" path="lib/json-lib/json-lib-2.2.2-jdk15.jar"/>
 	<classpathentry kind="lib" path="lib/picbuilder/PicBuilder.jar"/>
 	<classpathentry kind="lib" path="lib/fitnesse/fitnesse.jar" sourcepath="/opt/java/fitnesse/src/src"/>
-	<classpathentry kind="lib" path="lib/blog.jar"/>
 	<classpathentry kind="lib" path="lib/restclient/RestClient.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

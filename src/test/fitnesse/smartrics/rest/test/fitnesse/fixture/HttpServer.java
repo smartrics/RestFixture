@@ -97,7 +97,7 @@ public class HttpServer {
 		connector.setPort(port);
 		return connector;
 	}
-	
+
 	public int getPort() {
 		return port;
 	}
@@ -148,7 +148,7 @@ public class HttpServer {
 	public static void main(String[] args) {
 		// as in EventListener
 		HttpServer server = new HttpServer(8765);
-		server.addServlet(new ResourcesServlet(), ResourcesServlet.CONTEXT_ROOT);
+		server.addServlet(new ResourcesServlet(), "/");
 		server.start();
 		server.join();
 	}

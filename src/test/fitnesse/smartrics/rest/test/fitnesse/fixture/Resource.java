@@ -21,45 +21,32 @@
 package smartrics.rest.test.fitnesse.fixture;
 
 public class Resource {
-	String name;
-	String data;
-	boolean deleted;
-	int id;
+	private String payload;
+	private String id;
+	private boolean deleted;
 
-	public Resource(int id, String name, String data) {
-		super();
-		this.name = name;
-		this.data = data;
+	public Resource(String id, String payload) {
+		this.payload = payload;
 		this.id = id;
 	}
 
 	public Resource(String xmlContent) {
-		this.id = -1;
-		this.name = xmlContent.split("<name>")[1].split("</name>")[0];
-		this.data = xmlContent.split("<data>")[1].split("</data>")[0];
+		this(null, xmlContent);
 	}
 
-	public String getName() {
-		return name;
+	public void setPayload(String payload) {
+		this.payload = payload;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public String getPayload() {
+		return payload;
 	}
 
-	public String getData() {
-		return data;
-	}
-
-	public void setData(String data) {
-		this.data = data;
-	}
-
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -71,21 +58,9 @@ public class Resource {
 		this.deleted = deleted;
 	}
 
-	public String toXml() {
-		return "<resource>" + System.getProperty("line.separator")
-				+ "   <id>"
-				+ getId() + "</id>" + System.getProperty("line.separator")
-				+ "   <name>" + getName() + "</name>"
-				+ System.getProperty("line.separator")
-				+ "   <data>"
-				+ getData() + "</data>"
-				+ System.getProperty("line.separator") + "</resource>";
+	@Override
+	public String toString() {
+		return getPayload() == null ? "" : getPayload();
 	}
-
-	public String toJson() {
-		return "{ \"resource\" : { \"id\" : \"" + getId() + "\", \"name\" : \""
-				+ getName() + "\", \"data\" : \"" + getData() + "\" } }";
-	}
-
 
 }

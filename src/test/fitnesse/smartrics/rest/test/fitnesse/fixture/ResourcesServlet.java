@@ -39,7 +39,7 @@ import smartrics.rest.client.RestResponse;
 import smartrics.rest.client.RestRequest.Method;
 
 public class ResourcesServlet extends HttpServlet {
-	public static String CONTEXT_ROOT = "/resources";
+	public static String _CONTEXT_ROOT = "/resources";
 	private static final long serialVersionUID = -7012866414216034826L;
 	private final Resources resources = Resources.getInstance();
 	private static Log log = LogFactory.getLog(ResourcesServlet.class);
@@ -50,31 +50,24 @@ public class ResourcesServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		String uri = req.getRequestURI();
 		log.debug("REQUEST ========= " + req.toString());
+		String uri = sanitise(req.getRequestURI());
+		String id = getId(uri);
+		String type = getType(uri);
+		String extension = getExtension(uri);
 		echoHeader(req, resp);
-		if (uri.endsWith("/"))
-			uri = uri.substring(0, uri.length() - 1);
 		try {
-			int pos = uri.lastIndexOf("/");
-			String sId = uri.substring(pos + 1, pos + 2);
-			int id = -1;
-			try {
-				id = Integer.parseInt(sId);
-			} catch (NumberFormatException e) {
-				// get on resource type
-			}
-			if (id == -1) {
-				list(resp, uri);
-				headers(resp, uri);
-			} else if (resources.get(id) == null) {
+			if (id == null) {
+				list(resp, type, extension);
+				headers(resp, extension);
+			} else if (resources.get(type, id) == null) {
 				notFound(resp);
 			} else {
-				if (resources.get(id).isDeleted()) {
+				if (resources.get(type, id).isDeleted()) {
 					notFound(resp);
 				} else {
-					found(resp, uri, id);
-					headers(resp, uri);
+					found(resp, type, id);
+					headers(resp, extension);
 				}
 			}
 		} catch (RuntimeException e) {
@@ -84,35 +77,60 @@ public class ResourcesServlet extends HttpServlet {
 		}
 	}
 
-	private void headers(HttpServletResponse resp, String uri) {
+	private String sanitise(String rUri) {
+		String uri = rUri;
+		if (uri.endsWith("/"))
+			uri = uri.substring(0, uri.length() - 1);
+		return uri;
+	}
+
+	private void headers(HttpServletResponse resp, String extension) {
 		resp.setStatus(HttpServletResponse.SC_OK);
-		resp.addHeader("Content-Type", "application/" + extension(uri));
+		resp.addHeader("Content-Type", "application/" + extension);
 	}
 
-	private void list(HttpServletResponse resp, String uri) throws IOException {
-		StringBuffer buffer = new StringBuffer();
-		if ("json".equals(extension(uri))) {
-			buffer.append("resources : {");
-			for (int i = 0; i < resources.size(); i++) {
-				buffer.append(resources.get(i).toJson());
-				if (i != resources.size() - 1) {
-					buffer.append(", ");
-				}
-			}
-			buffer.append(" }");
+	private void list(HttpServletResponse resp, String type, String extension)
+			throws IOException {
+		if (type.contains("root-context")) {
+			list(resp, extension);
 		} else {
-			buffer.append("<resources>");
-			for (int i = 0; i < resources.size(); i++) {
-				buffer.append(resources.get(i).toXml());
+			StringBuffer buffer = new StringBuffer();
+			String slashremoved = type.substring(1);
+			if ("json".equals(extension))
+				buffer.append("{ \"" + slashremoved + "\" : ");
+			else
+				buffer.append("<" + slashremoved + ">");
+			for (Resource r : resources.asCollection(type)) {
+				buffer.append(r.getPayload());
 			}
-			buffer.append("</resources>");
+			if ("json".equals(extension))
+				buffer.append("}");
+			else
+				buffer.append("</" + slashremoved + ">");
+			resp.getOutputStream().write(buffer.toString().getBytes());
 		}
-		resp.getOutputStream().write(buffer.toString().getBytes());
-		resp.setHeader("Content-Lenght", Integer.toString(buffer.toString()
-				.getBytes().length));
 	}
 
-	private String extension(String uri) {
+	private void list(HttpServletResponse resp, String extension)
+			throws IOException {
+		StringBuffer buffer = new StringBuffer();
+		if ("json".equals(extension))
+			buffer.append("{ \"root-context\" : ");
+		else
+			buffer.append("<root-context>");
+		resp.getOutputStream().write(buffer.toString().getBytes());
+		for (String s : resources.contexts()) {
+			list(resp, s, extension);
+		}
+		buffer = new StringBuffer();
+		if ("json".equals(extension))
+			buffer.append("}");
+		else
+			buffer.append("</root-context>");
+		resp.getOutputStream().write(buffer.toString().getBytes());
+	}
+
+	private String getExtension(String uri) {
 		int extensionPoint = uri.lastIndexOf(".");
 		if (extensionPoint != -1) {
 			return uri.substring(extensionPoint + 1);
@@ -121,23 +139,29 @@ public class ResourcesServlet extends HttpServlet {
 		}
 	}
 
-	private void found(HttpServletResponse resp, String uri, int id)
+	private void found(HttpServletResponse resp, String type, String id)
 			throws IOException {
 		StringBuffer buffer = new StringBuffer();
-		if ("json".equals(extension(uri))) {
-			buffer.append(resources.get(id).toJson());
-		} else {
-			buffer.append(resources.get(id).toXml());
-		}
+		buffer.append(resources.get(type, id));
 		resp.getOutputStream().write(buffer.toString().getBytes());
-		resp.setHeader("Content-Lenght", Integer.toString(buffer.toString()
-				.getBytes().length));
+		// resp.setHeader("Content-Lenght",
+		// Integer.toString(buffer.toString().getBytes().length));
+	}
+
+	private String getType(String uri) {
+		if (uri.length() <= 1)
+			return "/root-context";
+		int pos = uri.substring(1).indexOf('/');
+		String ret = uri;
+		if (pos >= 0)
+			ret = uri.substring(0, pos + 1);
+		return ret;
 	}
 
 	private void notFound(HttpServletResponse resp) throws IOException {
 		resp.getOutputStream().write("".getBytes());
 		resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-		resp.setHeader("Content-Lenght", "0");
+		// resp.setHeader("Content-Lenght", "0");
 	}
 
 	private void echoHeader(HttpServletRequest req, HttpServletResponse resp) {
@@ -150,11 +174,19 @@ public class ResourcesServlet extends HttpServlet {
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		log.debug(req.toString());
+		String uri = sanitise(req.getRequestURI());
+		String type = getType(uri);
 		echoHeader(req, resp);
-		int id = getId(req);
-		Resource resource = resources.remove(id);
-		// resource.setDeleted(true);
-		// resources.add(id, resource);
+		String id = getId(uri);
+		Resource resource = resources.get(type, id);
+		if (resource != null) {
+			// resource.setDeleted(true);
+			resources.remove(type, id);
+			resp.getOutputStream().write("".getBytes());
+			resp.setStatus(HttpServletResponse.SC_OK);
+		} else {
+			notFound(resp);
+		}
 		resp.getOutputStream().write("".getBytes());
 		resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		log.debug(resp.toString());
@@ -165,23 +197,34 @@ public class ResourcesServlet extends HttpServlet {
 			throws ServletException, IOException {
 		log.debug(req.toString());
 		echoHeader(req, resp);
-		int id = getId(req);
-		String content = getContent(req);
-		resources.remove(id);
-		Resource resource = new Resource(content);
-		resource.setId(id);
-		resources.add(resource);
-		resp.getOutputStream().write("".getBytes());
-		resp.setStatus(HttpServletResponse.SC_OK);
+		String uri = sanitise(req.getRequestURI());
+		String id = getId(uri);
+		String type = getType(uri);
+		String content = getContent(req.getInputStream());
+		Resource resource = resources.get(type, id);
+		if (resource != null) {
+			resource.setPayload(content);
+			resp.getOutputStream().write("".getBytes());
+			resp.setStatus(HttpServletResponse.SC_OK);
+		} else {
+			notFound(resp);
+		}
 		log.debug(resp.toString());
 	}
 
-	private int getId(HttpServletRequest req) {
-		String uri = req.getRequestURI();
-		int pos = uri.lastIndexOf("/");
-		String sId = uri.substring(pos + 1);
-		int id = Integer.parseInt(sId);
-		return id;
+	private String getId(String uri) {
+		if (uri.length() <= 1)
+			return null;
+		int pos = uri.substring(1).lastIndexOf("/");
+		String sId = null;
+		if (pos > 0)
+			sId = uri.substring(pos + 2);
+		if (sId != null) {
+			int pos2 = sId.lastIndexOf('.');
+			if (pos2 >= 0)
+				sId = sId.substring(0, pos2);
+		}
+		return sId;
 	}
 
 	@Override
@@ -189,29 +232,26 @@ public class ResourcesServlet extends HttpServlet {
 			throws ServletException, IOException {
 		log.debug(req.toString());
 		echoHeader(req, resp);
-		String content = getContent(req);
-		if (content.trim().startsWith("<")) {
-			Resource newResource = new Resource(content);
-			resources.add(newResource);
-			// TODO: should put the ID in
-			resp.setStatus(HttpServletResponse.SC_CREATED);
-			final String contextRoot = getContextRoot(req);
-			resp.addHeader("Location", contextRoot + "/"
-					+ newResource.getId());
-		} else {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+		String uri = sanitise(req.getRequestURI());
+		String type = getType(uri);
+		try {
+			String content = getContent(req.getInputStream());
+			if (content.trim().startsWith("<") || content.trim().endsWith("}")) {
+				Resource newResource = new Resource(content);
+				resources.add(type, newResource);
+				// TODO: should put the ID in
+				resp.setStatus(HttpServletResponse.SC_CREATED);
+				resp.addHeader("Location", type + "/" + newResource.getId());
+			} else {
+				resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			}
+		} catch (RuntimeException e) {
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 		log.debug(resp.toString());
 	}
 
-	private String getContextRoot(HttpServletRequest req) {
-		if (req.getContextPath().indexOf(CONTEXT_ROOT) >= 0)
-			return CONTEXT_ROOT;
-		return "";
-	}
-
-	private String getContent(HttpServletRequest req) throws IOException {
-		InputStream is = req.getInputStream();
+	private String getContent(InputStream is) throws IOException {
 		StringBuffer sBuff = new StringBuffer();
 		int c;
 		while ((c = is.read()) != -1)
@@ -223,28 +263,34 @@ public class ResourcesServlet extends HttpServlet {
 	public static void main(String[] args) {
 		RestClient c = new RestClientImpl(new HttpClient());
 		RestRequest req = new RestRequest();
+
 		req.setBody("<resource><name>n</name><data>d1</data></resource>");
 		req.setResource("/resources/");
 		req.setMethod(Method.Post);
 		RestResponse res = c.execute("http://localhost:8765", req);
-		System.out.println("=======\n" + res);
+		System.out.println("=======>\n" + res + "\n<=======");
 
-		req.setResource("/resources/0");
-		req.setMethod(Method.Delete);
-		res = c.execute("http://localhost:8765", req);
-		System.out.println("=======\n" + res);
-
-		req.setMethod(Method.Post);
-		req.setBody("<resource><name>n</name><data>d2</data></resource>");
-		res = c.execute("http://localhost:8765", req);
-		System.out.println("=======\n" + res);
-
-		req.setResource("/resources/0");
+		String loc = res.getHeader("Location").get(0).getValue();
+		req.setResource(loc + ".json");
 		req.setMethod(Method.Get);
 		res = c.execute("http://localhost:8765", req);
-		System.out.println("=======\n" + res);
+		System.out.println("=======>\n" + res + "\n<=======");
 
+		req.setMethod(Method.Put);
+		req
+				.setBody("<resource><name>another name</name><data>another data</data></resource>");
+		res = c.execute("http://localhost:8765", req);
+		System.out.println("=======>\n" + res + "\n<=======");
 
+		req.setResource("/resources/");
+		req.setMethod(Method.Get);
+		res = c.execute("http://localhost:8765", req);
+		System.out.println("=======>\n" + res + "\n<=======");
+
+		req.setMethod(Method.Delete);
+		req.setResource(loc);
+		res = c.execute("http://localhost:8765", req);
+		System.out.println("=======>\n" + res + "\n<=======");
 	}
 
 }
