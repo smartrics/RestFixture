@@ -86,7 +86,7 @@ public class RestFixtureWithSeq extends RestFixture {
 	protected boolean validateState() {
 		return baseUrl != null && getPictureName() != null;
 	}
-	
+
 	@Override
 	protected void notifyInvalidState(boolean state) {
 		if (!state) {
@@ -266,7 +266,12 @@ class MyFixtureListener implements FixtureListener {
 		// + graphFile.getAbsolutePath());
 		// }
 		if (graphFile.exists()) {
-			graphFile.delete();
+			try {
+				graphFile.delete();
+			} catch (RuntimeException e) {
+				// ingore if cant delete
+				// TODO: should throw exception if file not deleted?
+			}
 		}
 	}
 

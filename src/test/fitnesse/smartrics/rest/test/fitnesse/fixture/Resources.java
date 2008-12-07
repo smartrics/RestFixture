@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 public class Resources {
 	private final Map<String, Map<String, Resource>> resourceDb = Collections
@@ -49,7 +50,8 @@ public class Resources {
 		Collection<Resource> c = new Vector<Resource>();
 		Map<String, Resource> m = resourceDb.get(context);
 		if (m != null) {
-			for (String s : m.keySet()) {
+			for (Entry<String, Resource> e : m.entrySet()) {
+				String s = e.getKey();
 				c.add(m.get(s));
 			}
 		}

@@ -34,11 +34,11 @@ import org.junit.Test;
 public class XPathBodyTypeAdapterTest {
 
     private final BodyTypeAdapter adapter = new XPathBodyTypeAdapter();
-    private final String xml0 = "<a><b>12</b><b>23</b><c>XY</c></a>";
-    private final String html1 = "&lt;a&gt;&nbsp;1&amp;&lt;/a&gt;";
-    private final String xml1 = "<a> 1&</a>";
-    private final List<String> xPaths = Arrays.asList("/a", "//b");
-    private final String xPathsAsString = "/a<br/>//b";
+    private final static String xml0 = "<a><b>12</b><b>23</b><c>XY</c></a>";
+	private final static String html1 = "&lt;a&gt;&nbsp;1&amp;&lt;/a&gt;";
+	private final static String xml1 = "<a> 1&</a>";
+	private final static List<String> xPaths = Arrays.asList("/a", "//b");
+    private final static String xPathsAsString = "/a<br/>//b";
 
     @Test
     public void shouldIdentifyContentObjectsWithNoBodyAsBeingEqual() {

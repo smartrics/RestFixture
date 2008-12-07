@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -101,7 +102,8 @@ public final class Tools {
 	public static String convertMapToString(Map<String, String> map, String nvSep, String entrySep){
 		StringBuffer sb = new StringBuffer();
 		if(map != null){
-			for(String el : map.keySet()){
+			for (Entry<String, String> entry : map.entrySet()) {
+				String el = entry.getKey();
 				sb.append(convertEntryToString(el, map.get(el), nvSep)).append(entrySep);
 			}
 		}

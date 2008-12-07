@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -619,7 +620,8 @@ public class RestFixture extends ActionFixture {
 			}
 		}
 		String newText = text;
-		for (String k : replacements.keySet()) {
+		for (Entry<String, String> en : replacements.entrySet()) {
+			String k = en.getKey();
 			String replacement = replacements.get(k);
 			if (replacement != null)
 				newText = newText.replace(k, replacement);
