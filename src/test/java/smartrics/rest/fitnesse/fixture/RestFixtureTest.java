@@ -180,6 +180,22 @@ public class RestFixtureTest {
 	}
 
 	@Test
+	public void mustExecuteAnyVerbOnAnyUriWithQueryString() {
+		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
+				"/uri?a=1", "", "", ""));
+		fixture.doCells(t);
+		assertAllCells(
+				t,
+				"GET",
+				buildResUriLink("/uri?a=1"),
+				"<span class=\"fit_grey\">200</span>",
+				"<span class=\"fit_grey\">h1&nbsp;:&nbsp;v1<br/>h2&nbsp;:&nbsp;v2<br/>Content-Type&nbsp;:&nbsp;application/xml</span>",
+				"<span class=\"fit_grey\">&lt;body&gt;text&lt;/body&gt;</span>");
+		assertEquals("a=1", fixture.getLastRequest().getQuery());
+		assertEquals("/uri", fixture.getLastRequest().getResource());
+	}
+
+	@Test
 	public void mustMatchRequestsWithNoBodyExpressedAsNoBodyString() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow(
 				"DELETE", "/uri", "200", "", "no-body"));

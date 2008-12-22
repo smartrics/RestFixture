@@ -524,7 +524,11 @@ public class RestFixture extends ActionFixture {
 		setLastRequest(new RestRequest());
 		getLastRequest().setMethod(RestRequest.Method.valueOf(method));
 		getLastRequest().addHeaders(getHeaders());
-		getLastRequest().setResource(resUrl);
+		String uri[] = resUrl.split("\\?");
+		getLastRequest().setResource(uri[0]);
+		if (uri.length == 2) {
+			getLastRequest().setQuery(uri[1]);
+		}
 		if ("Post".equals(method) || "Put".equals(method)) {
 			String rBody = resolve(FIND_VARS_PATTERN, body);
 			getLastRequest().setBody(rBody);
@@ -534,9 +538,13 @@ public class RestFixture extends ActionFixture {
 	}
 
 	private void completeHttpMethodExecution() {
-		String u = restClient.getBaseUrl() + getLastResponse().getResource();
+		String uri = getLastResponse().getResource();
+		if (getLastRequest().getQuery() != null) {
+			uri = uri + "?" + getLastRequest().getQuery();
+		}
+		String u = restClient.getBaseUrl() + uri;
 		cells.more.body = "<a href='" + u + "'>"
-				+ getLastResponse().getResource() + "</a>";
+				+ uri + "</a>";
 		process(cells.more.more, getLastResponse().getStatusCode().toString(),
 				new StatusCodeTypeAdapter());
 		process(cells.more.more.more, getLastResponse().getHeaders(),
