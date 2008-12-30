@@ -22,6 +22,7 @@ package smartrics.rest.fitnesse.fixture;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
@@ -79,14 +80,14 @@ public class RestFixtureTest {
 	}
 
 	@Test
-	public void shouldHaveConfigNameAsOptionalSecondParameterToDefaultWhenNotSpecified() {
+	public void mustHaveConfigNameAsOptionalSecondParameterToDefaultWhenNotSpecified() {
 		Parse parse = buildEmptyParse();
 		fixture.doCells(parse);
 		assertEquals(Config.DEFAULT_CONFIG_NAME, fixture.getConfig().getName());
 	}
 
 	@Test
-	public void shouldHaveConfigNameAsOptionalSecondParameterToBeSetToSpecifiedValue() {
+	public void mustHaveConfigNameAsOptionalSecondParameterToBeSetToSpecifiedValue() {
 		fixture = new RestFixture() {
 			{
 				super.args = new String[] { BASE_URL, "configName" };
@@ -110,7 +111,7 @@ public class RestFixtureTest {
 	}
 
 	@Test
-	public void shoudlUseDefaultHeadersIfDefinedOnNamedConfig() {
+	public void mustUseDefaultHeadersIfDefinedOnNamedConfig() {
 		config = new Config("config.with.headers");
 		config.add("restfixure.default.headers", "added1 : 1"
 				+ System.getProperty("line.separator") + "added2 : 2");
@@ -286,6 +287,29 @@ public class RestFixtureTest {
 				"<span class=\"fit_grey\">&lt;body&gt;text&lt;/body&gt;</span>");
 	}
 
+
+	@Test
+	public void mustExpectVerbOnFirstCell() {
+		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
+				"/uri", "", "", ""));
+		fixture.doCells(t);
+		assertEquals("GET", extractCell1(t));
+		t = helper.createFitTestInstance(helper.createFitTestRow("POST",
+				"/uri", "", "", ""));
+		fixture.body("<post/>");
+		fixture.doCells(t);
+		assertEquals("POST", extractCell1(t));
+		t = helper.createFitTestInstance(helper.createFitTestRow("DELETE",
+				"/uri", "", "", ""));
+		fixture.doCells(t);
+		assertEquals("DELETE", extractCell1(t));
+		t = helper.createFitTestInstance(helper.createFitTestRow("PUT", "/uri",
+				"", "", ""));
+		fixture.doCells(t);
+		fixture.body("<put/>");
+		assertEquals("PUT", extractCell1(t));
+	}
+
 	/**
 	 * expectations on body are verified by executing xpaths on the returned
 	 * body. it's assumed that the return body is XML. the expectation is
@@ -387,7 +411,7 @@ public class RestFixtureTest {
 	}
 
 	@Test
-	public void shouldUseValueOnSymbolMapIfNoVariableIsFoundInTheLocalMap() {
+	public void mustUseValueOnSymbolMapIfNoVariableIsFoundInTheLocalMap() {
 		Fixture.setSymbol("fred", "bloggs");
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
 				"/uri/%fred%", "", "", ""));
@@ -396,25 +420,20 @@ public class RestFixtureTest {
 	}
 
 	@Test
-	public void shoudlExecuteVerbOnAUriWithExcpectationsSetOnHeaders() {
+	public void mustSetValueOnSymbolMapIfVariableNameStartsWith$() {
+		// set up of a request which would genetate a response that can be used
+		// with LET
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
 				"/uri", "", "", ""));
 		fixture.doCells(t);
-		assertEquals("GET", extractCell1(t));
-		t = helper.createFitTestInstance(helper.createFitTestRow("POST",
-				"/uri", "", "", ""));
-		fixture.body("<post/>");
+		t = helper.createFitTestInstance(helper.createFitTestRow("let",
+				"$content", "body", "/body/text()", "text"));
 		fixture.doCells(t);
-		assertEquals("POST", extractCell1(t));
-		t = helper.createFitTestInstance(helper.createFitTestRow("DELETE",
-				"/uri", "", "", ""));
-		fixture.doCells(t);
-		assertEquals("DELETE", extractCell1(t));
-		t = helper.createFitTestInstance(helper.createFitTestRow("PUT", "/uri",
-				"", "", ""));
-		fixture.doCells(t);
-		fixture.body("<put/>");
-		assertEquals("PUT", extractCell1(t));
+		assertAllCells(t, "let", "$content", "body", "/body/text()", "text");
+		// no label should be defined in the local map
+		assertNull(new Variables().get("content"));
+		assertNull(new Variables().get("$content"));
+		assertEquals("text", Fixture.getSymbol("content"));
 	}
 
 	@Test
@@ -435,7 +454,7 @@ public class RestFixtureTest {
 	 * <code>| let | content |  body | /body/text() | |</code>
 	 */
 	@Test
-	public void mustAllowStorageInVariablesOfValuesExtractedViaXPathFromBody() {
+	public void mustAllowGlobalStorageOfValuesExtractedViaXPathFromBody() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
 				"/uri", "", "", ""));
 		fixture.doCells(t);
@@ -450,7 +469,7 @@ public class RestFixtureTest {
 	 * <code>| let | val | header | h1 : (\w\d) | |</code>
 	 */
 	@Test
-	public void mustAllowStorageInVariablesOfValuesExtractedViaRegexFromHeader() {
+	public void mustAllowGlobalStorageOfValuesExtractedViaRegexFromHeader() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
 				"/uri", "", "", ""));
 		fixture.doCells(t);

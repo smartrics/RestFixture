@@ -502,7 +502,13 @@ public class RestFixture extends ActionFixture {
 	}
 
 	private void assignVariable(String label, String val) {
-		variables.put(label, val);
+		String l = label;
+		if (label.startsWith("$")) {
+			l = label.substring(1);
+			Fixture.setSymbol(l, val);
+		} else {
+			variables.put(label, val);
+		}
 	}
 
 	private Map<String, String> getHeaders() {

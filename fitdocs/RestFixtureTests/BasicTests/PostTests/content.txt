@@ -20,14 +20,25 @@ The test succeedes only if the resulting XPath match the XML used for the creati
 You can also put variables in the expected result
 The subsequent '''let''' operation shows how to use XPaths in the body.
 
-Note also that labels are risolved in '''fit.Fixture.getSymbol()''' if not found in the local label value store.
+Label values can be accessed from code using '''new Variables().get("labelname");'''
 ***!
+
+!*** Note on fit.Fixture symbol map
+Labels are resolved in '''fit.Fixture.getSymbol()''' if not found in the local label value store.
+
+Labels whose name starts with $ are defined in the Symbol map in the '''fit.Fixture''' (and not in the local label store). In this way, values extracted with '''let''' 
+can be shared across various fixtures.
+***!
+
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
 |GET    | /resources/%id% | 200 | |!-
  /resource/name[text()='test post']<br/>
  /resource/data[text()='some data']
 -! |
 |let    | name | body | /resource/name/text() | |
+|let    | $symName | body | /resource/name/text() | |
+
+
 
 !**** Json
 Expectations can be asserted also in json format for responses whose content type is 'application/json'
