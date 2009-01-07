@@ -50,8 +50,9 @@ public class HeadersTypeAdapter extends RestDataTypeAdapter {
 
 	private Header find(Collection<Header> actual, Header k) {
 		for(Header h : actual){
-			if(h.getName().equals(k.getName()) && Tools.regex(h.getValue(), k.getValue()))
+			if(h.getName().equals(k.getName()) && Tools.regex(h.getValue(), k.getValue())) {
 				return h;
+			}
 		}
 		return null;
 	}
@@ -66,7 +67,7 @@ public class HeadersTypeAdapter extends RestDataTypeAdapter {
 			String[] nvpArray = expStr.split(System.getProperty("line.separator"));
 			for(String nvp : nvpArray){
 				try{
-					String[] nvpEl = nvp.split(":");
+					String[] nvpEl = nvp.split(":", 2);
 					expected.add(new Header(nvpEl[0].trim(), nvpEl[1].trim()));
 				} catch(RuntimeException e){
 					throw new IllegalArgumentException("Each entry in the must be separated by \\n and each entry must be expressed as a name:value");

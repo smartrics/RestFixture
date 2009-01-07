@@ -34,19 +34,23 @@ import smartrics.rest.client.RestData.Header;
 
 public class HeadersTypeAdapterTest {
 
-	private HeadersTypeAdapter adapter = new HeadersTypeAdapter();
-	private String ls = System.getProperty("line.separator");
-	private Header h0 = new Header("n0", "v0");
-	private Header h1 = new Header("n1", "v1");
-	private Header h = new Header("n", "v");
-	private Header h2 = new Header("n1", "v1");
-	private Header h3 = new Header("n3", "v3");
-	private Collection<Header> expected = Arrays.asList(h, h2, h3);
-	private Collection<Header> actualSubset = Arrays.asList(h, h2);
-	private Collection<Header> actualSame = Arrays.asList(h, h2, h3);
-	private Collection<Header> actualSuperset = Arrays.asList(h0, h1, h, h2, h3);
-	private String headersAsHtmlString = " n : v <br/> n1: v1 <br  /> n3 :v3 ";
-	private String headersAsOutputString = "n : v" + ls + "n1 : v1" + ls + "n3 : v3";
+	private final HeadersTypeAdapter adapter = new HeadersTypeAdapter();
+	private final String ls = System.getProperty("line.separator");
+	private final Header h0 = new Header("n0", "v0");
+	private final Header h1 = new Header("n1", "v1");
+	private final Header h = new Header("n", "v");
+	private final Header h2 = new Header("n1", "v1");
+	private final Header h3 = new Header("n3", "v3");
+	private final Header h4 = new Header("n", "http://something:port/blah:blah");
+	private final Collection<Header> expected = Arrays.asList(h, h2, h3);
+	private final Collection<Header> expectedWithColonsInValues = Arrays
+			.asList(h4, h2);
+	private final Collection<Header> actualSubset = Arrays.asList(h, h2);
+	private final Collection<Header> actualSame = Arrays.asList(h, h2, h3);
+	private final Collection<Header> actualSuperset = Arrays.asList(h0, h1, h, h2, h3);
+	private final String headersAsHtmlString = " n : v <br/> n1: v1 <br  /> n3 :v3 ";
+	private final String headersAsOutputString = "n : v" + ls + "n1 : v1" + ls + "n3 : v3";
+	private final String headersAsHtmlStringWithColonsInValue = " n : http://something:port/blah:blah <br/> n1: v1 ";
 
 	@Test
 	public void shouldIdentifyContentObjectsWithNoBodyAsBeingEqual(){
@@ -75,6 +79,17 @@ public class HeadersTypeAdapterTest {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void shouldParseHeadersInHtmlFormatWithMultipleColonsAsProperListOfHeaders() {
+		try {
+			Collection<Header> result = (Collection<Header>) adapter
+					.parse(headersAsHtmlStringWithColonsInValue);
+			assertEquals(expectedWithColonsInValues, result);
+		} catch (Exception e) {
+			fail();
+		}
+	}
 	@Test(expected=IllegalArgumentException.class)
 	public void shouldNotifyClientOfBadHeaderSyntax(){
 		try {
