@@ -7,7 +7,7 @@ Keep-Alive: 300
 Connection: keep-alive-!|
 
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://localhost:9011|twitterConfig|
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://twitter.com|twitterConfig|
 |GET|/statuses/friends_timeline.xml?page=1|200|Content-Type:application/xml| |
 
 
