@@ -56,6 +56,7 @@ public class ResourcesServlet extends HttpServlet {
 		String type = getType(uri);
 		String extension = getExtension(uri);
 		echoHeader(req, resp);
+		echoQString(req, resp);
 		try {
 			if (id == null) {
 				list(resp, type, extension);
@@ -74,6 +75,13 @@ public class ResourcesServlet extends HttpServlet {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		} finally {
 			log.debug("RESPONSE ========= " + resp.toString());
+		}
+	}
+
+	private void echoQString(HttpServletRequest req, HttpServletResponse resp) {
+		String qstring = req.getQueryString();
+		if (qstring != null) {
+			resp.setHeader("Query-String", qstring);
 		}
 	}
 

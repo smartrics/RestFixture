@@ -106,7 +106,7 @@
                 <include name="**/*.*" />
             </fileset>
         </copy>
-        <copy todir="${fitnesse.test.root}" overwrite="true">
+        <copy todir="${fitnesse.test.root}" overwrite="true" >
             <filterset>
                 <filter token="FITNESSE_HOME" value="${fitnesse.home}" />
                 <filter token="FITNESSE_TEST_ROOT" value="${fitnesse.test.root}" />

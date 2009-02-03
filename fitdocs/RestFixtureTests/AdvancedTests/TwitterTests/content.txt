@@ -1,0 +1,16 @@
+|!-smartrics.rest.fitnesse.fixture.RestFixtureConfig-!|twitterConfig|
+|http.basicauth.username|username|
+|http.basicauth.password|password|
+|restfixure.default.headers|!-Accept: application/xml
+Accept-Charset: utf-8
+Keep-Alive: 300
+Connection: keep-alive-!|
+
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://localhost:9011|twitterConfig|
+|GET|/statuses/friends_timeline.xml?page=1|200|Content-Type:application/xml| |
+
+
+
+
+
