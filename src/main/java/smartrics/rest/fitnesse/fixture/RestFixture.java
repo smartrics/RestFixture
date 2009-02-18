@@ -153,7 +153,7 @@ public class RestFixture extends ActionFixture {
 	private Map<String, String> defaultHeaders = new HashMap<String, String>();
 
 	private static final Pattern FIND_VARS_PATTERN = Pattern
-			.compile("\\%([a-zA-Z0-9]+)\\%");
+			.compile("\\%([a-zA-Z0-9_]+)\\%");
 	private static Log LOG = LogFactory.getLog(RestFixture.class);
 	private final static Variables variables = new Variables();
 
