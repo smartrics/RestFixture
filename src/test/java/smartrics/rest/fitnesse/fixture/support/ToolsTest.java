@@ -30,6 +30,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.xpath.XPathConstants;
+
 import org.junit.Test;
 
 public class ToolsTest {
@@ -93,11 +95,43 @@ public class ToolsTest {
 	}
 
 	@Test
-	public void shouldExtractXPathsFromXmlDocument(){
+	public void shouldExtractXPathsFromXmlDocumentAsNodeLists() {
 		String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
 		assertEquals(2, Tools.extractXPath("/a/c", xml).getLength());
-		assertEquals(1, Tools.extractXPath("/a/b[text()='test']", xml).getLength());
-		assertEquals("test", Tools.extractXPath("/a/b/text()", xml).item(0).getNodeValue());
+		assertEquals(1, Tools.extractXPath("/a/b[text()='test']", xml)
+				.getLength());
+		assertEquals("test", Tools.extractXPath("/a/b/text()", xml).item(0)
+				.getNodeValue());
+		assertEquals(1, Tools.extractXPath("/a[count(c)>0]", xml)
+				.getLength());
+		assertEquals(3, Tools.extractXPath("/a/b | /a/c | /a/X", xml)
+				.getLength());
+		assertEquals(3, Tools.extractXPath("/a/b | /a/c | /a/X", xml)
+				.getLength());
+	}
+
+	@Test
+	public void shouldExtractXPathsFromXmlDocumentAsStrings(){
+		String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
+		assertEquals("2", Tools.extractXPath("count(/a/c)", xml,
+				XPathConstants.STRING));
+
+	}
+
+	@Test
+	public void shouldExtractXPathsFromXmlDocumentAsNumber() {
+		String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
+		assertEquals(1.0, Tools.extractXPath("count(/a/b)", xml,
+				XPathConstants.NUMBER));
+
+	}
+
+	@Test
+	public void shouldExtractXPathsFromXmlDocumentAsBoolean() {
+		String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
+		assertEquals(Boolean.TRUE, Tools.extractXPath("count(/a/c)=2", xml,
+				XPathConstants.BOOLEAN));
+
 	}
 
 	@Test(expected=IllegalArgumentException.class)
