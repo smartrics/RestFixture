@@ -466,6 +466,21 @@ public class RestFixtureTest {
 	}
 
 	/**
+	 * <code>| let | content |  body | count(body) | |</code>
+	 */
+	@Test
+	public void mustAllowStorageOfValuesExtractedViaXPathsReturningStringValues() {
+		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
+				"/uri", "", "", ""));
+		fixture.doCells(t);
+		t = helper.createFitTestInstance(helper.createFitTestRow("let",
+				"contentCount", "body", "count(body)", "1"));
+		fixture.doCells(t);
+		assertAllCells(t, "let", "contentCount", "body", "count(body)", "1");
+		assertEquals("1", new Variables().get("contentCount"));
+	}
+
+	/**
 	 * <code>| let | val | header | h1 : (\w\d) | |</code>
 	 */
 	@Test
