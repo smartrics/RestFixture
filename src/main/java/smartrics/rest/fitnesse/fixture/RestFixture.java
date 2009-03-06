@@ -29,6 +29,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.xpath.XPathConstants;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -483,14 +485,33 @@ public class RestFixture extends ActionFixture {
 
 	private String handleXpathExpression(String label, String expr) {
 		// def. match only last response body
-		NodeList list = Tools.extractXPath(expr, getLastResponse().getBody());
-		Node item = list.item(0);
 		String val = null;
-		if (item != null) {
-			val = item.getTextContent();
+		try {
+			val = handleXPathAsNodeList(expr);
+		} catch (IllegalArgumentException e) {
+			// ignore - may be that it's eval to a string
 		}
+		if (val == null)
+			val = handleXPathAsString(expr);
 		if (val != null)
 			assignVariable(label, val);
+		return val;
+	}
+
+	private String handleXPathAsNodeList(String expr) {
+			NodeList list = Tools.extractXPath(expr, getLastResponse()
+					.getBody());
+			Node item = list.item(0);
+			String val = null;
+			if (item != null) {
+				val = item.getTextContent();
+			}
+		return val;
+	}
+
+	private String handleXPathAsString(String expr) {
+		String val = (String) Tools.extractXPath(expr, getLastResponse()
+				.getBody(), XPathConstants.STRING);
 		return val;
 	}
 
@@ -549,8 +570,7 @@ public class RestFixture extends ActionFixture {
 			uri = uri + "?" + getLastRequest().getQuery();
 		}
 		String u = restClient.getBaseUrl() + uri;
-		cells.more.body = "<a href='" + u + "'>"
-				+ uri + "</a>";
+		cells.more.body = "<a href='" + u + "'>" + uri + "</a>";
 		process(cells.more.more, getLastResponse().getStatusCode().toString(),
 				new StatusCodeTypeAdapter());
 		process(cells.more.more.more, getLastResponse().getHeaders(),
