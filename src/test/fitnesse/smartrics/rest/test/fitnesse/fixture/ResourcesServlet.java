@@ -250,6 +250,8 @@ public class ResourcesServlet extends HttpServlet {
 				// TODO: should put the ID in
 				resp.setStatus(HttpServletResponse.SC_CREATED);
 				resp.addHeader("Location", type + "/" + newResource.getId());
+			} else if (req.getContentType().startsWith("multipart")) {
+				resp.setStatus(HttpServletResponse.SC_OK);
 			} else {
 				resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			}

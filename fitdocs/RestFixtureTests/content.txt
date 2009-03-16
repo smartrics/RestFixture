@@ -5,6 +5,7 @@
 !*****> Variables Settings
 !define jettyHost {localhost}
 !define jettyPort {8765}
+!define tempDirectory {@TEMP_DIRECTORY@}
 ****!
 
 !*****> Classpath Settings

@@ -139,6 +139,8 @@ public class RestFixture extends ActionFixture {
 
 	private RestRequest lastRequest;
 
+	private String multipartFileName = null;
+
 	private String requestBody;
 
 	private Map<String, String> requestHeaders;
@@ -260,6 +262,17 @@ public class RestFixture extends ActionFixture {
 		if (args.length == 2) {
 			config = new Config(args[1]);
 		}
+	}
+
+	/**
+	 * <code>| setMultipartFileName | Name of file |</code>
+	 * <p/>
+	 * body text should be location of file which needs to be sent
+	 */
+	public void setMultipartFileName() {
+		if (cells.more == null)
+			throw new FitFailureException("You must pass a body to set");
+		multipartFileName = variables.substitute(cells.more.text());
 	}
 
 	/**
@@ -550,6 +563,7 @@ public class RestFixture extends ActionFixture {
 		String resUrl = resolve(FIND_VARS_PATTERN, cells.more.text());
 		setLastRequest(new RestRequest());
 		getLastRequest().setMethod(RestRequest.Method.valueOf(method));
+		getLastRequest().setMultipartFileName(multipartFileName);
 		getLastRequest().addHeaders(getHeaders());
 		String uri[] = resUrl.split("\\?");
 		getLastRequest().setResource(uri[0]);
