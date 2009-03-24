@@ -25,10 +25,13 @@ import java.util.List;
 
 import javax.xml.xpath.XPathConstants;
 
-import org.mortbay.log.Log;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.NodeList;
 
 public class XPathBodyTypeAdapter extends BodyTypeAdapter {
+	private static Log LOG = LogFactory.getLog(XPathBodyTypeAdapter.class);
+	
 
 	public XPathBodyTypeAdapter() {
 	}
@@ -85,7 +88,7 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
 			return !(ret == null || ret.getLength() == 0);
 		} catch (IllegalArgumentException e) {
 			// may be evaluatable as BOOLEAN
-			Log.debug("XPath does not evaluate to a node list. "
+			LOG.debug("XPath does not evaluate to a node list. "
 					+ "Trying to match to boolean: " + expr);
 		}
 		Boolean b = (Boolean) Tools.extractXPath(expr, content,
