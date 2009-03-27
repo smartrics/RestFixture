@@ -53,6 +53,29 @@ public class ContentTypeTest {
 		assertEquals(ContentType.JSON, ContentType.parse(headers));
 	}
 
+	// make sure you can get the right ContentType when header is
+	// text/plain
+	@Test
+	public void shouldReturnCorrectTypeGivenApplicationText() {
+		// setup
+		List<Header> headers = new ArrayList<Header>();
+		headers.add(new RestData.Header("Content-Type", "text/plain"));
+		// act & assert
+		assertEquals(ContentType.TEXT, ContentType.parse(headers));
+	}
+
+	// make sure you can get the right ContentType when header is
+	// text/plain with a charset
+	@Test
+	public void shouldReturnCorrectTypeGivenApplicationTextWithCharset() {
+		// setup
+		List<Header> headers = new ArrayList<Header>();
+		headers.add(new RestData.Header("Content-Type",
+				"text/plain; charset=iso-8859-1"));
+		// act & assert
+		assertEquals(ContentType.TEXT, ContentType.parse(headers));
+	}
+
 	// make sure you can get the UNKNOWN ContentType when header is
 	// anything else
 	@Test
@@ -94,5 +117,4 @@ public class ContentTypeTest {
 		// act & assert
 		assertEquals(ContentType.UNKNOWN, ContentType.parse(headers));
 	}
-
 }

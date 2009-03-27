@@ -20,8 +20,10 @@
  */
 package smartrics.rest.test.fitnesse.fixture;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -37,6 +39,11 @@ import smartrics.rest.client.RestClientImpl;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.client.RestRequest.Method;
+
+import com.oreilly.servlet.multipart.FilePart;
+import com.oreilly.servlet.multipart.MultipartParser;
+import com.oreilly.servlet.multipart.ParamPart;
+import com.oreilly.servlet.multipart.Part;
 
 public class ResourcesServlet extends HttpServlet {
 	public static String _CONTEXT_ROOT = "/resources";
@@ -235,6 +242,47 @@ public class ResourcesServlet extends HttpServlet {
 		return sId;
 	}
 
+	private void processMultiPart(HttpServletRequest req,
+			HttpServletResponse resp) throws IOException {
+		PrintWriter out = resp.getWriter();
+		resp.setContentType("text/plain");
+		MultipartParser mp = new MultipartParser(req, 2048);
+		Part part = null;
+		while ((part = mp.readNextPart()) != null) {
+			String name = part.getName();
+			if (part.isParam()) {
+				// it's a parameter part
+				ParamPart paramPart = (ParamPart) part;
+				String value = paramPart.getStringValue();
+				log.info("param; name=" + name + ", value=" + value);
+				out.print("param; name=" + name + ", value=" + value);
+			} else if (part.isFile()) {
+				// it's a file part
+				FilePart filePart = (FilePart) part;
+				String fileName = filePart.getFileName();
+				if (fileName != null) {
+					// the part actually contained a file
+					// StringWriter sw = new StringWriter();
+					// long size = filePart.writeTo(new File(System
+					// .getProperty("java.io.tmpdir")));
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					long size = filePart.writeTo(baos);
+					log.info("file; name=" + name + "; filename=" + fileName
+							+ ", filePath=" + filePart.getFilePath()
+							+ ", content type=" + filePart.getContentType()
+							+ ", size=" + size);
+					out.print(String.format("%s: %s", name, new String(baos
+							.toByteArray())));
+				} else {
+					// the field did not contain a file
+					log.info("file; name=" + name + "; EMPTY");
+				}
+				out.flush();
+			}
+		}
+		resp.setStatus(HttpServletResponse.SC_OK);
+	}
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -243,22 +291,40 @@ public class ResourcesServlet extends HttpServlet {
 		String uri = sanitise(req.getRequestURI());
 		String type = getType(uri);
 		try {
-			String content = getContent(req.getInputStream());
-			if (content.trim().startsWith("<") || content.trim().endsWith("}")) {
-				Resource newResource = new Resource(content);
-				resources.add(type, newResource);
-				// TODO: should put the ID in
-				resp.setStatus(HttpServletResponse.SC_CREATED);
-				resp.addHeader("Location", type + "/" + newResource.getId());
+			if (req.getContentType().equals("application/octet-stream")) {
+				processFileUpload(req, resp);
 			} else if (req.getContentType().startsWith("multipart")) {
-				resp.setStatus(HttpServletResponse.SC_OK);
+				processMultiPart(req, resp);
 			} else {
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+				String content = getContent(req.getInputStream());
+				if (content.trim().startsWith("<")
+						|| content.trim().endsWith("}")) {
+					Resource newResource = new Resource(content);
+					resources.add(type, newResource);
+					// TODO: should put the ID in
+					resp.setStatus(HttpServletResponse.SC_CREATED);
+					resp
+							.addHeader("Location", type + "/"
+									+ newResource.getId());
+				} else {
+					resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+				}
 			}
 		} catch (RuntimeException e) {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 		log.debug(resp.toString());
+	}
+
+	private void processFileUpload(HttpServletRequest req,
+			HttpServletResponse resp) throws IOException {
+		InputStream is = req.getInputStream();
+		PrintWriter out = resp.getWriter();
+		resp.setContentType("text/plain");
+		String fileContents = getContent(is);
+		out.print(fileContents);
+		out.flush();
+		resp.setStatus(HttpServletResponse.SC_OK);
 	}
 
 	private String getContent(InputStream is) throws IOException {

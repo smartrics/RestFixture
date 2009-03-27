@@ -43,6 +43,15 @@ public class BodyTypeAdapterFactoryTest {
 		assertTrue(bodyTypeAdapter instanceof XPathBodyTypeAdapter);
 	}
 
+	@Test
+	public void textContentTypeReturnsXPathBodyTypeAdapter() {
+		// act
+		BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory
+				.getBodyTypeAdapter(ContentType.TEXT);
+		// assert
+		assertTrue(bodyTypeAdapter instanceof TextBodyTypeAdapter);
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void nullContentTypeThrowsException() {
 		// act

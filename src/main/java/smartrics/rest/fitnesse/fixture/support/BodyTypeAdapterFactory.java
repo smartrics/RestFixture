@@ -27,6 +27,8 @@ public class BodyTypeAdapterFactory {
 			return new JSONBodyTypeAdapter();
 		else if (content == ContentType.XML)
 			return new XPathBodyTypeAdapter();
+		else if (content == ContentType.TEXT)
+			return new TextBodyTypeAdapter();
 		else if (content == ContentType.UNKNOWN)
 			return new XPathBodyTypeAdapter();
 		else

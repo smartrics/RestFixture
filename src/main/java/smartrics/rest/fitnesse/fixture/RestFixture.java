@@ -135,11 +135,17 @@ import fit.exception.FitFailureException;
  */
 public class RestFixture extends ActionFixture {
 
+	private static final String FILE = "file";
+
 	private RestResponse lastResponse;
 
 	private RestRequest lastRequest;
 
+	private String fileName = null;
+
 	private String multipartFileName = null;
+
+	private String multipartFileParameterName = FILE;
 
 	private String requestBody;
 
@@ -276,10 +282,30 @@ public class RestFixture extends ActionFixture {
 	}
 
 	/**
-	 * <code>| setBody | body text goes here |</code>
-	 * <p/>
-	 * body text can either be a kvp or a xml. The <code>ClientHelper</code>
-	 * will figure it out
+	 * <code>| setFileName | Name of file |</code> <p/> body text should be
+	 * location of file which needs to be sent
+	 */
+	public void setFileName() {
+		if (cells.more == null)
+			throw new FitFailureException("You must pass a body to set");
+		fileName = variables.substitute(cells.more.text());
+	}
+
+	/**
+	 * <code>| setMultipartFileParameterName | Name of form parameter for the uploaded file |</code>
+	 * <p/> body text should be the name of the form parameter, defaults to
+	 * 'file'
+	 */
+	public void setMultipartFileParameterName() {
+		if (cells.more == null)
+			throw new FitFailureException(
+					"You must pass a parameter name to set");
+		multipartFileParameterName = variables.substitute(cells.more.text());
+	}
+
+	/**
+	 * <code>| setBody | body text goes here |</code> <p/> body text can either
+	 * be a kvp or a xml. The <code>ClientHelper</code> will figure it out
 	 */
 	public void setBody() {
 		if (cells.more == null)
@@ -563,7 +589,10 @@ public class RestFixture extends ActionFixture {
 		String resUrl = resolve(FIND_VARS_PATTERN, cells.more.text());
 		setLastRequest(new RestRequest());
 		getLastRequest().setMethod(RestRequest.Method.valueOf(method));
+		getLastRequest().setFileName(fileName);
 		getLastRequest().setMultipartFileName(multipartFileName);
+		getLastRequest().setMultipartFileParameterName(
+				multipartFileParameterName);
 		getLastRequest().addHeaders(getHeaders());
 		String uri[] = resUrl.split("\\?");
 		getLastRequest().setResource(uri[0]);
@@ -705,5 +734,4 @@ public class RestFixture extends ActionFixture {
 		return Tools.convertStringToMap(str, ":", System
 				.getProperty("line.separator"));
 	}
-
 }

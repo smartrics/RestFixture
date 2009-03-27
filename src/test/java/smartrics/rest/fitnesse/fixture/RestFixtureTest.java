@@ -494,6 +494,15 @@ public class RestFixtureTest {
 		assertAllCells(t, "let", "val", "header", "h1:(\\w\\d)", "v1");
 		assertEquals("v1", new Variables().get("val"));
 	}
+	
+	@Test
+	public void testThatSymbolIsUsedIfNoVariable() {
+		Fixture.setSymbol("fred", "bloggs");
+		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
+				"/uri/%fred%", "", "", ""));
+		fixture.doCells(t);
+		assertTrue(extractCell2(t).contains("/uri/bloggs"));
+	}
 
 	private void assertAllCells(Parse t, String c1, String c2, String c3,
 			String c4, String c5) {

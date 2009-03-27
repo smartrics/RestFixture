@@ -62,4 +62,14 @@ Use the multipartFile property to upload files to a server
 
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
 |setMultipartFileName|${tempDirectory}/tempfile|
-|POST   | /resources/ | 200 | | no-body |
+|POST   | /resources/ | 200 | | file: { "resource" : { "name" : "test post", "data" : "some data" } }|
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|setMultipartFileName|${tempDirectory}/tempfile|
+|setMultipartFileParameterName|abc123|
+|POST   | /resources/ | 200 | | abc123: { "resource" : { "name" : "test post", "data" : "some data" } }|
+
+Use simple file upload
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|setFileName|${tempDirectory}/tempfile|
+|POST   | /resources/ | 200 | | { "resource" : { "name" : "test post", "data" : "some data" } }|
