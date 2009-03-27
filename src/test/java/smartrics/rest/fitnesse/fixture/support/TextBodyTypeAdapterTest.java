@@ -39,8 +39,9 @@ public class TextBodyTypeAdapterTest {
 	@Test
 	public void shouldRenderCellContentAsStrings(){
 		assertEquals("abc123", adapter.toString("abc123"));
-		assertEquals("blank", adapter.toString(" "));
-		assertEquals("null", adapter.toString(null));
+		assertEquals("no-body", adapter.toString(" "));
+		assertEquals("no-body", adapter.toString(null));
+		assertEquals("&lt;fred/&gt;", adapter.toString("<fred/>"));
 	}
 
 	@Test

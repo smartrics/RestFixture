@@ -25,14 +25,4 @@ public class TextBodyTypeAdapter extends BodyTypeAdapter {
 			return "null";
 		return s.trim();
 	}
-
-	@Override
-	public String toString(Object obj) {
-		if (obj == null)
-			return "null";
-		if (obj.toString().trim().equals(""))
-			return "blank";
-		return obj.toString();
-	}
-
 }
