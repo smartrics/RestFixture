@@ -30,11 +30,11 @@ import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.NodeList;
 
 public class XPathBodyTypeAdapter extends BodyTypeAdapter {
-	private static Log LOG = LogFactory.getLog(XPathBodyTypeAdapter.class);
-	
+    private static Log LOG = LogFactory.getLog(XPathBodyTypeAdapter.class);
 
-	public XPathBodyTypeAdapter() {
-	}
+
+    public XPathBodyTypeAdapter() {
+    }
 
 	/**
 	 * Equality check for bodies.
@@ -76,20 +76,20 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
 				}
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Cannot extract xpath '"
-						+ expr + "' from document " + actual.toString());
+						+ expr + "' from document " + actual.toString(), e);
 			}
 		}
 		return getErrors().size() == 0;
 	}
 
-	private boolean eval(String expr, String content) {
-		try {
+    private boolean eval(String expr, String content) {
+        try {
 			NodeList ret = Tools.extractXPath(expr, content);
 			return !(ret == null || ret.getLength() == 0);
 		} catch (IllegalArgumentException e) {
 			// may be evaluatable as BOOLEAN
 			LOG.debug("XPath does not evaluate to a node list. "
-					+ "Trying to match to boolean: " + expr);
+					+ "Trying to match to boolean: " + expr, e);
 		}
 		Boolean b = (Boolean) Tools.extractXPath(expr, content,
 				XPathConstants.BOOLEAN);

@@ -26,31 +26,31 @@ import smartrics.rest.client.RestData.Header;
 
 /**
  * Supported content types.
- * 
+ *
  * @author fabrizio
  */
 public enum ContentType {
-	XML("application/xml"), JSON("application/json"), TEXT("text/plain"), UNKNOWN(
-			null);
+    XML("application/xml"), JSON("application/json"), TEXT("text/plain"), UNKNOWN(null);
+    private String contentTypeString;
 
-	String contentTypeString;
-	
-	ContentType(String contentTypeString) {
-		this.contentTypeString = contentTypeString;
-	}
+    ContentType(String contentTypeString) {
+        this.contentTypeString = contentTypeString;
+    }
 
-	public static ContentType parse(List<Header> contentTypeHeaders) {
-		if (contentTypeHeaders.size() != 1
-				|| !"Content-Type".equals(contentTypeHeaders.get(0).getName()))
-			return UNKNOWN;
-		String typeString = contentTypeHeaders.get(0).getValue();
-		if (XML.contentTypeString.equals(typeString))
-			return XML;
-		else if (JSON.contentTypeString.equals(typeString))
-			return JSON;
-		else if (typeString.startsWith(TEXT.contentTypeString))
-			return TEXT;
-		else
-			return UNKNOWN;
-	}
+    public static ContentType parse(List<Header> contentTypeHeaders) {
+        if (contentTypeHeaders.size() != 1
+                || !"Content-Type".equals(contentTypeHeaders.get(0).getName()))
+            return UNKNOWN;
+        String typeString = contentTypeHeaders.get(0).getValue();
+        if (typeString == null)
+            return UNKNOWN;
+        if (typeString.contains(XML.contentTypeString))
+            return XML;
+        else if (typeString.contains(JSON.contentTypeString))
+            return JSON;
+        else if (typeString.contains(TEXT.contentTypeString))
+            return TEXT;
+        else
+            return UNKNOWN;
+    }
 }

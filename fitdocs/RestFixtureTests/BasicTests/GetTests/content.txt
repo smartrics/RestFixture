@@ -40,5 +40,4 @@ Expectations can be asserted also in json format for responses whose content typ
 ****!
 
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
-|GET    | /resources/1.json | 200 |Content-Type : application/json |!- { "resource" : { "name" : "a funky name", "data" : "an important message" } } -!|
-
+|GET    | /resources/1.json | 200 |Content-Type : application/json;charset=ISO-8859-1 |!- { "resource" : { "name" : "a funky name", "data" : "an important message" } } -!|

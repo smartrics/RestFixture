@@ -46,17 +46,17 @@ import com.oreilly.servlet.multipart.ParamPart;
 import com.oreilly.servlet.multipart.Part;
 
 public class ResourcesServlet extends HttpServlet {
-	public static String _CONTEXT_ROOT = "/resources";
-	private static final long serialVersionUID = -7012866414216034826L;
-	private final Resources resources = Resources.getInstance();
+    public static String _CONTEXT_ROOT = "/resources";
+    private static final long serialVersionUID = -7012866414216034826L;
+    private final Resources resources = Resources.getInstance();
 	private static Log log = LogFactory.getLog(ResourcesServlet.class);
 
-	public ResourcesServlet() {
-	}
+    public ResourcesServlet() {
+    }
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 		log.debug("REQUEST ========= " + req.toString());
 		String uri = sanitise(req.getRequestURI());
 		String id = getId(uri);
@@ -67,7 +67,7 @@ public class ResourcesServlet extends HttpServlet {
 		try {
 			if (id == null) {
 				list(resp, type, extension);
-				headers(resp, extension);
+				headers(resp, extension, ";charset=ISO-8859-1");
 			} else if (resources.get(type, id) == null) {
 				notFound(resp);
 			} else {
@@ -75,7 +75,7 @@ public class ResourcesServlet extends HttpServlet {
 					notFound(resp);
 				} else {
 					found(resp, type, id);
-					headers(resp, extension);
+					headers(resp, extension, ";charset=ISO-8859-1");
 				}
 			}
 		} catch (RuntimeException e) {
@@ -85,28 +85,32 @@ public class ResourcesServlet extends HttpServlet {
 		}
 	}
 
-	private void echoQString(HttpServletRequest req, HttpServletResponse resp) {
-		String qstring = req.getQueryString();
-		if (qstring != null) {
+    private void echoQString(HttpServletRequest req, HttpServletResponse resp) {
+        String qstring = req.getQueryString();
+        if (qstring != null) {
 			resp.setHeader("Query-String", qstring);
 		}
 	}
 
-	private String sanitise(String rUri) {
-		String uri = rUri;
-		if (uri.endsWith("/"))
+    private String sanitise(String rUri) {
+        String uri = rUri;
+        if (uri.endsWith("/"))
 			uri = uri.substring(0, uri.length() - 1);
 		return uri;
 	}
 
-	private void headers(HttpServletResponse resp, String extension) {
-		resp.setStatus(HttpServletResponse.SC_OK);
-		resp.addHeader("Content-Type", "application/" + extension);
+    private void headers(HttpServletResponse resp, String extension,
+            String optCharset) {
+        resp.setStatus(HttpServletResponse.SC_OK);
+		String s = "";
+		if (optCharset != null)
+			s = optCharset;
+		resp.addHeader("Content-Type", "application/" + extension + s);
 	}
 
-	private void list(HttpServletResponse resp, String type, String extension)
-			throws IOException {
-		if (type.contains("root-context")) {
+    private void list(HttpServletResponse resp, String type, String extension)
+            throws IOException {
+        if (type.contains("root-context")) {
 			list(resp, extension);
 		} else {
 			StringBuffer buffer = new StringBuffer();
@@ -126,9 +130,9 @@ public class ResourcesServlet extends HttpServlet {
 		}
 	}
 
-	private void list(HttpServletResponse resp, String extension)
-			throws IOException {
-		StringBuffer buffer = new StringBuffer();
+    private void list(HttpServletResponse resp, String extension)
+            throws IOException {
+        StringBuffer buffer = new StringBuffer();
 		if ("json".equals(extension))
 			buffer.append("{ \"root-context\" : ");
 		else
@@ -145,27 +149,27 @@ public class ResourcesServlet extends HttpServlet {
 		resp.getOutputStream().write(buffer.toString().getBytes());
 	}
 
-	private String getExtension(String uri) {
-		int extensionPoint = uri.lastIndexOf(".");
-		if (extensionPoint != -1) {
+    private String getExtension(String uri) {
+        int extensionPoint = uri.lastIndexOf(".");
+        if (extensionPoint != -1) {
 			return uri.substring(extensionPoint + 1);
 		} else {
 			return "xml";
 		}
 	}
 
-	private void found(HttpServletResponse resp, String type, String id)
-			throws IOException {
-		StringBuffer buffer = new StringBuffer();
+    private void found(HttpServletResponse resp, String type, String id)
+            throws IOException {
+        StringBuffer buffer = new StringBuffer();
 		buffer.append(resources.get(type, id));
 		resp.getOutputStream().write(buffer.toString().getBytes());
 		// resp.setHeader("Content-Lenght",
 		// Integer.toString(buffer.toString().getBytes().length));
 	}
 
-	private String getType(String uri) {
-		if (uri.length() <= 1)
-			return "/root-context";
+    private String getType(String uri) {
+        if (uri.length() <= 1)
+            return "/root-context";
 		int pos = uri.substring(1).indexOf('/');
 		String ret = uri;
 		if (pos >= 0)
@@ -173,21 +177,21 @@ public class ResourcesServlet extends HttpServlet {
 		return ret;
 	}
 
-	private void notFound(HttpServletResponse resp) throws IOException {
-		resp.getOutputStream().write("".getBytes());
-		resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    private void notFound(HttpServletResponse resp) throws IOException {
+        resp.getOutputStream().write("".getBytes());
+        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		// resp.setHeader("Content-Lenght", "0");
 	}
 
-	private void echoHeader(HttpServletRequest req, HttpServletResponse resp) {
-		String s = req.getHeader("Echo-Header");
-		if (s != null)
+    private void echoHeader(HttpServletRequest req, HttpServletResponse resp) {
+        String s = req.getHeader("Echo-Header");
+        if (s != null)
 			resp.setHeader("Echo-Header", s);
 	}
 
-	@Override
-	protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 		log.debug(req.toString());
 		String uri = sanitise(req.getRequestURI());
 		String type = getType(uri);
@@ -207,9 +211,9 @@ public class ResourcesServlet extends HttpServlet {
 		log.debug(resp.toString());
 	}
 
-	@Override
-	protected void doPut(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 		log.debug(req.toString());
 		echoHeader(req, resp);
 		String uri = sanitise(req.getRequestURI());
@@ -227,9 +231,9 @@ public class ResourcesServlet extends HttpServlet {
 		log.debug(resp.toString());
 	}
 
-	private String getId(String uri) {
-		if (uri.length() <= 1)
-			return null;
+    private String getId(String uri) {
+        if (uri.length() <= 1)
+            return null;
 		int pos = uri.substring(1).lastIndexOf("/");
 		String sId = null;
 		if (pos > 0)
@@ -242,9 +246,9 @@ public class ResourcesServlet extends HttpServlet {
 		return sId;
 	}
 
-	private void processMultiPart(HttpServletRequest req,
-			HttpServletResponse resp) throws IOException {
-		PrintWriter out = resp.getWriter();
+    private void processMultiPart(HttpServletRequest req,
+            HttpServletResponse resp) throws IOException {
+        PrintWriter out = resp.getWriter();
 		resp.setContentType("text/plain");
 		MultipartParser mp = new MultipartParser(req, 2048);
 		Part part = null;
@@ -283,9 +287,9 @@ public class ResourcesServlet extends HttpServlet {
 		resp.setStatus(HttpServletResponse.SC_OK);
 	}
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 		log.debug(req.toString());
 		echoHeader(req, resp);
 		String uri = sanitise(req.getRequestURI());
@@ -316,9 +320,9 @@ public class ResourcesServlet extends HttpServlet {
 		log.debug(resp.toString());
 	}
 
-	private void processFileUpload(HttpServletRequest req,
-			HttpServletResponse resp) throws IOException {
-		InputStream is = req.getInputStream();
+    private void processFileUpload(HttpServletRequest req,
+            HttpServletResponse resp) throws IOException {
+        InputStream is = req.getInputStream();
 		PrintWriter out = resp.getWriter();
 		resp.setContentType("text/plain");
 		String fileContents = getContent(is);
@@ -327,45 +331,45 @@ public class ResourcesServlet extends HttpServlet {
 		resp.setStatus(HttpServletResponse.SC_OK);
 	}
 
-	private String getContent(InputStream is) throws IOException {
-		StringBuffer sBuff = new StringBuffer();
-		int c;
+    private String getContent(InputStream is) throws IOException {
+        StringBuffer sBuff = new StringBuffer();
+        int c;
 		while ((c = is.read()) != -1)
 			sBuff.append((char) c);
 		String content = sBuff.toString();
 		return content;
 	}
 
-	public static void main(String[] args) {
-		RestClient c = new RestClientImpl(new HttpClient());
-		RestRequest req = new RestRequest();
+    public static void main(String[] args) {
+        RestClient c = new RestClientImpl(new HttpClient());
+        RestRequest req = new RestRequest();
 
-		req.setBody("<resource><name>n</name><data>d1</data></resource>");
-		req.setResource("/resources/");
-		req.setMethod(Method.Post);
+        req.setBody("<resource><name>n</name><data>d1</data></resource>");
+        req.setResource("/resources/");
+        req.setMethod(Method.Post);
 		RestResponse res = c.execute("http://localhost:8765", req);
 		System.out.println("=======>\n" + res + "\n<=======");
 
-		String loc = res.getHeader("Location").get(0).getValue();
-		req.setResource(loc + ".json");
-		req.setMethod(Method.Get);
+        String loc = res.getHeader("Location").get(0).getValue();
+        req.setResource(loc + ".json");
+        req.setMethod(Method.Get);
 		res = c.execute("http://localhost:8765", req);
 		System.out.println("=======>\n" + res + "\n<=======");
 
-		req.setMethod(Method.Put);
-		req
-				.setBody("<resource><name>another name</name><data>another data</data></resource>");
+        req.setMethod(Method.Put);
+        req
+                .setBody("<resource><name>another name</name><data>another data</data></resource>");
 		res = c.execute("http://localhost:8765", req);
 		System.out.println("=======>\n" + res + "\n<=======");
 
-		req.setResource("/resources/");
-		req.setMethod(Method.Get);
-		res = c.execute("http://localhost:8765", req);
+        req.setResource("/resources/");
+        req.setMethod(Method.Get);
+        res = c.execute("http://localhost:8765", req);
 		System.out.println("=======>\n" + res + "\n<=======");
 
-		req.setMethod(Method.Delete);
-		req.setResource(loc);
-		res = c.execute("http://localhost:8765", req);
+        req.setMethod(Method.Delete);
+        req.setResource(loc);
+        res = c.execute("http://localhost:8765", req);
 		System.out.println("=======>\n" + res + "\n<=======");
 	}
 
