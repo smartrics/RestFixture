@@ -189,13 +189,12 @@
 		<copy todir="${artifacts}" file="COPYING.LESSER" />
 		<copy todir="${artifacts}" file="COPYRIGHT" />
 		<copy todir="${artifacts}" file="README" />
-		<tstamp>
-			<format property="TS" pattern="yyyyMMdd" locale="en,UK" />
-		</tstamp>
+		<property file="version.properties" />
 		<antcall target="dist-doc" />
-		<zip destfile="dist/RestFixture-nodep-${TS}.zip" basedir="${artifacts}" casesensitive="true" compress="true" includes="**/*" excludes="lib/**/*.jar" />
-		<zip destfile="dist/RestFixture-${TS}.zip" basedir="${artifacts}" casesensitive="true" compress="true" includes="**/*" />
-		<zip destfile="dist/RestFixture-docs-${TS}.zip" basedir="${artifacts}/docs" casesensitive="true" compress="true" includes="**/*" />
+		<move file="${artifacts}/docs/docs.html" tofile="${artifacts}/docs/RestFixture-${version}.html" />
+		<zip destfile="dist/RestFixture-nodep-${version}.zip" basedir="${artifacts}" casesensitive="true" compress="true" includes="**/*" excludes="lib/**/*.jar" />
+		<zip destfile="dist/RestFixture-${version}.zip" basedir="${artifacts}" casesensitive="true" compress="true" includes="**/*" />
+		<zip destfile="dist/RestFixture-docs-${version}.zip" basedir="${artifacts}/docs" casesensitive="true" compress="true" includes="**/*" />
 	</target>
 
 </project>
