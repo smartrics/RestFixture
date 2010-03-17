@@ -646,7 +646,7 @@ public class RestFixture extends ActionFixture {
 		} else {
 			boolean success = false;
 			try {
-				success = ta.equals(ta.parse(expected.text()), actual);
+				success = ta.equals(ta.parse(variables.substitute(expected.text())), actual);
 			} catch (Exception e) {
 				exception(expected, e);
 				return;
