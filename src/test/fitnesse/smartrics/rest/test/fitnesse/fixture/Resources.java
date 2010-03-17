@@ -106,6 +106,7 @@ public class Resources {
 		add("/resources", new Resource(
 				"{ \"resource\" : { \"name\" : \"a funky name\", "
 						+ "\"data\" : \"an important message\" } }"));
+		add("/resources", new Resource(null));
 	}
 
 	private synchronized int newCounter() {

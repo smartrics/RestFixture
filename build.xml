@@ -5,10 +5,10 @@
 	<property file="build.properties" />
 
 	<property name="fitnesse.root.name" value="FitNesseRoot" />
-    <property name="fitnesse.path" value="${ant.project.name}Tests" />
-    <property name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
+        <property name="fitnesse.path" value="${ant.project.name}Tests" />
+        <property name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
 	<property name="src.unit" value="${basedir}/src/test/java" />
-    <property name="src.cat" value="${basedir}/src/test/fitnesse" />
+        <property name="src.cat" value="${basedir}/src/test/fitnesse" />
 	<property name="src" value="${basedir}/src/main/java" />
 	<property name="resources" value="${basedir}/src/main/resources" />
 	<property name="build" value="${basedir}/build" />

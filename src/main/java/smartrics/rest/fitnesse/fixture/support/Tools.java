@@ -25,6 +25,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,6 +46,12 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.copy.HierarchicalStreamCopier;
+import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
+import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 
 public final class Tools {
 
@@ -88,6 +96,16 @@ public final class Tools {
 			throw new IllegalArgumentException(
 					"IO Exception when reading the document", e);
 		}
+	}
+
+	public static String fromJSONtoXML(String json) throws IOException {
+		HierarchicalStreamDriver driver = new JettisonMappedXmlDriver();
+		StringReader reader = new StringReader(json);
+		HierarchicalStreamReader hsr = driver.createReader(reader);
+		StringWriter writer = new StringWriter();
+		new HierarchicalStreamCopier().copy(hsr, new PrettyPrintWriter(writer));
+		writer.close();
+		return writer.toString();
 	}
 
 	/**
@@ -195,6 +213,10 @@ public final class Tools {
 				.replaceAll(">", "&gt;").replaceAll(
 						System.getProperty("line.separator"), "<br/>")
 				.replaceAll(" ", "&nbsp;");
+	}
+
+	public static String toJSON(String text) {
+		return text.trim();
 	}
 
 	public static String fromHtml(String text) {

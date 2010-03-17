@@ -20,6 +20,7 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -484,7 +485,8 @@ public class RestFixture extends ActionFixture {
 					exception(valueCell, e);
 				}
 			}
-
+		} catch (IOException e) {
+			exception(cells.more.more.more, e);			
 		} catch (RuntimeException e) {
 			exception(cells.more.more.more, e);
 		} finally {
@@ -522,7 +524,8 @@ public class RestFixture extends ActionFixture {
 		return value;
 	}
 
-	private String handleXpathExpression(String label, String expr) {
+	private String handleXpathExpression(String label, String expr)
+			throws IOException {
 		// def. match only last response body
 		String val = null;
 		try {
@@ -537,9 +540,15 @@ public class RestFixture extends ActionFixture {
 		return val;
 	}
 
-	private String handleXPathAsNodeList(String expr) {
-			NodeList list = Tools.extractXPath(expr, getLastResponse()
-					.getBody());
+	private String getLastResponseBodyAsXml() throws IOException {
+		if(getContentTypeOfLastResponse().equals(ContentType.JSON) || getContentTypeOfLastResponse().equals(ContentType.JSONX))
+			return Tools.fromJSONtoXML(getLastResponse().getBody());
+
+		return getLastResponse().getBody();
+	}
+
+	private String handleXPathAsNodeList(String expr) throws IOException {
+		NodeList list = Tools.extractXPath(expr, getLastResponseBodyAsXml());
 			Node item = list.item(0);
 			String val = null;
 			if (item != null) {
@@ -607,6 +616,10 @@ public class RestFixture extends ActionFixture {
 		completeHttpMethodExecution();
 	}
 
+	private ContentType getContentTypeOfLastResponse() {
+		return ContentType.parse(getLastResponse().getHeader("Content-Type"));
+	}
+
 	private void completeHttpMethodExecution() {
 		String uri = getLastResponse().getResource();
 		if (getLastRequest().getQuery() != null) {
@@ -618,12 +631,11 @@ public class RestFixture extends ActionFixture {
 				new StatusCodeTypeAdapter());
 		process(cells.more.more.more, getLastResponse().getHeaders(),
 				new HeadersTypeAdapter());
-		ContentType content = ContentType.parse(getLastResponse().getHeader(
-				"Content-Type"));
 		cells.more.more.more.more.body = resolve(FIND_VARS_PATTERN,
 				cells.more.more.more.more.body);
 		process(cells.more.more.more.more, getLastResponse().getBody(),
-				BodyTypeAdapterFactory.getBodyTypeAdapter(content));
+				BodyTypeAdapterFactory
+						.getBodyTypeAdapter(getContentTypeOfLastResponse()));
 	}
 
 	private void process(Parse expected, Object actual, RestDataTypeAdapter ta) {

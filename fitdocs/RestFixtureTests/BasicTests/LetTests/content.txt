@@ -27,6 +27,15 @@ This example also shows how to use let to extract data from the XML body of a re
 -! |
 |let    | name | body | /resource/name/text() | |
 
+...or from a JSON body
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/1.json | 200 |Content-Type : application/json|!-
+ /resource/name[text()='a funky name']<br/>
+ /resource/data[text()='an important message']
+ -! |
+|let    | name | body | /resource/name/text() | |
+
 !*** Note
 Label values can be accessed from code using '''new Variables().get("labelname");'''
 ***!

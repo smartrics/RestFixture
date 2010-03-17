@@ -387,7 +387,7 @@ public class RestFixtureTest {
 			}
 		};
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
-				"/uri", "200", "", "{\"test\":\"me\"}"));
+				"/uri", "200", "", "/test[text()='me']"));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -395,11 +395,11 @@ public class RestFixtureTest {
 				buildResUriLink("/uri"),
 				"200",
 				"<span class=\"fit_grey\">h1&nbsp;:&nbsp;v1<br/>h2&nbsp;:&nbsp;v2<br/>Content-Type&nbsp;:&nbsp;application/json</span>",
-				"{\"test\":\"me\"}");
+				"/test[text()='me'] <span class=\"fit_label\">expected</span><hr>{\"test\":\"me\"} <span class=\"fit_label\">actual</span>");
 		// actual value is displayed unless displayActualOnRight is false
 		setDisplayActualOnRight(false);
 		t = helper.createFitTestInstance(helper.createFitTestRow("GET", "/uri",
-				"200", "", "{\"test\":\"me\"}"));
+				"200", "", "/test[text()='me']"));
 		fixture.doCells(t);
 		assertAllCells(
 				t,
@@ -407,7 +407,7 @@ public class RestFixtureTest {
 				buildResUriLink("/uri"),
 				"200",
 				"<span class=\"fit_grey\">h1&nbsp;:&nbsp;v1<br/>h2&nbsp;:&nbsp;v2<br/>Content-Type&nbsp;:&nbsp;application/json</span>",
-				"{\"test\":\"me\"}");
+				"/test[text()='me']");
 	}
 
 	@Test

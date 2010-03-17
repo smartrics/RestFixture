@@ -34,10 +34,15 @@ Instead of XPaths you can specify 'no-body' if the operation is expected to retu
 
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
 |GET    | /resources/20 | 404 | Content-Length : 0 | no-body |
+|GET    | /resources/2.json | 200 |!-Content-Length : 0
+Content-Type : application/json;charset=ISO-8859-1-!| no-body |
 
 !**** Json
-Expectations can be asserted also in json format for responses whose content type is 'application/json'
+Expectations can be asserted also in json format for responses whose content type is 'application/json' or 'application/x-javascript'
 ****!
 
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
-|GET    | /resources/1.json | 200 |Content-Type : application/json;charset=ISO-8859-1 |!- { "resource" : { "name" : "a funky name", "data" : "an important message" } } -!|
+|GET    | /resources/1.json | 200 |Content-Type : application/json;charset=ISO-8859-1 |!-
+ /resource/name[text()='a funky name'] <br/>
+ /resource/data[text()='an important message']
+-!|
