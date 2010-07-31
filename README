@@ -1,13 +1,37 @@
-RestFixture: A FitNesse fixture for testing REST API.
+RestFixture: A FitNesse fixture for testing REST services
+=========================================================
 
-The main purpose of this fixture is to allow developers or product
-owners to write tests for REST APIs in a simple and effective way.
-An overview of the features of this fixture is available here
-http://smartrics.blogspot.com/2008/08/get-fitnesse-with-some-rest.html
+The RestFixture is a FitNesse (http://fitnesse.org)  fixture that allows 
+developers and/or product owners to write test fixtures for REST services
+with simplicity in mind. The idea is to write tests that are self 
+documenting and easy to write and read, without the need to write Java code.
 
+The fixture allows test writers to express tests as actions (any of the 
+allowed HTTP methods) to operate on resource URIs and express expectations on 
+the content of the return code, headers and body. All without writing one 
+single line of Java code.
+
+And it also works as a living/executable documentation of the API.
+
+Overview:
+
+    * Get Fitnesse With Some Rest 
+      (http://smartrics.blogspot.com/2008/08/get-fitnesse-with-some-rest.html)
+    * Rest Fixture, Latest Additions 
+      (http://smartrics.blogspot.com/2008/11/restfixture-latest-additions.html)
+
+Documentation:
+
+    * http://rest-fixture.googlecode.com/files/RestFixture-docs-1.0.zip 
+    
+Build
+-----
 To build RestFixture edit the build.properties and set the values of the 
 properties to reflect your environment. Then use ant to run the default target
 
-Note: RestFixture distribution contains the file etc/restfixture/sequence.pic 
+Note on dependencies
+--------------------
+RestFixture distribution contains the file etc/restfixture/sequence.pic 
 part of UMLGraph (http://www.umlgraph.org), distributed under BSD license (see 
 etc/restfixture/BSDLICENSE)
+
