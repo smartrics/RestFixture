@@ -19,10 +19,13 @@ Overview:
       (http://smartrics.blogspot.com/2008/08/get-fitnesse-with-some-rest.html)
     * Rest Fixture, Latest Additions
       (http://smartrics.blogspot.com/2008/11/restfixture-latest-additions.html)
+    * Rest Fixure with namespaces support
+      (http://smartrics.blogspot.com/2011/01/restfixture-with-namespaces-support.html)
 
 Documentation:
 
-    * http://rest-fixture.googlecode.com/files/RestFixture-docs-1.0.zip
+    * http://rest-fixture.googlecode.com/files/RestFixture-docs-1.1.zip
+    * http://rest-fixture.googlecode.com/files/RestFixture-live-1.1.html
 
 Build
 -----
