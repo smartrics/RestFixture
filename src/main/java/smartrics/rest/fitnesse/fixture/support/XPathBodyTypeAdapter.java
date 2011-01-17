@@ -38,16 +38,16 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
 
 	/**
 	 * Equality check for bodies.
-	 * 
+	 *
 	 * Expected body is a {@code List<String>} of XPaths - as parsed by {@see
 	 * smartrics.rest.fitnesse.fixture.support.XPathBodyTypeAdapter#parse(String
 	 * )} - to be executed in the actual body. The check is true if all XPaths
 	 * executed in the actual body return a node list not null or empty.
-	 * 
+	 *
 	 * A special case is dedicated to {@code no-body}. If the expected body is
 	 * {@code no-body}, the equality check is true if the actual body returned
 	 * by the REST response is empty or null.
-	 * 
+	 *
 	 * @param expected
 	 *            the expected body, it's a string with XPaths separated by
 	 *            {@code System.getProperty("line.separator")}
@@ -82,27 +82,27 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
 		return getErrors().size() == 0;
 	}
 
-    private boolean eval(String expr, String content) {
+    protected boolean eval(String expr, String content) {
         try {
-			NodeList ret = Tools.extractXPath(expr, content);
+			NodeList ret = Tools.extractXPath(getContext(), expr, content);
 			return !(ret == null || ret.getLength() == 0);
 		} catch (IllegalArgumentException e) {
 			// may be evaluatable as BOOLEAN
 			LOG.debug("XPath does not evaluate to a node list. "
 					+ "Trying to match to boolean: " + expr, e);
 		}
-		Boolean b = (Boolean) Tools.extractXPath(expr, content,
+		Boolean b = (Boolean) Tools.extractXPath(getContext(), expr, content,
 				XPathConstants.BOOLEAN);
 		return b;
 	}
 
 	/**
 	 * Parses the expected body in the current test.
-	 * 
+	 *
 	 * A body is a String containing XPaths one for each new line. Empty body
 	 * would result in an empty {@code List<String>}. A body containing the
 	 * value {@code no-body} is especially treated separately.
-	 * 
+	 *
 	 * @param expectedListOfXpathsAsString
 	 */
 	@Override
@@ -123,5 +123,10 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
 				expectedXPathAsList.add(nvp.trim());
 		}
 		return expectedXPathAsList;
+	}
+
+	@Override
+	public String toXmlString(String content) {
+		return content;
 	}
 }

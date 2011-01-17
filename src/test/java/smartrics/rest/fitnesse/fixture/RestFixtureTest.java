@@ -113,7 +113,7 @@ public class RestFixtureTest {
 	@Test
 	public void mustUseDefaultHeadersIfDefinedOnNamedConfig() {
 		config = new Config("config.with.headers");
-		config.add("restfixure.default.headers", "added1 : 1"
+		config.add("restfixture.default.headers", "added1 : 1"
 				+ System.getProperty("line.separator") + "added2 : 2");
 		final MockRestClient rClient = new MockRestClient() {
 			@Override
@@ -494,7 +494,7 @@ public class RestFixtureTest {
 		assertAllCells(t, "let", "val", "header", "h1:(\\w\\d)", "v1");
 		assertEquals("v1", new Variables().get("val"));
 	}
-	
+
 	@Test
 	public void testThatSymbolIsUsedIfNoVariable() {
 		Fixture.setSymbol("fred", "bloggs");
@@ -514,7 +514,7 @@ public class RestFixtureTest {
 	}
 
 	private void setDisplayActualOnRight(boolean b) {
-		config.add("restfixure.display.actual.on.right", Boolean.toString(b));
+		config.add("restfixture.display.actual.on.right", Boolean.toString(b));
 	}
 
 	private Parse buildEmptyParse() {

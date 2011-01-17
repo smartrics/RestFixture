@@ -49,6 +49,8 @@ public abstract class BodyTypeAdapter extends RestDataTypeAdapter {
 		return "".equals(value.trim()) || "no-body".equals(value.trim());
 	}
 
+	public abstract String toXmlString(String content);
+
 	/**
 	 * This renders the actual body - expected as a String containing XML - as
 	 * HTML to be displayed in the test page.

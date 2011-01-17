@@ -1,37 +1,68 @@
 RestFixture: A FitNesse fixture for testing REST services
 =========================================================
 
-The RestFixture is a FitNesse (http://fitnesse.org)  fixture that allows 
+The RestFixture is a FitNesse (http://fitnesse.org)  fixture that allows
 developers and/or product owners to write test fixtures for REST services
-with simplicity in mind. The idea is to write tests that are self 
+with simplicity in mind. The idea is to write tests that are self
 documenting and easy to write and read, without the need to write Java code.
 
-The fixture allows test writers to express tests as actions (any of the 
-allowed HTTP methods) to operate on resource URIs and express expectations on 
-the content of the return code, headers and body. All without writing one 
+The fixture allows test writers to express tests as actions (any of the
+allowed HTTP methods) to operate on resource URIs and express expectations on
+the content of the return code, headers and body. All without writing one
 single line of Java code.
 
 And it also works as a living/executable documentation of the API.
 
 Overview:
 
-    * Get Fitnesse With Some Rest 
+    * Get Fitnesse With Some Rest
       (http://smartrics.blogspot.com/2008/08/get-fitnesse-with-some-rest.html)
-    * Rest Fixture, Latest Additions 
+    * Rest Fixture, Latest Additions
       (http://smartrics.blogspot.com/2008/11/restfixture-latest-additions.html)
 
 Documentation:
 
-    * http://rest-fixture.googlecode.com/files/RestFixture-docs-1.0.zip 
-    
+    * http://rest-fixture.googlecode.com/files/RestFixture-docs-1.0.zip
+
 Build
 -----
-To build RestFixture edit the build.properties and set the values of the 
-properties to reflect your environment. Then use ant to run the default target
+To build RestFixture edit the build.properties and set the values of the
+properties to reflect your environment.
+Use
+> ant
+or
+> ant full
+to run the defaul target (this will build the Rest Fixture, start a local instance
+of FitNesse on port 7070 and run the fitnesse tests in fitdocs. If it all succeedes
+a build of the RestFixture is available in dist/ alongside with the latest documentation
+
+To build and run unit tests run
+> and test
+
 
 Note on dependencies
 --------------------
-RestFixture distribution contains the file etc/restfixture/sequence.pic 
-part of UMLGraph (http://www.umlgraph.org), distributed under BSD license (see 
+RestFixture distribution contains the file etc/restfixture/sequence.pic
+part of UMLGraph (http://www.umlgraph.org), distributed under BSD license (see
 etc/restfixture/BSDLICENSE)
 
+Install
+-------
+
+To use the RestFixture, simply add RestFixture-<ver>.jar to your FitNesse tests classpath,
+alongside its dependencies. Dependencies are bundled in the RestFixture-<ver>.zip, or
+in the lib/ directory.
+
+For example,
+
+!*****> Classpath Settings
+!path @FITNESSE_TEST_ROOT@/lib/*
+!path @FITNESSE_TEST_ROOT@/lib/log4j.xml
+!path @FITNESSE_HOME@/fitnesse.jar
+****!
+
+@FITNESSE_TEST_ROOT@/lib is where the jars are
+ @FITNESSE_HOME@ is where fitnesse.jar is
+
+ Any page which is child of the content.txt page where the !path is defined will be able to
+ use the Rest Fixture (see fitdocs/ for a fully working example)

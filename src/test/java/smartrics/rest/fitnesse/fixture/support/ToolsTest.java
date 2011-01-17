@@ -35,6 +35,7 @@ import javax.xml.xpath.XPathConstants;
 import org.junit.Test;
 
 public class ToolsTest {
+	private static Map<String, String> DEF_NS_CONTEXT = new HashMap<String, String>();
 	@Test
 	public void mustMatchWhenRegexIsValidAndThereIsAMatch() {
 		assertTrue(Tools.regex("200", "200"));
@@ -97,16 +98,22 @@ public class ToolsTest {
 	@Test
 	public void shouldExtractXPathsFromXmlDocumentAsNodeLists() {
 		String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
-		assertEquals(2, Tools.extractXPath("/a/c", xml).getLength());
-		assertEquals(1, Tools.extractXPath("/a/b[text()='test']", xml)
+		assertEquals(2, Tools.extractXPath(DEF_NS_CONTEXT, "/a/c", xml)
 				.getLength());
-		assertEquals("test", Tools.extractXPath("/a/b/text()", xml).item(0)
+		assertEquals(1, Tools.extractXPath(DEF_NS_CONTEXT,
+				"/a/b[text()='test']", xml)
+				.getLength());
+		assertEquals("test", Tools.extractXPath(DEF_NS_CONTEXT, "/a/b/text()",
+				xml).item(0)
 				.getNodeValue());
-		assertEquals(1, Tools.extractXPath("/a[count(c)>0]", xml)
+		assertEquals(1, Tools.extractXPath(DEF_NS_CONTEXT, "/a[count(c)>0]",
+				xml)
 				.getLength());
-		assertEquals(3, Tools.extractXPath("/a/b | /a/c | /a/X", xml)
+		assertEquals(3, Tools.extractXPath(DEF_NS_CONTEXT,
+				"/a/b | /a/c | /a/X", xml)
 				.getLength());
-		assertEquals(3, Tools.extractXPath("/a/b | /a/c | /a/X", xml)
+		assertEquals(3, Tools.extractXPath(DEF_NS_CONTEXT,
+				"/a/b | /a/c | /a/X", xml)
 				.getLength());
 	}
 
@@ -134,19 +141,37 @@ public class ToolsTest {
 
 	}
 
+	@Test
+	public void shouldExtractXPathsFromXmlDocumentAsNumberWithDefaultNamespace() {
+		String xml = "<a xmlns='http://ns.com'><b>test</b><c>1</c></a>";
+		HashMap<String, String> ns = new HashMap<String, String>();
+		ns.put("def", "http://ns.com");
+		assertEquals("test", Tools.extractXPath(ns, "/def:a/def:b", xml,
+				XPathConstants.STRING));
+	}
+
+	@Test
+	public void shouldExtractXPathsFromXmlDocumentAsNumberWithGenericNamespace() {
+		String xml = "<?xml version='1.0' ?><a xmlns:ns1='http://ns1.com'><b>test</b><ns1:c>tada</ns1:c></a>";
+		HashMap<String, String> ns = new HashMap<String, String>();
+		ns.put("alias", "http://ns1.com");
+		assertEquals("tada", Tools.extractXPath(ns, "/a/alias:c", xml,
+				XPathConstants.STRING));
+	}
+
 	@Test(expected=IllegalArgumentException.class)
 	public void shouldNotifyCallerWhenXPathIsWrong(){
-		Tools.extractXPath("/a[text=1", "<a>1</a>");
+		Tools.extractXPath(DEF_NS_CONTEXT, "/a[text=1", "<a>1</a>");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void shouldNotifyCallerWhenXmlIsWrong(){
-		Tools.extractXPath("/a[text()='1']", "<a>1<a>");
+		Tools.extractXPath(DEF_NS_CONTEXT, "/a[text()='1']", "<a>1<a>");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void shouldNotifyCallerWhenXmlCannotBeParsed(){
-		Tools.extractXPath("/a[text()='1']", null);
+		Tools.extractXPath(DEF_NS_CONTEXT, "/a[text()='1']", null);
 	}
 
 }

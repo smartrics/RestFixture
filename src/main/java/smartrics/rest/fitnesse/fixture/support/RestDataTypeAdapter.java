@@ -23,22 +23,28 @@ package smartrics.rest.fitnesse.fixture.support;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import fit.TypeAdapter;
 
 public abstract class RestDataTypeAdapter extends TypeAdapter{
-	private List<String> errors = new ArrayList<String>();
+	private final List<String> errors = new ArrayList<String>();
 
 	private Object actual;
 
+	private Map<String, String> context;
+
+	@Override
 	public String toString(){
 		return toString(get());
 	}
 
+	@Override
 	public void set(Object actual){
 		this.actual = actual;
 	}
 
+	@Override
 	public Object get(){
 		return actual;
 	}
@@ -51,4 +57,16 @@ public abstract class RestDataTypeAdapter extends TypeAdapter{
 		return Collections.unmodifiableList(errors);
 	}
 
+	/**
+	 * Used to pass some form of context to the adapter
+	 * 
+	 * @param context
+	 */
+	public void setContext(Map<String, String> context) {
+		this.context = context;
+	}
+
+	protected Map<String, String> getContext() {
+		return context;
+	}
 }

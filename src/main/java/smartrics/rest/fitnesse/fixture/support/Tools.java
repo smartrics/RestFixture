@@ -28,11 +28,14 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -59,17 +62,51 @@ public final class Tools {
 
 	}
 
-	public static NodeList extractXPath(String xpathExpression, String content) {
+	public static NodeList extractXPath(Map<String, String> ns,
+			String xpathExpression, String content) {
 		// Use the java Xpath API to return a NodeList to the caller so they
 		// can iterate through
-		return (NodeList) extractXPath(xpathExpression, content,
+		return (NodeList) extractXPath(ns, xpathExpression, content,
 				XPathConstants.NODESET);
 	}
 
-	private static XPathExpression toExpression(String xpathExpression) {
+
+	public static Object extractXPath(String xpathExpression, String content,
+			QName returnType) {
+		// Use the java Xpath API to return a NodeList to the caller so they
+		// can iterate through
+		return extractXPath(new HashMap<String, String>(), xpathExpression,
+				content, returnType);
+	}
+
+	/**
+	 * extract the XPath from the content. the return value type is passed in
+	 * input using one of the {@link XPathConstants}. See also
+	 * {@link XPathExpression#evaluate(Object item, QName returnType)} ;
+	 */
+	public static Object extractXPath(Map<String, String> ns,
+			String xpathExpression, String content, QName returnType) {
+		if (null == ns)
+			ns = new HashMap<String, String>();
+		Document doc = toDocument(content);
+		XPathExpression expr = toExpression(ns, xpathExpression);
+		try {
+			Object o = expr.evaluate(doc, returnType);
+			return o;
+		} catch (XPathExpressionException e) {
+			throw new IllegalArgumentException(
+					"xPath expression can not be executed: " + xpathExpression);
+		}
+	}
+
+	private static XPathExpression toExpression(Map<String, String> ns,
+			String xpathExpression) {
 		try {
 			XPathFactory xpathFactory = XPathFactory.newInstance();
 			XPath xpath = xpathFactory.newXPath();
+			if (ns.size() > 0) {
+				xpath.setNamespaceContext(toNsContext(ns));
+			}
 			XPathExpression expr = xpath.compile(xpathExpression);
 			return expr;
 		} catch (XPathExpressionException e) {
@@ -77,6 +114,36 @@ public final class Tools {
 					"xPath expression can not be compiled: " + xpathExpression,
 					e);
 		}
+	}
+
+	private static NamespaceContext toNsContext(final Map<String, String> ns) {
+		NamespaceContext ctx = new NamespaceContext() {
+
+			@Override
+			public String getNamespaceURI(String prefix) {
+				String u = ns.get(prefix);
+				if (null == u)
+					return XMLConstants.NULL_NS_URI;
+				return u;
+			}
+
+			@Override
+			public String getPrefix(String namespaceURI) {
+				for (String k : ns.keySet()) {
+					if (ns.get(k).equals(namespaceURI))
+						return k;
+				}
+				return null;
+			}
+
+			@Override
+			@SuppressWarnings("unchecked")
+			public Iterator getPrefixes(String namespaceURI) {
+				return null;
+			}
+
+		};
+		return ctx;
 	}
 
 	private static Document toDocument(String content) {
@@ -98,31 +165,20 @@ public final class Tools {
 		}
 	}
 
-	public static String fromJSONtoXML(String json) throws IOException {
+	public static String fromJSONtoXML(String json) {
 		HierarchicalStreamDriver driver = new JettisonMappedXmlDriver();
 		StringReader reader = new StringReader(json);
 		HierarchicalStreamReader hsr = driver.createReader(reader);
-		StringWriter writer = new StringWriter();
-		new HierarchicalStreamCopier().copy(hsr, new PrettyPrintWriter(writer));
-		writer.close();
-		return writer.toString();
-	}
-
-	/**
-	 * extract the XPath from the content. the return value type is passed in
-	 * input using one of the {@link XPathConstants}. See also
-	 * {@link XPathExpression#evaluate(Object item, QName returnType)} ;
-	 */
-	public static Object extractXPath(String xpathExpression, String content,
-			QName returnType) {
-		Document doc = toDocument(content);
-		XPathExpression expr = toExpression(xpathExpression);
 		try {
-			Object o = expr.evaluate(doc, returnType);
-			return o;
-		} catch (XPathExpressionException e) {
-			throw new IllegalArgumentException(
-					"xPath expression can not be executed: " + xpathExpression);
+		StringWriter writer = new StringWriter();
+			new HierarchicalStreamCopier().copy(hsr, new PrettyPrintWriter(
+					writer));
+			writer.close();
+			return writer.toString();
+		} catch (IOException e) {
+			throw new RuntimeException(
+					"Something went horribly wrong during JSON->XML conversion",
+					e);
 		}
 	}
 

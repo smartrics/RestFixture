@@ -101,12 +101,13 @@ public class Resources {
 		clear();
 		counter = 0;
 		add("/resources", new Resource(
-				"<resource><name>a funky name</name>"
-						+ "<data>an important message</data></resource>"));
+				"<resource>\n    <name>a funky name</name>"
+								+ "\n    <data>an important message</data>"
+								+ "\n    <nstag xmlns:ns1='http://smartrics/ns1'>\n        <ns1:number>3</ns1:number>\n    </nstag>"
+								+ "\n</resource>"));
 		add("/resources", new Resource(
 				"{ \"resource\" : { \"name\" : \"a funky name\", "
 						+ "\"data\" : \"an important message\" } }"));
-		add("/resources", new Resource(null));
 	}
 
 	private synchronized int newCounter() {

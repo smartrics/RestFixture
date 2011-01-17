@@ -5,10 +5,10 @@
 	<property file="build.properties" />
 
 	<property name="fitnesse.root.name" value="FitNesseRoot" />
-        <property name="fitnesse.path" value="${ant.project.name}Tests" />
-        <property name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
+	<property name="fitnesse.path" value="${ant.project.name}Tests" />
+	<property name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
 	<property name="src.unit" value="${basedir}/src/test/java" />
-        <property name="src.cat" value="${basedir}/src/test/fitnesse" />
+	<property name="src.cat" value="${basedir}/src/test/fitnesse" />
 	<property name="src" value="${basedir}/src/main/java" />
 	<property name="resources" value="${basedir}/src/main/resources" />
 	<property name="build" value="${basedir}/build" />
@@ -19,6 +19,7 @@
 	<property name="lib" value="${basedir}/lib" />
 	<property name="reports" value="${build}/reports" />
 	<property name="fitnesse.reports" value="${reports}/fitnesse" />
+	<property name="fitnesse.reports.resources" value="etc/fitnesse" />
 	<property name="artifacts" value="${dist}/artifacts" />
 
 	<path id="project.classpath">
@@ -48,9 +49,7 @@
 
 	<target name="compile" depends="init">
 		<mkdir dir="${build}/classes/main" />
-		<javac includes="**/*.java" debug="${build.debug}"
-			destdir="${build}/classes/main"
-			target="${build.target}">
+		<javac includes="**/*.java" debug="${build.debug}" destdir="${build}/classes/main" target="${build.target}">
 			<src path="${src}" />
 			<classpath refid="project.classpath" />
 		</javac>
@@ -78,10 +77,7 @@
 
 	<target name="compile-cat" depends="compile">
 		<mkdir dir="${build}/classes/cat" />
-		<javac includes="**/*.java"
-			debug="${build.debug}"
-			target="${build.target}"
-			destdir="${build}/classes/cat">
+		<javac includes="**/*.java" debug="${build.debug}" target="${build.target}" destdir="${build}/classes/cat">
 			<src path="${src.cat}" />
 			<classpath refid="test.classpath" />
 		</javac>
@@ -92,44 +88,44 @@
 		<jar destfile="${build}/${ant.project.name}_fitnesse.jar" basedir="${build}/classes/cat" includes="**/*" excludes="**/*.jar" />
 	</target>
 
-    <target name="-fitnesse-copy" depends="package">
-        <delete dir="${fitnesse.test.root}" />
-        <mkdir dir="${fitnesse.test.root}/lib" />
-        <copy todir="${fitnesse.test.root}/lib" flatten="true">
-            <fileset dir="build">
-                <include name="*.jar" />
-            </fileset>
-            <fileset dir="lib">
-                <include name="**/*.jar" />
-            </fileset>
-            <fileset dir="${resources}">
-                <include name="**/*.*" />
-            </fileset>
-        </copy>
-        <copy todir="${fitnesse.test.root}" overwrite="true" >
-            <filterset>
-                <filter token="FITNESSE_HOME" value="${fitnesse.home}" />
-                <filter token="FITNESSE_TEST_ROOT" value="${fitnesse.test.root}" />
-                <filter token="TEMP_DIRECTORY" value="${temp.directory}" />
-            </filterset>
-            <fileset dir="fitdocs/${fitnesse.path}" />
-        </copy>
-    </target>
+	<target name="-fitnesse-copy" depends="package">
+		<delete dir="${fitnesse.test.root}" />
+		<mkdir dir="${fitnesse.test.root}/lib" />
+		<copy todir="${fitnesse.test.root}/lib" flatten="true">
+			<fileset dir="build">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="lib">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${resources}">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+		<copy todir="${fitnesse.test.root}" overwrite="true">
+			<filterset>
+				<filter token="FITNESSE_HOME" value="${fitnesse.home}" />
+				<filter token="FITNESSE_TEST_ROOT" value="${fitnesse.test.root}" />
+				<filter token="TEMP_DIRECTORY" value="${temp.directory}" />
+			</filterset>
+			<fileset dir="fitdocs/${fitnesse.path}" />
+		</copy>
+	</target>
 
-    <target name="fitnesse-deploy-remote" depends="package">
-    	<property name="remote.fitnesse.root" value="${fitnesse.root}" />
-        <antcall target="-fitnesse-copy">
-            <param name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
-            <param name="fitnesse.test.root" value="${remote.fitnesse.root}/${fitnesse.path}" />
-        </antcall>
-    </target>
+	<target name="fitnesse-deploy-remote" depends="package">
+		<property name="remote.fitnesse.root" value="${fitnesse.root}" />
+		<antcall target="-fitnesse-copy">
+			<param name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
+			<param name="fitnesse.test.root" value="${remote.fitnesse.root}/${fitnesse.path}" />
+		</antcall>
+	</target>
 
-    <target name="fitnesse-deploy" depends="package">
-        <antcall target="-fitnesse-copy">
-            <param name="fitnesse.root" value="${build.fitnesse.home}/${fitnesse.root.name}" />
-            <param name="fitnesse.test.root" value="${build.fitnesse.test.root}" />
-        </antcall>
-    </target>
+	<target name="fitnesse-deploy" depends="package">
+		<antcall target="-fitnesse-copy">
+			<param name="fitnesse.root" value="${build.fitnesse.home}/${fitnesse.root.name}" />
+			<param name="fitnesse.test.root" value="${build.fitnesse.test.root}" />
+		</antcall>
+	</target>
 
 	<target name="fitnesse-test-remote" depends="fitnesse-deploy-remote,fitnesse-exec-test,check.fitnesse.failure" if="execute.cat" />
 	<target name="fitnesse-test" depends="fitnesse-start,fitnesse-deploy,fitnesse-exec-test,fitnesse-stop,check.fitnesse.failure" if="execute.cat" />
@@ -151,27 +147,44 @@
 
 	<target name="fitnesse-exec-test" if="execute.cat">
 		<taskdef name="execute-fitnesse-tests" classname="fitnesse.ant.ExecuteFitnesseTestsTask" classpathref="project.classpath" />
-        <property name="fitnesse.suite.root" value="${fitnesse.path}.BasicTests" />
-        <mkdir dir="${fitnesse.reports}" />
+		<property name="fitnesse.suite.root" value="${fitnesse.path}.BasicTests" />
+		<mkdir dir="${fitnesse.reports}" />
 		<execute-fitnesse-tests suitepage="${fitnesse.suite.root}"
 			fitnesseport="${fitnesse.port}" resultsdir="${fitnesse.reports}"
-			resultshtmlpage="results.html" failonerror="false" resultproperty="fitnesse.fail" >
-            <classpath>
-                <pathelement location="${build}/${ant.project.name}.jar" />
-                <pathelement location="${build}/${ant.project.name}_fitnesse.jar" />
-                <path refid="project.classpath" />
-            </classpath>
+			resultshtmlpage="results.html" failonerror="false"
+			resultproperty="fitnesse.fail">
+			<classpath>
+				<pathelement location="${build}/${ant.project.name}.jar" />
+				<pathelement location="${build}/${ant.project.name}_fitnesse.jar" />
+				<path refid="project.classpath" />
+			</classpath>
 		</execute-fitnesse-tests>
 	</target>
 
 	<target name="dist-doc" if="execute.cat">
-		<copy tofile="${artifacts}/docs/docs.html" file="${reports}/fitnesse/results.html" failonerror="false" />
+		<!-- distributable docs -->
+		<property name="docs.html.file" value="${artifacts}/docs/RestFixture-${version}.html" />
+		<copy tofile="${docs.html.file}" file="${reports}/fitnesse/results.html" failonerror="false" />
+
 		<copy todir="${artifacts}/docs" flatten="true">
 			<fileset dir="${fitnesse.reports}" includes="**/*.*" excludes="results.*" />
 		</copy>
-		<replace file="${artifacts}/docs/docs.html" token="base href" value="xbase href" />
-		<replace file="${artifacts}/docs/docs.html" token="/files" value="http://fitnesse.org/files" />
-		<replace file="${artifacts}/docs/docs.html" token="files/restfixture/" value="" />
+		<copy todir="${artifacts}/docs">
+			<fileset dir="${fitnesse.root.name}" includes="**/*.gif" />
+			<fileset dir="${fitnesse.reports.resources}" includes="**/*.*" />
+		</copy>
+		<replace file="${docs.html.file}" token="base href" value="ignore-base href" summary="true"/>
+		<replace file="${docs.html.file}" token="/files" value="files"  summary="true"/>
+		<replace dir="${artifacts}/docs" token="/files/css/" value="" includes="**/*.css"  summary="true"/>
+
+		<!-- live deployed docs file -->
+		<property name="docs.html.live.file" value="${artifacts}/docs/RestFixture-live-${version}.html" />
+		<copy tofile="${docs.html.live.file}" file="${reports}/fitnesse/results.html" failonerror="false" />
+
+		<replace file="${docs.html.live.file}" token="base href" value="ignore-base href"  summary="true"/>
+		<replace file="${docs.html.live.file}" token="/files" value="http://fitnesse.org/files"  summary="true"/>
+		<replace file="${docs.html.live.file}" token="files/restfixture/" value=""  summary="true"/>
+
 	</target>
 
 	<target name="dist">
@@ -191,7 +204,6 @@
 		<copy todir="${artifacts}" file="README" />
 		<property file="version.properties" />
 		<antcall target="dist-doc" />
-		<move file="${artifacts}/docs/docs.html" tofile="${artifacts}/docs/RestFixture-${version}.html" />
 		<zip destfile="dist/RestFixture-nodep-${version}.zip" basedir="${artifacts}" casesensitive="true" compress="true" includes="**/*" excludes="lib/**/*.jar" />
 		<zip destfile="dist/RestFixture-${version}.zip" basedir="${artifacts}" casesensitive="true" compress="true" includes="**/*" />
 		<zip destfile="dist/RestFixture-docs-${version}.zip" basedir="${artifacts}/docs" casesensitive="true" compress="true" includes="**/*" />

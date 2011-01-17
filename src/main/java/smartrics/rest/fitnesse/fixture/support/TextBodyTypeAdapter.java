@@ -25,4 +25,9 @@ public class TextBodyTypeAdapter extends BodyTypeAdapter {
 			return "null";
 		return s.trim();
 	}
+
+	@Override
+	public String toXmlString(String content) {
+		return "<text>" + content + "</text>";
+	}
 }

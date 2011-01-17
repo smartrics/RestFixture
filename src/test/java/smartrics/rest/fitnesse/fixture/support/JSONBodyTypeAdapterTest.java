@@ -33,9 +33,8 @@ import org.junit.Test;
 
 public class JSONBodyTypeAdapterTest {
 	private final BodyTypeAdapter adapter = new JSONBodyTypeAdapter();
-	private final static String xml0 = "{\"a\": { b: [\"12\",\"23\"], \"c\": \"XY\" } }";
-	private final static String html1 = "{\"a\": \" 1&\"}";
-	private final static String xml1 = "{\"a\": \" 1&\"}";
+	private final static String json0 = "{\"a\": { b: [\"12\",\"23\"], \"c\": \"XY\" } }";
+	private final static String json1 = "{\"a\": \" 1&\"}";
 	private final static List<String> xPaths = Arrays.asList("/a", "//b");
 	private final static String xPathsAsString = "/a<br/>//b";
 
@@ -45,23 +44,27 @@ public class JSONBodyTypeAdapterTest {
 		assertTrue(adapter.equals("no-body", ""));
 		assertTrue(adapter.equals("no-body", null));
 		assertFalse(adapter.equals("/a", null));
-		assertFalse(adapter.equals("no-body", xml0));
+		assertFalse(adapter.equals("no-body", json0));
 	}
 
 	@Test
 	public void shouldIdentifyAsEqualsIfExpectedObjectIsAListOfXPathsAvailableInActual() {
-		assertTrue("not found simple nodelist xpath", adapter.equals(Arrays.asList("/a/b[text()='12']"), xml0));
-		assertTrue("not found two nodelist xpaths", adapter.equals(Arrays.asList("/a/b[text()='12']", "/a/c[text()='XY']"), xml0));
-		assertTrue("not found two boolean xpath", adapter.equals(Arrays.asList("count(/a/b)=2", "count(/a/c)=1"), xml0));
+		assertTrue("not found simple nodelist xpath", adapter.equals(Arrays
+				.asList("/a/b[text()='12']"), json0));
+		assertTrue("not found two nodelist xpaths", adapter.equals(Arrays
+				.asList("/a/b[text()='12']", "/a/c[text()='XY']"), json0));
+		assertTrue("not found two boolean xpath", adapter.equals(Arrays.asList(
+				"count(/a/b)=2", "count(/a/c)=1"), json0));
 		assertTrue(
 				"not found two boolean xpath and two nodelist xpaths",
-				adapter.equals(Arrays.asList("count(/a/b)=2","count(/a/c)=1","/a/b[text()='12']", "/a/c[text()='XY']"), xml0));
+				adapter.equals(Arrays.asList("count(/a/b)=2", "count(/a/c)=1",
+						"/a/b[text()='12']", "/a/c[text()='XY']"), json0));
 	}
 
 	@Test
 	public void shouldStoreNotFoundMessageForEveryExpressionNotFoundForEqualityCheck() {
 		assertFalse(adapter.equals(Arrays.asList("/a/b[text()='zzz']",
-				"/a/d[text()='next']", "/a/c[text()='XY']"), xml0));
+				"/a/d[text()='next']", "/a/c[text()='XY']"), json0));
 		assertEquals(2, adapter.getErrors().size());
 		assertEquals("not found: '/a/b[text()='zzz']'", adapter.getErrors()
 				.get(0));
@@ -72,12 +75,12 @@ public class JSONBodyTypeAdapterTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldFailEqualityCheckIfAnyExpressionIsInvalid() {
 		adapter.equals(Arrays.asList("invalid xpath", "/a/c[text()='XY']"),
-				xml0);
+				json0);
 	}
 
 	@Test
 	public void shouldReturnItsStringRepresentationAsPrintableHTML() {
-		assertEquals(html1, adapter.toString(xml1));
+		assertEquals(json1, adapter.toString(json1));
 	}
 
 	@Test
@@ -97,12 +100,12 @@ public class JSONBodyTypeAdapterTest {
 	}
 
 	@Test
-	public void shoudlParseNoXPathsIntoAnEmptyList() {
+	public void shoudlParseNoJsonIntoAnEmptyList() {
 		try {
 			// just make sure we have the right fata
 			assertEquals(new Vector<String>(), adapter.parse(null));
-			assertEquals(new Vector<String>(), adapter.parse(""));
 			assertEquals(new Vector<String>(), adapter.parse("no-body"));
+			assertEquals(new Vector<String>(), adapter.parse(""));
 		} catch (Exception e) {
 			fail("should have not raised an exception");
 		}

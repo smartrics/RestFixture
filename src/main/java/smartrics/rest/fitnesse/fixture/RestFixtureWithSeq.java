@@ -20,9 +20,9 @@ import fit.exception.FitFailureException;
  * An extension of RestFixture that generates a sequence diagrams for a table
  * fixture. Sequence diagrams are generated using PIC language templates defined
  * in <a href="http://www.umlgraph.org">UMLGraph</a>.
- * 
+ *
  * @author fabrizio
- * 
+ *
  */
 public class RestFixtureWithSeq extends RestFixture {
 
@@ -38,8 +38,12 @@ public class RestFixtureWithSeq extends RestFixture {
 	 * <code>new File("restfixture")</code>, a directory relative to the default
 	 * fitnesse root directory.
 	 */
-	public static final File GRAPH_FILES_DIR = new File(
-			"FitNesseRoot/files/restfixture");
+	public static final File GRAPH_FILES_DIR;
+	static {
+		String picsDir = System.getProperty("restfixture.graphs.dir",
+				"FitNesseRoot/files/restfixture");
+		GRAPH_FILES_DIR = new File(picsDir);
+	}
 
 	/**
 	 * the name of the object representing the fixture (eg the client executing
@@ -79,7 +83,7 @@ public class RestFixtureWithSeq extends RestFixture {
 	 * State of the RestFixtureWithSeq is valid (or true) if both the baseUrl
 	 * and picture name are not null. These parameters are the first and second
 	 * in input to the fixture.
-	 * 
+	 *
 	 * @return true if valid.
 	 */
 	@Override
@@ -177,7 +181,7 @@ public class RestFixtureWithSeq extends RestFixture {
 
 	/**
 	 * the picture name is the second parameter of the fixture
-	 * 
+	 *
 	 * @return the picture name
 	 */
 	String getPictureName() {
@@ -201,7 +205,7 @@ public class RestFixtureWithSeq extends RestFixture {
 /**
  * A <code>fit.FixtureListener</code> that listens for a table being completed.
  * the action performed on table completion is the actual graph generation.
- * 
+ *
  * @author fabrizio
  */
 class MyFixtureListener implements FixtureListener {

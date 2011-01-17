@@ -44,6 +44,7 @@ import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.client.RestData.Header;
 import smartrics.rest.config.Config;
+import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
@@ -81,7 +82,7 @@ import fit.exception.FitFailureException;
  * written in wiki syntax.
  * <li>tests should be easy to write and above all read.
  * </ul>
- *
+ * 
  * <b>Configuring RestFixture</b><br/>
  * RestFixture can be configured by using the {@link RestFixtureConfig}. A
  * {@code RestFixtureConfig} can define named maps with configuration key/value
@@ -90,9 +91,8 @@ import fit.exception.FitFailureException;
  * the default configuration map is used. See {@link RestFixtureConfig} for more
  * details.
  * <p/>
- * The following list of configuration parameters can be used.
+ * The following list of configuration parameters can are supported.
  * <p/>
- * Configuring the behaviour of the underlying {@link RestClient}.
  * <table border="1">
  * <tr>
  * <td>smartrics.rest.fitnesse.fixture.RestFixtureConfig</td>
@@ -100,38 +100,50 @@ import fit.exception.FitFailureException;
  * </tr>
  * <tr>
  * <td>http.proxy.host</td>
- * <td><i>http proxy host name</i></td>
+ * <td><i>http proxy host name (RestClient proxy configutation)</i></td>
  * </tr>
  * <tr>
  * <td>http.proxy.port</td>
- * <td><i>http proxy host port</i></td>
+ * <td><i>http proxy host port (RestClient proxy configutation)</i></td>
  * </tr>
  * <tr>
  * <td>http.basicauth.username</td>
- * <td><i>username for basic authentication</i></td>
+ * <td><i>username for basic authentication (RestClient proxy configutation)</i>
+ * </td>
  * </tr>
  * <tr>
  * <td>http.basicauth.password</td>
- * <td><i>password for basic authentication</i></td>
+ * <td><i>password for basic authentication (RestClient proxy configutation)</i>
+ * </td>
  * </tr>
  * <tr>
  * <td>http.client.connection.timeout</td>
- * <td><i>client timeout for http connection (default 3s)</i></td>
+ * <td><i>client timeout for http connection (default 3s). (RestClient proxy
+ * configutation)</i></td>
  * </tr>
  * <tr>
- * <td>restfixure.display.actual.on.right</td>
+ * <td>restfixture.display.actual.on.right</td>
  * <td><i>boolean value. if true, the actual value of the header or body in an
  * expectation cell is displayed even when the expectation is met.</i></td>
  * </tr>
  * <tr>
- * <td>restfixure.default.headers</td>
+ * <td>restfixture.default.headers</td>
  * <td><i>comma separated list of key value pairs representing the default list
  * of headers to be passed for each request. key and values are separated by a
  * colon. Entries are sepatated by {@code System.getProperty("line.separator")}.
  * {@link RestFixture#setHeader()} will override this value. </i></td>
  * </tr>
+ * <tr>
+ * <td>restfixture.xml.namespaces.context</td>
+ * <td><i>comma separated list of key value pairs representing namespace
+ * declarations. The key is the namespace alias, the value is the namespace URI.
+ * alias and URI are separated by a = sign. Entries are sepatated by {@code
+ * System.getProperty("line.separator")}. These entries will be used to define
+ * the namespace context to be used in xpaths that are evaluated in the
+ * results.</i></td>
+ * </tr>
  * </table>
- *
+ * 
  * @author fabrizio
  */
 public class RestFixture extends ActionFixture {
@@ -162,6 +174,7 @@ public class RestFixture extends ActionFixture {
 	 * the headers passed to each request by default.
 	 */
 	private Map<String, String> defaultHeaders = new HashMap<String, String>();
+	private Map<String, String> namespaceContext = new HashMap<String, String>();
 
 	private static final Pattern FIND_VARS_PATTERN = Pattern
 			.compile("\\%([a-zA-Z0-9_]+)\\%");
@@ -222,9 +235,11 @@ public class RestFixture extends ActionFixture {
 	 */
 	protected void configFixture() {
 		displayActualOnRight = config.getAsBoolean(
-				"restfixure.display.actual.on.right", true);
-		String str = config.get("restfixure.default.headers", "");
+				"restfixture.display.actual.on.right", true);
+		String str = config.get("restfixture.default.headers", "");
 		defaultHeaders = parseHeaders(str);
+		str = config.get("restfixture.xml.namespace.context", "");
+		namespaceContext = parseNamespaceContext(str);
 	}
 
 	/**
@@ -486,7 +501,7 @@ public class RestFixture extends ActionFixture {
 				}
 			}
 		} catch (IOException e) {
-			exception(cells.more.more.more, e);			
+			exception(cells.more.more.more, e);
 		} catch (RuntimeException e) {
 			exception(cells.more.more.more, e);
 		} finally {
@@ -540,26 +555,22 @@ public class RestFixture extends ActionFixture {
 		return val;
 	}
 
-	private String getLastResponseBodyAsXml() throws IOException {
-		if(getContentTypeOfLastResponse().equals(ContentType.JSON) || getContentTypeOfLastResponse().equals(ContentType.JSONX))
-			return Tools.fromJSONtoXML(getLastResponse().getBody());
-
-		return getLastResponse().getBody();
-	}
-
-	private String handleXPathAsNodeList(String expr) throws IOException {
-		NodeList list = Tools.extractXPath(expr, getLastResponseBodyAsXml());
-			Node item = list.item(0);
-			String val = null;
-			if (item != null) {
-				val = item.getTextContent();
-			}
+	private String handleXPathAsNodeList(String expr) {
+		BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory
+				.getBodyTypeAdapter(getContentTypeOfLastResponse());
+		NodeList list = Tools.extractXPath(namespaceContext, expr,
+				bodyTypeAdapter.toXmlString(getLastResponse().getBody()));
+		Node item = list.item(0);
+		String val = null;
+		if (item != null) {
+			val = item.getTextContent();
+		}
 		return val;
 	}
 
 	private String handleXPathAsString(String expr) {
-		String val = (String) Tools.extractXPath(expr, getLastResponse()
-				.getBody(), XPathConstants.STRING);
+		String val = (String) Tools.extractXPath(namespaceContext, expr,
+				getLastResponse().getBody(), XPathConstants.STRING);
 		return val;
 	}
 
@@ -633,9 +644,11 @@ public class RestFixture extends ActionFixture {
 				new HeadersTypeAdapter());
 		cells.more.more.more.more.body = resolve(FIND_VARS_PATTERN,
 				cells.more.more.more.more.body);
+		BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory
+				.getBodyTypeAdapter(getContentTypeOfLastResponse());
+		bodyTypeAdapter.setContext(namespaceContext);
 		process(cells.more.more.more.more, getLastResponse().getBody(),
-				BodyTypeAdapterFactory
-						.getBodyTypeAdapter(getContentTypeOfLastResponse()));
+				bodyTypeAdapter);
 	}
 
 	private void process(Parse expected, Object actual, RestDataTypeAdapter ta) {
@@ -744,6 +757,11 @@ public class RestFixture extends ActionFixture {
 
 	private Map<String, String> parseHeaders(String str) {
 		return Tools.convertStringToMap(str, ":", System
+				.getProperty("line.separator"));
+	}
+
+	private Map<String, String> parseNamespaceContext(String str) {
+		return Tools.convertStringToMap(str, "=", System
 				.getProperty("line.separator"));
 	}
 }

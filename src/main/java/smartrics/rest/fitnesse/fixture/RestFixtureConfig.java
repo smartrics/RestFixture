@@ -118,8 +118,12 @@ public class RestFixtureConfig extends Fixture {
 			String key = cells.text();
 			String value = cells.more.text();
 			c.add(key, value);
+			String fValue = value.replaceAll(System
+					.getProperty("line.separator"), "<br>");
 			right(cells);
-			right(cells.more);
+			Parse valueParse = cells.more;
+			valueParse.body = fValue;
+			right(valueParse);
 		} catch (Exception e) {
 			System.err.println("Exception for " + p.text());
 			e.printStackTrace();
