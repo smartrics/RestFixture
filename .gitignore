@@ -1,0 +1,6 @@
+FitNesseRoot/
+*.log
+bin/
+build/
+dist/
+
