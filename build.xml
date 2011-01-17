@@ -183,7 +183,7 @@
 
 		<replace file="${docs.html.live.file}" token="base href" value="ignore-base href"  summary="true"/>
 		<replace file="${docs.html.live.file}" token="/files" value="http://fitnesse.org/files"  summary="true"/>
-		<replace file="${docs.html.live.file}" token="files/restfixture/" value=""  summary="true"/>
+		<replace file="${docs.html.live.file}" token="files/restfixture/" value="http://rest-fixture.googlecode.com/files/"  summary="true"/>
 
 	</target>
 
