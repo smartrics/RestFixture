@@ -237,7 +237,14 @@ public final class Tools {
 
 	public static Map<String, String> convertStringToMap(final String expStr,
 			final String nvSep, final String entrySep) {
-		String[] nvpArray = expStr.split(entrySep);
+		String sanitisedExpStr = expStr.trim();
+		if (sanitisedExpStr.startsWith("!-"))
+			sanitisedExpStr = sanitisedExpStr.substring(2);
+		if (sanitisedExpStr.endsWith("-!"))
+			sanitisedExpStr = sanitisedExpStr.substring(0,
+					sanitisedExpStr.length() - 2);
+		sanitisedExpStr = sanitisedExpStr.trim();
+		String[] nvpArray = sanitisedExpStr.split(entrySep);
 		Map<String, String> ret = new HashMap<String, String>();
 		for (String nvp : nvpArray) {
 			try {
