@@ -198,6 +198,7 @@
 		<copy todir="${artifacts}/etc">
 			<fileset dir="etc" includes="**/*.*" />
 		</copy>
+        <copy todir="${artifacts}" file="CHANGELOG" />
 		<copy todir="${artifacts}" file="COPYING" />
 		<copy todir="${artifacts}" file="COPYING.LESSER" />
 		<copy todir="${artifacts}" file="COPYRIGHT" />
