@@ -113,8 +113,9 @@ public class RestFixtureTest {
 	@Test
 	public void mustUseDefaultHeadersIfDefinedOnNamedConfig() {
 		config = new Config("config.with.headers");
-		config.add("restfixture.default.headers", "added1 : 1"
-				+ System.getProperty("line.separator") + "added2 : 2");
+		config.add("restfixture.default.headers",
+				"added1 : 1" + System.getProperty("line.separator")
+						+ "added2 : 2");
 		final MockRestClient rClient = new MockRestClient() {
 			@Override
 			protected RestResponse createRestResponse(RestRequest request) {
@@ -127,6 +128,7 @@ public class RestFixtureTest {
 			{
 				super.args = new String[] { BASE_URL, "config.with.headers" };
 			}
+
 			@Override
 			public RestClient buildRestClient() {
 				return rClient;
@@ -139,6 +141,20 @@ public class RestFixtureTest {
 				.getRestResponse().getHeader("added1").get(0).toString());
 		assertEquals("added2:2 does not exist", "added2:2", rClient
 				.getRestResponse().getHeader("added2").get(0).toString());
+	}
+
+	@Test
+	public void mustAllowMultilineHeadersWhenSettingHeaders() {
+		String multilineHeaders = "!-header1:one"
+				+ System.getProperty("line.separator") + "header2:two"
+				+ System.getProperty("line.separator") + "-!";
+		Parse t = helper.createFitTestInstance(helper.createFitTestRow(
+				"setHeader", multilineHeaders));
+		fixture.doCells(t);
+		assertEquals("header1 han't been parsed and added", "one", fixture
+				.getHeaders().get("header1"));
+		assertEquals("header1 han't been parsed and added", "two", fixture
+				.getHeaders().get("header2"));
 	}
 
 	@Test
@@ -287,7 +303,6 @@ public class RestFixtureTest {
 				"<span class=\"fit_grey\">&lt;body&gt;text&lt;/body&gt;</span>");
 	}
 
-
 	@Test
 	public void mustExpectVerbOnFirstCell() {
 		Parse t = helper.createFitTestInstance(helper.createFitTestRow("GET",
@@ -329,8 +344,9 @@ public class RestFixtureTest {
 				"/body[text()='text'] <span class=\"fit_label\">expected</span><hr>&lt;body&gt;text&lt;/body&gt; <span class=\"fit_label\">actual</span>");
 		// multiple xpaths can be passed separated by line.separator
 		t = helper.createFitTestInstance(helper.createFitTestRow("GET", "/uri",
-				"200", "", "/body[text()='text']"
-						+ System.getProperty("line.separator") + "/body"));
+				"200", "",
+				"/body[text()='text']" + System.getProperty("line.separator")
+						+ "/body"));
 		fixture.doCells(t);
 		assertAllCells(
 				t,

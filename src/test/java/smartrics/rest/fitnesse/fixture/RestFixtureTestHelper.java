@@ -22,13 +22,14 @@ public class RestFixtureTestHelper {
 		return t;
 	}
 
-	public String createFitTestRow(String cell1, String cell2, String cell3,
-			String cell4, String cell5) {
-		String row = String
-				.format(
-						"<row><col>%s</col><col>%s</col><col>%s</col><col>%s</col><col>%s</col></row>",
-						cell1, cell2, cell3, cell4, cell5);
-		return row;
+	public String createFitTestRow(String... cells) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<row>");
+		for (String c : cells) {
+			buffer.append("<col>").append(c).append("</col>");
+		}
+		buffer.append("</row>");
+		return buffer.toString();
 	}
 
 }
