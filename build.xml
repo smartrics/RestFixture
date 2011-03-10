@@ -106,7 +106,7 @@
 			<filterset>
 				<filter token="FITNESSE_HOME" value="${fitnesse.home}" />
 				<filter token="FITNESSE_TEST_ROOT" value="${fitnesse.test.root}" />
-				<filter token="TEMP_DIRECTORY" value="${temp.directory}" />
+				<filter token="TEMP_DIRECTORY" value="${java.io.tmpdir}" />
 			</filterset>
 			<fileset dir="fitdocs/${fitnesse.path}" />
 		</copy>
