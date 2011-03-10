@@ -1,0 +1,13 @@
+version 2.0
+ * added support for SLIM
+
+version 1.1.1
+ * bug fix: setHeader now parses multiline headers
+ * API change: added setHeaders (sugarpop for multiline headers"
+ 
+ version 1.1
+ * added namespace support on matcher queries
+
+ version 1.0
+ * first fully usable release
+
