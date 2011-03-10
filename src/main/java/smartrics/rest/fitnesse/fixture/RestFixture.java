@@ -40,9 +40,9 @@ import org.w3c.dom.NodeList;
 
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestClientImpl;
+import smartrics.rest.client.RestData.Header;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
-import smartrics.rest.client.RestData.Header;
 import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory;
@@ -343,15 +343,23 @@ public class RestFixture extends ActionFixture {
 	}
 
 	/**
+	 * Equivalent to setHeader - syntactic sugar to indicate that you can now
+	 * set multiple headers in a single call
+	 */
+	public void setHeaders() {
+		setHeader();
+	}
+
+	/**
 	 * <code> | PUT | uri | ?ret | ?headers | ?body |</code>
 	 * <p/>
 	 * executes a PUT on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers and the http response
 	 * body
-	 *
+	 * 
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
-	 *
+	 * 
 	 * the http request headers can be set via <code>setHeaders()</code>. If not
 	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
@@ -591,7 +599,7 @@ public class RestFixture extends ActionFixture {
 		}
 	}
 
-	private Map<String, String> getHeaders() {
+	public Map<String, String> getHeaders() {
 		Map<String, String> headers = null;
 		if (requestHeaders != null) {
 			headers = requestHeaders;
@@ -756,8 +764,8 @@ public class RestFixture extends ActionFixture {
 	}
 
 	private Map<String, String> parseHeaders(String str) {
-		return Tools.convertStringToMap(str, ":", System
-				.getProperty("line.separator"));
+		return Tools.convertStringToMap(str, ":",
+				System.getProperty("line.separator"));
 	}
 
 	private Map<String, String> parseNamespaceContext(String str) {
