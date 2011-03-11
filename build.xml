@@ -135,24 +135,21 @@
 	</target>
 
 	<target name="fitnesse-start" if="execute.cat">
-		<taskdef name="start-fitnesse" classname="fitnesse.ant.StartFitnesseTask" classpathref="project.classpath" />
+		<taskdef name="start-fitnesse" classname="fitnesseMain.ant.StartFitnesseTask" classpathref="project.classpath" />
 		<start-fitnesse wikidirectoryrootpath="${build.fitnesse.home}" fitnesseport="${fitnesse.port}" />
 		<sleep seconds="2" />
 	</target>
 
 	<target name="fitnesse-stop" if="execute.cat">
-		<taskdef name="stop-fitnesse" classname="fitnesse.ant.StopFitnesseTask" classpathref="project.classpath" />
+		<taskdef name="stop-fitnesse" classname="fitnesseMain.ant.StopFitnesseTask" classpathref="project.classpath" />
 		<stop-fitnesse fitnesseport="${fitnesse.port}" />
 	</target>
 
 	<target name="fitnesse-exec-test" if="execute.cat">
-		<taskdef name="execute-fitnesse-tests" classname="fitnesse.ant.ExecuteFitnesseTestsTask" classpathref="project.classpath" />
+		<taskdef name="execute-fitnesse-tests" classname="fitnesseMain.ant.ExecuteFitnesseTestsTask" classpathref="project.classpath" />
 		<property name="fitnesse.suite.root" value="${fitnesse.path}.BasicTests" />
 		<mkdir dir="${fitnesse.reports}" />
-		<execute-fitnesse-tests suitepage="${fitnesse.suite.root}"
-			fitnesseport="${fitnesse.port}" resultsdir="${fitnesse.reports}"
-			resultshtmlpage="results.html" failonerror="false"
-			resultproperty="fitnesse.fail">
+		<execute-fitnesse-tests suitepage="${fitnesse.suite.root}" fitnesseport="${fitnesse.port}" resultsdir="${fitnesse.reports}" resultshtmlpage="results.html" failonerror="false" resultproperty="fitnesse.fail">
 			<classpath>
 				<pathelement location="${build}/${ant.project.name}.jar" />
 				<pathelement location="${build}/${ant.project.name}_fitnesse.jar" />
@@ -173,17 +170,17 @@
 			<fileset dir="${fitnesse.root.name}" includes="**/*.gif" />
 			<fileset dir="${fitnesse.reports.resources}" includes="**/*.*" />
 		</copy>
-		<replace file="${docs.html.file}" token="base href" value="ignore-base href" summary="true"/>
-		<replace file="${docs.html.file}" token="/files" value="files"  summary="true"/>
-		<replace dir="${artifacts}/docs" token="/files/css/" value="" includes="**/*.css"  summary="true"/>
+		<replace file="${docs.html.file}" token="base href" value="ignore-base href" summary="true" />
+		<replace file="${docs.html.file}" token="/files" value="files" summary="true" />
+		<replace dir="${artifacts}/docs" token="/files/css/" value="" includes="**/*.css" summary="true" />
 
 		<!-- live deployed docs file -->
 		<property name="docs.html.live.file" value="${artifacts}/docs/RestFixture-live-${version}.html" />
 		<copy tofile="${docs.html.live.file}" file="${reports}/fitnesse/results.html" failonerror="false" />
 
-		<replace file="${docs.html.live.file}" token="base href" value="ignore-base href"  summary="true"/>
-		<replace file="${docs.html.live.file}" token="/files" value="http://fitnesse.org/files"  summary="true"/>
-		<replace file="${docs.html.live.file}" token="files/restfixture/" value="http://rest-fixture.googlecode.com/files/"  summary="true"/>
+		<replace file="${docs.html.live.file}" token="base href" value="ignore-base href" summary="true" />
+		<replace file="${docs.html.live.file}" token="/files" value="http://fitnesse.org/files" summary="true" />
+		<replace file="${docs.html.live.file}" token="files/restfixture/" value="http://rest-fixture.googlecode.com/files/" summary="true" />
 
 	</target>
 
@@ -198,7 +195,7 @@
 		<copy todir="${artifacts}/etc">
 			<fileset dir="etc" includes="**/*.*" />
 		</copy>
-        <copy todir="${artifacts}" file="CHANGELOG" />
+		<copy todir="${artifacts}" file="CHANGELOG" />
 		<copy todir="${artifacts}" file="COPYING" />
 		<copy todir="${artifacts}" file="COPYING.LESSER" />
 		<copy todir="${artifacts}" file="COPYRIGHT" />

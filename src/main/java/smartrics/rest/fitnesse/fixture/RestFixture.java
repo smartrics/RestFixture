@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -181,15 +182,37 @@ public class RestFixture extends ActionFixture {
 	private static Log LOG = LogFactory.getLog(RestFixture.class);
 	private final static Variables variables = new Variables();
 
-	protected Object baseUrl;
+	private Url baseUrl;
 
 	public RestFixture() {
 		super();
 		displayActualOnRight = true;
 	}
 
+	/**
+	 * Slim constructor
+	 * 
+	 * @param args
+	 *            the cells following up the first cell in the first row.
+	 */
+	public RestFixture(String host) {
+		super();
+		displayActualOnRight = true;
+		initialize(new String[] { host });
+	}
+
+	public RestFixture(String host, String configName) {
+		super();
+		displayActualOnRight = true;
+		initialize(new String[] { host, configName });
+	}
+
 	public Config getConfig() {
 		return config;
+	}
+
+	public String getBaseUrl() {
+		return baseUrl.toString();
 	}
 
 	/**
@@ -213,21 +236,41 @@ public class RestFixture extends ActionFixture {
 		return new RestClientImpl(httpClient);
 	}
 
+	public List<List<String>> doTable(List<List<String>> rows) {
+		StringBuffer b = new StringBuffer();
+		List<List<String>> res = new Vector<List<String>>();
+		for (List<String> row : rows) {
+			Vector<String> newRow = new Vector<String>();
+			for (String cell : row) {
+				b.append("|").append(cell);
+				newRow.add("pass:" + cell);
+			}
+			b.append("\n");
+			res.add(newRow);
+		}
+		System.out.println(b.toString());
+		return res;
+	}
+
 	@Override
 	public void doCells(Parse parse) {
 		cells = parse;
-		processArguments();
-		boolean state = validateState();
-		notifyInvalidState(state);
-		configFixture();
-		restClient = buildRestClient();
-		configRestClient();
+		initialize(args);
 		try {
 			Method method1 = getClass().getMethod(parse.text());
 			method1.invoke(this);
 		} catch (Exception exception) {
 			exception(parse, exception);
 		}
+	}
+
+	protected void initialize(String[] args) {
+		processArguments(args);
+		boolean state = validateState();
+		notifyInvalidState(state);
+		configFixture();
+		restClient = buildRestClient();
+		configRestClient();
 	}
 
 	/**
@@ -276,9 +319,9 @@ public class RestFixture extends ActionFixture {
 					"You must specify a base url in the |start|, after the fixture to start");
 	}
 
-	protected void processArguments() {
+	protected void processArguments(String[] args) {
 		if (args.length > 0) {
-			baseUrl = new Url(args[0]);
+			baseUrl = new Url(stripTag(args[0]));
 			config = new Config();
 		}
 		if (args.length == 2) {
@@ -771,5 +814,10 @@ public class RestFixture extends ActionFixture {
 	private Map<String, String> parseNamespaceContext(String str) {
 		return Tools.convertStringToMap(str, "=", System
 				.getProperty("line.separator"));
+	}
+
+	private String stripTag(String somethingWithinATag) {
+		return somethingWithinATag.replaceAll("<[^>]+>", "")
+				.replace("</a>", "");
 	}
 }

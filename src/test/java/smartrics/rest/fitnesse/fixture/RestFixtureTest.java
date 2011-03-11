@@ -520,6 +520,35 @@ public class RestFixtureTest {
 		assertTrue(extractCell2(t).contains("/uri/bloggs"));
 	}
 
+	/**
+	 * tests for slim support
+	 */
+
+	@Test
+	public void testConstructingWithOneArgShoudlBeTheSUTUri() {
+		String uri = "http://localhost:9090";
+		RestFixture f = new RestFixture(uri);
+		assertEquals(uri, f.getBaseUrl());
+	}
+
+	@Test
+	public void testConstructingWithOneArgShoudlStripAnyTagAndSetTheSUTUri() {
+		String uri = "http://localhost:9090";
+		String taggedUri = "<sometag att='1'>" + uri + "</sometag>";
+		RestFixture f = new RestFixture(taggedUri);
+		assertEquals(uri, f.getBaseUrl());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testConstructingWithOneFailsIfArgIsNotAnUri() {
+		String uri = "rubbish";
+		new RestFixture(uri);
+	}
+
+	/**
+	 * helper methods
+	 */
+
 	private void assertAllCells(Parse t, String c1, String c2, String c3,
 			String c4, String c5) {
 		assertEquals(c1, extractCell1(t));
@@ -565,5 +594,4 @@ public class RestFixtureTest {
 		System.out.println(p.more.more.more.more.body);
 		return p.more.more.more.more.body;
 	}
-
 }

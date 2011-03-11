@@ -1,0 +1,5 @@
+| Action Fixture. |
+| start |!-smartrics.rest.test.fitnesse.fixture.HttpServerFixture-!|
+| check | isStarted | true |
+| press | resetResourcesDatabase |
+

@@ -18,7 +18,7 @@
 	<classpathentry kind="lib" path="lib/json-lib/ezmorph-1.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/json-lib/json-lib-2.2.2-jdk15.jar"/>
 	<classpathentry kind="lib" path="lib/picbuilder/PicBuilder.jar"/>
-	<classpathentry kind="lib" path="lib/fitnesse/fitnesse.jar" sourcepath="/opt/java/fitnesse/src/src"/>
+	<classpathentry kind="lib" path="lib/fitnesse/fitnesse.jar" sourcepath="C:/Opt/sources/fitnesse/src"/>
 	<classpathentry kind="lib" path="lib/restclient/RestClient.jar"/>
 	<classpathentry kind="lib" path="lib/oreilly/cos.jar"/>
 	<classpathentry kind="lib" path="lib/commons/commons-httpclient-3.1.jar"/>

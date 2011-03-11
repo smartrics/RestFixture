@@ -67,8 +67,8 @@ public class RestFixtureWithSeq extends RestFixture {
 	}
 
 	@Override
-	protected void processArguments() {
-		super.processArguments();
+	protected void processArguments(String[] args) {
+		super.processArguments(args);
 		if (args.length == 2) {
 			pictureName = args[1];
 			config = new Config();
@@ -88,7 +88,7 @@ public class RestFixtureWithSeq extends RestFixture {
 	 */
 	@Override
 	protected boolean validateState() {
-		return baseUrl != null && getPictureName() != null;
+		return getBaseUrl() != null && getPictureName() != null;
 	}
 
 	@Override
