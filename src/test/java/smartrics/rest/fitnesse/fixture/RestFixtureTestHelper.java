@@ -14,8 +14,7 @@ public class RestFixtureTestHelper {
 		}
 		rBuff.append("</table>");
 		try {
-			t = new Parse(rBuff.toString(), new String[] { "table", "row",
-					"col" }, 2, 0);
+            t = new Parse(rBuff.toString(), new String[] { "table", "row", "col" }, 2, 0);
 		} catch (FitParseException e) {
 			fail("Unable to build Parse object");
 		}

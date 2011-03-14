@@ -148,7 +148,7 @@ import fit.exception.FitFailureException;
  * 
  * @author smartrics
  */
-public class RestFixture /**/extends ActionFixture /**/{
+public class RestFixture extends ActionFixture {
 
 	private static final String FILE = "file";
 
@@ -184,6 +184,12 @@ public class RestFixture /**/extends ActionFixture /**/{
 	private final static Variables variables = new Variables();
 
 	private Url baseUrl;
+
+	@SuppressWarnings("rawtypes")
+	private RowWrapper row;
+
+	@SuppressWarnings("rawtypes")
+	private CellFormatter formatter;
 
 	public RestFixture() {
 		super();
@@ -265,14 +271,16 @@ public class RestFixture /**/extends ActionFixture /**/{
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void doCells(Parse parse) {
-		cells = parse;
+		this.row = new FitRow(parse);
+		this.formatter = new FitFormatter(this);
 		initialize(args);
 		try {
-			String methodName = parse.text();
+			String methodName = this.row.getCell(0).text();
 			executeCell0Method(methodName);
 		} catch (Exception exception) {
-			exception(parse, exception);
+			formatter.exception(this.row.getCell(0), exception);
 		}
 	}
 
@@ -280,8 +288,7 @@ public class RestFixture /**/extends ActionFixture /**/{
 	 * Configure the fixture with data from {@link RestFixtureConfig}.
 	 */
 	protected void configFixture() {
-		displayActualOnRight = config.getAsBoolean(
-				"restfixture.display.actual.on.right", true);
+        displayActualOnRight = config.getAsBoolean("restfixture.display.actual.on.right", true);
 		String str = config.get("restfixture.default.headers", "");
 		defaultHeaders = parseHeaders(str);
 		str = config.get("restfixture.xml.namespace.context", "");
@@ -338,9 +345,9 @@ public class RestFixture /**/extends ActionFixture /**/{
 	 * body text should be location of file which needs to be sent
 	 */
 	public void setMultipartFileName() {
-		if (cells.more == null)
+		if (row.getCell(0) == null)
 			throw new FitFailureException("You must pass a body to set");
-		multipartFileName = variables.substitute(cells.more.text());
+		multipartFileName = variables.substitute(row.getCell(0).text());
 	}
 
 	/**
@@ -348,9 +355,9 @@ public class RestFixture /**/extends ActionFixture /**/{
 	 * location of file which needs to be sent
 	 */
 	public void setFileName() {
-		if (cells.more == null)
+		if (row.getCell(0) == null)
 			throw new FitFailureException("You must pass a body to set");
-		fileName = variables.substitute(cells.more.text());
+		fileName = variables.substitute(row.getCell(0).text());
 	}
 
 	/**
@@ -359,10 +366,11 @@ public class RestFixture /**/extends ActionFixture /**/{
 	 * 'file'
 	 */
 	public void setMultipartFileParameterName() {
-		if (cells.more == null)
+		if (row.getCell(0) == null)
 			throw new FitFailureException(
 					"You must pass a parameter name to set");
-		multipartFileParameterName = variables.substitute(cells.more.text());
+		multipartFileParameterName = variables
+				.substitute(row.getCell(0).text());
 	}
 
 	/**
@@ -370,9 +378,9 @@ public class RestFixture /**/extends ActionFixture /**/{
 	 * be a kvp or a xml. The <code>ClientHelper</code> will figure it out
 	 */
 	public void setBody() {
-		if (cells.more == null)
+		if (row.getCell(0) == null)
 			throw new FitFailureException("You must pass a body to set");
-		body(variables.substitute(cells.more.text()));
+		body(variables.substitute(row.getCell(0).text()));
 	}
 
 	/**
@@ -382,9 +390,10 @@ public class RestFixture /**/extends ActionFixture /**/{
 	 * header is in its own line
 	 */
 	public void setHeader() {
-		if (cells.more == null)
+        CellWrapper<?> cell = row.getCell(1);
+        if (cell == null)
 			throw new FitFailureException("You must pass a header map to set");
-		String header = variables.substitute(cells.more.text());
+        String header = variables.substitute(cell.text());
 		headers(header);
 	}
 
@@ -529,12 +538,13 @@ public class RestFixture /**/extends ActionFixture /**/{
 	 * <code>| let  | id | header | /services/([.]+) | |</code><br/>
 	 * <code>| GET  | /services/%id% | 200 | | |</code>
 	 */
+	@SuppressWarnings("unchecked")
 	public void let() {
 		debugMethodCallStart();
-		String label = cells.more.text().trim();
-		String loc = cells.more.more.text();
-		String expr = cells.more.more.more.text();
-		Parse valueCell = cells.more.more.more.more;
+        String label = row.getCell(1).text().trim();
+        String loc = row.getCell(2).text();
+        String expr = row.getCell(3).text();
+		CellWrapper<?> valueCell = row.getCell(4);
 		String sValue = null;
 		try {
 			if ("header".equals(loc)) {
@@ -549,15 +559,15 @@ public class RestFixture /**/extends ActionFixture /**/{
 				StringTypeAdapter adapter = new StringTypeAdapter();
 				try {
 					adapter.set(sValue);
-					super.check(valueCell, adapter);
+					formatter.check(valueCell, adapter);
 				} catch (Exception e) {
-					exception(valueCell, e);
+					formatter.exception(valueCell, e);
 				}
 			}
 		} catch (IOException e) {
-			exception(cells.more.more.more, e);
+			formatter.exception(row.getCell(3), e);
 		} catch (RuntimeException e) {
-			exception(cells.more.more.more, e);
+			formatter.exception(row.getCell(3), e);
 		} finally {
 			debugMethodCallEnd();
 		}
@@ -676,13 +686,12 @@ public class RestFixture /**/extends ActionFixture /**/{
 	}
 
 	private void doMethod(String body, String method) {
-		String resUrl = resolve(FIND_VARS_PATTERN, cells.more.text());
+        String resUrl = resolve(FIND_VARS_PATTERN, row.getCell(1).text());
 		setLastRequest(new RestRequest());
 		getLastRequest().setMethod(RestRequest.Method.valueOf(method));
 		getLastRequest().setFileName(fileName);
 		getLastRequest().setMultipartFileName(multipartFileName);
-		getLastRequest().setMultipartFileParameterName(
-				multipartFileParameterName);
+        getLastRequest().setMultipartFileParameterName(multipartFileParameterName);
 		getLastRequest().addHeaders(getHeaders());
 		String uri[] = resUrl.split("\\?");
 		getLastRequest().setResource(uri[0]);
@@ -707,31 +716,27 @@ public class RestFixture /**/extends ActionFixture /**/{
 			uri = uri + "?" + getLastRequest().getQuery();
 		}
 		String u = restClient.getBaseUrl() + uri;
-		cells.more.body = "<a href='" + u + "'>" + uri + "</a>";
-		process(cells.more.more, getLastResponse().getStatusCode().toString(),
-				new StatusCodeTypeAdapter());
-		process(cells.more.more.more, getLastResponse().getHeaders(),
-				new HeadersTypeAdapter());
-		cells.more.more.more.more.body = resolve(FIND_VARS_PATTERN,
-				cells.more.more.more.more.body);
-		BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory
-				.getBodyTypeAdapter(getContentTypeOfLastResponse());
+        row.getCell(1).body("<a href='" + u + "'>" + uri + "</a>");
+        process(row.getCell(2), getLastResponse().getStatusCode().toString(), new StatusCodeTypeAdapter());
+        process(row.getCell(3), getLastResponse().getHeaders(), new HeadersTypeAdapter());
+		row.getCell(4).body(resolve(FIND_VARS_PATTERN, row.getCell(4).body()));
+        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(getContentTypeOfLastResponse());
 		bodyTypeAdapter.setContext(namespaceContext);
-		process(cells.more.more.more.more, getLastResponse().getBody(),
-				bodyTypeAdapter);
+        process(row.getCell(4), getLastResponse().getBody(), bodyTypeAdapter);
 	}
 
-	private void process(Parse expected, Object actual, RestDataTypeAdapter ta) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+    private void process(CellWrapper expected, Object actual, RestDataTypeAdapter ta) {
 		ta.set(actual);
 		boolean ignore = "".equals(expected.text().trim());
 		if (ignore) {
-			expected.addToBody(gray(ta.toString()));
+			expected.addToBody(formatter.gray(ta.toString()));
 		} else {
 			boolean success = false;
 			try {
 				success = ta.equals(ta.parse(variables.substitute(expected.text())), actual);
 			} catch (Exception e) {
-				exception(expected, e);
+				formatter.exception(expected, e);
 				return;
 			}
 			if (success) {
@@ -742,23 +747,25 @@ public class RestFixture /**/extends ActionFixture /**/{
 		}
 	}
 
-	private void right(Parse expected, RestDataTypeAdapter ta) {
-		super.right(expected);
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void right(CellWrapper expected, RestDataTypeAdapter ta) {
+		formatter.right(expected);
 		if (isDisplayActualOnRight() && !expected.text().equals(ta.toString())) {
-			expected.addToBody(label("expected") + "<hr>" + ta.toString()
-					+ label("actual"));
+			expected.addToBody(formatter.label("expected") + "<hr>"
+					+ ta.toString() + formatter.label("actual"));
 		}
 	}
 
-	private void wrong(Parse expected, RestDataTypeAdapter ta) {
-		super.wrong(expected);
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void wrong(CellWrapper expected, RestDataTypeAdapter ta) {
+		formatter.wrong(expected);
 		StringBuffer sb = new StringBuffer();
 		for (String e : ta.getErrors()) {
 			sb.append(e).append(System.getProperty("line.separator"));
 		}
-		expected.addToBody(label("expected") + "<hr>" + ta.toString()
-				+ label("actual") + "<hr>" + Tools.toHtml(sb.toString())
-				+ label("errors"));
+		expected.addToBody(formatter.label("expected") + "<hr>" + ta.toString()
+				+ formatter.label("actual") + "<hr>"
+				+ Tools.toHtml(sb.toString()) + formatter.label("errors"));
 	}
 
 	private void debugMethodCallStart() {

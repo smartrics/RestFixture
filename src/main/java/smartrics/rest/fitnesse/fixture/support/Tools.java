@@ -58,236 +58,206 @@ import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 
 public final class Tools {
 
-	private Tools() {
+    private Tools() {
 
-	}
+    }
 
-	public static NodeList extractXPath(Map<String, String> ns,
-			String xpathExpression, String content) {
-		// Use the java Xpath API to return a NodeList to the caller so they
-		// can iterate through
-		return (NodeList) extractXPath(ns, xpathExpression, content,
-				XPathConstants.NODESET);
-	}
+    public static NodeList extractXPath(Map<String, String> ns, String xpathExpression, String content) {
+        // Use the java Xpath API to return a NodeList to the caller so they
+        // can iterate through
+        return (NodeList) extractXPath(ns, xpathExpression, content, XPathConstants.NODESET);
+    }
 
+    public static Object extractXPath(String xpathExpression, String content, QName returnType) {
+        // Use the java Xpath API to return a NodeList to the caller so they can
+        // iterate through
+        return extractXPath(new HashMap<String, String>(), xpathExpression, content, returnType);
+    }
 
-	public static Object extractXPath(String xpathExpression, String content,
-			QName returnType) {
-		// Use the java Xpath API to return a NodeList to the caller so they
-		// can iterate through
-		return extractXPath(new HashMap<String, String>(), xpathExpression,
-				content, returnType);
-	}
+    /**
+     * extract the XPath from the content. the return value type is passed in
+     * input using one of the {@link XPathConstants}. See also
+     * {@link XPathExpression#evaluate(Object item, QName returnType)} ;
+     */
+    public static Object extractXPath(Map<String, String> ns, String xpathExpression, String content, QName returnType) {
+        if (null == ns)
+            ns = new HashMap<String, String>();
+        Document doc = toDocument(content);
+        XPathExpression expr = toExpression(ns, xpathExpression);
+        try {
+            Object o = expr.evaluate(doc, returnType);
+            return o;
+        } catch (XPathExpressionException e) {
+            throw new IllegalArgumentException("xPath expression can not be executed: " + xpathExpression);
+        }
+    }
 
-	/**
-	 * extract the XPath from the content. the return value type is passed in
-	 * input using one of the {@link XPathConstants}. See also
-	 * {@link XPathExpression#evaluate(Object item, QName returnType)} ;
-	 */
-	public static Object extractXPath(Map<String, String> ns,
-			String xpathExpression, String content, QName returnType) {
-		if (null == ns)
-			ns = new HashMap<String, String>();
-		Document doc = toDocument(content);
-		XPathExpression expr = toExpression(ns, xpathExpression);
-		try {
-			Object o = expr.evaluate(doc, returnType);
-			return o;
-		} catch (XPathExpressionException e) {
-			throw new IllegalArgumentException(
-					"xPath expression can not be executed: " + xpathExpression);
-		}
-	}
+    private static XPathExpression toExpression(Map<String, String> ns, String xpathExpression) {
+        try {
+            XPathFactory xpathFactory = XPathFactory.newInstance();
+            XPath xpath = xpathFactory.newXPath();
+            if (ns.size() > 0) {
+                xpath.setNamespaceContext(toNsContext(ns));
+            }
+            XPathExpression expr = xpath.compile(xpathExpression);
+            return expr;
+        } catch (XPathExpressionException e) {
+            throw new IllegalArgumentException("xPath expression can not be compiled: " + xpathExpression, e);
+        }
+    }
 
-	private static XPathExpression toExpression(Map<String, String> ns,
-			String xpathExpression) {
-		try {
-			XPathFactory xpathFactory = XPathFactory.newInstance();
-			XPath xpath = xpathFactory.newXPath();
-			if (ns.size() > 0) {
-				xpath.setNamespaceContext(toNsContext(ns));
-			}
-			XPathExpression expr = xpath.compile(xpathExpression);
-			return expr;
-		} catch (XPathExpressionException e) {
-			throw new IllegalArgumentException(
-					"xPath expression can not be compiled: " + xpathExpression,
-					e);
-		}
-	}
+    private static NamespaceContext toNsContext(final Map<String, String> ns) {
+        NamespaceContext ctx = new NamespaceContext() {
 
-	private static NamespaceContext toNsContext(final Map<String, String> ns) {
-		NamespaceContext ctx = new NamespaceContext() {
+            @Override
+            public String getNamespaceURI(String prefix) {
+                String u = ns.get(prefix);
+                if (null == u)
+                    return XMLConstants.NULL_NS_URI;
+                return u;
+            }
 
-			@Override
-			public String getNamespaceURI(String prefix) {
-				String u = ns.get(prefix);
-				if (null == u)
-					return XMLConstants.NULL_NS_URI;
-				return u;
-			}
+            @Override
+            public String getPrefix(String namespaceURI) {
+                for (String k : ns.keySet()) {
+                    if (ns.get(k).equals(namespaceURI))
+                        return k;
+                }
+                return null;
+            }
 
-			@Override
-			public String getPrefix(String namespaceURI) {
-				for (String k : ns.keySet()) {
-					if (ns.get(k).equals(namespaceURI))
-						return k;
-				}
-				return null;
-			}
+            @Override
+            @SuppressWarnings("unchecked")
+            public Iterator getPrefixes(String namespaceURI) {
+                return null;
+            }
 
-			@Override
-			@SuppressWarnings("unchecked")
-			public Iterator getPrefixes(String namespaceURI) {
-				return null;
-			}
+        };
+        return ctx;
+    }
 
-		};
-		return ctx;
-	}
+    private static Document toDocument(String content) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(getInputStreamFromString(content));
+            return doc;
+        } catch (ParserConfigurationException e) {
+            throw new IllegalArgumentException("parser for last response body caused an error", e);
+        } catch (SAXException e) {
+            throw new IllegalArgumentException("last response body cannot be parsed", e);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("IO Exception when reading the document", e);
+        }
+    }
 
-	private static Document toDocument(String content) {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setNamespaceAware(true);
-		try {
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(getInputStreamFromString(content));
-			return doc;
-		} catch (ParserConfigurationException e) {
-			throw new IllegalArgumentException(
-					"parser for last response body caused an error", e);
-		} catch (SAXException e) {
-			throw new IllegalArgumentException(
-					"last response body cannot be parsed", e);
-		} catch (IOException e) {
-			throw new IllegalArgumentException(
-					"IO Exception when reading the document", e);
-		}
-	}
+    public static String fromJSONtoXML(String json) {
+        HierarchicalStreamDriver driver = new JettisonMappedXmlDriver();
+        StringReader reader = new StringReader(json);
+        HierarchicalStreamReader hsr = driver.createReader(reader);
+        try {
+            StringWriter writer = new StringWriter();
+            new HierarchicalStreamCopier().copy(hsr, new PrettyPrintWriter(writer));
+            writer.close();
+            return writer.toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Something went horribly wrong during JSON->XML conversion", e);
+        }
+    }
 
-	public static String fromJSONtoXML(String json) {
-		HierarchicalStreamDriver driver = new JettisonMappedXmlDriver();
-		StringReader reader = new StringReader(json);
-		HierarchicalStreamReader hsr = driver.createReader(reader);
-		try {
-		StringWriter writer = new StringWriter();
-			new HierarchicalStreamCopier().copy(hsr, new PrettyPrintWriter(
-					writer));
-			writer.close();
-			return writer.toString();
-		} catch (IOException e) {
-			throw new RuntimeException(
-					"Something went horribly wrong during JSON->XML conversion",
-					e);
-		}
-	}
+    public static String getStringFromInputStream(InputStream is) {
+        String line = null;
+        if (is == null)
+            return "";
+        BufferedReader in = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        try {
+            while ((line = in.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Unable to read from stream", e);
+        }
+        return sb.toString();
+    }
 
-	public static String getStringFromInputStream(InputStream is) {
-		String line = null;
-		if (is == null)
-			return "";
-		BufferedReader in = new BufferedReader(new InputStreamReader(is));
-		StringBuilder sb = new StringBuilder();
-		try {
-			while ((line = in.readLine()) != null) {
-				sb.append(line);
-			}
-		} catch (IOException e) {
-			throw new IllegalArgumentException("Unable to read from stream", e);
-		}
-		return sb.toString();
-	}
+    public static InputStream getInputStreamFromString(String string) {
+        if (string == null)
+            throw new IllegalArgumentException("null input");
+        byte[] byteArray = string.getBytes();
+        return new ByteArrayInputStream(byteArray);
+    }
 
-	public static InputStream getInputStreamFromString(String string) {
-		if (string == null)
-			throw new IllegalArgumentException("null input");
-		byte[] byteArray = string.getBytes();
-		return new ByteArrayInputStream(byteArray);
-	}
+    public static String convertMapToString(Map<String, String> map, String nvSep, String entrySep) {
+        StringBuffer sb = new StringBuffer();
+        if (map != null) {
+            for (Entry<String, String> entry : map.entrySet()) {
+                String el = entry.getKey();
+                sb.append(convertEntryToString(el, map.get(el), nvSep)).append(entrySep);
+            }
+        }
+        String repr = sb.toString();
+        int pos = repr.lastIndexOf(entrySep);
+        return repr.substring(0, pos);
+    }
 
-	public static String convertMapToString(Map<String, String> map,
-			String nvSep, String entrySep) {
-		StringBuffer sb = new StringBuffer();
-		if (map != null) {
-			for (Entry<String, String> entry : map.entrySet()) {
-				String el = entry.getKey();
-				sb.append(convertEntryToString(el, map.get(el), nvSep)).append(
-						entrySep);
-			}
-		}
-		String repr = sb.toString();
-		int pos = repr.lastIndexOf(entrySep);
-		return repr.substring(0, pos);
-	}
+    public static String convertEntryToString(String name, String value, String nvSep) {
+        return String.format("%s%s%s", name, nvSep, value);
+    }
 
-	public static String convertEntryToString(String name, String value,
-			String nvSep) {
-		return String.format("%s%s%s", name, nvSep, value);
-	}
+    public static boolean regex(String text, String expr) {
+        try {
+            Pattern p = Pattern.compile(expr);
+            boolean find = p.matcher(text).find();
+            return find;
+        } catch (PatternSyntaxException e) {
+            throw new IllegalArgumentException("Invalid regex " + expr);
+        }
+    }
 
-	public static boolean regex(String text, String expr) {
-		try {
-			Pattern p = Pattern.compile(expr);
-			boolean find = p.matcher(text).find();
-			return find;
-		} catch (PatternSyntaxException e) {
-			throw new IllegalArgumentException("Invalid regex " + expr);
-		}
-	}
+    public static Map<String, String> convertStringToMap(final String expStr, final String nvSep, final String entrySep) {
+        String sanitisedExpStr = expStr.trim();
+        if (sanitisedExpStr.startsWith("!-"))
+            sanitisedExpStr = sanitisedExpStr.substring(2);
+        if (sanitisedExpStr.endsWith("-!"))
+            sanitisedExpStr = sanitisedExpStr.substring(0, sanitisedExpStr.length() - 2);
+        sanitisedExpStr = sanitisedExpStr.trim();
+        String[] nvpArray = sanitisedExpStr.split(entrySep);
+        Map<String, String> ret = new HashMap<String, String>();
+        for (String nvp : nvpArray) {
+            try {
+                int pos = nvp.indexOf(nvSep);
+                String v = "";
+                String k = nvp;
+                if (pos != -1) {
+                    int pos2 = pos + nvSep.length();
+                    v = nvp.substring(pos2).trim();
+                    k = nvp.substring(0, pos).trim();
+                }
+                ret.put(k, v);
+            } catch (RuntimeException e) {
+                throw new IllegalArgumentException("Each entry in the must be separated by '" + entrySep + "' and each entry must be expressed as a name" + nvSep + "value");
+            }
+        }
+        return ret;
+    }
 
-	public static Map<String, String> convertStringToMap(final String expStr,
-			final String nvSep, final String entrySep) {
-		String sanitisedExpStr = expStr.trim();
-		if (sanitisedExpStr.startsWith("!-"))
-			sanitisedExpStr = sanitisedExpStr.substring(2);
-		if (sanitisedExpStr.endsWith("-!"))
-			sanitisedExpStr = sanitisedExpStr.substring(0,
-					sanitisedExpStr.length() - 2);
-		sanitisedExpStr = sanitisedExpStr.trim();
-		String[] nvpArray = sanitisedExpStr.split(entrySep);
-		Map<String, String> ret = new HashMap<String, String>();
-		for (String nvp : nvpArray) {
-			try {
-				int pos = nvp.indexOf(nvSep);
-				String v = "";
-				String k = nvp;
-				if (pos != -1) {
-					int pos2 = pos + nvSep.length();
-					v = nvp.substring(pos2).trim();
-					k = nvp.substring(0, pos).trim();
-				}
-				ret.put(k, v);
-			} catch (RuntimeException e) {
-				throw new IllegalArgumentException(
-						"Each entry in the must be separated by '"
-								+ entrySep
-								+ "' and each entry must be expressed as a name"
-								+ nvSep + "value");
-			}
-		}
-		return ret;
-	}
+    public static String toHtml(String text) {
+        // if(text.trim().startsWith("<"))
+        // return "<textarea cols='180' rows='10' readonly='true'>" +
+        // prettyPrint(text).replaceAll("&gt;", "&gt;\n") + "</textarea>";
+        return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll(System.getProperty("line.separator"), "<br/>").replaceAll(" ", "&nbsp;");
+    }
 
-	public static String toHtml(String text) {
-		// if(text.trim().startsWith("<"))
-		// return "<textarea cols='180' rows='10' readonly='true'>" +
-		// prettyPrint(text).replaceAll("&gt;", "&gt;\n") + "</textarea>";
-		return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;")
-				.replaceAll(">", "&gt;").replaceAll(
-						System.getProperty("line.separator"), "<br/>")
-				.replaceAll(" ", "&nbsp;");
-	}
+    public static String toJSON(String text) {
+        return text.trim();
+    }
 
-	public static String toJSON(String text) {
-		return text.trim();
-	}
-
-	public static String fromHtml(String text) {
-		String ls = System.getProperty("line.separator");
-		return text.replaceAll("<br[\\s]*/>", ls).replaceAll("<BR[\\s]*/>", ls)
-				.replaceAll("<pre>", "").replaceAll("</pre>", "").replaceAll(
-						"&nbsp;", " ").replaceAll("&gt;", ">").replaceAll(
-						"&lt;", "<").replaceAll("&nbsp;", " ");
-	}
+    public static String fromHtml(String text) {
+        String ls = System.getProperty("line.separator");
+        return text.replaceAll("<br[\\s]*/>", ls).replaceAll("<BR[\\s]*/>", ls).replaceAll("<pre>", "").replaceAll("</pre>", "").replaceAll("&nbsp;", " ").replaceAll("&gt;", ">")
+                .replaceAll("&lt;", "<").replaceAll("&nbsp;", " ");
+    }
 
 }
