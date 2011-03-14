@@ -21,6 +21,7 @@
 package smartrics.rest.fitnesse.fixture;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,10 +88,10 @@ import fit.exception.FitFailureException;
  * <b>Configuring RestFixture</b><br/>
  * RestFixture can be configured by using the {@link RestFixtureConfig}. A
  * {@code RestFixtureConfig} can define named maps with configuration key/value
- * pairs. The name of the map is passed as second parameter to the {@code
- * RestFixture}. Using a named configuration is optional: if no name is passed,
- * the default configuration map is used. See {@link RestFixtureConfig} for more
- * details.
+ * pairs. The name of the map is passed as second parameter to the
+ * {@code RestFixture}. Using a named configuration is optional: if no name is
+ * passed, the default configuration map is used. See {@link RestFixtureConfig}
+ * for more details.
  * <p/>
  * The following list of configuration parameters can are supported.
  * <p/>
@@ -138,16 +139,16 @@ import fit.exception.FitFailureException;
  * <td>restfixture.xml.namespaces.context</td>
  * <td><i>comma separated list of key value pairs representing namespace
  * declarations. The key is the namespace alias, the value is the namespace URI.
- * alias and URI are separated by a = sign. Entries are sepatated by {@code
- * System.getProperty("line.separator")}. These entries will be used to define
- * the namespace context to be used in xpaths that are evaluated in the
+ * alias and URI are separated by a = sign. Entries are sepatated by
+ * {@code System.getProperty("line.separator")}. These entries will be used to
+ * define the namespace context to be used in xpaths that are evaluated in the
  * results.</i></td>
  * </tr>
  * </table>
  * 
- * @author fabrizio
+ * @author smartrics
  */
-public class RestFixture extends ActionFixture {
+public class RestFixture /**/extends ActionFixture /**/{
 
 	private static final String FILE = "file";
 
@@ -236,6 +237,12 @@ public class RestFixture extends ActionFixture {
 		return new RestClientImpl(httpClient);
 	}
 
+	/**
+	 * Slim Table table hook
+	 * 
+	 * @param rows
+	 * @return
+	 */
 	public List<List<String>> doTable(List<List<String>> rows) {
 		StringBuffer b = new StringBuffer();
 		List<List<String>> res = new Vector<List<String>>();
@@ -244,6 +251,11 @@ public class RestFixture extends ActionFixture {
 			for (String cell : row) {
 				b.append("|").append(cell);
 				newRow.add("pass:" + cell);
+				try {
+					executeCell0Method(row.get(0));
+				} catch (Exception e) {
+
+				}
 			}
 			b.append("\n");
 			res.add(newRow);
@@ -257,20 +269,11 @@ public class RestFixture extends ActionFixture {
 		cells = parse;
 		initialize(args);
 		try {
-			Method method1 = getClass().getMethod(parse.text());
-			method1.invoke(this);
+			String methodName = parse.text();
+			executeCell0Method(methodName);
 		} catch (Exception exception) {
 			exception(parse, exception);
 		}
-	}
-
-	protected void initialize(String[] args) {
-		processArguments(args);
-		boolean state = validateState();
-		notifyInvalidState(state);
-		configFixture();
-		restClient = buildRestClient();
-		configRestClient();
 	}
 
 	/**
@@ -560,6 +563,22 @@ public class RestFixture extends ActionFixture {
 		}
 	}
 
+	private void executeCell0Method(String methodName)
+			throws NoSuchMethodException, IllegalAccessException,
+			InvocationTargetException {
+		Method method1 = getClass().getMethod(methodName);
+		method1.invoke(this);
+	}
+
+	protected void initialize(String[] args) {
+		processArguments(args);
+		boolean state = validateState();
+		notifyInvalidState(state);
+		configFixture();
+		restClient = buildRestClient();
+		configRestClient();
+	}
+
 	private String handleRegexExpression(String label, String loc,
 			String expression) {
 		List<String> content = new ArrayList<String>();
@@ -820,4 +839,5 @@ public class RestFixture extends ActionFixture {
 		return somethingWithinATag.replaceAll("<[^>]+>", "")
 				.replace("</a>", "");
 	}
+
 }
