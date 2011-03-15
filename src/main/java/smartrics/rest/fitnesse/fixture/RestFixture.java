@@ -150,7 +150,9 @@ import fit.exception.FitFailureException;
  */
 public class RestFixture extends ActionFixture {
 
-	private static final String FILE = "file";
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+    private static final String FILE = "file";
 
 	private RestResponse lastResponse;
 
@@ -178,8 +180,7 @@ public class RestFixture extends ActionFixture {
 	private Map<String, String> defaultHeaders = new HashMap<String, String>();
 	private Map<String, String> namespaceContext = new HashMap<String, String>();
 
-	private static final Pattern FIND_VARS_PATTERN = Pattern
-			.compile("\\%([a-zA-Z0-9_]+)\\%");
+    private static final Pattern FIND_VARS_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");
 	private static Log LOG = LogFactory.getLog(RestFixture.class);
 	private final static Variables variables = new Variables();
 
@@ -238,8 +239,7 @@ public class RestFixture extends ActionFixture {
 	 * implementation.
 	 */
 	protected RestClient buildRestClient() {
-		HttpClient httpClient = new HttpClientBuilder()
-				.createHttpClient(config);
+        HttpClient httpClient = new HttpClientBuilder().createHttpClient(config);
 		return new RestClientImpl(httpClient);
 	}
 
@@ -276,11 +276,12 @@ public class RestFixture extends ActionFixture {
 		this.row = new FitRow(parse);
 		this.formatter = new FitFormatter(this);
 		initialize(args);
+        @SuppressWarnings("rawtypes")
+        CellWrapper methodNameCell = this.row.getCell(0);
 		try {
-			String methodName = this.row.getCell(0).text();
-			executeCell0Method(methodName);
+            executeCell0Method(methodNameCell.text());
 		} catch (Exception exception) {
-			formatter.exception(this.row.getCell(0), exception);
+            formatter.exception(methodNameCell, exception);
 		}
 	}
 
@@ -324,9 +325,9 @@ public class RestFixture extends ActionFixture {
 	 *            as returned by {@link RestFixture#validateState()}
 	 */
 	protected void notifyInvalidState(boolean state) {
-		if (!state)
-			throw new FitFailureException(
-					"You must specify a base url in the |start|, after the fixture to start");
+        if (!state) {
+            throw new FitFailureException("You must specify a base url in the |start|, after the fixture to start");
+        }
 	}
 
 	protected void processArguments(String[] args) {
@@ -345,8 +346,9 @@ public class RestFixture extends ActionFixture {
 	 * body text should be location of file which needs to be sent
 	 */
 	public void setMultipartFileName() {
-		if (row.getCell(0) == null)
-			throw new FitFailureException("You must pass a body to set");
+        if (row.getCell(1) == null) {
+            throw new FitFailureException("You must pass a body to set");
+        }
 		multipartFileName = variables.substitute(row.getCell(0).text());
 	}
 
@@ -355,8 +357,9 @@ public class RestFixture extends ActionFixture {
 	 * location of file which needs to be sent
 	 */
 	public void setFileName() {
-		if (row.getCell(0) == null)
+        if (row.getCell(1) == null) {
 			throw new FitFailureException("You must pass a body to set");
+        }
 		fileName = variables.substitute(row.getCell(0).text());
 	}
 
@@ -366,7 +369,7 @@ public class RestFixture extends ActionFixture {
 	 * 'file'
 	 */
 	public void setMultipartFileParameterName() {
-		if (row.getCell(0) == null)
+        if (row.getCell(1) == null)
 			throw new FitFailureException(
 					"You must pass a parameter name to set");
 		multipartFileParameterName = variables
@@ -378,7 +381,7 @@ public class RestFixture extends ActionFixture {
 	 * be a kvp or a xml. The <code>ClientHelper</code> will figure it out
 	 */
 	public void setBody() {
-		if (row.getCell(0) == null)
+        if (row.getCell(1) == null)
 			throw new FitFailureException("You must pass a body to set");
 		body(variables.substitute(row.getCell(0).text()));
 	}
@@ -552,8 +555,7 @@ public class RestFixture extends ActionFixture {
 			} else if ("body".equals(loc)) {
 				sValue = handleXpathExpression(label, expr);
 			} else {
-				throw new FitFailureException(
-						"let handles 'xpath' in body or 'regex' in headers.");
+                throw new FitFailureException("let handles 'xpath' in body or 'regex' in headers.");
 			}
 			if (valueCell != null) {
 				StringTypeAdapter adapter = new StringTypeAdapter();
@@ -573,9 +575,7 @@ public class RestFixture extends ActionFixture {
 		}
 	}
 
-	private void executeCell0Method(String methodName)
-			throws NoSuchMethodException, IllegalAccessException,
-			InvocationTargetException {
+    private void executeCell0Method(String methodName) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		Method method1 = getClass().getMethod(methodName);
 		method1.invoke(this);
 	}
@@ -589,14 +589,12 @@ public class RestFixture extends ActionFixture {
 		configRestClient();
 	}
 
-	private String handleRegexExpression(String label, String loc,
-			String expression) {
+    private String handleRegexExpression(String label, String loc, String expression) {
 		List<String> content = new ArrayList<String>();
 		if ("header".equals(loc)) {
 			if (getLastResponse().getHeaders() != null) {
 				for (Header e : getLastResponse().getHeaders()) {
-					String string = Tools.convertEntryToString(e.getName(), e
-							.getValue(), ":");
+                    String string = Tools.convertEntryToString(e.getName(), e.getValue(), ":");
 					content.add(string);
 				}
 			}
@@ -628,18 +626,18 @@ public class RestFixture extends ActionFixture {
 		} catch (IllegalArgumentException e) {
 			// ignore - may be that it's eval to a string
 		}
-		if (val == null)
+        if (val == null) {
 			val = handleXPathAsString(expr);
-		if (val != null)
+        }
+        if (val != null) {
 			assignVariable(label, val);
+        }
 		return val;
 	}
 
 	private String handleXPathAsNodeList(String expr) {
-		BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory
-				.getBodyTypeAdapter(getContentTypeOfLastResponse());
-		NodeList list = Tools.extractXPath(namespaceContext, expr,
-				bodyTypeAdapter.toXmlString(getLastResponse().getBody()));
+        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(getContentTypeOfLastResponse());
+        NodeList list = Tools.extractXPath(namespaceContext, expr, bodyTypeAdapter.toXmlString(getLastResponse().getBody()));
 		Node item = list.item(0);
 		String val = null;
 		if (item != null) {
@@ -649,15 +647,15 @@ public class RestFixture extends ActionFixture {
 	}
 
 	private String handleXPathAsString(String expr) {
-		String val = (String) Tools.extractXPath(namespaceContext, expr,
-				getLastResponse().getBody(), XPathConstants.STRING);
+        String val = (String) Tools.extractXPath(namespaceContext, expr, getLastResponse().getBody(), XPathConstants.STRING);
 		return val;
 	}
 
 	private String emptifyBody(String b) {
 		String body = b;
-		if (body == null)
+        if (body == null) {
 			body = "";
+        }
 		return body;
 	}
 
@@ -761,7 +759,7 @@ public class RestFixture extends ActionFixture {
 		formatter.wrong(expected);
 		StringBuffer sb = new StringBuffer();
 		for (String e : ta.getErrors()) {
-			sb.append(e).append(System.getProperty("line.separator"));
+			sb.append(e).append(LINE_SEPARATOR);
 		}
 		expected.addToBody(formatter.label("expected") + "<hr>" + ta.toString()
 				+ formatter.label("actual") + "<hr>"
@@ -833,18 +831,15 @@ public class RestFixture extends ActionFixture {
 	}
 
 	private Map<String, String> parseHeaders(String str) {
-		return Tools.convertStringToMap(str, ":",
-				System.getProperty("line.separator"));
+        return Tools.convertStringToMap(str, ":", LINE_SEPARATOR);
 	}
 
 	private Map<String, String> parseNamespaceContext(String str) {
-		return Tools.convertStringToMap(str, "=", System
-				.getProperty("line.separator"));
+        return Tools.convertStringToMap(str, "=", LINE_SEPARATOR);
 	}
 
 	private String stripTag(String somethingWithinATag) {
-		return somethingWithinATag.replaceAll("<[^>]+>", "")
-				.replace("</a>", "");
+        return somethingWithinATag.replaceAll("<[^>]+>", "").replace("</a>", "");
 	}
 
 }
