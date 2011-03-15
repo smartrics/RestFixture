@@ -149,7 +149,14 @@
 		<taskdef name="execute-fitnesse-tests" classname="fitnesseMain.ant.ExecuteFitnesseTestsTask" classpathref="project.classpath" />
 		<property name="fitnesse.suite.root" value="${fitnesse.path}.BasicTests" />
 		<mkdir dir="${fitnesse.reports}" />
-		<execute-fitnesse-tests suitepage="${fitnesse.suite.root}" fitnesseport="${fitnesse.port}" resultsdir="${fitnesse.reports}" resultshtmlpage="results.html" failonerror="false" resultproperty="fitnesse.fail">
+		<execute-fitnesse-tests 
+			suitepage="${fitnesse.suite.root}" 
+			fitnesseport="${fitnesse.port}" 
+			resultsdir="${fitnesse.reports}" 
+			resultshtmlpage="results.html" 
+			failonerror="false" 
+			resultproperty="fitnesse.fail">
+			
 			<classpath>
 				<pathelement location="${build}/${ant.project.name}.jar" />
 				<pathelement location="${build}/${ant.project.name}_fitnesse.jar" />
