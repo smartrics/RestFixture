@@ -88,7 +88,7 @@ public final class Tools {
             Object o = expr.evaluate(doc, returnType);
             return o;
         } catch (XPathExpressionException e) {
-            throw new IllegalArgumentException("xPath expression can not be executed: " + xpathExpression);
+            throw new IllegalArgumentException("xPath expression cannot be executed: " + xpathExpression);
         }
     }
 
@@ -127,8 +127,7 @@ public final class Tools {
             }
 
             @Override
-            @SuppressWarnings("unchecked")
-            public Iterator getPrefixes(String namespaceURI) {
+            public Iterator<?> getPrefixes(String namespaceURI) {
                 return null;
             }
 
