@@ -33,145 +33,141 @@ import java.util.Map;
 import javax.xml.xpath.XPathConstants;
 
 import org.junit.Test;
+import org.w3c.dom.NodeList;
 
 public class ToolsTest {
-	private static Map<String, String> DEF_NS_CONTEXT = new HashMap<String, String>();
-	@Test
-	public void mustMatchWhenRegexIsValidAndThereIsAMatch() {
-		assertTrue(Tools.regex("200", "200"));
-	}
-	@Test
-	public void mustNotMatchWhenRegexIsValidAndThereIsNotAMatch() {
-		assertFalse(Tools.regex("200", "404"));
-	}
+    private static Map<String, String> DEF_NS_CONTEXT = new HashMap<String, String>();
 
-	@Test(expected = IllegalArgumentException.class)
-	public void mustNotMatchWhenRegexIsInvalidAndNotifyError() {
-		Tools.regex("200", "40[]4");
-		fail("Should have thrown IAE as expression is invalid");
-	}
+    @Test
+    public void mustMatchWhenRegexIsValidAndThereIsAMatch() {
+        assertTrue(Tools.regex("200", "200"));
+    }
 
-	@Test
-	public void dualityOfToAndFromHtml(){
-		String stuff = "<a> " + System.getProperty("line.separator") + "  </a>";
-		assertEquals(stuff, Tools.fromHtml(Tools.toHtml(stuff)));
-	}
+    @Test
+    public void mustNotMatchWhenRegexIsValidAndThereIsNotAMatch() {
+        assertFalse(Tools.regex("200", "404"));
+    }
 
-	@Test
-	public void shouldReadAnInputStreamToAString(){
-		InputStream is = new ByteArrayInputStream("a string".getBytes());
-		assertEquals("a string", Tools.getStringFromInputStream(is));
-		assertEquals("", Tools.getStringFromInputStream(null));
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void mustNotMatchWhenRegexIsInvalidAndNotifyError() {
+        Tools.regex("200", "40[]4");
+        fail("Should have thrown IAE as expression is invalid");
+    }
 
-	@Test
-	public void shouldWrapAStringIntoAnInputStream(){
-		InputStream is = Tools.getInputStreamFromString("another string");
-		assertEquals("another string", Tools.getStringFromInputStream(is));
-	}
+    @Test
+    public void dualityOfToAndFromHtml() {
+        String stuff = "<a> " + System.getProperty("line.separator") + "  </a>";
+        assertEquals(stuff, Tools.fromHtml(Tools.toHtml(stuff)));
+    }
 
-	@Test
-	public void shouldConvertAMapIntoAStringRepresentation(){
-		final Map<String, String> map = new HashMap<String, String>();
-		map.put("k1", "v1");
-		map.put("k2", "v2");
-		final String nvSep = "|";
-		final String entrySep = "##";
-		String repr = Tools.convertMapToString(map, nvSep, entrySep);
-		assertEquals("k1|v1##k2|v2", repr);
-	}
+    @Test
+    public void shouldReadAnInputStreamToAString() {
+        InputStream is = new ByteArrayInputStream("a string".getBytes());
+        assertEquals("a string", Tools.getStringFromInputStream(is));
+        assertEquals("", Tools.getStringFromInputStream(null));
+    }
 
-	@Test
-	public void shouldConvertAStringIntoAMap(){
-		Map<String, String> map = Tools.convertStringToMap("k1|v1##k2|v2", "|", "##");
-		assertEquals(2, map.size());
-		assertEquals("v2", map.get("k2"));
-		assertEquals("v1", map.get("k1"));
+    @Test
+    public void shouldWrapAStringIntoAnInputStream() {
+        InputStream is = Tools.getInputStreamFromString("another string");
+        assertEquals("another string", Tools.getStringFromInputStream(is));
+    }
 
-		map = Tools.convertStringToMap("k1##k2|v2", "|", "##");
-		assertEquals(2, map.size());
-		assertEquals("", map.get("k1"));
-		assertEquals("v2", map.get("k2"));
+    @Test
+    public void shouldConvertAMapIntoAStringRepresentation() {
+        final Map<String, String> map = new HashMap<String, String>();
+        map.put("k1", "v1");
+        map.put("k2", "v2");
+        final String nvSep = "|";
+        final String entrySep = "##";
+        String repr = Tools.convertMapToString(map, nvSep, entrySep);
+        assertEquals("k1|v1##k2|v2", repr);
+    }
 
-	}
+    @Test
+    public void shouldConvertAStringIntoAMap() {
+        Map<String, String> map = Tools.convertStringToMap("k1|v1##k2|v2", "|", "##");
+        assertEquals(2, map.size());
+        assertEquals("v2", map.get("k2"));
+        assertEquals("v1", map.get("k1"));
 
-	@Test
-	public void shouldExtractXPathsFromXmlDocumentAsNodeLists() {
-		String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
-		assertEquals(2, Tools.extractXPath(DEF_NS_CONTEXT, "/a/c", xml)
-				.getLength());
-		assertEquals(1, Tools.extractXPath(DEF_NS_CONTEXT,
-				"/a/b[text()='test']", xml)
-				.getLength());
-		assertEquals("test", Tools.extractXPath(DEF_NS_CONTEXT, "/a/b/text()",
-				xml).item(0)
-				.getNodeValue());
-		assertEquals(1, Tools.extractXPath(DEF_NS_CONTEXT, "/a[count(c)>0]",
-				xml)
-				.getLength());
-		assertEquals(3, Tools.extractXPath(DEF_NS_CONTEXT,
-				"/a/b | /a/c | /a/X", xml)
-				.getLength());
-		assertEquals(3, Tools.extractXPath(DEF_NS_CONTEXT,
-				"/a/b | /a/c | /a/X", xml)
-				.getLength());
-	}
+        map = Tools.convertStringToMap("k1##k2|v2", "|", "##");
+        assertEquals(2, map.size());
+        assertEquals("", map.get("k1"));
+        assertEquals("v2", map.get("k2"));
 
-	@Test
-	public void shouldExtractXPathsFromXmlDocumentAsStrings(){
-		String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
-		assertEquals("2", Tools.extractXPath("count(/a/c)", xml,
-				XPathConstants.STRING));
+    }
 
-	}
+    @Test
+    public void shouldExtractXPathsFromXmlDocumentAsNodeLists() {
+        String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
+        assertEquals(2, Tools.extractXPath(DEF_NS_CONTEXT, "/a/c", xml).getLength());
+        assertEquals(1, Tools.extractXPath(DEF_NS_CONTEXT, "/a/b[text()='test']", xml).getLength());
+        assertEquals("test", Tools.extractXPath(DEF_NS_CONTEXT, "/a/b/text()", xml).item(0).getNodeValue());
+        assertEquals(1, Tools.extractXPath(DEF_NS_CONTEXT, "/a[count(c)>0]", xml).getLength());
+        assertEquals(3, Tools.extractXPath(DEF_NS_CONTEXT, "/a/b | /a/c | /a/X", xml).getLength());
+        assertEquals(3, Tools.extractXPath(DEF_NS_CONTEXT, "/a/b | /a/c | /a/X", xml).getLength());
+    }
 
-	@Test
-	public void shouldExtractXPathsFromXmlDocumentAsNumber() {
-		String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
-		assertEquals(1.0, Tools.extractXPath("count(/a/b)", xml,
-				XPathConstants.NUMBER));
+    @Test
+    public void shouldExtractXPathsFromXmlDocumentAsStrings() {
+        String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
+        assertEquals("2", Tools.extractXPath("count(/a/c)", xml, XPathConstants.STRING));
 
-	}
+    }
 
-	@Test
-	public void shouldExtractXPathsFromXmlDocumentAsBoolean() {
-		String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
-		assertEquals(Boolean.TRUE, Tools.extractXPath("count(/a/c)=2", xml,
-				XPathConstants.BOOLEAN));
+    @Test
+    public void shouldExtractXPathsFromXmlDocumentAsNumber() {
+        String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
+        assertEquals(1.0, Tools.extractXPath("count(/a/b)", xml, XPathConstants.NUMBER));
 
-	}
+    }
 
-	@Test
-	public void shouldExtractXPathsFromXmlDocumentAsNumberWithDefaultNamespace() {
-		String xml = "<a xmlns='http://ns.com'><b>test</b><c>1</c></a>";
-		HashMap<String, String> ns = new HashMap<String, String>();
-		ns.put("def", "http://ns.com");
-		assertEquals("test", Tools.extractXPath(ns, "/def:a/def:b", xml,
-				XPathConstants.STRING));
-	}
+    @Test
+    public void shouldExtractXPathsFromXmlDocumentAsBoolean() {
+        String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
+        assertEquals(Boolean.TRUE, Tools.extractXPath("count(/a/c)=2", xml, XPathConstants.BOOLEAN));
 
-	@Test
-	public void shouldExtractXPathsFromXmlDocumentAsNumberWithGenericNamespace() {
-		String xml = "<?xml version='1.0' ?><a xmlns:ns1='http://ns1.com'><b>test</b><ns1:c>tada</ns1:c></a>";
-		HashMap<String, String> ns = new HashMap<String, String>();
-		ns.put("alias", "http://ns1.com");
-		assertEquals("tada", Tools.extractXPath(ns, "/a/alias:c", xml,
-				XPathConstants.STRING));
-	}
+    }
 
-	@Test(expected=IllegalArgumentException.class)
-	public void shouldNotifyCallerWhenXPathIsWrong(){
-		Tools.extractXPath(DEF_NS_CONTEXT, "/a[text=1", "<a>1</a>");
-	}
+    @Test
+    public void shouldExtractXPathsFromXmlDocumentAsNumberWithDefaultNamespace() {
+        String xml = "<a xmlns='http://ns.com'><b>test</b><c>1</c></a>";
+        HashMap<String, String> ns = new HashMap<String, String>();
+        ns.put("def", "http://ns.com");
+        assertEquals("test", Tools.extractXPath(ns, "/def:a/def:b", xml, XPathConstants.STRING));
+    }
 
-	@Test(expected=IllegalArgumentException.class)
-	public void shouldNotifyCallerWhenXmlIsWrong(){
-		Tools.extractXPath(DEF_NS_CONTEXT, "/a[text()='1']", "<a>1<a>");
-	}
+    @Test
+    public void shouldExtractXPathsFromXmlDocumentAsNumberWithGenericNamespace() {
+        String xml = "<?xml version='1.0' ?><a xmlns:ns1='http://ns1.com'><b>test</b><ns1:c>tada</ns1:c></a>";
+        HashMap<String, String> ns = new HashMap<String, String>();
+        ns.put("alias", "http://ns1.com");
+        assertEquals("tada", Tools.extractXPath(ns, "/a/alias:c", xml, XPathConstants.STRING));
+    }
 
-	@Test(expected=IllegalArgumentException.class)
-	public void shouldNotifyCallerWhenXmlCannotBeParsed(){
-		Tools.extractXPath(DEF_NS_CONTEXT, "/a[text()='1']", null);
-	}
+    @Test
+    public void shouldExtractXPathsFromXmlDocumentAsNodelistWithGenericNamespace() {
+        String xml = "<resource><name>test data</name><data>some data</data></resource>";
+        HashMap<String, String> ns = new HashMap<String, String>();
+        ns.put("ns1alias", "http://smartrics/ns1");
+        NodeList nodeList = (NodeList) Tools.extractXPath(ns, "/resource/name[text()='test data']", xml, XPathConstants.NODESET);
+        assertEquals(1, nodeList.getLength());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotifyCallerWhenXPathIsWrong() {
+        Tools.extractXPath(DEF_NS_CONTEXT, "/a[text=1", "<a>1</a>");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotifyCallerWhenXmlIsWrong() {
+        Tools.extractXPath(DEF_NS_CONTEXT, "/a[text()='1']", "<a>1<a>");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotifyCallerWhenXmlCannotBeParsed() {
+        Tools.extractXPath(DEF_NS_CONTEXT, "/a[text()='1']", null);
+    }
 
 }

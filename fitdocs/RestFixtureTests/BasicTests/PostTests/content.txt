@@ -76,3 +76,7 @@ Use simple file upload
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
 |setFileName|${tempDirectory}/tempfile|
 |POST   | /resources/ | 200 | | { "resource" : { "name" : "test post", "data" : "some data" } }|
+
+!|Action Fixture.|
+|start|!-smartrics.rest.test.fitnesse.fixture.FileUtilFixture-!|
+|enter|deleteTempFile|${tempDirectory}/tempfile|
