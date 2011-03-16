@@ -11,7 +11,7 @@ has to be an XPath whose execution must return a String node.
 ***!
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
 |setBody|<resource><name>test post</name><data>some data</data></resource>|
-|POST   | /resources/ | 201 | | no-body |
+|POST   | /resources | 201 | | no-body |
 |let    | id | header | Location:/resources/(.+) | |
 
 !*** Note
