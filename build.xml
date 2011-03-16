@@ -4,23 +4,29 @@
 	<property file="properties/${user.name}.properties" />
 	<property file="build.properties" />
 
-	<property name="fitnesse.root.name" value="FitNesseRoot" />
-	<property name="fitnesse.path" value="${ant.project.name}Tests" />
-	<property name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
 	<property name="src.unit" value="${basedir}/src/test/java" />
 	<property name="src.cat" value="${basedir}/src/test/fitnesse" />
 	<property name="src" value="${basedir}/src/main/java" />
 	<property name="resources" value="${basedir}/src/main/resources" />
 	<property name="build" value="${basedir}/build" />
-	<property name="build.fitnesse.home" value="${basedir}/build/fitnesse" />
-	<property name="build.fitnesse.root" value="${build.fitnesse.home}/${fitnesse.root.name}" />
-	<property name="build.fitnesse.test.root" value="${build.fitnesse.root}/${fitnesse.path}" />
 	<property name="dist" value="${basedir}/dist" />
 	<property name="lib" value="${basedir}/lib" />
 	<property name="reports" value="${build}/reports" />
 	<property name="fitnesse.reports" value="${reports}/fitnesse" />
 	<property name="fitnesse.reports.resources" value="etc/fitnesse" />
 	<property name="artifacts" value="${dist}/artifacts" />
+
+	<property name="fitnesse.path" value="${ant.project.name}Tests" />
+	<property name="fitnesse.test.suite" value="${fitnesse.path}.BasicTests" />
+	<property name="fitnesse.root.name" value="FitNesseRoot" />
+	<property name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
+	<property name="fitnesse.jar" value="${lib}/fitnesse/fitnesse.jar" />
+	<property name="restfixture.jar" value="${build}/${ant.project.name}.jar" />
+	<property name="restfixture.fitnesse.jar" value="${build}/${ant.project.name}_fitnesse.jar" />
+
+	<property name="build.fitnesse.home" value="${basedir}/build/fitnesse" />
+	<property name="build.fitnesse.root" value="${build.fitnesse.home}/${fitnesse.root.name}" />
+	<property name="build.fitnesse.test.root" value="${build.fitnesse.root}/${fitnesse.path}" />
 
 	<path id="project.classpath">
 		<pathelement location="${resources}" />
@@ -84,11 +90,11 @@
 	</target>
 
 	<target name="package" depends="compile,compile-cat">
-		<jar destfile="${build}/${ant.project.name}.jar" basedir="${build}/classes/main" includes="**/*" />
-		<jar destfile="${build}/${ant.project.name}_fitnesse.jar" basedir="${build}/classes/cat" includes="**/*" excludes="**/*.jar" />
+		<jar destfile="${restfixture.jar}" basedir="${build}/classes/main" includes="**/*" />
+		<jar destfile="${restfixture.fitnesse.jar}" basedir="${build}/classes/cat" includes="**/*" excludes="**/*.jar" />
 	</target>
 
-	<target name="-fitnesse-copy" depends="package">
+	<target name="fitnesse-copy" depends="package">
 		<delete dir="${fitnesse.test.root}" />
 		<mkdir dir="${fitnesse.test.root}/lib" />
 		<copy todir="${fitnesse.test.root}/lib" flatten="true">
@@ -114,56 +120,51 @@
 
 	<target name="fitnesse-deploy-remote" depends="package">
 		<property name="remote.fitnesse.root" value="${fitnesse.root}" />
-		<antcall target="-fitnesse-copy">
+		<antcall target="fitnesse-copy">
 			<param name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
 			<param name="fitnesse.test.root" value="${remote.fitnesse.root}/${fitnesse.path}" />
 		</antcall>
 	</target>
 
 	<target name="fitnesse-deploy" depends="package">
-		<antcall target="-fitnesse-copy">
+		<antcall target="fitnesse-copy">
 			<param name="fitnesse.root" value="${build.fitnesse.home}/${fitnesse.root.name}" />
 			<param name="fitnesse.test.root" value="${build.fitnesse.test.root}" />
 		</antcall>
 	</target>
 
-	<target name="fitnesse-test-remote" depends="fitnesse-deploy-remote,fitnesse-exec-test,check.fitnesse.failure" if="execute.cat" />
-	<target name="fitnesse-test" depends="fitnesse-start,fitnesse-deploy,fitnesse-exec-test,fitnesse-stop,check.fitnesse.failure" if="execute.cat" />
+	<target name="fitnesse-test-remote" depends="fitnesse-deploy-remote,fitnesse-exec-test,check.fitnesse.failure,check.fitnesse.report.failure" if="execute.cat" />
+
+	<target name="fitnesse-test" depends="fitnesse-deploy,fitnesse-exec-test,check.fitnesse.failure,check.fitnesse.report.failure" if="execute.cat" />
 
 	<target name="check.fitnesse.failure" if="fitnesse.fail">
-		<fail message="FitNesse tests failed, see reports in '${fitnesse.reports}/results.html' for details." />
+		<fail message="FitNesse tests failed, see reports in '${fitnesse.reports}/results_sanitised.html' for details." />
 	</target>
 
-	<target name="fitnesse-start" if="execute.cat">
-		<taskdef name="start-fitnesse" classname="fitnesseMain.ant.StartFitnesseTask" classpathref="project.classpath" />
-		<start-fitnesse wikidirectoryrootpath="${build.fitnesse.home}" fitnesseport="${fitnesse.port}" />
-		<sleep seconds="2" />
-	</target>
-
-	<target name="fitnesse-stop" if="execute.cat">
-		<taskdef name="stop-fitnesse" classname="fitnesseMain.ant.StopFitnesseTask" classpathref="project.classpath" />
-		<stop-fitnesse fitnesseport="${fitnesse.port}" />
-	</target>
+	<target name="check.fitnesse.report.failure" if="fitnesse.report.fail">
+        <fail message="FitNesse tests report creation failed, see reports in '${fitnesse.reports}/results.html' for a non sanitised version of the report." />
+    </target>
 
 	<target name="fitnesse-exec-test" if="execute.cat">
-		<taskdef name="execute-fitnesse-tests" classname="fitnesseMain.ant.ExecuteFitnesseTestsTask" classpathref="project.classpath" />
-		<property name="fitnesse.suite.root" value="${fitnesse.path}.BasicTests" />
+		<property name="fitnesse.suite.root" value="${fitnesse.test.suite}" />
 		<mkdir dir="${fitnesse.reports}" />
-		<execute-fitnesse-tests 
-			suitepage="${fitnesse.suite.root}" 
-			fitnesseport="${fitnesse.port}" 
-			resultsdir="${fitnesse.reports}" 
-			resultshtmlpage="results.html" 
-			failonerror="false" 
-			resultproperty="fitnesse.fail">
-			
-			<classpath>
-				<pathelement location="${build}/${ant.project.name}.jar" />
-				<pathelement location="${build}/${ant.project.name}_fitnesse.jar" />
-				<path refid="project.classpath" />
-			</classpath>
-		</execute-fitnesse-tests>
+		<java jar="${fitnesse.jar}" failonerror="false" fork="true" output="${fitnesse.reports}/results.html" resultproperty="fitnesse.fail">
+			<arg value="-c" />
+			<arg value="${fitnesse.suite.root}?suite&amp;format=html" />
+			<arg value="-p" />
+			<arg value="${fitnesse.port}" />
+			<arg value="-r" />
+			<arg value="${fitnesse.root.name}" />
+			<arg value="-d" />
+			<arg value="build/fitnesse" />
+		</java>
+		<java classname="smartrics.rest.support.fitnesse.FitnesseResultSanitiser" failonerror="true" fork="true" resultproperty="fitnesse.report.fail">
+			<classpath location="${restfixture.fitnesse.jar}"/>
+            <arg value="${fitnesse.reports}/results.html" />
+            <arg value="${build.fitnesse.root}" />
+		</java>
 	</target>
+
 
 	<target name="dist-doc" if="execute.cat">
 		<!-- distributable docs -->
