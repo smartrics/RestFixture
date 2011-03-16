@@ -381,9 +381,10 @@ public class RestFixture extends ActionFixture {
 	 * be a kvp or a xml. The <code>ClientHelper</code> will figure it out
 	 */
 	public void setBody() {
-        if (row.getCell(1) == null)
+        CellWrapper<?> cell = row.getCell(1);
+        if (cell == null)
 			throw new FitFailureException("You must pass a body to set");
-		body(variables.substitute(row.getCell(0).text()));
+        body(variables.substitute(cell.text()));
 	}
 
 	/**
@@ -617,8 +618,7 @@ public class RestFixture extends ActionFixture {
 		return value;
 	}
 
-	private String handleXpathExpression(String label, String expr)
-			throws IOException {
+    private String handleXpathExpression(String label, String expr) throws IOException {
 		// def. match only last response body
 		String val = null;
 		try {
@@ -647,7 +647,10 @@ public class RestFixture extends ActionFixture {
 	}
 
 	private String handleXPathAsString(String expr) {
-        String val = (String) Tools.extractXPath(namespaceContext, expr, getLastResponse().getBody(), XPathConstants.STRING);
+        String body = getLastResponse().getBody();
+        if (body == null)
+            throw new FitFailureException("'xpath' cannot be applied to body of last response because it's null.");
+        String val = (String) Tools.extractXPath(namespaceContext, expr, body, XPathConstants.STRING);
 		return val;
 	}
 
