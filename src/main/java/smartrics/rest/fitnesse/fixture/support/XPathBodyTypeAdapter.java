@@ -75,8 +75,7 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
 					addError("not found: '" + expr + "'");
 				}
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Cannot extract xpath '"
-						+ expr + "' from document " + actual.toString(), e);
+                throw new IllegalArgumentException("Cannot extract xpath '" + expr + "' from document " + actual.toString(), e);
 			}
 		}
 		return getErrors().size() == 0;
@@ -84,15 +83,14 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
 
     protected boolean eval(String expr, String content) {
         try {
+            LOG.debug("Eval xPath: '" + expr + "' on '" + content + "'");
 			NodeList ret = Tools.extractXPath(getContext(), expr, content);
 			return !(ret == null || ret.getLength() == 0);
 		} catch (IllegalArgumentException e) {
-			// may be evaluatable as BOOLEAN
-			LOG.debug("XPath does not evaluate to a node list. "
-					+ "Trying to match to boolean: " + expr, e);
+            // may be evaluateable as BOOLEAN
+            LOG.debug("XPath does not evaluate to a node list. Trying to match to boolean: " + expr, e);
 		}
-		Boolean b = (Boolean) Tools.extractXPath(getContext(), expr, content,
-				XPathConstants.BOOLEAN);
+        Boolean b = (Boolean) Tools.extractXPath(getContext(), expr, content, XPathConstants.BOOLEAN);
 		return b;
 	}
 
