@@ -138,17 +138,17 @@
 	<target name="fitnesse-test" depends="fitnesse-deploy,fitnesse-exec-test,check.fitnesse.failure,check.fitnesse.report.failure" if="execute.cat" />
 
 	<target name="check.fitnesse.failure" if="fitnesse.fail">
-		<fail message="FitNesse tests failed, see reports in '${fitnesse.reports}/results_sanitised.html' for details." />
+		<fail message="FitNesse tests failed (# of failed tests: ${number.of.failed.tests}), see reports in '${fitnesse.reports}/results_sanitised.html' for details." />
 	</target>
 
 	<target name="check.fitnesse.report.failure" if="fitnesse.report.fail">
-        <fail message="FitNesse tests report creation failed, see reports in '${fitnesse.reports}/results.html' for a non sanitised version of the report." />
-    </target>
+		<fail message="FitNesse tests report creation failed (exit status: ${fitnesse.report.exit.status}), see reports in '${fitnesse.reports}/results.html' for a non sanitised version of the report." />
+	</target>
 
 	<target name="fitnesse-exec-test" if="execute.cat">
 		<property name="fitnesse.suite.root" value="${fitnesse.test.suite}" />
 		<mkdir dir="${fitnesse.reports}" />
-		<java jar="${fitnesse.jar}" failonerror="false" fork="true" output="${fitnesse.reports}/results.html" resultproperty="fitnesse.fail">
+		<java jar="${fitnesse.jar}" failonerror="false" fork="true" output="${fitnesse.reports}/results.html" resultproperty="number.of.failed.tests">
 			<arg value="-c" />
 			<arg value="${fitnesse.suite.root}?suite&amp;format=html" />
 			<arg value="-p" />
@@ -158,11 +158,21 @@
 			<arg value="-d" />
 			<arg value="build/fitnesse" />
 		</java>
-		<java classname="smartrics.rest.support.fitnesse.FitnesseResultSanitiser" failonerror="true" fork="true" resultproperty="fitnesse.report.fail">
-			<classpath location="${restfixture.fitnesse.jar}"/>
-            <arg value="${fitnesse.reports}/results.html" />
-            <arg value="${build.fitnesse.root}" />
+		<condition property="fitnesse.fail">
+			<not>
+				<equals arg1="0" arg2="number.of.failed.tests" />
+			</not>
+		</condition>
+		<java classname="smartrics.rest.support.fitnesse.FitnesseResultSanitiser" failonerror="true" fork="true" resultproperty="fitnesse.report.exit.status">
+			<classpath location="${restfixture.fitnesse.jar}" />
+			<arg value="${fitnesse.reports}/results.html" />
+			<arg value="${build.fitnesse.root}" />
 		</java>
+        <condition property="fitnesse.report.fail">
+            <not>
+                <equals arg1="0" arg2="fitnesse.report.exit.status" />
+            </not>
+        </condition>
 	</target>
 
 
