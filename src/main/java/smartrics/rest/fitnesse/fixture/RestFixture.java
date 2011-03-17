@@ -346,10 +346,11 @@ public class RestFixture extends ActionFixture {
 	 * body text should be location of file which needs to be sent
 	 */
 	public void setMultipartFileName() {
-        if (row.getCell(1) == null) {
-            throw new FitFailureException("You must pass a body to set");
+        CellWrapper<?> cell = row.getCell(1);
+        if (cell == null) {
+            throw new FitFailureException("You must pass a multipart file name to set");
         }
-		multipartFileName = variables.substitute(row.getCell(0).text());
+        multipartFileName = variables.substitute(cell.text());
 	}
 
 	/**
@@ -357,10 +358,11 @@ public class RestFixture extends ActionFixture {
 	 * location of file which needs to be sent
 	 */
 	public void setFileName() {
-        if (row.getCell(1) == null) {
-			throw new FitFailureException("You must pass a body to set");
+        CellWrapper<?> cell = row.getCell(1);
+        if (cell == null) {
+            throw new FitFailureException("You must pass a file name to set");
         }
-		fileName = variables.substitute(row.getCell(0).text());
+        fileName = variables.substitute(cell.text());
 	}
 
 	/**
@@ -369,11 +371,10 @@ public class RestFixture extends ActionFixture {
 	 * 'file'
 	 */
 	public void setMultipartFileParameterName() {
-        if (row.getCell(1) == null)
-			throw new FitFailureException(
-					"You must pass a parameter name to set");
-		multipartFileParameterName = variables
-				.substitute(row.getCell(0).text());
+        CellWrapper<?> cell = row.getCell(1);
+        if (cell == null)
+            throw new FitFailureException("You must pass a parameter name to set");
+        multipartFileParameterName = variables.substitute(cell.text());
 	}
 
 	/**

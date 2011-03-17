@@ -60,8 +60,10 @@ Use the multipartFile property to upload files to a server
 ****!
 !|Action Fixture.|
 |start|!-smartrics.rest.test.fitnesse.fixture.FileUtilFixture-!|
-|enter|fileContents|!- { "resource" : { "name" : "test post", "data" : "some data" } } -!|
-|enter|createTempFile|${tempDirectory}/tempfile|
+|enter|content|!- { "resource" : { "name" : "test post", "data" : "some data" } } -!|
+|enter|name|${tempDirectory}/tempfile|
+|check|create| true |
+|check|exists| true |
 
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
 |setMultipartFileName|${tempDirectory}/tempfile|
@@ -79,4 +81,6 @@ Use simple file upload
 
 !|Action Fixture.|
 |start|!-smartrics.rest.test.fitnesse.fixture.FileUtilFixture-!|
-|enter|deleteTempFile|${tempDirectory}/tempfile|
+|enter|name|${tempDirectory}/tempfile|
+|check|delete| true |
+|check|exists| false |
