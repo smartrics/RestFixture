@@ -159,9 +159,7 @@
 			<arg value="build/fitnesse" />
 		</java>
 		<condition property="fitnesse.fail">
-			<not>
-				<equals arg1="0" arg2="number.of.failed.tests" />
-			</not>
+			<equals arg1="0" arg2="number.of.failed.tests" />
 		</condition>
 		<java classname="smartrics.rest.support.fitnesse.FitnesseResultSanitiser" failonerror="true" fork="true" resultproperty="fitnesse.report.exit.status">
 			<classpath location="${restfixture.fitnesse.jar}" />
@@ -169,9 +167,7 @@
 			<arg value="${build.fitnesse.root}" />
 		</java>
         <condition property="fitnesse.report.fail">
-            <not>
-                <equals arg1="0" arg2="fitnesse.report.exit.status" />
-            </not>
+            <equals arg1="0" arg2="fitnesse.report.exit.status" />
         </condition>
 	</target>
 
