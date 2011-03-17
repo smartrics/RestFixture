@@ -20,12 +20,7 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
-
-	private static Log LOG = LogFactory.getLog(JSONBodyTypeAdapter.class);
 
 	@Override
 	protected boolean eval(String expr, String json) {

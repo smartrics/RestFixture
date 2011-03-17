@@ -3,15 +3,12 @@ package smartrics.rest.test.fitnesse.fixture;
 import java.io.File;
 import java.io.FileWriter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import fit.ActionFixture;
 
 public class FileUtilFixture extends ActionFixture {
-    private static Log LOG = LogFactory.getLog(FileUtilFixture.class);
 
     private String fileContents;
+
     private String fileName;
 
     public void content(String fileContents) {

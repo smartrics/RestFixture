@@ -27,7 +27,7 @@ import java.util.Map;
 
 import fit.TypeAdapter;
 
-public abstract class RestDataTypeAdapter extends TypeAdapter{
+public abstract class RestDataTypeAdapter extends TypeAdapter implements fitnesse.slim.Converter {
 	private final List<String> errors = new ArrayList<String>();
 
 	private Object actual;
@@ -69,4 +69,16 @@ public abstract class RestDataTypeAdapter extends TypeAdapter{
 	protected Map<String, String> getContext() {
 		return context;
 	}
+
+    public String toString(Object o) {
+        return o.toString();
+    }
+
+    public Object fromString(String o) {
+        try {
+            return this.parse(o);
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to parse as " + this.getClass().getName() + ": " + o);
+        }
+    }
 }
