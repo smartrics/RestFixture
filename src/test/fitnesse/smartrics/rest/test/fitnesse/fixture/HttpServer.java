@@ -63,7 +63,7 @@ public class HttpServer {
 		} catch (Exception e) {
 			ret = "Failed stopping http server: " + e.getMessage();
 		}
-		if (!getServer().isStopped() && ret == null)
+        if (!getServer().isStopped())
 			ret = "Failed stopping http server after 30 seconds wait";
 		return ret;
 	}
@@ -118,7 +118,7 @@ public class HttpServer {
 			ret = "Failed starting http server: " + e.getMessage();
 			LOG.error(ret, e);
 		}
-		if (!getServer().isRunning() && ret == null)
+        if (!getServer().isRunning())
 			ret = "Failed to start http server after waiting 30 seconds";
 
 		return ret;
