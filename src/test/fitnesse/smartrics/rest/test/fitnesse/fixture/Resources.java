@@ -26,108 +26,102 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Vector;
 
 public class Resources {
-	private final Map<String, Map<String, Resource>> resourceDb = Collections
-			.synchronizedMap(new HashMap<String, Map<String, Resource>>());
-	private static Resources instance = new Resources();
-	private int counter = 0;
+    private final Map<String, Map<String, Resource>> resourceDb = Collections.synchronizedMap(new HashMap<String, Map<String, Resource>>());
+    private static Resources instance = new Resources();
+    private int counter = 0;
 
-	public static Resources getInstance() {
-		return instance;
-	}
+    public static Resources getInstance() {
+        return instance;
+    }
 
-	public void clear() {
-		for (String c : resourceDb.keySet()) {
-			resourceDb.get(c).clear();
-		}
-		resourceDb.clear();
-	}
+    public void clear() {
+        for (String c : resourceDb.keySet()) {
+            resourceDb.get(c).clear();
+        }
+        resourceDb.clear();
+    }
 
-	public Collection<Resource> asCollection(String context) {
-		Collection<Resource> c = new Vector<Resource>();
-		Map<String, Resource> m = resourceDb.get(context);
-		if (m != null) {
-			for (Entry<String, Resource> e : m.entrySet()) {
-				String s = e.getKey();
-				c.add(m.get(s));
-			}
-		}
-		return c;
-	}
+    public Collection<Resource> asCollection(String context) {
+        Collection<Resource> c = new Vector<Resource>();
+        Map<String, Resource> m = resourceDb.get(context);
+        if (m != null) {
+            for (Entry<String, Resource> e : m.entrySet()) {
+                String s = e.getKey();
+                c.add(m.get(s));
+            }
+        }
+        return c;
+    }
 
-	public List<String> contexts() {
-		List<String> ctxKeys = new ArrayList<String>();
-		ctxKeys.addAll(resourceDb.keySet());
-		return ctxKeys;
-	}
+    public List<String> contexts() {
+        List<String> ctxKeys = new ArrayList<String>();
+        ctxKeys.addAll(resourceDb.keySet());
+        return ctxKeys;
+    }
 
-	public void add(String context, Resource r) {
-		if (r.getId() == null) {
-			r.setId(Integer.toString(newCounter()));
-		}
-		Map<String, Resource> m = getMapForContext(context);
-		m.put(r.getId(), r);
-	}
+    public void add(String context, Resource r) {
+        if (r.getId() == null) {
+            r.setId(Integer.toString(newCounter()));
+        }
+        Map<String, Resource> m = getMapForContext(context);
+        m.put(r.getId(), r);
+    }
 
-	private Map<String, Resource> getMapForContext(String context) {
-		Map<String, Resource> m = resourceDb.get(context);
-		if (m == null) {
-			m = new HashMap<String, Resource>();
-			resourceDb.put(context, m);
-		}
-		return m;
-	}
+    private Map<String, Resource> getMapForContext(String context) {
+        Map<String, Resource> m = resourceDb.get(context);
+        if (m == null) {
+            m = new HashMap<String, Resource>();
+            resourceDb.put(context, m);
+        }
+        return m;
+    }
 
-	public Resource get(String context, String i) {
-		return getMapForContext(context).get(i);
-	}
+    public Resource get(String context, String i) {
+        return getMapForContext(context).get(i);
+    }
 
-	public int size(String context) {
-		return getMapForContext(context).size();
-	}
+    public int size(String context) {
+        return getMapForContext(context).size();
+    }
 
-	public Resource remove(String context, String index) {
-		return getMapForContext(context).remove(index);
-	}
+    public Resource remove(String context, String index) {
+        return getMapForContext(context).remove(index);
+    }
 
-	public void remove(String context, Resource o) {
-		remove(context, o.getId());
-	}
+    public void remove(String context, Resource o) {
+        remove(context, o.getId());
+    }
 
-	public void reset() {
-		clear();
-		counter = 0;
-		add("/resources", new Resource(
-				"<resource>\n    <name>a funky name</name>"
-								+ "\n    <data>an important message</data>"
-								+ "\n    <nstag xmlns:ns1='http://smartrics/ns1'>\n        <ns1:number>3</ns1:number>\n    </nstag>"
-								+ "\n</resource>"));
-		add("/resources", new Resource(
-				"{ \"resource\" : { \"name\" : \"a funky name\", "
-						+ "\"data\" : \"an important message\" } }"));
-	}
+    public void reset() {
+        clear();
+        counter = 0;
+        add("/resources", new Resource("<resource>\n    <name>a funky name</name>\n    <data>an important message</data>"
+                + "\n    <nstag xmlns:ns1='http://smartrics/ns1'>\n        <ns1:number>3</ns1:number>\n    </nstag>" + "\n</resource>"));
+        add("/resources", new Resource("{ \"resource\" : { \"name\" : \"a funky name\", " + "\"data\" : \"an important message\" } }"));
+    }
 
-	private synchronized int newCounter() {
-		return counter++;
-	}
+    private synchronized int newCounter() {
+        return counter++;
+    }
 
-	@Override
-	public String toString() {
-		StringBuffer b = new StringBuffer();
-		String nl = System.getProperty("line.separator");
-		b.append("Resources:[").append(nl);
-		for (String c : resourceDb.keySet()) {
-			b.append(" Context(").append(c).append("):[").append(nl);
-			for (Resource r : asCollection(c)) {
-				b.append(r).append(nl);
-			}
-			b.append(" ]").append(nl);
-		}
-		b.append("]").append(nl);
-		return b.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuffer b = new StringBuffer();
+        String nl = System.getProperty("line.separator");
+        b.append("Resources:[").append(nl);
+        for (String c : resourceDb.keySet()) {
+            b.append(" Context(").append(c).append("):[").append(nl);
+            for (Resource r : asCollection(c)) {
+                b.append(r).append(nl);
+            }
+            b.append(" ]").append(nl);
+        }
+        b.append("]").append(nl);
+        return b.toString();
+    }
 
 }

@@ -21,4 +21,14 @@ public class SlimRow implements RowWrapper<String> {
 		return null;
 	}
 
+    public List<String> asList() {
+        System.out.println("###### asList");
+        List<String> ret = new ArrayList<String>();
+        for (CellWrapper<String> w : row) {
+            System.out.println(">> " + w.body());
+            ret.add(w.body());
+        }
+        return ret;
+    }
+
 }

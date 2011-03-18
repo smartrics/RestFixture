@@ -15,7 +15,8 @@ public class SlimFormatter implements CellFormatter<String> {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(out);
         exception.printStackTrace(ps);
-        cell.body("error:" + cell.getWrapped() + "<br /><hr/><br/>" + out.toString());
+        String st = out.toString().replaceAll(" ", "&nbsp;").replaceAll("\t", "&nbsp;&nbsp;&nbsp;&nbsp;").replace("\n", "<br/>");
+        cell.body("error:" + cell.getWrapped() + "<br /><hr/><br/><code>" + st + "</code>");
 	}
 
 	@Override

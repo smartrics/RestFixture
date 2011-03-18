@@ -4,11 +4,9 @@ package smartrics.rest.fitnesse.fixture;
 public class SlimCell implements CellWrapper<String> {
 
     private String cell;
-    private String modCell;
 
 	public SlimCell(String c) {
         this.cell = c;
-        this.modCell = c;
 	}
 
 	@Override
@@ -18,17 +16,17 @@ public class SlimCell implements CellWrapper<String> {
 
 	@Override
 	public void body(String string) {
-        modCell = string;
+        cell = string;
 	}
 
 	@Override
 	public String body() {
-        return modCell;
+        return cell;
 	}
 
 	@Override
 	public void addToBody(String string) {
-        modCell = modCell + string;
+        cell = cell + string;
 	}
 
 	@Override

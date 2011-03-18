@@ -20,22 +20,33 @@
  */
 package smartrics.rest.test.fitnesse.fixture;
 
-import fit.ActionFixture;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-public class HttpServerFixture extends ActionFixture{
+public class HttpServerFixture {
 
+    private int port;
     private static HttpServer server;
 
+    private static Log LOG = LogFactory.getLog(HttpServerFixture.class);
 
     public HttpServerFixture() throws Exception {
         super();
-	}
+    }
 
-    public void start(int port) {
+    public void startServer(String port) {
+        startServer(Integer.parseInt(port));
+    }
+
+    public void startServer(int port) {
         if (server == null) {
+            this.port = port;
+            LOG.info("Starting server on port " + port);
 			server = new HttpServer(port);
 			server.addServlet(new ResourcesServlet(), "/");
 			server.start();
+        } else {
+            LOG.info("Server already started on port " + port);
 		}
 	}
 
@@ -47,9 +58,16 @@ public class HttpServerFixture extends ActionFixture{
         return server != null && server.isStopped();
 	}
 
-    public void stop() {
+    public void stopServer() {
         if (server != null) {
+            LOG.info("Stopping server on port " + port);
 			server.stop();
+        } else {
+            if (port == 0) {
+                LOG.info("Server never started");
+            } else {
+                LOG.info("Server already stopped on port " + port);
+            }
 		}
 	}
 
@@ -57,13 +75,14 @@ public class HttpServerFixture extends ActionFixture{
         server.join();
 	}
 
-    public void resetResourcesDatabase() {
+    public boolean resetResourcesDatabase() {
         Resources.getInstance().reset();
+        return true;
 	}
 
     public static void main(String[] args) throws Exception {
         HttpServerFixture f = new HttpServerFixture();
-		f.start(8765);
+        f.startServer(8765);
 		f.join();
 	}
 }

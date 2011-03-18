@@ -1,7 +1,5 @@
 !3 GET
 
-Get an existing resource should return the resource. There's a pre loaded resource in !-smartrics.rest.text.fitnesse.fixture.ResourcesServlet-!.
-
 !**** Notes
 A GET request is performed on the resource whose URI is specified in the second cell.
 The following cell indicate:

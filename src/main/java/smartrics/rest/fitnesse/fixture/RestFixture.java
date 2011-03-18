@@ -249,22 +249,21 @@ public class RestFixture extends ActionFixture {
 	 * @param rows
 	 * @return
 	 */
-	public List<List<String>> doTable(List<List<String>> rows) {
+    @SuppressWarnings("unchecked")
+    public List<List<String>> doTable(List<List<String>> rows) {
 		StringBuffer b = new StringBuffer();
 		List<List<String>> res = new Vector<List<String>>();
-		for (List<String> row : rows) {
-			Vector<String> newRow = new Vector<String>();
-			for (String cell : row) {
-				b.append("|").append(cell);
-				newRow.add("pass:" + cell);
-				try {
-					executeCell0Method(row.get(0));
-				} catch (Exception e) {
-
-				}
-			}
-			b.append("\n");
-			res.add(newRow);
+        formatter = new SlimFormatter();
+        for (List<String> r : rows) {
+            row = new SlimRow(r);
+            try {
+                executeCell0Method(r.get(0));
+            } catch (Exception e) {
+                LOG.error("Exception raised when executing method " + r.get(0));
+                formatter.exception(row.getCell(0), e);
+            } finally {
+                res.add(((SlimRow) row).asList());
+            }
 		}
 		System.out.println(b.toString());
 		return res;

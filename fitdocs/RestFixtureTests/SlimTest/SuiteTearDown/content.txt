@@ -1,5 +1,4 @@
-| Action Fixture. |
-| start |!-smartrics.rest.test.fitnesse.fixture.HttpServerFixture-!|
-| check | isStarted | true |
-| press | stop | |
-| check | isStopped | true |
+| script | smartrics.rest.test.fitnesse.fixture.HttpServerFixture |
+| check  | is started | true |
+| stop server                |
+| check  | is stopped | true |
