@@ -21,7 +21,8 @@ public class FitFormatter implements CellFormatter<Parse> {
 
 	@Override
 	public void exception(CellWrapper<Parse> cell, Throwable exception) {
-		fixture.exception(cell.getWrapped(), exception);
+		Parse wrapped = cell.getWrapped();
+        fixture.exception(wrapped, exception);
 	}
 
 	@Override

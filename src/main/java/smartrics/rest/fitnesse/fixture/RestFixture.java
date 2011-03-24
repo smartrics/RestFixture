@@ -198,7 +198,9 @@ public class RestFixture extends ActionFixture {
      * Fit constructor
      */
 	public RestFixture() {
-        this(Runner.FIT, new PartsFactory(), null, new String[] {});
+        super();
+        this.displayActualOnRight = true;
+        this.partsFactory = new PartsFactory();
     }
 
 	/**
@@ -213,7 +215,6 @@ public class RestFixture extends ActionFixture {
     }
 
     public RestFixture(Runner runner, PartsFactory partsFactory, Config config, String... args) {
-        super();
         this.displayActualOnRight = true;
         this.partsFactory = partsFactory;
         this.config = config;
@@ -306,9 +307,9 @@ public class RestFixture extends ActionFixture {
 	@Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	public void doCells(Parse parse) {
-        getFormatter().setDisplayActual(isDisplayActualOnRight());
-        // TODO: check if this initialize call is now necessary;
         initialize(Runner.FIT, args);
+        getFormatter().setDisplayActual(isDisplayActualOnRight());
+        ((FitFormatter) getFormatter()).setActionFixtureDelegate(this);
         RowWrapper currentRow = new FitRow(parse);
 		try {
             processRow(currentRow);
@@ -369,15 +370,16 @@ public class RestFixture extends ActionFixture {
 	}
 
 	protected void processArguments(String[] args) {
+	    if(args==null)
+            return;
 		if (args.length > 0) {
 			baseUrl = new Url(stripTag(args[0]));
             if (config == null) {
-                config = new Config();
-            }
-		}
-		if (args.length == 2) {
-            if (config == null) {
-                config = new Config(args[1]);
+                if (args.length == 2) {
+                    config = new Config(args[1]);
+                } else {
+                    config = new Config();
+                }
             }
 		}
 	}
@@ -619,9 +621,17 @@ public class RestFixture extends ActionFixture {
 		}
 	}
 
+    @SuppressWarnings("rawtypes")
     public void processRow(RowWrapper<?> currentRow) {
         row = currentRow;
-        String methodName = row.getCell(0).text();
+        CellWrapper cell0 = row.getCell(0);
+        if (cell0 == null) {
+            throw new RuntimeException("Current RestFixture row is not parseable (maybe empty or not existent)");
+        }
+        String methodName = cell0.text();
+        if ("".equals(methodName)) {
+            throw new RuntimeException("RestFixture method not specified");
+        }
         Method method1 = null;
         try {
             method1 = getClass().getMethod(methodName);
@@ -752,7 +762,7 @@ public class RestFixture extends ActionFixture {
 		doMethod(null, m);
 	}
 
-	private void doMethod(String body, String method) {
+    protected void doMethod(String body, String method) {
         CellWrapper<?> urlCell = row.getCell(1);
         String url = urlCell.text();
         String resUrl = resolve(FIND_VARS_PATTERN, url);

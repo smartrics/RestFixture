@@ -12,7 +12,11 @@ public class FitCell implements CellWrapper<Parse> {
 
 	@Override
 	public String text() {
-		return cell.text();
+	    try {
+	        return cell.text();
+	    } catch(RuntimeException e) {
+            return "";
+	    }
 	}
 
 	@Override

@@ -63,12 +63,12 @@ public class RestFixtureTest {
     private RestFixture fixture;
     private final Variables variables = new Variables();
     private RestFixtureTestHelper helper;
-    private Config config;
     private PartsFactory mockPartsFactory;
     private RestClient mockRestClient;
     private RestRequest mockLastRequest;
     @SuppressWarnings("rawtypes")
     private CellFormatter mockCellFormatter;
+    private Config config;
     private RestResponse lastResponse;
 
     @Before
@@ -109,20 +109,36 @@ public class RestFixtureTest {
     }
 
     @Test
-    public void mustHaveConfigNameAsOptionalSecondParameterToDefaultWhenNotSpecified() {
+    public void mustSetConfigNameToDefaultWhenNotSpecifiedAsSecondOptionalParameter_FIT() {
+        fixture = new RestFixture() {
+            {
+                super.args = new String[] { BASE_URL };
+            }
+        };
         Parse parse = buildEmptyParse();
         fixture.doCells(parse);
         assertEquals(Config.DEFAULT_CONFIG_NAME, fixture.getConfig().getName());
     }
 
     @Test
-    public void mustHaveConfigNameAsOptionalSecondParameterToBeSetToSpecifiedValue() {
+    public void mustSetConfigNameToDefaultWhenNotSpecifiedAsSecondOptionalParameter_SLIM() {
+        fixture = new RestFixture(BASE_URL, "configName");
+        assertEquals("configName", fixture.getConfig().getName());
+    }
+
+    @Test
+    public void mustSetConfigNameToSpecifiedValueIfOptionalSecondParameterIsSpecified_FIT() {
         fixture = new RestFixture() {
             {
                 super.args = new String[] { BASE_URL, "configName" };
             }
         };
         fixture.doCells(buildEmptyParse());
+        assertEquals("configName", fixture.getConfig().getName());
+    }
+
+    public void mustSetConfigNameToSpecifiedValueIfOptionalSecondParameterIsSpecified_SLIM() {
+        fixture = new RestFixture(BASE_URL, "configName");
         assertEquals("configName", fixture.getConfig().getName());
     }
 
@@ -164,14 +180,6 @@ public class RestFixtureTest {
         RowWrapper<?> row = helper.createFitTestRow("IDONTEXIST", "/uri", "", "", "");
         fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, "http://service-host:1357");
         fixture.processRow(row);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void wireMocks() {
-        when(mockPartsFactory.buildRestClient(config)).thenReturn(mockRestClient);
-        when(mockPartsFactory.buildRestRequest()).thenReturn(mockLastRequest);
-        when(mockRestClient.execute(mockLastRequest)).thenReturn(lastResponse);
-        when(mockPartsFactory.buildCellFormatter(any(RestFixture.Runner.class))).thenReturn(mockCellFormatter);
     }
 
     @SuppressWarnings("unchecked")
@@ -591,48 +599,24 @@ public class RestFixtureTest {
      * helper methods
      */
 
-    private void assertAllCells(Parse t, String c1, String c2, String c3, String c4, String c5) {
-        assertEquals(c1, extractCell1(t));
-        assertEquals(c2, extractCell2(t).trim());
-        assertEquals(c3, extractCell3(t).trim());
-        assertEquals(c4, extractCell4(t).trim());
-        assertEquals(c5, extractcell5(t).trim());
-    }
-
     private void setDisplayActualOnRight(boolean b) {
         config.add("restfixture.display.actual.on.right", Boolean.toString(b));
     }
 
     private Parse buildEmptyParse() {
         try {
-            return new Parse("<table><tr><td></td></tr></table>");
+            return new Parse("<table><tr><td>&nbsp;</td></tr></table>");
         } catch (FitParseException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private String buildResUriLink(String resUri) {
-        return "<a href='" + BASE_URL + resUri + "'>" + resUri + "</a>";
+    @SuppressWarnings("unchecked")
+    private void wireMocks() {
+        when(mockPartsFactory.buildRestClient(config)).thenReturn(mockRestClient);
+        when(mockPartsFactory.buildRestRequest()).thenReturn(mockLastRequest);
+        when(mockRestClient.execute(mockLastRequest)).thenReturn(lastResponse);
+        when(mockPartsFactory.buildCellFormatter(any(RestFixture.Runner.class))).thenReturn(mockCellFormatter);
     }
 
-    private String extractCell1(Parse p) {
-        return p.body;
-    }
-
-    private String extractCell2(Parse p) {
-        return p.more.body;
-    }
-
-    private String extractCell3(Parse p) {
-        return p.more.more.body;
-    }
-
-    private String extractCell4(Parse p) {
-        return p.more.more.more.body;
-    }
-
-    private String extractcell5(Parse p) {
-        System.out.println(p.more.more.more.more.body);
-        return p.more.more.more.more.body;
-    }
 }
