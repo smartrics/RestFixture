@@ -140,7 +140,6 @@ public class RestFixtureTest {
     }
 
     @Test
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void mustUseDefaultHeadersIfDefinedOnNamedConfig() {
         config.add("restfixture.default.headers", "added1 : 1" + System.getProperty("line.separator") + "added2 : 2");
         wireMocks();
@@ -413,7 +412,7 @@ public class RestFixtureTest {
         lastResponse.addHeader("Content-Type", "text/plain");
         lastResponse.setBody("in AD 1492 Columbus discovered America");
 
-        RowWrapper<?> row = helper.createFitTestRow("GET", "/uri", "", "", "AD \\d\\d\\d\\d");
+        RowWrapper<?> row = helper.createFitTestRow("GET", "/uri", "", "", ".+AD \\d\\d\\d\\d.+");
         fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
 
         fixture.processRow(row);
@@ -558,9 +557,9 @@ public class RestFixtureTest {
 
         RowWrapper<?> row = helper.createFitTestRow("GET", "/uri", "", "", "");
         fixture.processRow(row);
-        row = helper.createFitTestRow("let", "val", "header", "h1:(\\w\\d)", "v1");
+        row = helper.createFitTestRow("let", "keytovalue", "header", "header:(.+\\d)", "value1");
         fixture.processRow(row);
-        assertEquals("value1", new Variables().get("val"));
+        assertEquals("value1", new Variables().get("keytovalue"));
     }
 
     /**

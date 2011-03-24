@@ -673,8 +673,8 @@ public class RestFixture extends ActionFixture {
 			Pattern p = Pattern.compile(expression);
 			for (String c : content) {
 				Matcher m = p.matcher(c);
-				if (m.find()) {
-					int cc = m.groupCount();
+                if (m.find()) {
+                    int cc = m.groupCount();
 					value = m.group(cc);
 					assignVariable(label, value);
 					break;
