@@ -1,0 +1,15 @@
+!3 PUT
+
+!*** Note
+This test shows how to pass bespoke headers in the request. In this specific case, the stub echoes back the 'Echo-Header', so that the 
+following PUT and GET can match it the response.
+***!
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|setBody|<resource><name>name being updated</name><data>data being updated</data></resource>|
+|setHeader|Echo-Header : echoed|
+|PUT | /resources/0 | 200 | Echo-Header : echoed | no-body |
+|GET | /resources/0 | 200 | Echo-Header : echoed |!-
+ /resource/name[text()='name being updated'] <br/>
+ /resource/data[text()='data being updated']
+-!|

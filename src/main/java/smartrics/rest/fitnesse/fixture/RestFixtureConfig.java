@@ -23,6 +23,7 @@ package smartrics.rest.fitnesse.fixture;
 import java.util.List;
 
 import smartrics.rest.config.Config;
+import smartrics.rest.fitnesse.fixture.support.Tools;
 import fit.Fixture;
 import fit.Parse;
 
@@ -105,70 +106,66 @@ import fit.Parse;
  */
 public class RestFixtureConfig extends Fixture {
 
-	private Config config;
+    private Config config;
 
-	/**
-	 * support for SLIM
-	 * 
-	 * @param rows
-	 * @return
-	 */
-	public List<List<String>> doTable(List<List<String>> rows) {
-		Config c = getConfig();
-		for (List<String> row : rows) {
-			String k = row.get(0);
-			if (row.size() == 2) {
-				k = row.get(0);
-				String v = row.get(1);
-				c.add(k, v);
-				row.clear();
-				row.add("");
-				row.add("pass:" + v);
-			} else {
-				row.remove(0);
-				row.add(0,
-						"error:"
-						+ k
-								+ "<br/><br/>this line doesn't conform to NVP format (col 0 for name, col 1 for value) - content skipped");
-			}
-		}
-		return rows;
-	}
+    /**
+     * support for SLIM
+     * 
+     * @param rows
+     * @return
+     */
+    public List<List<String>> doTable(List<List<String>> rows) {
+        Config c = getConfig();
+        for (List<String> row : rows) {
+            String k = row.get(0);
+            if (row.size() == 2) {
+                k = row.get(0);
+                String v = row.get(1);
+                c.add(k, v);
+                row.clear();
+                row.add("");
+                row.add("pass:" + Tools.toHtml(v));
+            } else {
+                row.remove(0);
+                row.add(0, "error:" + k + Tools.toHtml("\n\nthis line doesn't conform to NVP format (col 0 for name, col 1 for value) - content skipped"));
+            }
+        }
+        return rows;
+    }
 
-	/**
-	 * processes each row in the config fixture table and loads the key/value
-	 * pairs. The fixture optional first argument is the config name. If not
-	 * supplied the value is defaulted. See {@link Config.DEFAULT_CONFIG_NAME}.
-	 */
-	@Override
-	public void doRow(Parse p) {
-		Parse cells = p.parts;
-		try {
-			String key = cells.text();
-			String value = cells.more.text();
-			Config c = getConfig();
-			c.add(key, value);
-			String fValue = value.replaceAll(
-					System.getProperty("line.separator"), "<br>");
-			right(cells);
-			Parse valueParse = cells.more;
-			valueParse.body = fValue;
-			right(valueParse);
-		} catch (Exception e) {
-			System.err.println("Exception for " + p.text());
-			e.printStackTrace();
-			exception(p, e);
-		}
-	}
+    /**
+     * processes each row in the config fixture table and loads the key/value
+     * pairs. The fixture optional first argument is the config name. If not
+     * supplied the value is defaulted. See {@link Config.DEFAULT_CONFIG_NAME}.
+     */
+    @Override
+    public void doRow(Parse p) {
+        Parse cells = p.parts;
+        try {
+            String key = cells.text();
+            String value = cells.more.text();
+            Config c = getConfig();
+            c.add(key, value);
+            String fValue = value.replaceAll(System.getProperty("line.separator"), "<br>");
+            right(cells);
+            Parse valueParse = cells.more;
+            valueParse.body = fValue;
+            right(valueParse);
+        } catch (Exception e) {
+            System.err.println("Exception for " + p.text());
+            e.printStackTrace();
+            exception(p, e);
+        }
+    }
 
-	private Config getConfig() {
-		if (config != null)
-			return config;
-		if (super.args != null && super.args.length > 0) {
-			config = new Config(super.args[0]);
-		} else {
-			config = new Config();
-		}
-		return config;
-	}
+    private Config getConfig() {
+        if (config != null)
+            return config;
+        if (super.args != null && super.args.length > 0) {
+            config = new Config(super.args[0]);
+        } else {
+            config = new Config();
+        }
+        return config;
+    }
 }

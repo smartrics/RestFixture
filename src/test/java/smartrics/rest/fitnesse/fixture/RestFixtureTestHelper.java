@@ -1,34 +1,30 @@
 package smartrics.rest.fitnesse.fixture;
 
-import static org.junit.Assert.fail;
-import fit.Parse;
-import fit.exception.FitParseException;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RestFixtureTestHelper {
-	public Parse createFitTestInstance(String... rows) {
-		Parse t = null;
-		StringBuffer rBuff = new StringBuffer();
-		rBuff.append("<table>");
-		for (String r : rows) {
-			rBuff.append(r);
-		}
-		rBuff.append("</table>");
-		try {
-            t = new Parse(rBuff.toString(), new String[] { "table", "row", "col" }, 2, 0);
-		} catch (FitParseException e) {
-			fail("Unable to build Parse object");
-		}
-		return t;
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public RowWrapper<?> createFitTestRow(String... rows) {
+        RowWrapper<?> row = mock(RowWrapper.class);
+        for (int i = 0; i < rows.length; i++) {
+            CellWrapper cell = mock(CellWrapper.class);
+            when(cell.getWrapped()).thenReturn(rows[i]);
+            when(cell.text()).thenReturn(rows[i]);
+            when(row.getCell(i)).thenReturn(cell, cell);
+        }
+		return row;
 	}
 
-	public String createFitTestRow(String... cells) {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("<row>");
-		for (String c : cells) {
-			buffer.append("<col>").append(c).append("</col>");
-		}
-		buffer.append("</row>");
-		return buffer.toString();
-	}
+    // public String createFitTestInstance(String... rows) {
+    // StringBuffer buffer = new StringBuffer();
+    // buffer.append("<row>");
+    // for (String c : cells) {
+    // buffer.append("<col>").append(c).append("</col>");
+    // }
+    // buffer.append("</row>");
+    // return buffer.toString();
+    // }
 
 }

@@ -3,7 +3,12 @@ package smartrics.rest.fitnesse.fixture;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class SlimRow implements RowWrapper<String> {
+
+    private static Log LOG = LogFactory.getLog(SlimRow.class);
 
 	private final List<CellWrapper<String>> row;
 
@@ -22,10 +27,8 @@ public class SlimRow implements RowWrapper<String> {
 	}
 
     public List<String> asList() {
-        System.out.println("###### asList");
         List<String> ret = new ArrayList<String>();
         for (CellWrapper<String> w : row) {
-            System.out.println(">> " + w.body());
             ret.add(w.body());
         }
         return ret;

@@ -34,14 +34,12 @@ import java.util.regex.Pattern;
 
 import javax.xml.xpath.XPathConstants;
 
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import smartrics.rest.client.RestClient;
-import smartrics.rest.client.RestClientImpl;
 import smartrics.rest.client.RestData.Header;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
@@ -50,7 +48,6 @@ import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.HttpClientBuilder;
 import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StatusCodeTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
@@ -150,6 +147,10 @@ import fit.exception.FitFailureException;
  */
 public class RestFixture extends ActionFixture {
 
+    enum Runner {
+        SLIM, FIT, OTHER;
+    };
+    
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     private static final String FILE = "file";
@@ -189,13 +190,16 @@ public class RestFixture extends ActionFixture {
 	@SuppressWarnings("rawtypes")
 	private RowWrapper row;
 
-	@SuppressWarnings("rawtypes")
-	private CellFormatter formatter;
+    private CellFormatter<?> formatter;
 
+    private PartsFactory partsFactory;
+
+    /**
+     * Fit constructor
+     */
 	public RestFixture() {
-		super();
-		displayActualOnRight = true;
-	}
+        this(Runner.FIT, new PartsFactory(), null, new String[] {});
+    }
 
 	/**
 	 * Slim constructor
@@ -203,44 +207,71 @@ public class RestFixture extends ActionFixture {
 	 * @param args
 	 *            the cells following up the first cell in the first row.
 	 */
-	public RestFixture(String host) {
-		super();
-		displayActualOnRight = true;
-		initialize(new String[] { host });
-	}
+    public RestFixture(String... args) {
+        // here config will be picked up using the named config in args if any
+        this(Runner.SLIM, new PartsFactory(), null, args);
+    }
 
-	public RestFixture(String host, String configName) {
-		super();
-		displayActualOnRight = true;
-		initialize(new String[] { host, configName });
-	}
+    public RestFixture(Runner runner, PartsFactory partsFactory, Config config, String... args) {
+        super();
+        this.displayActualOnRight = true;
+        this.partsFactory = partsFactory;
+        this.config = config;
+        initialize(runner, args);
+    }
 
+	/**
+	 * @return the config used for this fixture instance
+	 */
 	public Config getConfig() {
 		return config;
 	}
 
+	/**
+	 * allows overriding of the config for this instance.
+	 * @param conf the new config to use
+	 */
+    public void setConfig(Config conf) {
+        this.config = conf;
+    }
+
+    /**
+     * the base url as defined by the rest fixture ctor or input args
+     * 
+     * @return the base url as string
+     */
 	public String getBaseUrl() {
 		return baseUrl.toString();
 	}
 
-	/**
-	 * The value of the flag controlling the display of the actual header or
-	 * body in the cell containing the expectations.
-	 *
-	 * @return true if the actual value of the headers or body is displayed when
-	 *         expectation is true
-	 */
+    /**
+     * The default headers as defined in the config used to initialise this
+     * fixture.
+     * 
+     * @return the map of default headers.
+     */
+    public Map<String, String> getDefaultHeaders() {
+        return defaultHeaders;
+    }
+
+    /**
+     * The formatter for this instance of the RestFixture
+     * 
+     * @return
+     */
+    public CellFormatter<?> getFormatter() {
+        return formatter;
+    }
+
+    /**
+     * The value of the flag controlling the display of the actual header or
+     * body in the cell containing the expectations.
+     * 
+     * @return true if the actual value of the headers or body is displayed when
+     *         expectation is true
+     */
 	public boolean isDisplayActualOnRight() {
 		return displayActualOnRight;
-	}
-
-	/**
-	 * Overrideable method that allows to redefine the rest client
-	 * implementation.
-	 */
-	protected RestClient buildRestClient() {
-        HttpClient httpClient = new HttpClientBuilder().createHttpClient(config);
-		return new RestClientImpl(httpClient);
 	}
 
 	/**
@@ -249,60 +280,68 @@ public class RestFixture extends ActionFixture {
 	 * @param rows
 	 * @return
 	 */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<List<String>> doTable(List<List<String>> rows) {
-		StringBuffer b = new StringBuffer();
 		List<List<String>> res = new Vector<List<String>>();
-        formatter = new SlimFormatter();
+        getFormatter().setDisplayActual(isDisplayActualOnRight());
         for (List<String> r : rows) {
-            row = new SlimRow(r);
+            RowWrapper currentRow = new SlimRow(r);
             try {
-                executeCell0Method(r.get(0));
+                processRow(currentRow);
             } catch (Exception e) {
                 LOG.error("Exception raised when executing method " + r.get(0));
-                formatter.exception(row.getCell(0), e);
+                getFormatter().exception(currentRow.getCell(0), e);
             } finally {
-                res.add(((SlimRow) row).asList());
+                List<String> rowAsList = ((SlimRow) currentRow).asList();
+                // HACK: it seems that even if the content is unchanged, Slim
+                // renders red cell
+                rowAsList.set(0, "");
+                res.add(rowAsList);
+                LOG.info("FIRST CELL: [" + res.get(0).get(0).toString() + "][" + currentRow.getCell(0).getWrapped() + "]");
             }
 		}
-		System.out.println(b.toString());
 		return res;
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
 	public void doCells(Parse parse) {
-		this.row = new FitRow(parse);
-		this.formatter = new FitFormatter(this);
-		initialize(args);
-        @SuppressWarnings("rawtypes")
-        CellWrapper methodNameCell = this.row.getCell(0);
+        getFormatter().setDisplayActual(isDisplayActualOnRight());
+        // TODO: check if this initialize call is now necessary;
+        initialize(Runner.FIT, args);
+        RowWrapper currentRow = new FitRow(parse);
 		try {
-            executeCell0Method(methodNameCell.text());
+            processRow(currentRow);
 		} catch (Exception exception) {
-            formatter.exception(methodNameCell, exception);
+            getFormatter().exception(currentRow.getCell(0), exception);
 		}
 	}
+
+    private void configFormatter(Runner runner) {
+        formatter = partsFactory.buildCellFormatter(runner);
+    }
 
 	/**
 	 * Configure the fixture with data from {@link RestFixtureConfig}.
 	 */
-	protected void configFixture() {
-        displayActualOnRight = config.getAsBoolean("restfixture.display.actual.on.right", true);
+    private void configFixture() {
+        displayActualOnRight = config.getAsBoolean("restfixture.display.actual.on.right", displayActualOnRight);
 		String str = config.get("restfixture.default.headers", "");
 		defaultHeaders = parseHeaders(str);
 		str = config.get("restfixture.xml.namespace.context", "");
 		namespaceContext = parseNamespaceContext(str);
 	}
 
-	/**
-	 * Overrideable method that allows to config the rest client implementation.
-	 * the method shoudl configure the instance attribute
-	 * {@link RestFixture#restClient} created by the
-	 * {@link RestFixture#buildRestClient()}.
-	 */
-	protected void configRestClient() {
-		restClient.setBaseUrl(baseUrl.toString());
+    /**
+     * Allows to config the rest client implementation. the method shoudl
+     * configure the instance attribute {@link RestFixture#restClient} created
+     * by the {@link RestFixture#buildRestClient()}.
+     */
+	private void configRestClient() {
+        restClient = partsFactory.buildRestClient(getConfig());
+        if (baseUrl != null) {
+            getRestClient().setBaseUrl(baseUrl.toString());
+        }
 	}
 
 	/**
@@ -332,10 +371,14 @@ public class RestFixture extends ActionFixture {
 	protected void processArguments(String[] args) {
 		if (args.length > 0) {
 			baseUrl = new Url(stripTag(args[0]));
-			config = new Config();
+            if (config == null) {
+                config = new Config();
+            }
 		}
 		if (args.length == 2) {
-			config = new Config(args[1]);
+            if (config == null) {
+                config = new Config(args[1]);
+            }
 		}
 	}
 
@@ -542,13 +585,13 @@ public class RestFixture extends ActionFixture {
 	 * <code>| let  | id | header | /services/([.]+) | |</code><br/>
 	 * <code>| GET  | /services/%id% | 200 | | |</code>
 	 */
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
 	public void let() {
 		debugMethodCallStart();
         String label = row.getCell(1).text().trim();
         String loc = row.getCell(2).text();
         String expr = row.getCell(3).text();
-		CellWrapper<?> valueCell = row.getCell(4);
+        CellWrapper valueCell = row.getCell(4);
 		String sValue = null;
 		try {
 			if ("header".equals(loc)) {
@@ -562,32 +605,55 @@ public class RestFixture extends ActionFixture {
 				StringTypeAdapter adapter = new StringTypeAdapter();
 				try {
 					adapter.set(sValue);
-					formatter.check(valueCell, adapter);
+                    getFormatter().check(valueCell, adapter);
 				} catch (Exception e) {
-					formatter.exception(valueCell, e);
+                    getFormatter().exception(valueCell, e);
 				}
 			}
 		} catch (IOException e) {
-			formatter.exception(row.getCell(3), e);
+            getFormatter().exception(row.getCell(3), e);
 		} catch (RuntimeException e) {
-			formatter.exception(row.getCell(3), e);
+            getFormatter().exception(row.getCell(3), e);
 		} finally {
 			debugMethodCallEnd();
 		}
 	}
 
-    private void executeCell0Method(String methodName) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-		Method method1 = getClass().getMethod(methodName);
-		method1.invoke(this);
+    public void processRow(RowWrapper<?> currentRow) {
+        row = currentRow;
+        String methodName = row.getCell(0).text();
+        Method method1 = null;
+        try {
+            method1 = getClass().getMethod(methodName);
+            method1.invoke(this);
+        } catch (SecurityException e) {
+            throw new RuntimeException("Not enough permissions to access method " + methodName + " for this class " + this.getClass().getSimpleName(), e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Class " + this.getClass().getName() + " doesn't have a callable method named " + methodName, e);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Method named " + methodName + " invoked with the wrong argument.", e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Method named " + methodName + " is not public.", e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Method named " + methodName + " threw an exception when executing.", e);
+        }
 	}
 
-	protected void initialize(String[] args) {
+    private void initialize(Runner runner, String[] args) {
 		processArguments(args);
 		boolean state = validateState();
 		notifyInvalidState(state);
+        configFormatter(runner);
 		configFixture();
-		restClient = buildRestClient();
 		configRestClient();
+	}
+
+    public RestClient getRestClient() {
+        return this.restClient;
+    }
+
+	public void setRestClient(RestClient restClient){
+        this.restClient = restClient;
 	}
 
     private String handleRegexExpression(String label, String loc, String expression) {
@@ -687,13 +753,19 @@ public class RestFixture extends ActionFixture {
 	}
 
 	private void doMethod(String body, String method) {
-        String resUrl = resolve(FIND_VARS_PATTERN, row.getCell(1).text());
-		setLastRequest(new RestRequest());
+        CellWrapper<?> urlCell = row.getCell(1);
+        String url = urlCell.text();
+        String resUrl = resolve(FIND_VARS_PATTERN, url);
+        setLastRequest(partsFactory.buildRestRequest());
 		getLastRequest().setMethod(RestRequest.Method.valueOf(method));
-		getLastRequest().setFileName(fileName);
-		getLastRequest().setMultipartFileName(multipartFileName);
+        getLastRequest().addHeaders(getHeaders());
+        if (fileName != null) {
+            getLastRequest().setFileName(fileName);
+        }
+        if (multipartFileName != null) {
+            getLastRequest().setMultipartFileName(multipartFileName);
+        }
         getLastRequest().setMultipartFileParameterName(multipartFileParameterName);
-		getLastRequest().addHeaders(getHeaders());
 		String uri[] = resUrl.split("\\?");
 		getLastRequest().setResource(uri[0]);
 		if (uri.length == 2) {
@@ -703,7 +775,8 @@ public class RestFixture extends ActionFixture {
 			String rBody = resolve(FIND_VARS_PATTERN, body);
 			getLastRequest().setBody(rBody);
 		}
-		setLastResponse(restClient.execute(getLastRequest()));
+        RestResponse response = getRestClient().execute(getLastRequest());
+        setLastResponse(response);
 		completeHttpMethodExecution();
 	}
 
@@ -711,19 +784,25 @@ public class RestFixture extends ActionFixture {
 		return ContentType.parse(getLastResponse().getHeader("Content-Type"));
 	}
 
-	private void completeHttpMethodExecution() {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void completeHttpMethodExecution() {
 		String uri = getLastResponse().getResource();
 		if (getLastRequest().getQuery() != null) {
 			uri = uri + "?" + getLastRequest().getQuery();
 		}
-		String u = restClient.getBaseUrl() + uri;
-        row.getCell(1).body("<a href='" + u + "'>" + uri + "</a>");
-        process(row.getCell(2), getLastResponse().getStatusCode().toString(), new StatusCodeTypeAdapter());
-        process(row.getCell(3), getLastResponse().getHeaders(), new HeadersTypeAdapter());
-		row.getCell(4).body(resolve(FIND_VARS_PATTERN, row.getCell(4).body()));
+        String u = getRestClient().getBaseUrl() + uri;
+        CellWrapper uriCell = row.getCell(1);
+        getFormatter().asLink(uriCell, u, uri);
+        CellWrapper cellStatusCode = row.getCell(2);
+        Integer lastStatusCode = getLastResponse().getStatusCode();
+        process(cellStatusCode, lastStatusCode.toString(), new StatusCodeTypeAdapter());
+        List<Header> lastHeaders = getLastResponse().getHeaders();
+        process(row.getCell(3), lastHeaders, new HeadersTypeAdapter());
+        CellWrapper bodyCell = row.getCell(4);
+        bodyCell.body(resolve(FIND_VARS_PATTERN, bodyCell.body()));
         BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(getContentTypeOfLastResponse());
 		bodyTypeAdapter.setContext(namespaceContext);
-        process(row.getCell(4), getLastResponse().getBody(), bodyTypeAdapter);
+        process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -731,58 +810,41 @@ public class RestFixture extends ActionFixture {
 		ta.set(actual);
 		boolean ignore = "".equals(expected.text().trim());
 		if (ignore) {
-			expected.addToBody(formatter.gray(ta.toString()));
+            if (!"".equals(ta.toString())) {
+                expected.addToBody(getFormatter().gray(ta.toString()));
+            }
 		} else {
 			boolean success = false;
 			try {
 				success = ta.equals(ta.parse(variables.substitute(expected.text())), actual);
 			} catch (Exception e) {
-				formatter.exception(expected, e);
+                getFormatter().exception(expected, e);
 				return;
 			}
 			if (success) {
-				right(expected, ta);
+                getFormatter().right(expected, ta);
 			} else {
-				wrong(expected, ta);
+                getFormatter().wrong(expected, ta);
 			}
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void right(CellWrapper expected, RestDataTypeAdapter ta) {
-		formatter.right(expected);
-		if (isDisplayActualOnRight() && !expected.text().equals(ta.toString())) {
-			expected.addToBody(formatter.label("expected") + "<hr>"
-					+ ta.toString() + formatter.label("actual"));
-		}
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void wrong(CellWrapper expected, RestDataTypeAdapter ta) {
-		formatter.wrong(expected);
-		StringBuffer sb = new StringBuffer();
-		for (String e : ta.getErrors()) {
-			sb.append(e).append(LINE_SEPARATOR);
-		}
-		expected.addToBody(formatter.label("expected") + "<hr>" + ta.toString()
-				+ formatter.label("actual") + "<hr>"
-				+ Tools.toHtml(sb.toString()) + formatter.label("errors"));
-	}
-
-	private void debugMethodCallStart() {
-		debugMethodCall("=> ");
-	}
+    private void debugMethodCallStart() {
+        debugMethodCall("=> ");
+    }
 
 	private void debugMethodCallEnd() {
 		debugMethodCall("<= ");
 	}
 
 	private void debugMethodCall(String h) {
-		StackTraceElement el = Thread.currentThread().getStackTrace()[4];
-		LOG.debug(h + el.getMethodName());
+        // StackTraceElement el = Thread.currentThread().getStackTrace()[4];
+        // LOG.debug(h + el.getMethodName());
 	}
 
 	private String resolve(Pattern pattern, String text) {
+        if (text == null)
+            return null;
 		Matcher m = pattern.matcher(text);
 		Map<String, String> replacements = new HashMap<String, String>();
 		while (m.find()) {
@@ -841,8 +903,8 @@ public class RestFixture extends ActionFixture {
         return Tools.convertStringToMap(str, "=", LINE_SEPARATOR);
 	}
 
-	private String stripTag(String somethingWithinATag) {
-        return somethingWithinATag.replaceAll("<[^>]+>", "").replace("</a>", "");
+    private String stripTag(String somethingWithinATag) {
+        return Tools.fromSimpleTag(somethingWithinATag);
 	}
 
 }

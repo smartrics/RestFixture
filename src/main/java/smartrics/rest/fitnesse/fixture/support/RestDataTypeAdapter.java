@@ -36,7 +36,7 @@ public abstract class RestDataTypeAdapter extends TypeAdapter implements fitness
 
 	@Override
 	public String toString(){
-		return toString(get());
+        return toString(get());
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public abstract class RestDataTypeAdapter extends TypeAdapter implements fitness
 	}
 
     public String toString(Object o) {
-        return o.toString();
+        return super.toString(o);
     }
 
     public Object fromString(String o) {

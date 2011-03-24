@@ -23,7 +23,9 @@ package smartrics.rest.test.fitnesse.fixture;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class HttpServerFixture {
+import fit.ActionFixture;
+
+public class HttpServerFixture extends ActionFixture {
 
     private int port;
     private static HttpServer server;
@@ -38,7 +40,7 @@ public class HttpServerFixture {
         startServer(Integer.parseInt(port));
     }
 
-    public void startServer(int port) {
+    private void startServer(int port) {
         if (server == null) {
             this.port = port;
             LOG.info("Starting server on port " + port);

@@ -243,20 +243,30 @@ public final class Tools {
     }
 
     public static String toHtml(String text) {
-        // if(text.trim().startsWith("<"))
-        // return "<textarea cols='180' rows='10' readonly='true'>" +
-        // prettyPrint(text).replaceAll("&gt;", "&gt;\n") + "</textarea>";
-        return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll(System.getProperty("line.separator"), "<br/>").replaceAll(" ", "&nbsp;");
+        return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll("-----", "<hr/>").replaceAll(">", "&gt;").replaceAll(System.getProperty("line.separator"), "<br/>")
+                .replaceAll(" ", "&nbsp;");
+    }
+
+    public static String toCode(String c) {
+        return "<code>" + c + "</code>";
     }
 
     public static String toJSON(String text) {
         return text.trim();
     }
 
+    public static String fromSimpleTag(String somethingWithinATag) {
+        return somethingWithinATag.replaceAll("<[^>]+>", "").replace("</[^>]+>", "");
+    }
+
     public static String fromHtml(String text) {
         String ls = System.getProperty("line.separator");
         return text.replaceAll("<br[\\s]*/>", ls).replaceAll("<BR[\\s]*/>", ls).replaceAll("<pre>", "").replaceAll("</pre>", "").replaceAll("&nbsp;", " ").replaceAll("&gt;", ">")
                 .replaceAll("&lt;", "<").replaceAll("&nbsp;", " ");
+    }
+
+    public static String toHtmlLabel(String string) {
+        return "<i>" + string + "</i>";
     }
 
 }

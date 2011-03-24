@@ -17,7 +17,7 @@
 	<property name="artifacts" value="${dist}/artifacts" />
 
 	<property name="fitnesse.path" value="${ant.project.name}Tests" />
-	<property name="fitnesse.test.suite" value="${fitnesse.path}.BasicTests" />
+	<property name="fitnesse.test.suite" value="${fitnesse.path}" />
 	<property name="fitnesse.root.name" value="FitNesseRoot" />
 	<property name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
 	<property name="fitnesse.jar" value="${lib}/fitnesse/fitnesse.jar" />

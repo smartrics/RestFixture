@@ -1,3 +1,0 @@
-!1 Rest Fixture Acceptance Test Suite
-
-!contents -g
