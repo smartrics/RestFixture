@@ -35,7 +35,7 @@ import smartrics.rest.client.RestData.Header;
 public class HeadersTypeAdapterTest {
 
 	private final HeadersTypeAdapter adapter = new HeadersTypeAdapter();
-	private final String ls = System.getProperty("line.separator");
+    private final String ls = "\n";
 	private final Header h0 = new Header("n0", "v0");
 	private final Header h1 = new Header("n1", "v1");
 	private final Header h = new Header("n", "v");
@@ -105,7 +105,7 @@ public class HeadersTypeAdapterTest {
 	@Test
 	public void shouldTransformACollectionOfHeadersIntoAHtmlString(){
 		String result = adapter.toString(expected);
-		assertEquals(Tools.toHtml(headersAsOutputString), result);
+        assertEquals(headersAsOutputString, result);
 	}
 
 }

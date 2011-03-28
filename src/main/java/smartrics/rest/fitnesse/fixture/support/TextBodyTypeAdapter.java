@@ -1,6 +1,7 @@
 package smartrics.rest.fitnesse.fixture.support;
 
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import fit.Parse;
 
@@ -15,8 +16,15 @@ public class TextBodyTypeAdapter extends BodyTypeAdapter {
             expected = ((Parse) r1).text();
         }
         String actual = (String) r2;
-        if (!Pattern.matches(expected, actual)) {
-            addError("not match: " + expected);
+        try {
+            if (!Pattern.matches(expected, actual)) {
+                addError("not match: " + expected);
+            }
+        } catch (PatternSyntaxException e) {
+            // lets try to string match just to be kind
+            if (!expected.equals(actual)) {
+                addError("not found: " + expected);
+            }
         }
         return getErrors().size() == 0;
     }

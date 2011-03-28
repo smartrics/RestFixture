@@ -25,82 +25,99 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.junit.Test;
 
 public class XPathBodyTypeAdapterTest {
 
-    private final BodyTypeAdapter adapter = new XPathBodyTypeAdapter();
+    private final XPathBodyTypeAdapter adapter = new XPathBodyTypeAdapter();
     private final static String xml0 = "<a><b>12</b><b>23</b><c>XY</c></a>";
-	private final static String html1 = "&lt;a&gt;&nbsp;1&amp;&lt;/a&gt;";
-	private final static String xml1 = "<a> 1&</a>";
-	private final static List<String> xPaths = Arrays.asList("/a", "//b");
+    private final static String xml1 = "<a> 1&</a>";
+    private final static List<String> xPaths = Arrays.asList("/a", "//b");
     private final static String xPathsAsString = "/a<br/>//b";
 
     @Test
     public void shouldIdentifyContentObjectsWithNoBodyAsBeingEqual() {
-	assertTrue(adapter.equals("no-body", "no-body"));
-	assertTrue(adapter.equals("no-body", ""));
-	assertTrue(adapter.equals("no-body", null));
-	assertFalse(adapter.equals("/a", null));
-	assertFalse(adapter.equals("no-body", xml0));
+        assertTrue(adapter.equals("no-body", "no-body"));
+        assertTrue(adapter.equals("no-body", ""));
+        assertTrue(adapter.equals("no-body", null));
+        assertFalse(adapter.equals("/a", null));
+        assertFalse(adapter.equals("no-body", xml0));
     }
 
     @Test
     public void shouldIdentifyAsEqualsIfExpectedObjectIsAListOfXPathsAvailableInActual() {
-	assertTrue("not found simple nodelist xpath", adapter.equals(Arrays.asList("/a/b[text()='12']"), xml0));
-	assertTrue("not found two nodelist xpaths", adapter.equals(Arrays.asList("/a/b[text()='12']", "/a/c[text()='XY']"), xml0));
-	assertTrue("not found two boolean xpath", adapter.equals(Arrays.asList("count(/a/b)=2", "count(/a/c)=1"), xml0));
-	assertTrue("not found two boolean xpath and two nodelist xpaths", adapter.equals(Arrays.asList("count(/a/b)=2", "count(/a/c)=1", "/a/b[text()='12']", "/a/c[text()='XY']"), xml0));
+        assertTrue("not found simple nodelist xpath", adapter.equals(Arrays.asList("/a/b[text()='12']"), xml0));
+        assertTrue("not found two nodelist xpaths", adapter.equals(Arrays.asList("/a/b[text()='12']", "/a/c[text()='XY']"), xml0));
+        assertTrue("not found two boolean xpath", adapter.equals(Arrays.asList("count(/a/b)=2", "count(/a/c)=1"), xml0));
+        assertTrue("not found two boolean xpath and two nodelist xpaths",
+                adapter.equals(Arrays.asList("count(/a/b)=2", "count(/a/c)=1", "/a/b[text()='12']", "/a/c[text()='XY']"), xml0));
     }
 
     @Test
     public void shouldStoreNotFoundMessageForEveryExpressionNotFoundForEqualityCheck() {
-	assertFalse(adapter.equals(Arrays.asList("/a/b[text()='zzz']", "/a/d[text()='next']", "/a/c[text()='XY']"), xml0));
-	assertEquals(2, adapter.getErrors().size());
-	assertEquals("not found: '/a/b[text()='zzz']'", adapter.getErrors().get(0));
-	assertEquals("not found: '/a/d[text()='next']'", adapter.getErrors().get(1));
+        assertFalse(adapter.equals(Arrays.asList("/a/b[text()='zzz']", "/a/d[text()='next']", "/a/c[text()='XY']"), xml0));
+        assertEquals(2, adapter.getErrors().size());
+        assertEquals("not found: '/a/b[text()='zzz']'", adapter.getErrors().get(0));
+        assertEquals("not found: '/a/d[text()='next']'", adapter.getErrors().get(1));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailEqualityCheckIfAnyExpressionIsInvalid() {
-	adapter.equals(Arrays.asList("invalid xpath", "/a/c[text()='XY']"), xml0);
+        adapter.equals(Arrays.asList("invalid xpath", "/a/c[text()='XY']"), xml0);
     }
 
     @Test
     public void shouldReturnItsStringRepresentationAsPrintableHTML() {
-	assertEquals(html1, adapter.toString(xml1));
+        assertEquals(xml1, adapter.toString(xml1));
     }
 
     @Test
     public void shouldReturnItsStringRepresentationAsPrintableHTMLEvenWhenEmpty() {
-	assertEquals("no-body", adapter.toString(""));
+        assertEquals("no-body", adapter.toString(""));
     }
 
     @Test
     public void shoudlParseStringWithXPathInHtmlIntoAProperList() {
-	try {
-	    // just make sure we have the right fata
-	    assertTrue(xPathsAsString.indexOf("<br/>") > -1);
-	    assertEquals(xPaths, adapter.parse(xPathsAsString));
-	} catch (Exception e) {
-	    fail("should have not raised an exception");
-	}
+        try {
+            // just make sure we have the right fata
+            assertTrue(xPathsAsString.indexOf("<br/>") > -1);
+            assertEquals(xPaths, adapter.parse(xPathsAsString));
+        } catch (Exception e) {
+            fail("should have not raised an exception");
+        }
     }
 
     @Test
     public void shoudlParseNoXPathsIntoAnEmptyList() {
-	try {
-	    // just make sure we have the right fata
-	    assertEquals(new Vector<String>(), adapter.parse(null));
-	    assertEquals(new Vector<String>(), adapter.parse(""));
-	    assertEquals(new Vector<String>(), adapter.parse("no-body"));
-	} catch (Exception e) {
-	    fail("should have not raised an exception");
-	}
+        try {
+            // just make sure we have the right fata
+            assertEquals(new Vector<String>(), adapter.parse(null));
+            assertEquals(new Vector<String>(), adapter.parse(""));
+            assertEquals(new Vector<String>(), adapter.parse("no-body"));
+        } catch (Exception e) {
+            fail("should have not raised an exception");
+        }
+    }
+
+    @Test
+    public void shouldMatchXPathWithNamespaces() {
+        List<String> expected = new ArrayList<String>();
+        expected.add("/resource/nstag/ns1alias:number[text()='3']");
+
+        String actual = "<resource><name>a funky name</name><data>an important message</data>"
+                + "<nstag xmlns:ns1='http://smartrics/ns1'><ns1:number>3</ns1:number></nstag></resource>";
+
+        Map<String, String> ns = new HashMap<String, String>();
+        ns.put("ns1alias", "http://smartrics/ns1");
+        adapter.setContext(ns);
+        assertTrue(adapter.equals(expected, actual));
     }
 
 }

@@ -64,7 +64,7 @@ public class HeadersTypeAdapter extends RestDataTypeAdapter {
 		List<Header> expected = new ArrayList<Header>();
 		if (!"".equals(s.trim())) {
 			String expStr = Tools.fromHtml(s.trim());
-			String[] nvpArray = expStr.split(System.getProperty("line.separator"));
+            String[] nvpArray = expStr.split("\n");
 			for(String nvp : nvpArray){
 				try{
 					String[] nvpEl = nvp.split(":", 2);
@@ -83,9 +83,9 @@ public class HeadersTypeAdapter extends RestDataTypeAdapter {
 		StringBuffer b = new StringBuffer();
 		List<Header> list = (List<Header>) obj;
 		for(Header h : list){
-			b.append(h.getName()).append(" : ").append(h.getValue()).append(System.getProperty("line.separator"));
+            b.append(h.getName()).append(" : ").append(h.getValue()).append("\n");
 		}
-		return Tools.toHtml(b.toString().trim());
+        return b.toString().trim();
 	}
 
 }

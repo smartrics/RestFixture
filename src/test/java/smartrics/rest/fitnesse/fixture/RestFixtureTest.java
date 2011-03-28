@@ -28,7 +28,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -49,7 +48,6 @@ import smartrics.rest.fitnesse.fixture.support.JSONBodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StatusCodeTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.TextBodyTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.Tools;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import smartrics.rest.fitnesse.fixture.support.XPathBodyTypeAdapter;
 import fit.Fixture;
@@ -202,7 +200,7 @@ public class RestFixtureTest {
         verify(mockLastRequest).setResource("/uri");
         verify(mockLastRequest).setQuery("a=b");
         verify(mockLastRequest).setMultipartFileParameterName("file");
-        verify(mockLastRequest, times(2)).getQuery();
+        verify(mockLastRequest).getQuery();
         // correctly executes request
         verify(mockRestClient).setBaseUrl(fixture.getBaseUrl());
         verify(mockRestClient).getBaseUrl();
@@ -210,12 +208,51 @@ public class RestFixtureTest {
         // correctly formats the response
         verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri?a=b"), eq("/uri?a=b"));
         verify(mockCellFormatter).gray("200");
-        verify(mockCellFormatter).gray(Tools.toHtml("<body />"));
-        verify(mockCellFormatter).gray(Tools.toHtml("Header : some/thing"));
+        verify(mockCellFormatter).gray("Header : some/thing");
+        verify(mockCellFormatter).gray("<body />");
         
         verifyNoMoreInteractions(mockRestClient);
         verifyNoMoreInteractions(mockCellFormatter);
         verifyNoMoreInteractions(mockLastRequest);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void mustExecutePOSTWithFileUploadWhenFileParamNameIsDefault() {
+        wireMocks();
+        when(mockLastRequest.getQuery()).thenReturn("");
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        lastResponse.setStatusCode(202);
+        lastResponse.addHeader("Content-Type", "text/plain; charset=iso-8859-1");
+        lastResponse.addHeader("Transfer-Encoding", "chunked");
+        String body = "file: { \"resource\" : { \"name\" : \"test post\", \"data\" : \"some data\" } }";
+        lastResponse.setBody(body);
+
+        RowWrapper<?> row = helper.createFitTestRow("POST", "/uri", "", "", "file: { \"resource\" : { \"name\" : \"test post\", \"data\" : \"some data\" } }");
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+
+        fixture.processRow(row);
+
+        verify(mockLastRequest).addHeaders(fixture.getHeaders());
+        verify(mockLastRequest).getQuery();
+        verify(mockLastRequest).setMethod(Method.Post);
+        verify(mockLastRequest).setResource("/uri");
+        verify(mockLastRequest).setBody("");
+        verify(mockLastRequest).setMultipartFileParameterName("file");
+
+        verify(mockRestClient).setBaseUrl(fixture.getBaseUrl());
+        verify(mockRestClient).getBaseUrl();
+        verify(mockRestClient).execute(mockLastRequest);
+
+        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verify(mockCellFormatter).gray("202");
+        verify(mockCellFormatter).right(isA(CellWrapper.class), isA(TextBodyTypeAdapter.class));
+        verify(mockCellFormatter).gray("Content-Type : text/plain; charset=iso-8859-1\nTransfer-Encoding : chunked");
+
+        verifyNoMoreInteractions(mockLastRequest);
+        verifyNoMoreInteractions(mockRestClient);
+        verifyNoMoreInteractions(mockCellFormatter);
+
     }
 
     @Test
@@ -238,7 +275,7 @@ public class RestFixtureTest {
         verify(mockLastRequest).setResource("/uri");
         verify(mockLastRequest).setQuery("a=b");
         verify(mockLastRequest).setMultipartFileParameterName("file");
-        verify(mockLastRequest, times(2)).getQuery();
+        verify(mockLastRequest).getQuery();
         // correctly executes request
         verify(mockRestClient).setBaseUrl(fixture.getBaseUrl());
         verify(mockRestClient).getBaseUrl();
@@ -275,7 +312,7 @@ public class RestFixtureTest {
         verify(mockLastRequest).setResource("/uri");
         verify(mockLastRequest).setQuery("a=b");
         verify(mockLastRequest).setMultipartFileParameterName("file");
-        verify(mockLastRequest, times(2)).getQuery();
+        verify(mockLastRequest).getQuery();
         // correctly executes request
         verify(mockRestClient).setBaseUrl(fixture.getBaseUrl());
         verify(mockRestClient).getBaseUrl();

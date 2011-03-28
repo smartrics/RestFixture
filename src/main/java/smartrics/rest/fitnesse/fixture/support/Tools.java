@@ -80,8 +80,9 @@ public final class Tools {
      * {@link XPathExpression#evaluate(Object item, QName returnType)} ;
      */
     public static Object extractXPath(Map<String, String> ns, String xpathExpression, String content, QName returnType) {
-        if (null == ns)
+        if (null == ns) {
             ns = new HashMap<String, String>();
+        }
         Document doc = toDocument(content);
         XPathExpression expr = toExpression(ns, xpathExpression);
         try {
@@ -226,7 +227,7 @@ public final class Tools {
         Map<String, String> ret = new HashMap<String, String>();
         for (String nvp : nvpArray) {
             try {
-                int pos = nvp.indexOf(nvSep);
+                int pos = nvp.trim().indexOf(nvSep);
                 String v = "";
                 String k = nvp;
                 if (pos != -1) {
@@ -243,8 +244,7 @@ public final class Tools {
     }
 
     public static String toHtml(String text) {
-        return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll("-----", "<hr/>").replaceAll(">", "&gt;").replaceAll(System.getProperty("line.separator"), "<br/>")
-                .replaceAll(" ", "&nbsp;");
+        return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll("-----", "<hr/>").replaceAll(">", "&gt;").replaceAll("\n", "<br/>").replaceAll(" ", "&nbsp;");
     }
 
     public static String toCode(String c) {
@@ -260,7 +260,7 @@ public final class Tools {
     }
 
     public static String fromHtml(String text) {
-        String ls = System.getProperty("line.separator");
+        String ls = "\n";
         return text.replaceAll("<br[\\s]*/>", ls).replaceAll("<BR[\\s]*/>", ls).replaceAll("<pre>", "").replaceAll("</pre>", "").replaceAll("&nbsp;", " ").replaceAll("&gt;", ">")
                 .replaceAll("&lt;", "<").replaceAll("&nbsp;", " ");
     }

@@ -41,7 +41,7 @@ public class TextBodyTypeAdapterTest {
 		assertEquals("abc123", adapter.toString("abc123"));
 		assertEquals("no-body", adapter.toString(" "));
 		assertEquals("no-body", adapter.toString(null));
-		assertEquals("&lt;fred/&gt;", adapter.toString("<fred/>"));
+        assertEquals("<fred />", adapter.toString("<fred />"));
 	}
 
 	@Test

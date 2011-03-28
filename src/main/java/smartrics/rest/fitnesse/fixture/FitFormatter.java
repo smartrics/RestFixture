@@ -42,20 +42,42 @@ public class FitFormatter implements CellFormatter<Parse> {
 
 	@Override
     public void wrong(CellWrapper<Parse> expected, String actual, RestDataTypeAdapter ta) {
-        fixture.wrong(expected.getWrapped());
+        expected.body(Tools.toHtml(expected.body()));
         StringBuffer sb = new StringBuffer();
+        sb.append(Tools.toHtml("\n"));
+        sb.append(label("expected"));
+        sb.append(Tools.toHtml("-----"));
+        sb.append(Tools.toHtml("\n"));
+        sb.append(Tools.toHtml(ta.toString()));
+        sb.append(Tools.toHtml("\n"));
+        sb.append(label("actual"));
+        sb.append(Tools.toHtml("-----"));
+        sb.append(Tools.toHtml("\n"));
         for (String e : ta.getErrors()) {
-            sb.append(e).append(System.getProperty("line.separator"));
+            sb.append(Tools.toHtml(e + "\n"));
         }
-        expected.addToBody(label("expected") + "<hr>" + ta.toString() + label("actual") + "<hr>" + Tools.toHtml(sb.toString()) + label("errors"));
+        sb.append(Tools.toHtml("\n"));
+        sb.append(label("errors"));
+
+        expected.addToBody(sb.toString());
+        fixture.wrong(expected.getWrapped());
 	}
 
 	@Override
     public void right(CellWrapper<Parse> expected, RestDataTypeAdapter ta) {
-        fixture.right(expected.getWrapped());
         if (displayActual && !expected.text().equals(ta.toString())) {
-            expected.addToBody(label("expected") + "<hr>" + ta.toString() + label("actual"));
+            expected.body(Tools.toHtml(expected.body()));
+            StringBuffer sb = new StringBuffer();
+            sb.append(Tools.toHtml("\n"));
+            sb.append(label("expected"));
+            sb.append(Tools.toHtml("-----"));
+            sb.append(Tools.toHtml("\n"));
+            sb.append(Tools.toHtml(ta.toString()));
+            sb.append(Tools.toHtml("\n"));
+            sb.append(label("actual"));
+            expected.addToBody(sb.toString());
         }
+        fixture.right(expected.getWrapped());
 	}
 
 	@Override

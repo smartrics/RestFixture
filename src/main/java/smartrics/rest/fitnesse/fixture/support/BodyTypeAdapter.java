@@ -64,8 +64,8 @@ public abstract class BodyTypeAdapter extends RestDataTypeAdapter {
 		if (obj == null || obj.toString().trim().equals(""))
 			return "no-body";
 		// the actual value is passed as an xml string
-		// todo: pretty print?
-		return Tools.toHtml(obj.toString());
+        // TODO: pretty print toString on BodyTypeAdapter
+        return obj.toString();
 	}
 
 }

@@ -82,10 +82,13 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
 
     protected boolean eval(String expr, String content) {
         try {
+            LOG.info("CONTEXT: " + getContext());
+            LOG.info("   EXPR: " + expr);
+            LOG.info("CONTENT: " + content);
             NodeList ret = Tools.extractXPath(getContext(), expr, content);
             return !(ret == null || ret.getLength() == 0);
         } catch (IllegalArgumentException e) {
-            // may be evaluateable as BOOLEAN
+            // may be evaluated as BOOLEAN
             LOG.debug("XPath does not evaluate to a node list. Trying to match to boolean: " + expr, e);
         }
         Boolean b = (Boolean) Tools.extractXPath(getContext(), expr, content, XPathConstants.BOOLEAN);

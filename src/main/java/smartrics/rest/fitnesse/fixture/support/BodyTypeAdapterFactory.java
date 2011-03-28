@@ -1,4 +1,4 @@
-/*  Copyright 2008 Andrew Ochsner
+/*  Copyright 2008 Fabrizio Cannizzo
  *
  *  This file is part of RestFixture.
  *
@@ -20,6 +20,16 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+/**
+ * Depending on Content-Type passed in it'll build the appropriate type adapter
+ * for parsing/rendering the cell content
+ * 
+ * TODO: allow configuration of DEFAULT Adapter (no recognised content type) and
+ * what content types are associated with each adapter.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class BodyTypeAdapterFactory {
 
 	public static BodyTypeAdapter getBodyTypeAdapter(ContentType content) {

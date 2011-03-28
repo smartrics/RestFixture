@@ -56,7 +56,7 @@ public class ToolsTest {
 
     @Test
     public void dualityOfToAndFromHtml() {
-        String stuff = "<a> " + System.getProperty("line.separator") + "  </a>";
+        String stuff = "<a> \n  </a>";
         assertEquals(stuff, Tools.fromHtml(Tools.toHtml(stuff)));
     }
 
@@ -95,7 +95,14 @@ public class ToolsTest {
         assertEquals(2, map.size());
         assertEquals("", map.get("k1"));
         assertEquals("v2", map.get("k2"));
+    }
 
+    @Test
+    public void shouldConvertAMultilineStringIntoAMap() {
+        Map<String, String> map = Tools.convertStringToMap("!- k1=v1\nk2=v2-!", "=", "\n");
+        assertEquals(2, map.size());
+        assertEquals("v2", map.get("k2"));
+        assertEquals("v1", map.get("k1"));
     }
 
     @Test
@@ -144,6 +151,15 @@ public class ToolsTest {
         HashMap<String, String> ns = new HashMap<String, String>();
         ns.put("alias", "http://ns1.com");
         assertEquals("tada", Tools.extractXPath(ns, "/a/alias:c", xml, XPathConstants.STRING));
+    }
+
+    @Test
+    public void shouldExtractXPathsFromXmlDocumentWithNestedGenericNamespace() {
+        String xml = "<?xml version='1.0' ?><resource><name>a funky name</name><data>an important message</data>"
+                + "<nstag xmlns:ns1='http://smartrics/ns1'><ns1:number>3</ns1:number></nstag></resource>";
+        HashMap<String, String> ns = new HashMap<String, String>();
+        ns.put("ns1alias", "http://smartrics/ns1");
+        assertEquals("true", Tools.extractXPath(ns, "/resource/nstag/ns1alias:number[text()='3']", xml, XPathConstants.BOOLEAN).toString());
     }
 
     @Test

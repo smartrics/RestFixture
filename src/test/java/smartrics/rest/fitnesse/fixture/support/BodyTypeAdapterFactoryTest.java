@@ -25,46 +25,42 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class BodyTypeAdapterFactoryTest {
-	@Test
-	public void jsonContentTypeReturnsJSONBodyTypeAdapter() {
-		// act
-		BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory
-				.getBodyTypeAdapter(ContentType.JSON);
-		// assert
-		assertTrue(bodyTypeAdapter instanceof JSONBodyTypeAdapter);
-	}
+    @Test
+    public void jsonContentTypeReturnsJSONBodyTypeAdapter() {
+        // act
+        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ContentType.JSON);
+        // assert
+        assertTrue(bodyTypeAdapter instanceof JSONBodyTypeAdapter);
+    }
 
-	@Test
-	public void xmlContentTypeReturnsXPathBodyTypeAdapter() {
-		// act
-		BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory
-				.getBodyTypeAdapter(ContentType.XML);
-		// assert
-		assertTrue(bodyTypeAdapter instanceof XPathBodyTypeAdapter);
-	}
+    @Test
+    public void xmlContentTypeReturnsXPathBodyTypeAdapter() {
+        // act
+        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ContentType.XML);
+        // assert
+        assertTrue(bodyTypeAdapter instanceof XPathBodyTypeAdapter);
+    }
 
-	@Test
-	public void textContentTypeReturnsXPathBodyTypeAdapter() {
-		// act
-		BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory
-				.getBodyTypeAdapter(ContentType.TEXT);
-		// assert
-		assertTrue(bodyTypeAdapter instanceof TextBodyTypeAdapter);
-	}
+    @Test
+    public void textContentTypeReturnsXPathBodyTypeAdapter() {
+        // act
+        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ContentType.TEXT);
+        // assert
+        assertTrue(bodyTypeAdapter instanceof TextBodyTypeAdapter);
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void nullContentTypeThrowsException() {
-		// act
-		BodyTypeAdapterFactory.getBodyTypeAdapter(null);
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void nullContentTypeThrowsException() {
+        // act
+        BodyTypeAdapterFactory.getBodyTypeAdapter(null);
+    }
 
-	@Test
-	public void unknownContentTypeReturnsXPathBodyTypeAdapter() {
-		// act
-		BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory
-				.getBodyTypeAdapter(ContentType.UNKNOWN);
-		// assert
-		assertTrue(bodyTypeAdapter instanceof XPathBodyTypeAdapter);
-	}
+    @Test
+    public void unknownContentTypeReturnsXPathBodyTypeAdapter() {
+        // act
+        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ContentType.UNKNOWN);
+        // assert
+        assertTrue(bodyTypeAdapter instanceof XPathBodyTypeAdapter);
+    }
 
 }
