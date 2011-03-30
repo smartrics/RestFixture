@@ -1,5 +1,7 @@
 file.pic
 temp
+etc/metrics
+build.metrics.xml
 FitNesseRoot/
 *.log
 bin/
