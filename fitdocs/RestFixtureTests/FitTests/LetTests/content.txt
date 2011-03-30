@@ -76,11 +76,12 @@ Other fixtures can set a value in the symbol map with ''Fixture.setSymbol''.
 The RestFixture can then pick them up
 
 This fixture sets ''symbolName=/resources''...
+
 |Action Fixture|
 |start|!-smartrics.rest.test.fitnesse.fixture.LetTestActionFixture-!|
 |enter|symbolName|aNameOfASymbol|
 |enter|symbolValue|/resources|
 
-... then the value is used by the RestFixture
+... then the value is used by the !-RestFixture-!
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
 |GET    | %aNameOfASymbol%/%id% | 200 | | |
