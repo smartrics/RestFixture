@@ -175,6 +175,8 @@ public class RestFixture extends ActionFixture {
 
     private boolean displayActualOnRight;
 
+    private boolean debugMethodCall = false;
+
     /**
      * the headers passed to each request by default.
      */
@@ -219,6 +221,10 @@ public class RestFixture extends ActionFixture {
         this.partsFactory = partsFactory;
         this.config = config;
         initialize(runner, args);
+    }
+
+    public RowWrapper<?> getCurrentRow() {
+        return row;
     }
 
     /**
@@ -296,11 +302,16 @@ public class RestFixture extends ActionFixture {
                 getFormatter().exception(currentRow.getCell(0), e);
             } finally {
                 List<String> rowAsList = ((SlimRow) currentRow).asList();
-                // HACK: it seems that even if the content is unchanged, Slim
-                // renders red cell
-                rowAsList.set(0, "");
+                for (int c = 0; c < rowAsList.size(); c++) {
+                    // HACK: it seems that even if the content is unchanged,
+                    // Slim renders red cell
+                    String v = rowAsList.get(c);
+                    System.out.println("I: " + r.get(c) + "\nO: " + v + "\nC: " + currentRow.getCell(c).toString() + "\n?:" + v.equals(r.get(c)) + "\n\n");
+                    if (v.equals(r.get(c))) {
+                        rowAsList.set(c, "");
+                    }
+                }
                 res.add(rowAsList);
-                LOG.info("FIRST CELL: [" + res.get(0).get(0).toString() + "][" + currentRow.getCell(0).getWrapped() + "]");
             }
         }
         return res;
@@ -434,7 +445,7 @@ public class RestFixture extends ActionFixture {
         CellWrapper<?> cell = row.getCell(1);
         if (cell == null)
             throw new FitFailureException("You must pass a body to set");
-        body(variables.substitute(cell.text()));
+        requestBody = variables.substitute(getFormatter().fromRaw(cell.text()));
     }
 
     /**
@@ -448,7 +459,7 @@ public class RestFixture extends ActionFixture {
         if (cell == null)
             throw new FitFailureException("You must pass a header map to set");
         String header = variables.substitute(cell.text());
-        headers(header);
+        requestHeaders = parseHeaders(header);
     }
 
     /**
@@ -611,6 +622,7 @@ public class RestFixture extends ActionFixture {
             if (valueCell != null) {
                 StringTypeAdapter adapter = new StringTypeAdapter();
                 try {
+                    System.out.println("LET: adapter.value=" + sValue + ", cell value==empty?: " + valueCell.body().equals(""));
                     adapter.set(sValue);
                     getFormatter().check(valueCell, adapter);
                 } catch (Exception e) {
@@ -856,8 +868,10 @@ public class RestFixture extends ActionFixture {
     }
 
     private void debugMethodCall(String h) {
-        // StackTraceElement el = Thread.currentThread().getStackTrace()[4];
-        // LOG.debug(h + el.getMethodName());
+        if (debugMethodCall) {
+            StackTraceElement el = Thread.currentThread().getStackTrace()[4];
+            LOG.debug(h + el.getMethodName());
+        }
     }
 
     private String resolve(Pattern pattern, String text) {
@@ -887,14 +901,6 @@ public class RestFixture extends ActionFixture {
                 newText = newText.replace(k, replacement);
         }
         return newText;
-    }
-
-    void body(String string) {
-        requestBody = string;
-    }
-
-    void headers(String header) {
-        requestHeaders = parseHeaders(header);
     }
 
     protected RestResponse getLastResponse() {

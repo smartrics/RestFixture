@@ -39,4 +39,9 @@ public class FitCell implements CellWrapper<Parse> {
 		// TODO Auto-generated method stub
 		return cell;
 	}
+
+    @Override
+    public String toString() {
+        return "FitCell[body:'" + body() + "', text:'" + text() + "']";
+    }
 }

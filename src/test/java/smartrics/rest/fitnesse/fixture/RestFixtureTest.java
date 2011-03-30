@@ -21,9 +21,7 @@
 package smartrics.rest.fitnesse.fixture;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -46,14 +44,10 @@ import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.JSONBodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StatusCodeTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.TextBodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import smartrics.rest.fitnesse.fixture.support.XPathBodyTypeAdapter;
 import fit.Fixture;
-import fit.Parse;
-import fit.exception.FitFailureException;
-import fit.exception.FitParseException;
 
 public class RestFixtureTest {
 
@@ -71,14 +65,13 @@ public class RestFixtureTest {
 
     @Before
     public void setUp() {
-        config = new Config();
         helper = new RestFixtureTestHelper();
+
         mockCellFormatter = mock(CellFormatter.class);
         mockRestClient = mock(RestClient.class);
         mockLastRequest = mock(RestRequest.class);
         mockPartsFactory = mock(PartsFactory.class);
-        // this is created for tests that don't need to verify expectations
-        fixture = new RestFixture(BASE_URL);
+
         variables.clearAll();
 
         lastResponse = new RestResponse();
@@ -96,61 +89,14 @@ public class RestFixtureTest {
         config.clear();
     }
 
-    @Test(expected = FitFailureException.class)
-    public void mustNotifyCallerThatBaseUrlAsFixtureArgIsMandatory() {
-        fixture = new RestFixture() {
-            {
-                super.args = new String[] {};
-            }
-        };
-        fixture.doCells(buildEmptyParse());
-    }
-
-    @Test
-    public void mustSetConfigNameToDefaultWhenNotSpecifiedAsSecondOptionalParameter_FIT() {
-        fixture = new RestFixture() {
-            {
-                super.args = new String[] { BASE_URL };
-            }
-        };
-        Parse parse = buildEmptyParse();
-        fixture.doCells(parse);
-        assertEquals(Config.DEFAULT_CONFIG_NAME, fixture.getConfig().getName());
-    }
-
     @Test
     public void mustSetConfigNameToDefaultWhenNotSpecifiedAsSecondOptionalParameter_SLIM() {
         fixture = new RestFixture(BASE_URL, "configName");
         assertEquals("configName", fixture.getConfig().getName());
     }
-
-    @Test
-    public void mustSetConfigNameToSpecifiedValueIfOptionalSecondParameterIsSpecified_FIT() {
-        fixture = new RestFixture() {
-            {
-                super.args = new String[] { BASE_URL, "configName" };
-            }
-        };
-        fixture.doCells(buildEmptyParse());
-        assertEquals("configName", fixture.getConfig().getName());
-    }
-
     public void mustSetConfigNameToSpecifiedValueIfOptionalSecondParameterIsSpecified_SLIM() {
         fixture = new RestFixture(BASE_URL, "configName");
         assertEquals("configName", fixture.getConfig().getName());
-    }
-
-    @Test
-    public void mustSetTheDisplayActualOnRightFlagFromConfigFile() {
-        setDisplayActualOnRight(false);
-        fixture.doCells(buildEmptyParse());
-        assertFalse(fixture.isDisplayActualOnRight());
-    }
-
-    @Test
-    public void mustSetTheDisplayActualOnRightFlagDefaultValueToTrue() {
-        fixture.doCells(buildEmptyParse());
-        assertTrue(fixture.isDisplayActualOnRight());
     }
 
     @Test
@@ -165,6 +111,7 @@ public class RestFixtureTest {
 
     @Test
     public void mustAllowMultilineHeadersWhenSettingHeaders() {
+        fixture = new RestFixture(BASE_URL);
         String multilineHeaders = "!-header1:one" + System.getProperty("line.separator") + "header2:two" + System.getProperty("line.separator") + "-!";
         RowWrapper<?> row = helper.createFitTestRow("setHeaders", multilineHeaders);
         fixture.processRow(row);
@@ -400,7 +347,9 @@ public class RestFixtureTest {
         fixture.processRow(row);
         verify(mockLastRequest).setMethod(Method.Delete);
 
-        fixture.body("<body />");
+        row = helper.createFitTestRow("setBody", "<body />");
+        fixture.processRow(row);
+
         row = helper.createFitTestRow("POST", "/uri", "", "", "");
         fixture.processRow(row);
         verify(mockLastRequest).setMethod(Method.Delete);
@@ -520,7 +469,6 @@ public class RestFixtureTest {
         fixture.processRow(row);
 
         // correctly builds request
-        verify(mockCellFormatter).check(isA(CellWrapper.class), isA(StringTypeAdapter.class));
         assertNull(new Variables().get("content"));
         assertNull(new Variables().get("$content"));
         assertEquals("text", Fixture.getSymbol("content"));
@@ -635,18 +583,6 @@ public class RestFixtureTest {
     /**
      * helper methods
      */
-
-    private void setDisplayActualOnRight(boolean b) {
-        config.add("restfixture.display.actual.on.right", Boolean.toString(b));
-    }
-
-    private Parse buildEmptyParse() {
-        try {
-            return new Parse("<table><tr><td>&nbsp;</td></tr></table>");
-        } catch (FitParseException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @SuppressWarnings("unchecked")
     private void wireMocks() {

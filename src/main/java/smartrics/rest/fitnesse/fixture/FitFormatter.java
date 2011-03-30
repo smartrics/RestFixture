@@ -48,11 +48,13 @@ public class FitFormatter implements CellFormatter<Parse> {
         sb.append(label("expected"));
         sb.append(Tools.toHtml("-----"));
         sb.append(Tools.toHtml("\n"));
-        sb.append(Tools.toHtml(ta.toString()));
-        sb.append(Tools.toHtml("\n"));
-        sb.append(label("actual"));
-        sb.append(Tools.toHtml("-----"));
-        sb.append(Tools.toHtml("\n"));
+        if (displayActual) {
+            sb.append(Tools.toHtml(ta.toString()));
+            sb.append(Tools.toHtml("\n"));
+            sb.append(label("actual"));
+            sb.append(Tools.toHtml("-----"));
+            sb.append(Tools.toHtml("\n"));
+        }
         for (String e : ta.getErrors()) {
             sb.append(Tools.toHtml(e + "\n"));
         }
@@ -82,12 +84,17 @@ public class FitFormatter implements CellFormatter<Parse> {
 
 	@Override
 	public String gray(String string) {
-		return ActionFixture.gray(string);
+        return ActionFixture.gray(Tools.toHtml(string));
 	}
 
     @Override
     public void asLink(CellWrapper<Parse> cell, String link, String text) {
-        cell.body("<a href='" + link + "'>" + text + "</a>");
+        cell.body(Tools.toHtmlLink(link, text));
+    }
+
+    @Override
+    public String fromRaw(String text) {
+        return text;
     }
 
 }

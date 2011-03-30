@@ -3,6 +3,10 @@ package smartrics.rest.fitnesse.fixture;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class RestFixtureTestHelper {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -17,14 +21,9 @@ public class RestFixtureTestHelper {
 		return row;
 	}
 
-    // public String createFitTestInstance(String... rows) {
-    // StringBuffer buffer = new StringBuffer();
-    // buffer.append("<row>");
-    // for (String c : cells) {
-    // buffer.append("<col>").append(c).append("</col>");
-    // }
-    // buffer.append("</row>");
-    // return buffer.toString();
-    // }
-
+    public List<List<String>> createSingleRowSlimTable(String... cells) {
+        List<List<String>> table = new ArrayList<List<String>>();
+        table.add(Arrays.asList(cells));
+        return table;
+    }
 }

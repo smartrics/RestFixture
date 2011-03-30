@@ -244,7 +244,7 @@ public final class Tools {
     }
 
     public static String toHtml(String text) {
-        return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll("-----", "<hr/>").replaceAll(">", "&gt;").replaceAll("\n", "<br/>").replaceAll(" ", "&nbsp;");
+        return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>").replaceAll(" ", "&nbsp;").replaceAll("-----", "<hr/>");
     }
 
     public static String toCode(String c) {
@@ -267,6 +267,10 @@ public final class Tools {
 
     public static String toHtmlLabel(String string) {
         return "<i>" + string + "</i>";
+    }
+
+    public static String toHtmlLink(String href, String text) {
+        return "<a href='" + href + "'>" + text + "</a>";
     }
 
 }

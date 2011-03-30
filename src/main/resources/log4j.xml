@@ -19,7 +19,7 @@
 
   <category name="httpclient.wire" additivity="false">
     <priority value="DEBUG" />
-    <appender-ref ref="httptraffic" />
+    <appender-ref ref="CONSOLE" />
   </category>
 
   <root>

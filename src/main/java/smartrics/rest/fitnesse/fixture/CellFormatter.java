@@ -22,4 +22,9 @@ public interface CellFormatter<E> {
     void asLink(CellWrapper<E> cell, String link, String text);
 
     void setDisplayActual(boolean displayActual);
+
+    // in SLIM cell content is HTML escaped - we abstract this method to
+    // delegate to formatter the
+    // cleaning of the content.
+    String fromRaw(String text);
 }
