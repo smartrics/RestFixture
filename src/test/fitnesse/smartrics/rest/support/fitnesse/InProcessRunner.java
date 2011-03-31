@@ -18,7 +18,7 @@ import fitnesse.wiki.WikiPage;
 
 public class InProcessRunner {
 
-    private static String SRC = "./src";
+    private static String SRC = "build/fitnesse";
     private static String SUITE_ROOT = "RestFixtureTests.SlimTest.SequenceDiagramGenerationTests";
     private static String FITNESSE_ROOT_PAGE = "FitNesseRoot";
 
@@ -57,9 +57,14 @@ public class InProcessRunner {
 
         };
         response.readyToSend(sender);
+        System.out.println();
         for (int i = 0; i < 100; i++) {
-            if (sb.toString().indexOf("Exit-Code") > 0)
+            System.out.print(".");
+            Thread.sleep(1000);
+            if (sb.toString().indexOf("Exit-Code") > 0) {
+                System.out.println();
                 break;
+            }
         }
 
         System.out.println(sb.toString());
