@@ -1,9 +1,11 @@
 A sequence diagram is generated for the fixture below. 
 The diagram can be displayed anywhere using the !-!img-! wiki command.
-The filename for the diagram is the second parameter of the fixture. 
+The filename for the diagram is the second parameter of the fixture (or the third if a config name is passed).
 Accepted formats for the files are ''.gif'' and ''.png'' (the format is inferred from the file extension).
-Files are generated in the directory ''FITNESSE_HOME/files/restfixture''. Failure on generating the sequence diagram
-does not break the test. A stack trace is shown in standard error (see fixture output).
+Files are generated, by default, in the directory ''FITNESSE_HOME/files/restfixture''. 
+The location can be overridden by setting *restfixture.graphs.dir* property in a !-RestFixtureConfig-!
+
+Failure on generating the sequence diagram does not break the test. A stack trace is shown in standard error (see fixture output).
 
 !3 Installation
 The sequence diagram generation works only on unix platforms.
@@ -33,6 +35,15 @@ sudo apt-get install netpbm
 - at the moment, it's assumed that the fitnesse root directory is ''!-FitNesseRoot-!''
 - make sure that the script myps2img.sh has executable permission for the user running Fitnesse
 *!
+
+!*> Overriding default graphs location
+
+| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureConfig-! |
+| restfixture.graphs.dir | build/fitnesse/FitNesseRoot/files/restfixture |
+
+*!
+
+
 
 !3 Basic Sequence Diagrams
 

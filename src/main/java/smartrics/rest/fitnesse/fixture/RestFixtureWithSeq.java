@@ -21,6 +21,7 @@
 package smartrics.rest.fitnesse.fixture;
 
 import java.io.File;
+import java.util.List;
 
 import smartrics.rest.client.RestData.Header;
 import smartrics.rest.config.Config;
@@ -58,11 +59,7 @@ public class RestFixtureWithSeq extends RestFixture {
      * <code>new File("restfixture")</code>, a directory relative to the default
      * fitnesse root directory.
      */
-    public static final File GRAPH_FILES_DIR;
-    static {
-        String picsDir = System.getProperty("restfixture.graphs.dir", "FitNesseRoot/files/restfixture");
-        GRAPH_FILES_DIR = new File(picsDir);
-    }
+    private File graphFileDir;
 
     /**
      * the name of the object representing the fixture (eg the client executing
@@ -85,13 +82,17 @@ public class RestFixtureWithSeq extends RestFixture {
 
     public RestFixtureWithSeq(String... args) {
         super(args);
-        init();
         processArguments(args);
+        init();
     }
 
     private void init() {
         create(new PicDiagram(), new Model());
-        setFixtureListener(new MyFixtureListener(this, builder, SUPPORT_FILES_DIR, GRAPH_FILES_DIR));
+        String picsDir = System.getProperty("restfixture.graphs.dir", "FitNesseRoot/files/restfixture");
+        picsDir = getConfig().get("restfixture.graphs.dir", picsDir);
+        graphFileDir = new File(picsDir);
+
+        setFixtureListener(new MyFixtureListener(this, builder, SUPPORT_FILES_DIR, graphFileDir));
     }
 
     @Override
@@ -145,6 +146,11 @@ public class RestFixtureWithSeq extends RestFixture {
         listener.tableFinished(parse1);
     }
 
+    @Override
+    public List<List<String>> doTable(List<List<String>> rows) {
+        return super.doTable(rows);
+    }
+    
     /**
      * a DELETE generates a message and a return arrows
      */
