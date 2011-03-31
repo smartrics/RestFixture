@@ -454,7 +454,6 @@ public class RestFixtureTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void mustSetValueOnSymbolMapIfVariableNameStartsWith$() {
         wireMocks();
         when(mockLastRequest.getQuery()).thenReturn("");

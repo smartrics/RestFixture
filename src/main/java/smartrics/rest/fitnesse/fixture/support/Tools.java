@@ -266,7 +266,7 @@ public final class Tools {
     }
 
     public static String toHtmlLabel(String string) {
-        return "<i>" + string + "</i>";
+        return "<i><span class='fit_label'>" + string + "</span></i>";
     }
 
     public static String toHtmlLink(String href, String text) {

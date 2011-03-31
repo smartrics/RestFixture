@@ -1,4 +1,4 @@
-/*  Copyright 2008 Andrew Ochsner
+/*  Copyright 2008 Andrew Ochsner and Fabrizio Cannizzo
  *
  *  This file is part of RestFixture.
  *

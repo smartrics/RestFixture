@@ -18,22 +18,36 @@
  *  If you want to contact the author please leave a comment here
  *  http://smartrics.blogspot.com/2008/08/get-fitnesse-with-some-rest.html
  */
+
 package smartrics.rest.fitnesse.fixture;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-public class PartsFactoryTest {
+import smartrics.rest.config.Config;
+import fit.exception.FitFailureException;
 
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotBuildACellFormatterForANullRunner() {
-        PartsFactory f = new PartsFactory();
-        f.buildCellFormatter(null);
+public class RestFixtureWithSeqSlimTest {
+
+    private RestFixtureWithSeq fixture;
+
+    @Test(expected = FitFailureException.class)
+    public void itFailsToConstructWhenCreatedWithURLOnly() {
+        fixture = new RestFixtureWithSeq("http://localhost:9090");
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void cantBuildACellFormatterForNonFitOrSlimRunner() {
-        PartsFactory f = new PartsFactory();
-        f.buildCellFormatter(RestFixture.Runner.OTHER);
+    @Test
+    public void usesDefaultConfigWhenCreatedWithURLAndPicFileName() {
+        fixture = new RestFixtureWithSeq("http://localhost:9090", "some_picture.png");
+        assertThat(fixture.getConfig().getName(), is(equalTo(Config.DEFAULT_CONFIG_NAME)));
     }
-    
+
+    @Test
+    public void usesNamedConfigWhenCreatedWithURLConfigNameAndPicFileName() {
+        fixture = new RestFixtureWithSeq("http://localhost:9090", "some_config", "some_picture.png");
+        assertThat(fixture.getConfig().getName(), is(equalTo("some_config")));
+    }
 }

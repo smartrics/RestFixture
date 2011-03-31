@@ -58,10 +58,9 @@ Variables may be substitued in the expected result
 !**** File uploads
 Use the multipartFile property to upload files to a server
 ****!
-!|Action Fixture.|
-|start|!-smartrics.rest.test.fitnesse.fixture.FileUtilFixture-!|
-|enter|content|!- { "resource" : { "name" : "test post", "data" : "some data" } } -!|
-|enter|name|${tempDirectory}/tempfile|
+|script|!-smartrics.rest.test.fitnesse.fixture.FileUtilFixture-!|
+|content|!- { "resource" : { "name" : "test post", "data" : "some data" } } -!|
+|name|${tempDirectory}/tempfile|
 |check|create| true |
 |check|exists| true |
 
@@ -79,8 +78,7 @@ Use simple file upload
 |setFileName|${tempDirectory}/tempfile|
 |POST   | /resources/ | 200 | | { "resource" : { "name" : "test post", "data" : "some data" } }|
 
-!|Action Fixture.|
-|start|!-smartrics.rest.test.fitnesse.fixture.FileUtilFixture-!|
-|enter|name|${tempDirectory}/tempfile|
+|script|!-smartrics.rest.test.fitnesse.fixture.FileUtilFixture-!|
+|name|${tempDirectory}/tempfile|
 |check|delete| true |
 |check|exists| false |
