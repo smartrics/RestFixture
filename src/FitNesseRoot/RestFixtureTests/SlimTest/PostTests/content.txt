@@ -1,0 +1,84 @@
+!3 POST
+
+Posting an XML should create a resource
+
+!*** Note
+You set the body for the POST operation with the setBody.
+Here you can see how '''let''' is used. The first cell is the ''label'' of the variable.
+The follwoing cell indicates where to get the data from. That is either the ''header'' or the _body_ of the last successful HTTP response
+Then the expression to extract the value to be assigned to he variable. For ''header'' it has to be a regular expression, for _body_ it
+has to be an XPath whose execution must return a String node.
+***!
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|setBody|<resource><name>test post</name><data>some data</data></resource>|
+|POST   | /resources | 201 | | no-body |
+|let    | id | header | Location:/resources/(.+) | |
+
+!*** Note
+Variables are global: here the GET op is executed on an URI containing '''%id%''' where the label 'id' is defined in the test above.
+The test succeedes only if the resulting XPath match the XML used for the creation of the resource.
+You can also put variables in the expected result
+The subsequent '''let''' operation shows how to use XPaths in the body.
+
+Label values can be accessed from code using '''new Variables().get("labelname");'''
+***!
+
+!*** Note on fit.Fixture symbol map
+Labels are resolved in '''fit.Fixture.getSymbol()''' if not found in the local label value store.
+
+Labels whose name starts with $ are defined in the Symbol map in the '''fit.Fixture''' (and not in the local label store). In this way, values extracted with '''let''' 
+can be shared across various fixtures.
+***!
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/%id% | 200 | |!-
+ /resource/name[text()='test post']<br/>
+ /resource/data[text()='some data']
+-! |
+|let    | name | body | /resource/name/text() | |
+|let    | $symName | body | /resource/name/text() | |
+
+
+
+!**** Json
+Expectations can be asserted also in json format for responses whose content type is 'application/json'
+Variables may be substitued in the expected result
+****!
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|setBody|!- { "resource" : { "name" : "test post", "data" : "some data" } } -!|
+|POST   | /resources/ | 201 | | no-body |
+|let    | id | header | Location:/resources/(.+) | |
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/%id%.json | 200 |Content-Type : application/json |!-
+  /resource/name[text()='test post'] <br/>
+  /resource/data[text()='some data']
+-!|
+
+!**** File uploads
+Use the multipartFile property to upload files to a server
+****!
+|script|!-smartrics.rest.test.fitnesse.fixture.FileUtilFixture-!|
+|content|!- { "resource" : { "name" : "test post", "data" : "some data" } } -!|
+|name|${tempDirectory}/tempfile|
+|check|create| true |
+|check|exists| true |
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|setMultipartFileName|${tempDirectory}/tempfile|
+|POST   | /resources/ | 200 | | file: { "resource" : { "name" : "test post", "data" : "some data" } }|
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|setMultipartFileName|${tempDirectory}/tempfile|
+|setMultipartFileParameterName|abc123|
+|POST   | /resources/ | 200 | | abc123: { "resource" : { "name" : "test post", "data" : "some data" } }|
+
+Use simple file upload
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|setFileName|${tempDirectory}/tempfile|
+|POST   | /resources/ | 200 | | { "resource" : { "name" : "test post", "data" : "some data" } }|
+
+|script|!-smartrics.rest.test.fitnesse.fixture.FileUtilFixture-!|
+|name|${tempDirectory}/tempfile|
+|check|delete| true |
+|check|exists| false |

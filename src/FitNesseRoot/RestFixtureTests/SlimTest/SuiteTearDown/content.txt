@@ -1,0 +1,4 @@
+| script | smartrics.rest.test.fitnesse.fixture.HttpServerFixture |
+| check  | is started | true |
+| stop server                |
+| check  | is stopped | true |

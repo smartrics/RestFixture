@@ -82,7 +82,6 @@ public class RestFixtureWithSeq extends RestFixture {
 
     public RestFixtureWithSeq(String... args) {
         super(args);
-        processArguments(args);
         init();
     }
 
@@ -141,16 +140,16 @@ public class RestFixtureWithSeq extends RestFixture {
      * correctly invoked to complete the sequence diagram generation.
      */
     @Override
-    public void doTable(Parse parse1) {
-        super.doTable(parse1);
-        listener.tableFinished(parse1);
+    public void doTable(Parse table) {
+        super.doTable(table);
+        listener.tableFinished(table);
     }
 
     @Override
     public List<List<String>> doTable(List<List<String>> rows) {
         return super.doTable(rows);
     }
-    
+
     /**
      * a DELETE generates a message and a return arrows
      */

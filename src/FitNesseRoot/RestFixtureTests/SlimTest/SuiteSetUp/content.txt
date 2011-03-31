@@ -1,0 +1,19 @@
+| script       | smartrics.rest.test.fitnesse.fixture.HttpServerFixture |
+| check        | is started | false |
+| start server | ${jettyPort}       |
+| check        | is started | true  |
+
+Default configuration parameters for each !-RestFixture-! instance
+ * '''http.client.connection.timeout''' the client http timeout
+ * '''restfixture.display.actual.on.right''' wether the actual value of headers and body are displayed when an expectation is met
+ * '''restfixture.default.headers''' list of http headers passed to each REST request (overridden by '''setHeader''')
+ * '''restfixture.xml.namespace.context''' list of key/value defining a namespace context. (keys represent aliases used in !-XPaths-!, values are the ns URI as per xml)
+| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureConfig-! |
+| http.client.connection.timeout | 5000 |
+| restfixture.display.actual.on.right | true |
+| restfixture.default.headers | !-defHeader : 1
+anotherDefHeader : 2
+-!|
+| restfixture.xml.namespace.context | !-ns1alias=http://smartrics/ns1
+defalias=http://smartrics/defns
+-!|

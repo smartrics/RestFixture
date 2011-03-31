@@ -1,0 +1,5 @@
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/0 | 200 | Content-Length : [\d]+ |!-
+ /resource/name[text()='a funky name'] <br/>
+ /resource/data[text()='an important message']
+-!|

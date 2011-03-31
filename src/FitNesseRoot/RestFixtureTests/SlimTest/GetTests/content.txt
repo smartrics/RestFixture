@@ -1,0 +1,55 @@
+!3 GET
+
+!**** Notes
+A GET request is performed on the resource whose URI is specified in the second cell.
+The following cell indicate:
+1) the expected return HTTP code,
+2) a subset of headers - regular expressions are allowed
+3) a list of XPaths to be executed in the body. Each XPath is run and it suceedes only if the result of the execution
+returns at least one node
+****!
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/0 | 200 | Content-Length : [\d]+ |!-
+ /resource/name[text()='a funky name'] <br/>
+ /resource/data[text()='an important message']
+-!|
+
+A GET request properly handles query strings. In this example the stub resource echoes the query string in a Query-String header
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/0?param=echome | 200 | !-Content-Length : [\d]+
+Query-String : param=echome -! |!-
+ /resource/name[text()='a funky name'] <br/>
+ /resource/data[text()='an important message']
+-!|
+
+Get a non existing resource should not find it
+
+!**** Note
+Instead of XPaths you can specify 'no-body' if the operation is expected to return an empty body
+****!
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/20 | 404 | Content-Length : 0 | no-body |
+|GET    | /resources/20.json | 404 | Content-Length : 0 | no-body |
+
+!**** XPaths and namespaces
+Namespaces are supported by declaring the alias/uri map in the RestFixtureConfig, using the key restfixture.xml.namespace.context (See SuiteSetup)
+****!
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/0 | 200 | Content-Length : [\d]+ |!-
+ /resource/nstag/ns1alias:number[text()='3']
+-!|
+
+
+!**** Json
+Expectations can be asserted also in json format for responses whose content type is 'application/json' or 'application/x-javascript'
+****!
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/1.json | 200 |Content-Type : application/json;charset=ISO-8859-1 |!-
+ /resource/name[text()='a funky name'] <br/>
+ /resource/data[text()='an important message']
+-!|
