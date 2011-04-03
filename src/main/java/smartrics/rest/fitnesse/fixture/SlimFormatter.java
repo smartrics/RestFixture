@@ -43,7 +43,7 @@ public class SlimFormatter implements CellFormatter<String> {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(out);
         exception.printStackTrace(ps);
-        String m = Tools.toHtml(cell.getWrapped() + "\n-----\n") + Tools.toCode(out.toString());
+        String m = Tools.toHtml(cell.getWrapped() + "\n-----\n") + Tools.toCode(Tools.toHtml(out.toString()));
         cell.body("error:" + m);
     }
 

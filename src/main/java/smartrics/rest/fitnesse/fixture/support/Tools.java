@@ -244,7 +244,8 @@ public final class Tools {
     }
 
     public static String toHtml(String text) {
-        return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>").replaceAll(" ", "&nbsp;").replaceAll("-----", "<hr/>");
+        return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>").replaceAll("\t", "    ").replaceAll(" ", "&nbsp;")
+                .replaceAll("-----", "<hr/>");
     }
 
     public static String toCode(String c) {
