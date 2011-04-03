@@ -77,20 +77,19 @@ public class RestFixtureWithSeq extends RestFixture {
 
     public RestFixtureWithSeq() {
         super();
-        init();
     }
 
     public RestFixtureWithSeq(String... args) {
         super(args);
-        init();
     }
 
-    private void init() {
+    @Override
+    protected void initialize(Runner runner, String[] args) {
+        super.initialize(runner, args);
         create(new PicDiagram(), new Model());
         String picsDir = System.getProperty("restfixture.graphs.dir", "FitNesseRoot/files/restfixture");
         picsDir = getConfig().get("restfixture.graphs.dir", picsDir);
         graphFileDir = new File(picsDir);
-
         setFixtureListener(new MyFixtureListener(this, builder, SUPPORT_FILES_DIR, graphFileDir));
     }
 
@@ -132,6 +131,11 @@ public class RestFixtureWithSeq extends RestFixture {
         builder = new Builder(model, diagram);
     }
 
+    @Override
+    public List<List<String>> doTable(List<List<String>> rows) {
+        return super.doTable(rows);
+    }
+
     /**
      * Method invoked to start processing the current table. Action fixtures
      * seem not to cope correctly with overriding the default
@@ -139,15 +143,19 @@ public class RestFixtureWithSeq extends RestFixture {
      * to make sure that the listener set in <code>this.listener</code> is
      * correctly invoked to complete the sequence diagram generation.
      */
-    @Override
-    public void doTable(Parse table) {
-        super.doTable(table);
-        listener.tableFinished(table);
-    }
+    // @Override
+    // public void doTable(Parse table) {
+    // super.doTable(table);
+    // }
 
     @Override
-    public List<List<String>> doTable(List<List<String>> rows) {
-        return super.doTable(rows);
+    public void doRows(Parse rows) {
+        while (rows != null) {
+            Parse more = rows.more;
+            doRow(rows);
+            rows = more;
+        }
+        listener.tableFinished(rows);
     }
 
     /**

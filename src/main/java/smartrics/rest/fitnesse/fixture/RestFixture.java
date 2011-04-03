@@ -56,6 +56,7 @@ import smartrics.rest.fitnesse.fixture.support.Url;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import fit.ActionFixture;
 import fit.Fixture;
+import fit.FixtureListener;
 import fit.Parse;
 import fit.exception.FitFailureException;
 
@@ -666,7 +667,7 @@ public class RestFixture extends ActionFixture {
         }
     }
 
-    private void initialize(Runner runner, String[] args) {
+    protected void initialize(Runner runner, String[] args) {
         processArguments(args);
         boolean state = validateState();
         notifyInvalidState(state);
@@ -802,9 +803,15 @@ public class RestFixture extends ActionFixture {
             String rBody = resolve(FIND_VARS_PATTERN, body);
             getLastRequest().setBody(rBody);
         }
-        RestResponse response = getRestClient().execute(getLastRequest());
-        setLastResponse(response);
-        completeHttpMethodExecution();
+        try {
+            RestResponse response = getRestClient().execute(getLastRequest());
+            setLastResponse(response);
+            completeHttpMethodExecution();
+        } catch (RuntimeException e) {
+            String message = "Execution of " + method + " caused exception '" + e.getMessage() + "'";
+            LOG.error(message, e);
+            throw new FitFailureException(message);
+        }
     }
 
     private ContentType getContentTypeOfLastResponse() {
@@ -929,6 +936,14 @@ public class RestFixture extends ActionFixture {
 
     private String stripTag(String somethingWithinATag) {
         return Tools.fromSimpleTag(somethingWithinATag);
+    }
+
+    public FixtureListener getListener() {
+        return listener;
+    }
+
+    public void setListener(FixtureListener l) {
+        listener = l;
     }
 
 }

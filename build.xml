@@ -103,6 +103,7 @@
 			</fileset>
 			<fileset dir="lib">
 				<include name="**/*.jar" />
+				<exclude name="${libs.excluded}"/>
 			</fileset>
 			<fileset dir="${resources}">
 				<include name="**/*.*" />
@@ -123,6 +124,7 @@
 		<antcall target="fitnesse-copy">
 			<param name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
 			<param name="fitnesse.test.root" value="${remote.fitnesse.root}/${fitnesse.path}" />
+			<param name="libs.excluded" value="**/fitnesse.jar" />
 		</antcall>
 	</target>
 
@@ -130,7 +132,20 @@
 		<antcall target="fitnesse-copy">
 			<param name="fitnesse.root" value="${build.fitnesse.home}/${fitnesse.root.name}" />
 			<param name="fitnesse.test.root" value="${build.fitnesse.test.root}" />
+			<param name="libs.excluded" value="" />
 		</antcall>
+		<!-- for local execution with in-process runner we need the fitnesse resources to be available -->
+		<mkdir dir="${build}/fitnesse.extract" />
+		<unzip dest="${build}/fitnesse.extract" src="${fitnesse.jar}" >
+			<patternset>
+				<include name="Resources/FitNesseRoot/files/**/*.*" />
+			</patternset>
+		</unzip>
+		<copy todir="${build.fitnesse.home}/${fitnesse.root.name}">
+			<!-- this should reflect the internal fitnesse.jar structure -->
+			<fileset dir="${build}/fitnesse.extract/Resources/FitNesseRoot" />
+		</copy>
+		<delete dir="${build}/fitnesse.extract"/>
 	</target>
 
 	<target name="fitnesse-test-remote" depends="fitnesse-deploy-remote,fitnesse-exec-test,check.fitnesse.failure,check.fitnesse.report.failure" if="execute.cat" />
@@ -166,9 +181,9 @@
 			<arg value="${fitnesse.reports}/results.html" />
 			<arg value="${build.fitnesse.root}" />
 		</java>
-        <condition property="fitnesse.report.fail">
-            <equals arg1="0" arg2="fitnesse.report.exit.status" />
-        </condition>
+		<condition property="fitnesse.report.fail">
+			<equals arg1="0" arg2="fitnesse.report.exit.status" />
+		</condition>
 	</target>
 
 
