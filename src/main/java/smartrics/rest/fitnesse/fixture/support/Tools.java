@@ -243,6 +243,15 @@ public final class Tools {
         return ret;
     }
 
+    public static String makeToggleCollapseable(String content) {
+        String id = Integer.toString(content.hashCode());
+        StringBuffer sb = new StringBuffer();
+        sb.append("<a href=\"javascript:toggleCollapsable('" + id + "');\">");
+        sb.append("<img src=\"/files/images/collapsableClosed.gif\" class=\"left\" id=\"img" + id + "\"/></a>");
+        sb.append("<div class='hidden' id='" + id + "'>").append(content).append("</div>");
+        return sb.toString();
+    }
+
     public static String toHtml(String text) {
         return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>").replaceAll("\t", "    ").replaceAll(" ", "&nbsp;")
                 .replaceAll("-----", "<hr/>");

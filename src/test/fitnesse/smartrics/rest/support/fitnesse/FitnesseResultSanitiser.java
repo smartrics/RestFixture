@@ -205,6 +205,25 @@ public class FitnesseResultSanitiser {
                 content = pre + generateTagWithEmbeddedImage(filesRootLoc, tag) + post;
             }
         }
+        // content =
+        // generateEncodedImgFromFileName("var collapsableOpenImg = \"/files/images/collapsableOpen.gif\"",
+        // filesRootLoc, content);
+        // content =
+        // generateEncodedImgFromFileName("var collapsableClosedImg = \"/files/images/collapsableClosed.gif\"",
+        // filesRootLoc, content);
+
+        return content;
+    }
+
+    private String generateEncodedImgFromFileName(String matchingString, String filesRootLoc, String content) {
+        int pos = content.indexOf(matchingString);
+        pos = content.indexOf("\"", pos) + 1;
+        int posEnd = content.indexOf('"', pos);
+        String pre = content.substring(0, pos - 1);
+        String fileName = content.substring(pos, posEnd);
+        String post = content.substring(posEnd + 1);
+        String enc = encodeBase64(filesRootLoc + fileName);
+        content = pre + enc + post;
         return content;
     }
 
@@ -212,16 +231,24 @@ public class FitnesseResultSanitiser {
         int pos = imgTag.indexOf("src=\"") + 5;
         int posEnd = imgTag.indexOf("\"", pos + 1);
         String file = imgTag.substring(pos, posEnd);
-        int extPos = file.lastIndexOf('.') + 1;
-        String ext = file.substring(extPos);
+        String fileName = filesRootLoc + file;
+        String encoded = encodeBase64(fileName);
+        if (null != encoded)
+            return encoded;
+        return imgTag;
+    }
+
+    private String encodeBase64(String fileName) {
+        int extPos = fileName.lastIndexOf('.') + 1;
+        String ext = fileName.substring(extPos);
         try {
-            String content = readFile(filesRootLoc + file);
+            String content = readFile(fileName);
             String encoded = new String(Base64.encodeBase64(content.getBytes()));
             return "<img src=\"data:image/" + ext + ";base64," + encoded + "\"/>";
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
-        return imgTag;
+        return null;
     }
 
 }
