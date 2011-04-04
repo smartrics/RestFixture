@@ -26,6 +26,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.codec.binary.Base64;
+
 public class FitnesseResultSanitiser {
 
     private static String FITNESSE_CSS_TAG = "<link rel=\"stylesheet\" type=\"text/css\" href=\"/files/css/fitnesse.css\" media=\"screen\"/>";
@@ -41,8 +43,10 @@ public class FitnesseResultSanitiser {
             FitnesseResultSanitiser sanitiser = new FitnesseResultSanitiser();
             String content = sanitiser.readFile(args[0]);
             content = sanitiser.removeNonHtmlGarbage(content);
+            content = sanitiser.removeLinksToExternalPages(content);
             String fitnesseRootLocation = args[1];
             content = sanitiser.injectCssAndJs(fitnesseRootLocation, content);
+            content = sanitiser.embedPictures(fitnesseRootLocation, content);
             String newName = sanitiser.generateNewName(args[0]);
             sanitiser.writeFile(newName, content);
             System.out.println("Input file has been sanitised. Result is: " + newName);
@@ -50,6 +54,17 @@ public class FitnesseResultSanitiser {
             System.out.println("Exception when sanitising file " + args[0]);
             e.printStackTrace(System.out);
         }
+    }
+
+    private String removeLinksToExternalPages(String content) {
+        content = content.replace("<a style=\"font-size:small;\" href=\"RestFixtureTests?pageHistory\"> [history]</a>", "");
+
+        int pos = content.indexOf("<div id=\"execution-status\">");
+        if (pos >= 0) {
+            int endPos = content.indexOf("</div>", pos) + 6;
+            content = content.substring(0, pos - 1) + content.substring(endPos + 1);
+        }
+        return content;
     }
 
     private String generateNewName(String name) {
@@ -87,6 +102,8 @@ public class FitnesseResultSanitiser {
     private String doReplacement(String filesRootLoc, String link, String pre, String post, String content) throws Exception {
         int len = link.length();
         int pos = content.indexOf(link);
+        if (pos < 0)
+            return content;
         String part1 = content.substring(0, pos - 1);
         String part2 = content.substring(pos + len);
 
@@ -111,9 +128,9 @@ public class FitnesseResultSanitiser {
         }
 
         return part1 + pre + resContent + post + part2;
-        
+
     }
-    
+
     private String resolveImport(String rootLoc, String content) throws Exception {
         String newContent = "";
         final String pattern = "@import url";
@@ -138,7 +155,9 @@ public class FitnesseResultSanitiser {
 
     private String removeNonHtmlGarbage(String content) {
         int pos = content.indexOf("<html>");
-        return content.substring(pos);
+        int endPos = content.indexOf("</html>") + 7;
+        content = content.substring(pos, endPos);
+        return content;
     }
 
     private String readFile(String fileLocation) throws Exception {
@@ -165,9 +184,44 @@ public class FitnesseResultSanitiser {
         byte[] buff = new byte[1024];
         while (true) {
             int r = is.read(buff);
-            if(r==-1) break;
-            sb.append(new String(buff,0, r ));
+            if (r == -1)
+                break;
+            sb.append(new String(buff, 0, r));
         }
         return sb.toString();
     }
+
+    private String embedPictures(String filesRootLoc, String content) {
+        boolean foundAll = false;
+        int posEnd = 0;
+        while (!foundAll) {
+            int pos = content.indexOf("<img", posEnd);
+            foundAll = pos < 0;
+            if (!foundAll) {
+                posEnd = content.indexOf("/>", pos) + 2;
+                String pre = content.substring(0, pos - 1);
+                String tag = content.substring(pos, posEnd);
+                String post = content.substring(posEnd + 1);
+                content = pre + generateTagWithEmbeddedImage(filesRootLoc, tag) + post;
+            }
+        }
+        return content;
+    }
+
+    private String generateTagWithEmbeddedImage(String filesRootLoc, String imgTag) {
+        int pos = imgTag.indexOf("src=\"") + 5;
+        int posEnd = imgTag.indexOf("\"", pos + 1);
+        String file = imgTag.substring(pos, posEnd);
+        int extPos = file.lastIndexOf('.') + 1;
+        String ext = file.substring(extPos);
+        try {
+            String content = readFile(filesRootLoc + file);
+            String encoded = new String(Base64.encodeBase64(content.getBytes()));
+            return "<img src=\"data:image/" + ext + ";base64," + encoded + "\"/>";
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        return imgTag;
+    }
+
 }
