@@ -177,7 +177,8 @@
 			<equals arg1="0" arg2="number.of.failed.tests" />
 		</condition>
 		<java classname="smartrics.rest.support.fitnesse.FitnesseResultSanitiser" failonerror="true" fork="true" resultproperty="fitnesse.report.exit.status">
-			<classpath location="${restfixture.fitnesse.jar}" />
+            <classpath location="${restfixture.fitnesse.jar}" />
+            <classpath refid="project.classpath" />
 			<arg value="${fitnesse.reports}/results.html" />
 			<arg value="${build.fitnesse.root}" />
 		</java>
