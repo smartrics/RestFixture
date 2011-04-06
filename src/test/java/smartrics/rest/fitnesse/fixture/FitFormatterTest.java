@@ -35,7 +35,7 @@ public class FitFormatterTest {
         formatter.setActionFixtureDelegate(mockDelegate);
         // unless otherwise indicated this is the default - for simplicity
         formatter.setDisplayActual(false);
-        dummyParse = new Parse(createFitTestRow("some", "content"));
+        dummyParse = new Parse(FitTestSupport.createFitTestRow("some", "content"));
         dummyParse.body = "somebody";
     }
 
@@ -166,16 +166,14 @@ public class FitFormatterTest {
         assertThat(cell.body(), is(equalTo("<a href='http://localhost'>linked</a>")));
     }
 
-    private String createFitTestRow(String... cells) {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("<table>");
-        buffer.append("<tr>");
-        for (String c : cells) {
-            buffer.append("<td>").append(c).append("</td>");
-        }
-        buffer.append("</tr>");
-        buffer.append("</table>");
-        return buffer.toString();
+    @Test
+    public void fromRawIsSimplyABypassAsAllHandlingIsDoneByTheParse() {
+        assertThat(formatter.fromRaw("a"), is(equalTo("a")));
     }
 
+    @Test
+    public void greyCellAreSpansWithAnAssignedClass() {
+        assertThat(formatter.gray("area").trim(), is(equalTo("<span class=\"fit_grey\">area</span>")));
+    }
 }
+

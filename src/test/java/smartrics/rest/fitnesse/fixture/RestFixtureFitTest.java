@@ -32,7 +32,6 @@ import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import fit.Parse;
 import fit.exception.FitFailureException;
-import fit.exception.FitParseException;
 
 public class RestFixtureFitTest {
 
@@ -61,7 +60,7 @@ public class RestFixtureFitTest {
                 super.args = new String[] {};
             }
         };
-        fixture.doCells(buildEmptyParse());
+        fixture.doCells(FitTestSupport.buildEmptyParse());
     }
 
     @Test
@@ -71,7 +70,7 @@ public class RestFixtureFitTest {
                 super.args = new String[] { BASE_URL };
             }
         };
-        Parse parse = buildEmptyParse();
+        Parse parse = FitTestSupport.buildEmptyParse();
         fixture.doCells(parse);
         assertEquals(Config.DEFAULT_CONFIG_NAME, fixture.getConfig().getName());
     }
@@ -83,29 +82,21 @@ public class RestFixtureFitTest {
                 super.args = new String[] { BASE_URL, "configName" };
             }
         };
-        fixture.doCells(buildEmptyParse());
+        fixture.doCells(FitTestSupport.buildEmptyParse());
         assertEquals("configName", fixture.getConfig().getName());
     }
 
     @Test
     public void mustSetTheDisplayActualOnRightFlagFromConfigFile() {
         config.add("restfixture.display.actual.on.right", Boolean.FALSE.toString());
-        fixture.doCells(buildEmptyParse());
+        fixture.doCells(FitTestSupport.buildEmptyParse());
         assertFalse(fixture.isDisplayActualOnRight());
     }
 
     @Test
     public void mustSetTheDisplayActualOnRightFlagDefaultValueToTrue() {
-        fixture.doCells(buildEmptyParse());
+        fixture.doCells(FitTestSupport.buildEmptyParse());
         assertTrue(fixture.isDisplayActualOnRight());
-    }
-
-    private Parse buildEmptyParse() {
-        try {
-            return new Parse("<table><tr><td>&nbsp;</td></tr></table>");
-        } catch (FitParseException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

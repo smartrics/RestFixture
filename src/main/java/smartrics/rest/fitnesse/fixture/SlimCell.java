@@ -24,11 +24,9 @@ import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 
 public class SlimCell implements CellWrapper<String> {
 
-    private String original;
     private String cell;
 
 	public SlimCell(String c) {
-        this.original = c;
         this.cell = c;
 	}
 
@@ -57,12 +55,4 @@ public class SlimCell implements CellWrapper<String> {
 		return cell;
 	}
 
-    public String getOriginal() {
-        return original;
-    }
-
-    @Override
-    public String toString() {
-        return "SlimCell[\n  original:'" + original + "',\n      cell:'" + cell + "'\n]";
-    }
 }

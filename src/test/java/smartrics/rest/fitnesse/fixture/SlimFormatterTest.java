@@ -24,9 +24,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import org.junit.Test;
 
 import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
+import smartrics.rest.fitnesse.fixture.support.Tools;
 
 public class SlimFormatterTest {
 
@@ -108,4 +112,29 @@ public class SlimFormatterTest {
         assertThat(c.body(), is(equalTo("fail:abc123<br/><i><span class='fit_label'>expected</span></i><hr/><br/>def345<br/><i><span class='fit_label'>actual</span></i>")));
     }
 
+    @Test
+    public void shouldRenderLinksAsGreyed() {
+        SlimFormatter formatter = new SlimFormatter();
+        SlimCell c = new SlimCell("abc123");
+        formatter.asLink(c, "http://localhost", "text");
+        assertThat(c.body(), is(equalTo("report:<a href='http://localhost'>text</a>")));
+    }
+
+    @Test
+    public void shouldRenderExceptionsAsSlimErrorCellWithStackTracesInCode() {
+        SlimFormatter formatter = new SlimFormatter();
+        Throwable t = new Throwable();
+        SlimCell c = new SlimCell("abc123");
+        ByteArrayOutputStream bais = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(bais);
+        t.printStackTrace(ps);
+        String trace = Tools.toHtml(new String(bais.toByteArray()));
+
+        formatter.exception(c, t);
+        
+        assertThat(c.body().startsWith("error:"), is(true));
+        assertThat(c.body().contains("<code>"), is(true));
+        assertThat(c.body().contains("</code>"), is(true));
+        assertThat(c.body().contains(trace), is(true));
+    }
 }
