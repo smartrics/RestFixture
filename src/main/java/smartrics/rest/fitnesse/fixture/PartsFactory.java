@@ -27,6 +27,7 @@ import smartrics.rest.client.RestClientImpl;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.RestFixture.Runner;
+import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.HttpClientBuilder;
 
 /**
@@ -75,7 +76,7 @@ public class PartsFactory {
         if (Runner.FIT.equals(runner)) {
             return new FitFormatter();
         }
-        throw new IllegalStateException("Runner " + runner.name() + " not supprted");
+        throw new IllegalStateException("Runner " + runner.name() + " not supported");
     }
 
 }

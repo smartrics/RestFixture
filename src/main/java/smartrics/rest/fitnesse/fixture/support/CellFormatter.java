@@ -18,38 +18,30 @@
  *  If you want to contact the author please leave a comment here
  *  http://smartrics.blogspot.com/2008/08/get-fitnesse-with-some-rest.html
  */
-package smartrics.rest.fitnesse.fixture;
+package smartrics.rest.fitnesse.fixture.support;
 
-import java.util.ArrayList;
-import java.util.List;
+public interface CellFormatter<E> {
 
-import smartrics.rest.fitnesse.fixture.support.CellWrapper;
-import smartrics.rest.fitnesse.fixture.support.RowWrapper;
+	void exception(CellWrapper<E> cellWrapper, Throwable exception);
 
-public class SlimRow implements RowWrapper<String> {
+	void check(CellWrapper<E> valueCell, StringTypeAdapter adapter);
 
-	private final List<CellWrapper<String>> row;
+	String label(String string);
 
-    public SlimRow(List<String> rawRow) {
-        this.row = new ArrayList<CellWrapper<String>>();
-        for (String r : rawRow) {
-            this.row.add(new SlimCell(r));
-		}
-	}
+    void wrong(CellWrapper<E> expected, RestDataTypeAdapter typeAdapter);
 
-	public CellWrapper<String> getCell(int c) {
-        if (c < this.row.size()) {
-            return this.row.get(c);
-		}
-		return null;
-	}
+	void right(CellWrapper<E> expected, RestDataTypeAdapter typeAdapter);
 
-    public List<String> asList() {
-        List<String> ret = new ArrayList<String>();
-        for (CellWrapper<String> w : row) {
-            ret.add(w.body());
-        }
-        return ret;
-    }
+	String gray(String string);
 
+    void asLink(CellWrapper<E> cell, String link, String text);
+
+    void setDisplayActual(boolean displayActual);
+
+    boolean isDisplayActual();
+
+    // in SLIM cell content is HTML escaped - we abstract this method to
+    // delegate to formatter the
+    // cleaning of the content.
+    String fromRaw(String text);
 }

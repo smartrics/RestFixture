@@ -20,6 +20,8 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
+import smartrics.rest.fitnesse.fixture.support.CellWrapper;
+
 public class SlimCell implements CellWrapper<String> {
 
     private String original;

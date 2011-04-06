@@ -20,12 +20,17 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +56,6 @@ public class ToolsTest {
     @Test(expected = IllegalArgumentException.class)
     public void mustNotMatchWhenRegexIsInvalidAndNotifyError() {
         Tools.regex("200", "40[]4");
-        fail("Should have thrown IAE as expression is invalid");
     }
 
     @Test
@@ -65,6 +69,17 @@ public class ToolsTest {
         InputStream is = new ByteArrayInputStream("a string".getBytes());
         assertEquals("a string", Tools.getStringFromInputStream(is));
         assertEquals("", Tools.getStringFromInputStream(null));
+    }
+
+    @Test
+    public void shouldThrowRTEWrappingInputStreamExceptionsWhenReadingInputStreamToAString() throws Exception {
+        InputStream is = mock(InputStream.class);
+        when(is.read()).thenThrow(new IOException("io error"));
+        try {
+            Tools.getStringFromInputStream(is);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Unable to read from stream", e.getMessage());
+        }
     }
 
     @Test
@@ -186,4 +201,37 @@ public class ToolsTest {
         Tools.extractXPath(DEF_NS_CONTEXT, "/a[text()='1']", null);
     }
 
+    @Test
+    public void codeCoversionUsesCodeHtmlTag() {
+        assertThat(Tools.toCode("x"), is(equalTo("<code>x</code>")));
+    }
+
+    @Test
+    public void shouldWrapTextInHtmlAnchor() {
+        assertThat(Tools.toHtmlLink("http://localhost:1234", "x"), is(equalTo("<a href='http://localhost:1234'>x</a>")));
+    }
+
+    @Test
+    public void shouldExtractTextFromSimpleTag() {
+        assertEquals("stuff", Tools.fromSimpleTag("<bob data='1'>stuff</bob>"));
+    }
+
+    @Test
+    public void basicChecksOnMakeCollapsableItem() {
+        // not much of a test, I know, but guarantees minimal info on fitnesse
+        // stylesheed/js
+        int id = "someContent".hashCode();
+        String ret = Tools.makeToggleCollapseable("someContent");
+        assertTrue(ret.indexOf("javascript:toggleCollapsable('" + id + "')") > 0);
+        assertTrue(ret.indexOf("<div class='hidden' id='" + id + "'>") > 0);
+    }
+
+    @Test
+    public void shouldConvertJsonToXml() {
+        String xml = Tools.fromJSONtoXML("{\"person\" : {\"address\" : { \"street\" : \"regent st\", \"number\" : \"1\"}, \"name\" : \"joe\", \"surname\" : \"bloggs\"} }");
+        assertEquals("1", Tools.extractXPath("/person/address/number", xml, XPathConstants.STRING));
+        assertEquals("regent st", Tools.extractXPath("/person/address/street", xml, XPathConstants.STRING));
+        assertEquals("joe", Tools.extractXPath("/person/name", xml, XPathConstants.STRING));
+        assertEquals("bloggs", Tools.extractXPath("/person/surname", xml, XPathConstants.STRING));
+    }
 }

@@ -29,6 +29,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -156,13 +157,18 @@ public final class Tools {
         HierarchicalStreamDriver driver = new JettisonMappedXmlDriver();
         StringReader reader = new StringReader(json);
         HierarchicalStreamReader hsr = driver.createReader(reader);
+        StringWriter writer = new StringWriter();
         try {
-            StringWriter writer = new StringWriter();
             new HierarchicalStreamCopier().copy(hsr, new PrettyPrintWriter(writer));
-            writer.close();
             return writer.toString();
-        } catch (IOException e) {
-            throw new RuntimeException("Something went horribly wrong during JSON->XML conversion", e);
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+
+                }
+            }
         }
     }
 
@@ -247,7 +253,7 @@ public final class Tools {
         String id = Integer.toString(content.hashCode());
         StringBuffer sb = new StringBuffer();
         sb.append("<a href=\"javascript:toggleCollapsable('" + id + "');\">");
-        sb.append("<img src=\"/files/images/collapsableClosed.gif\" class=\"left\" id=\"img" + id + "\"/></a>");
+        sb.append("<img src='/files/images/collapsableClosed.gif' class='left' id='img" + id + "'/></a>");
         sb.append("<div class='hidden' id='" + id + "'>").append(content).append("</div>");
         return sb.toString();
     }
@@ -259,10 +265,6 @@ public final class Tools {
 
     public static String toCode(String c) {
         return "<code>" + c + "</code>";
-    }
-
-    public static String toJSON(String text) {
-        return text.trim();
     }
 
     public static String fromSimpleTag(String somethingWithinATag) {
@@ -283,4 +285,45 @@ public final class Tools {
         return "<a href='" + href + "'>" + text + "</a>";
     }
 
+    public static String makeContentForWrongCell(String expected, RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(toHtml(expected));
+        if (formatter.isDisplayActual()) {
+            sb.append(toHtml("\n"));
+            sb.append(formatter.label("expected"));
+            String actual = typeAdapter.toString();
+            sb.append(toHtml("-----"));
+            sb.append(toHtml("\n"));
+            sb.append(toHtml(actual));
+            sb.append(toHtml("\n"));
+            sb.append(formatter.label("actual"));
+        }
+        List<String> errors = typeAdapter.getErrors();
+        if (errors.size() > 0) {
+            sb.append(toHtml("-----"));
+            sb.append(toHtml("\n"));
+            for (String e : errors) {
+                sb.append(toHtml(e + "\n"));
+            }
+            sb.append(toHtml("\n"));
+            sb.append(formatter.label("errors"));
+        }
+        return sb.toString();
+    }
+
+    public static String makeContentForRightCell(String expected, RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(Tools.toHtml(expected));
+        String actual = typeAdapter.toString();
+        if (formatter.isDisplayActual() && !expected.equals(actual)) {
+            sb.append(toHtml("\n"));
+            sb.append(formatter.label("expected"));
+            sb.append(toHtml("-----"));
+            sb.append(toHtml("\n"));
+            sb.append(toHtml(actual));
+            sb.append(toHtml("\n"));
+            sb.append(formatter.label("actual"));
+        }
+        return sb.toString();
+    }
 }

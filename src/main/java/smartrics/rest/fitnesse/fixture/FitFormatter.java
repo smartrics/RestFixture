@@ -20,6 +20,8 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
+import smartrics.rest.fitnesse.fixture.support.CellFormatter;
+import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.Tools;
@@ -32,9 +34,15 @@ public class FitFormatter implements CellFormatter<Parse> {
     private boolean displayActual;
 
     public void setActionFixtureDelegate(ActionFixture f) {
-		this.fixture = f;
-	}
+        this.fixture = f;
+    }
 
+    @Override
+    public boolean isDisplayActual() {
+        return displayActual;
+    }
+
+    @Override
     public void setDisplayActual(boolean d) {
         this.displayActual = d;
     }
@@ -52,53 +60,21 @@ public class FitFormatter implements CellFormatter<Parse> {
 
 	@Override
 	public String label(String string) {
-		return ActionFixture.label(string);
+        return ActionFixture.label(string);
 	}
 
 	@Override
     public void wrong(CellWrapper<Parse> expected, RestDataTypeAdapter typeAdapter) {
-        wrong(expected, typeAdapter.get().toString(), typeAdapter);
-	}
-
-	@Override
-    public void wrong(CellWrapper<Parse> expected, String actual, RestDataTypeAdapter ta) {
-        expected.body(Tools.toHtml(expected.body()));
-        StringBuffer sb = new StringBuffer();
-        sb.append(Tools.toHtml("\n"));
-        sb.append(label("expected"));
-        sb.append(Tools.toHtml("-----"));
-        sb.append(Tools.toHtml("\n"));
-        if (displayActual) {
-            sb.append(Tools.toHtml(ta.toString()));
-            sb.append(Tools.toHtml("\n"));
-            sb.append(label("actual"));
-            sb.append(Tools.toHtml("-----"));
-            sb.append(Tools.toHtml("\n"));
-        }
-        for (String e : ta.getErrors()) {
-            sb.append(Tools.toHtml(e + "\n"));
-        }
-        sb.append(Tools.toHtml("\n"));
-        sb.append(label("errors"));
-
-        expected.addToBody(sb.toString());
+        String expectedContent = expected.body();
+        String body = Tools.makeContentForWrongCell(expectedContent, typeAdapter, this);
+        expected.body(body);
         fixture.wrong(expected.getWrapped());
 	}
 
 	@Override
-    public void right(CellWrapper<Parse> expected, RestDataTypeAdapter ta) {
-        if (displayActual && !expected.text().equals(ta.toString())) {
-            expected.body(Tools.toHtml(expected.body()));
-            StringBuffer sb = new StringBuffer();
-            sb.append(Tools.toHtml("\n"));
-            sb.append(label("expected"));
-            sb.append(Tools.toHtml("-----"));
-            sb.append(Tools.toHtml("\n"));
-            sb.append(Tools.toHtml(ta.toString()));
-            sb.append(Tools.toHtml("\n"));
-            sb.append(label("actual"));
-            expected.addToBody(sb.toString());
-        }
+    public void right(CellWrapper<Parse> expected, RestDataTypeAdapter typeAdapter) {
+        String expectedContent = expected.body();
+        expected.body(Tools.makeContentForRightCell(expectedContent, typeAdapter, this));
         fixture.right(expected.getWrapped());
 	}
 
@@ -116,5 +92,4 @@ public class FitFormatter implements CellFormatter<Parse> {
     public String fromRaw(String text) {
         return text;
     }
-
 }

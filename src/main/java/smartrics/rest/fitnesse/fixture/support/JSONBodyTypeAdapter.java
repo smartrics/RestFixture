@@ -34,7 +34,7 @@ public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
 			return "no-body";
 		// the actual value is passed as an xml string
 		// todo: pretty print?
-		return Tools.toJSON(obj.toString());
+        return obj.toString();
 	}
 
 	@Override

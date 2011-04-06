@@ -1,6 +1,7 @@
 package smartrics.rest.support.fitnesse;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.net.Socket;
@@ -19,7 +20,7 @@ import fitnesse.wiki.WikiPage;
 public class InProcessRunner {
 
     private static String SRC = "build/fitnesse";
-    private static String SUITE_ROOT = "RestFixtureTests.SlimTest.SequenceDiagramGenerationTests";
+    private static String SUITE_ROOT = "RestFixtureTests";
     private static String FITNESSE_ROOT_PAGE = "FitNesseRoot";
 
     public static void main(String... args) throws Exception {
@@ -29,7 +30,8 @@ public class InProcessRunner {
         WikiPage root = pFac.makeRootPage(SRC, FITNESSE_ROOT_PAGE, componentFactory);
         Request request = mock(Request.class);
         when(request.getResource()).thenReturn(SUITE_ROOT);
-        when(request.getQueryString()).thenReturn("test");
+        when(request.getQueryString()).thenReturn("suite&format=xml");
+        verifyNoMoreInteractions(request);
         Responder responder = rFac.makeResponder(request, root);
         FitNesseContext context = new FitNesseContext(root);
         context.rootDirectoryName = FITNESSE_ROOT_PAGE;
@@ -58,8 +60,9 @@ public class InProcessRunner {
         };
         response.readyToSend(sender);
         System.out.println();
-        for (int i = 0; i < 100; i++) {
-            System.out.print(".");
+        for (int i = 0; i < 20; i++) {
+            // System.out.print(".");
+            System.out.print(sb.toString());
             Thread.sleep(1000);
             if (sb.toString().indexOf("Exit-Code") > 0) {
                 System.out.println();

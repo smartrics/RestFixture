@@ -29,6 +29,7 @@ import org.junit.Test;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.config.Config;
+import smartrics.rest.fitnesse.fixture.support.RowWrapper;
 import smartrics.sequencediagram.Create;
 import smartrics.sequencediagram.Event;
 import smartrics.sequencediagram.Message;
@@ -50,6 +51,7 @@ public class RestFixtureWithSeqFitTest {
         fixture = new RestFixtureWithSeq() {
             {
                 super.args = new String[] { "http://localhost:8080", "sequence.gif" };
+                initialize(Runner.FIT, super.args);
             }
 
             public RestResponse getLastResponse() {

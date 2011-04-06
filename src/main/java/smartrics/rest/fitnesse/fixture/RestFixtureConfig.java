@@ -152,8 +152,6 @@ public class RestFixtureConfig extends Fixture {
             valueParse.body = fValue;
             right(valueParse);
         } catch (Exception e) {
-            System.err.println("Exception for " + p.text());
-            e.printStackTrace();
             exception(p, e);
         }
     }

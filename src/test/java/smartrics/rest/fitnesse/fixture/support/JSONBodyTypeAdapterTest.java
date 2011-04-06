@@ -20,10 +20,12 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.List;
@@ -80,25 +82,22 @@ public class JSONBodyTypeAdapterTest {
 	}
 
 	@Test
-	public void shoudlParseStringWithXPathInHtmlIntoAProperList() {
-		try {
-			// just make sure we have the right fata
-			assertTrue(xPathsAsString.indexOf("<br/>") > -1);
-			assertEquals(xPaths, adapter.parse(xPathsAsString));
-		} catch (Exception e) {
-			fail("should have not raised an exception");
-		}
+    public void shoudlParseStringWithXPathInHtmlIntoAProperList() throws Exception {
+        // just make sure we have the right fata
+        assertTrue(xPathsAsString.indexOf("<br/>") > -1);
+        assertEquals(xPaths, adapter.parse(xPathsAsString));
 	}
 
 	@Test
-	public void shoudlParseNoJsonIntoAnEmptyList() {
-		try {
-			// just make sure we have the right fata
-			assertEquals(new Vector<String>(), adapter.parse(null));
-			assertEquals(new Vector<String>(), adapter.parse("no-body"));
-			assertEquals(new Vector<String>(), adapter.parse(""));
-		} catch (Exception e) {
-			fail("should have not raised an exception");
-		}
+    public void shoudlParseNoJsonIntoAnEmptyList() throws Exception {
+        // just make sure we have the right fata
+        assertEquals(new Vector<String>(), adapter.parse(null));
+        assertEquals(new Vector<String>(), adapter.parse("no-body"));
+        assertEquals(new Vector<String>(), adapter.parse(""));
 	}
+
+    @Test
+    public void shouldConvertJSONToXML() {
+        assertThat(adapter.toXmlString(json1), is(equalTo("<a> 1&amp;</a>")));
+    }
 }

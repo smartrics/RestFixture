@@ -20,20 +20,63 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import org.junit.Before;
 import org.junit.Test;
+
+import smartrics.rest.client.RestClient;
+import smartrics.rest.client.RestRequest;
+import smartrics.rest.config.Config;
 
 public class PartsFactoryTest {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotBuildACellFormatterForANullRunner() {
-        PartsFactory f = new PartsFactory();
-        f.buildCellFormatter(null);
+    private PartsFactory f;
+
+    @Before
+    public void setUp() {
+        f = new PartsFactory();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void cantBuildACellFormatterForNonFitOrSlimRunner() {
-        PartsFactory f = new PartsFactory();
-        f.buildCellFormatter(RestFixture.Runner.OTHER);
+    @Test
+    public void cannotBuildACellFormatterForANullRunner() {
+        try {
+            f.buildCellFormatter(null);
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), is(equalTo("Runner is null")));
+        }
     }
-    
+
+    @Test
+    public void buildsRestRequest() {
+        assertThat(f.buildRestRequest(), is(instanceOf(RestRequest.class)));
+    }
+
+    @Test
+    public void buildsRestClient() {
+        Config c = new Config();
+        assertThat(f.buildRestClient(c), is(instanceOf(RestClient.class)));
+    }
+
+    @Test
+    public void cantBuildACellFormatterForNonFitOrSlimRunner() {
+        try {
+            f.buildCellFormatter(RestFixture.Runner.OTHER);
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage(), is(equalTo("Runner OTHER not supported")));
+        }
+    }
+
+    @Test
+    public void buildsASlimFormatterForSLIMRunner() {
+        assertThat(f.buildCellFormatter(RestFixture.Runner.SLIM), is(instanceOf(SlimFormatter.class)));
+    }
+
+    @Test
+    public void buildsASlimFormatterForFITRunner() {
+        assertThat(f.buildCellFormatter(RestFixture.Runner.FIT), is(instanceOf(FitFormatter.class)));
+    }
 }

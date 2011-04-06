@@ -20,6 +20,7 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
+import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import fit.Parse;
 
 public class FitCell implements CellWrapper<Parse> {
@@ -59,9 +60,4 @@ public class FitCell implements CellWrapper<Parse> {
 		// TODO Auto-generated method stub
 		return cell;
 	}
-
-    @Override
-    public String toString() {
-        return "FitCell[body:'" + body() + "', text:'" + text() + "']";
-    }
 }

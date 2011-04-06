@@ -23,6 +23,8 @@ package smartrics.rest.fitnesse.fixture;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import smartrics.rest.fitnesse.fixture.support.CellFormatter;
+import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.Tools;
@@ -36,6 +38,10 @@ public class SlimFormatter implements CellFormatter<String> {
 
     public void setDisplayActual(boolean d) {
         this.displayActual = d;
+    }
+
+    public boolean isDisplayActual() {
+        return displayActual;
     }
 
     @Override
@@ -72,52 +78,15 @@ public class SlimFormatter implements CellFormatter<String> {
 
     @Override
     public void wrong(CellWrapper<String> expected, RestDataTypeAdapter ta) {
-        wrong(expected, ta.get().toString(), ta);
-    }
-
-    @Override
-    public void wrong(CellWrapper<String> expected, String actual, RestDataTypeAdapter ta) {
-        expected.body(Tools.toHtml(expected.body()));
-        StringBuffer sb = new StringBuffer();
-        sb.append(Tools.toHtml("\n"));
-        sb.append(label("expected"));
-        if (displayActual) {
-            sb.append(Tools.toHtml("-----"));
-            sb.append(Tools.toHtml("\n"));
-            sb.append(Tools.toHtml(ta.toString()));
-            sb.append(Tools.toHtml("\n"));
-            sb.append(label("actual"));
-        }
-        if (ta.getErrors().size() > 0) {
-            sb.append(Tools.toHtml("-----"));
-            sb.append(Tools.toHtml("\n"));
-            for (String e : ta.getErrors()) {
-                sb.append(Tools.toHtml(e + "\n"));
-            }
-            sb.append(Tools.toHtml("\n"));
-            sb.append(label("errors"));
-        }
-
-        expected.addToBody(sb.toString());
-
+        String expectedContent = expected.body();
+        expected.body(Tools.makeContentForWrongCell(expectedContent, ta, this));
         expected.body("fail:" + expected.body());
     }
 
     @Override
-    public void right(CellWrapper<String> expected, RestDataTypeAdapter ta) {
-        if (displayActual && !expected.text().equals(ta.toString())) {
-            expected.body(Tools.toHtml(expected.body()));
-            StringBuffer sb = new StringBuffer();
-            sb.append(Tools.toHtml("\n"));
-            sb.append(label("expected"));
-            sb.append(Tools.toHtml("-----"));
-            sb.append(Tools.toHtml("\n"));
-            sb.append(Tools.toHtml(ta.toString()));
-            sb.append(Tools.toHtml("\n"));
-            sb.append(label("actual"));
-            expected.addToBody(sb.toString());
-        }
-        expected.body("pass:" + expected.body());
+    public void right(CellWrapper<String> expected, RestDataTypeAdapter typeAdapter) {
+
+        expected.body("pass:" + Tools.makeContentForRightCell(expected.body(), typeAdapter, this));
     }
 
     @Override

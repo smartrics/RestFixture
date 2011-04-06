@@ -21,59 +21,91 @@
 package smartrics.rest.fitnesse.fixture.support;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import fit.Fixture;
+
 public class RestDataTypeAdapterTest {
-	RestDataTypeAdapter adapter = new RestDataTypeAdapter(){
+    private RestDataTypeAdapter adapter;
 
-	};
+    @Before
+    public void setUp() {
+        adapter = new RestDataTypeAdapter() {
 
-	@Test
-	public void mustAllowStoringOfTheInstanceOfTheCellContent(){
-		adapter.set("data");
-		assertEquals("data", adapter.get());
-	}
+        };
+    }
 
+    @Test
+    public void mustAllowStoringOfTheInstanceOfTheCellContent() {
+        adapter.set("data");
+        assertEquals("data", adapter.get());
+    }
 
-	@Test
-	public void mustReturnStringRepresentationOfTheCellContent(){
-		adapter.set("");
-		assertEquals("blank", adapter.toString());
-		adapter.set(null);
-		assertEquals("null", adapter.toString());
-		adapter.set(new Object(){
-			public String toString(){
-				return "x45";
-			}
-		});
-		assertEquals("x45", adapter.toString());
-	}
+    @Test
+    public void mustReturnStringRepresentationOfTheCellContent() {
+        adapter.set("");
+        assertEquals("blank", adapter.toString());
+        adapter.set(null);
+        assertEquals("null", adapter.toString());
+        adapter.set(new Object() {
+            public String toString() {
+                return "x45";
+            }
+        });
+        assertEquals("x45", adapter.toString());
+    }
 
-	@Test
-	public void mustAllowStoringOfErrors(){
-		adapter.addError("error");
-		assertEquals("error", adapter.getErrors().get(0));
-	}
+    @Test
+    public void mustAllowStoringOfErrors() {
+        adapter.addError("error");
+        assertEquals("error", adapter.getErrors().get(0));
+    }
 
-	@Test(expected = UnsupportedOperationException.class)
-	public void mustDisallowAddToTheErrorsList(){
-		adapter.getErrors().add("i am not allowed");
-	}
+    @Test(expected = UnsupportedOperationException.class)
+    public void mustDisallowAddToTheErrorsList() {
+        adapter.getErrors().add("i am not allowed");
+    }
 
-	@Test(expected = UnsupportedOperationException.class)
-	public void mustDisallowRemoveFromTheErrorsList(){
-		adapter.addError("error");
-		adapter.getErrors().remove(0);
-	}
+    @Test(expected = UnsupportedOperationException.class)
+    public void mustDisallowRemoveFromTheErrorsList() {
+        adapter.addError("error");
+        adapter.getErrors().remove(0);
+    }
 
-	@Test(expected = UnsupportedOperationException.class)
-	public void mustDisallowOpsOnTheErrorsList(){
-		adapter.addError("error1");
-		adapter.addError("error2");
-		Collections.sort(adapter.getErrors());
-	}
+    @Test(expected = UnsupportedOperationException.class)
+    public void mustDisallowOpsOnTheErrorsList() {
+        adapter.addError("error1");
+        adapter.addError("error2");
+        Collections.sort(adapter.getErrors());
+    }
+
+    @Test
+    // this tests the fit.TypeAdapter behaviour
+    public void fromRawStringDelegatesToParse() throws Exception {
+        Fixture mockFixture = mock(Fixture.class);
+        adapter.init(mockFixture, String.class);
+        when(mockFixture.parse("ss", String.class)).thenReturn("parsed ss");
+        adapter.fromString("ss");
+        verify(mockFixture).parse("ss", String.class);
+        verifyNoMoreInteractions(mockFixture);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void fromRawStringMapsCheckedExceptionsOfParseIntoRuntimeException() throws Exception {
+        Fixture mockFixture = mock(Fixture.class);
+        adapter.init(mockFixture, String.class);
+        when(mockFixture.parse("ss", String.class)).thenThrow(new Exception("some badness happened!"));
+        adapter.fromString("ss");
+        verify(mockFixture).parse("ss", String.class);
+        verifyNoMoreInteractions(mockFixture);
+    }
 
 }

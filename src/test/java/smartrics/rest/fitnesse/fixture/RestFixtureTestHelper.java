@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import smartrics.rest.fitnesse.fixture.support.CellWrapper;
+import smartrics.rest.fitnesse.fixture.support.RowWrapper;
+
 public class RestFixtureTestHelper {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

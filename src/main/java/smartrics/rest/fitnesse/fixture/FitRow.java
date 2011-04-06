@@ -23,6 +23,9 @@ package smartrics.rest.fitnesse.fixture;
 import java.util.ArrayList;
 import java.util.List;
 
+import smartrics.rest.fitnesse.fixture.support.CellWrapper;
+import smartrics.rest.fitnesse.fixture.support.RowWrapper;
+
 import fit.Parse;
 
 public class FitRow implements RowWrapper<Parse> {

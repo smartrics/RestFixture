@@ -58,7 +58,6 @@ public class FitnesseResultSanitiser {
 
     private String removeLinksToExternalPages(String content) {
         content = content.replace("<a style=\"font-size:small;\" href=\"RestFixtureTests?pageHistory\"> [history]</a>", "");
-
         int pos = content.indexOf("<div id=\"execution-status\">");
         if (pos >= 0) {
             int endPos = content.indexOf("</div>", pos) + 6;

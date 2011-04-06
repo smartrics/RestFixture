@@ -18,38 +18,10 @@
  *  If you want to contact the author please leave a comment here
  *  http://smartrics.blogspot.com/2008/08/get-fitnesse-with-some-rest.html
  */
-package smartrics.rest.fitnesse.fixture;
+package smartrics.rest.fitnesse.fixture.support;
 
-import java.util.ArrayList;
-import java.util.List;
+public interface RowWrapper<E> {
 
-import smartrics.rest.fitnesse.fixture.support.CellWrapper;
-import smartrics.rest.fitnesse.fixture.support.RowWrapper;
-
-public class SlimRow implements RowWrapper<String> {
-
-	private final List<CellWrapper<String>> row;
-
-    public SlimRow(List<String> rawRow) {
-        this.row = new ArrayList<CellWrapper<String>>();
-        for (String r : rawRow) {
-            this.row.add(new SlimCell(r));
-		}
-	}
-
-	public CellWrapper<String> getCell(int c) {
-        if (c < this.row.size()) {
-            return this.row.get(c);
-		}
-		return null;
-	}
-
-    public List<String> asList() {
-        List<String> ret = new ArrayList<String>();
-        for (CellWrapper<String> w : row) {
-            ret.add(w.body());
-        }
-        return ret;
-    }
+	CellWrapper<E> getCell(int c);
 
 }

@@ -79,7 +79,10 @@ public class SlimFormatterTest {
         };
         actual.set("abc123");
         formatter.check(c, actual);
-        assertThat(c.body(), is(equalTo("pass:something&nbsp;matching&nbsp;logically&nbsp;abc123<br/><i>expected</i><hr/><br/>abc123<br/><i>actual</i>")));
+
+        assertThat(
+                c.body(),
+                is(equalTo("pass:something&nbsp;matching&nbsp;logically&nbsp;abc123<br/><i><span class='fit_label'>expected</span></i><hr/><br/>abc123<br/><i><span class='fit_label'>actual</span></i>")));
     }
 
     @Test
@@ -90,7 +93,7 @@ public class SlimFormatterTest {
         StringTypeAdapter actual = new StringTypeAdapter();
         actual.set("def345");
         formatter.check(c, actual);
-        assertThat(c.body(), is(equalTo("fail:abc123<br/><i>expected</i>")));
+        assertThat(c.body(), is(equalTo("fail:abc123")));
     }
 
     @Test
@@ -101,7 +104,8 @@ public class SlimFormatterTest {
         StringTypeAdapter actual = new StringTypeAdapter();
         actual.set("def345");
         formatter.check(c, actual);
-        assertThat(c.body(), is(equalTo("fail:abc123<br/><i>expected</i><hr/><br/>def345<br/><i>actual</i>")));
+
+        assertThat(c.body(), is(equalTo("fail:abc123<br/><i><span class='fit_label'>expected</span></i><hr/><br/>def345<br/><i><span class='fit_label'>actual</span></i>")));
     }
 
 }

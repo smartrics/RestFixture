@@ -27,6 +27,7 @@ import smartrics.rest.client.RestData.Header;
 import smartrics.rest.config.Config;
 import smartrics.sequencediagram.Builder;
 import smartrics.sequencediagram.Create;
+import smartrics.sequencediagram.Event;
 import smartrics.sequencediagram.GraphGenerator;
 import smartrics.sequencediagram.Message;
 import smartrics.sequencediagram.Model;
@@ -133,7 +134,8 @@ public class RestFixtureWithSeq extends RestFixture {
 
     @Override
     public List<List<String>> doTable(List<List<String>> rows) {
-        return super.doTable(rows);
+        // return super.doTable(rows);
+        throw new RuntimeException("This fixture is not supported on SLIM runner. Please use it with FIT");
     }
 
     /**
@@ -143,19 +145,10 @@ public class RestFixtureWithSeq extends RestFixture {
      * to make sure that the listener set in <code>this.listener</code> is
      * correctly invoked to complete the sequence diagram generation.
      */
-    // @Override
-    // public void doTable(Parse table) {
-    // super.doTable(table);
-    // }
-
     @Override
-    public void doRows(Parse rows) {
-        while (rows != null) {
-            Parse more = rows.more;
-            doRow(rows);
-            rows = more;
-        }
-        listener.tableFinished(rows);
+    public void doTable(Parse table) {
+        super.doTable(table);
+        listener.tableFinished(table);
     }
 
     /**
@@ -187,7 +180,9 @@ public class RestFixtureWithSeq extends RestFixture {
     @Override
     public void POST() {
         super.POST();
-        model.addEvent(new Message(FIXTURE, getLastRequest().getResource(), "POST"));
+        String res = getLastRequest().getResource();
+        Event event = new Message(FIXTURE, res, "POST");
+        model.addEvent(event);
         Header list = getLastResponse().getHeader("Location").get(0);
         String location = "";
         if (list != null) {
