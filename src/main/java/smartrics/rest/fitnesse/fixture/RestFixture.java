@@ -58,7 +58,6 @@ import smartrics.rest.fitnesse.fixture.support.Tools;
 import smartrics.rest.fitnesse.fixture.support.Url;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import fit.ActionFixture;
-import fit.Fixture;
 import fit.Parse;
 import fit.exception.FitFailureException;
 
@@ -295,7 +294,6 @@ public class RestFixture extends ActionFixture {
                     // HACK: it seems that even if the content is unchanged,
                     // Slim renders red cell
                     String v = rowAsList.get(c);
-                    System.out.println("I: " + r.get(c) + "\nO: " + v + "\nC: " + currentRow.getCell(c).toString() + "\n?:" + v.equals(r.get(c)) + "\n\n");
                     if (v.equals(r.get(c))) {
                         rowAsList.set(c, "");
                     }
@@ -623,7 +621,6 @@ public class RestFixture extends ActionFixture {
             if (valueCell != null) {
                 StringTypeAdapter adapter = new StringTypeAdapter();
                 try {
-                    System.out.println("LET: adapter.value=" + sValue + ", cell value==empty?: " + valueCell.body().equals(""));
                     adapter.set(sValue);
                     getFormatter().check(valueCell, adapter);
                 } catch (Exception e) {
@@ -750,12 +747,7 @@ public class RestFixture extends ActionFixture {
 
     private void assignVariable(String label, String val) {
         String l = label;
-        if (label.startsWith("$")) {
-            l = label.substring(1);
-            Fixture.setSymbol(l, val);
-        } else {
-            variables.put(label, val);
-        }
+        variables.put(label, val);
     }
 
     public Map<String, String> getHeaders() {
@@ -884,11 +876,6 @@ public class RestFixture extends ActionFixture {
                 String g0 = m.group(0);
                 String g1 = m.group(1);
                 String value = variables.get(g1);
-                if (null == value) {
-                    Object o = Fixture.getSymbol(g1);
-                    if (null != o)
-                        value = o.toString();
-                }
                 replacements.put(g0, value);
             }
         }

@@ -21,7 +21,6 @@
 package smartrics.rest.fitnesse.fixture;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -471,8 +470,8 @@ public class RestFixtureTest {
         fixture.processRow(row);
 
         // correctly builds request
-        assertNull(new Variables().get("content"));
-        assertNull(new Variables().get("$content"));
+        assertEquals("text", new Variables().get("content"));
+        assertEquals("text", new Variables().get("$content"));
         assertEquals("text", Fixture.getSymbol("content"));
     }
 

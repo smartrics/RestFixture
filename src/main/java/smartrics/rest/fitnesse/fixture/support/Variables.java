@@ -20,32 +20,52 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+
+import fit.Fixture;
 
 public class Variables {
-	private static Map<String, String> locals = new HashMap<String, String>();
+    private static List<String> symbolNamesCache = new ArrayList<String>();
 
 	public void put(String label, String val) {
-		locals.put(label, val);
+        String l = fromFitNesseSymbol(label);
+        Fixture.setSymbol(l, val);
+        symbolNamesCache.add(l);
 	}
 
 	public String get(String label) {
-		return locals.get(label);
+        String l = fromFitNesseSymbol(label);
+        if (Fixture.hasSymbol(l)) {
+            return Fixture.getSymbol(l).toString();
+        }
+        return null;
 	}
 
 	public void clearAll(){
-		locals.clear();
+        Fixture.ClearSymbols();
+        symbolNamesCache.clear();
 	}
 
 	public String substitute(String text) {
 		String textUpdatedWithVariableSubstitution = text;
-		for (Map.Entry<String, String> variableEntry : locals.entrySet()) {
-			String qualifiedVariableName = "%" + variableEntry.getKey() + "%";
-			textUpdatedWithVariableSubstitution =
-				textUpdatedWithVariableSubstitution.replaceAll(qualifiedVariableName, variableEntry.getValue());
+        for (String entry : symbolNamesCache) {
+            String qualifiedVariableName = "%" + entry + "%";
+            if (textUpdatedWithVariableSubstitution.indexOf(qualifiedVariableName) >= 0) {
+                System.err.println("The use of %label% will be deprecated in favour of $label in the next major version of RestFixture (" + qualifiedVariableName + ")");
+            }
+            textUpdatedWithVariableSubstitution = textUpdatedWithVariableSubstitution.replaceAll(qualifiedVariableName, get(entry));
 		}
 		return textUpdatedWithVariableSubstitution;
 	}
 
+    private String fromFitNesseSymbol(String label) {
+        String l = label;
+        if (l.startsWith("$")) {
+            // kept for backward compatibility
+            System.err.println("The use of $ to reference labels for storage will be deprecated in the next major version of RestFixture (" + label + ")");
+            l = l.substring(1);
+        }
+        return l;
+    }
 }
