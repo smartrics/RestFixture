@@ -23,12 +23,15 @@ package smartrics.rest.fitnesse.fixture;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import smartrics.rest.config.Config;
-import fit.Fixture;
 import fit.Parse;
 import fit.exception.FitParseException;
 
@@ -56,23 +59,55 @@ public class RestFixtureConfigTest {
 				super.args = new String[] { CONFIG_NAME };
 			}
 		};
-		testStoreDataInNamedConfig(fixture, namedConfig);
+        testStoreDataInNamedFitConfig(fixture, namedConfig);
+
+        fixture = new RestFixtureConfig(CONFIG_NAME);
+        testStoreDataInNamedSlimConfig(fixture, namedConfig);
+
 	}
 
-	@Test
-	public void mustStoreDataInNamedConfigWhoseNameIsNotPassedHenceUsingDefault() {
-		RestFixtureConfig fixtureNoArg = new RestFixtureConfig();
-		testStoreDataInNamedConfig(fixtureNoArg, defaultNamedConfig);
-	}
+    @Test
+    public void mustStoreDataInNamedConfigWhoseNameIsNotPassedHenceUsingDefault_FitVersion() {
+        RestFixtureConfig fixtureNoArg = new RestFixtureConfig();
+        testStoreDataInNamedFitConfig(fixtureNoArg, defaultNamedConfig);
+        testStoreDataInNamedSlimConfig(fixtureNoArg, defaultNamedConfig);
+    }
 
-	private void testStoreDataInNamedConfig(Fixture fixture, final Config config) {
-		String row1 = createFitTestRow("key1", "value1");
-		String row2 = createFitTestRow("key2", "value2");
-		Parse table = createFitTestInstance(row1, row2);
-		fixture.doRows(table);
-		assertEquals("value1", config.get("key1"));
-		assertEquals("value2", config.get("key2"));
-	}
+	
+	
+    private void testStoreDataInNamedFitConfig(RestFixtureConfig fixture, final Config config) {
+        String row1 = createFitTestRow("key1", "value1");
+        String row2 = createFitTestRow("key2", "value2");
+        Parse table = createFitTestInstance(row1, row2);
+        fixture.doRows(table);
+        assertEquals("value1", config.get("key1"));
+        assertEquals("value2", config.get("key2"));
+    }
+
+    private void testStoreDataInNamedSlimConfig(RestFixtureConfig fixture, final Config config) {
+        List<String> row1 = createSlimTestRow("key1", "value1");
+        List<String> row2 = createSlimTestRow("key2", "value2");
+        List<List<String>> table = createSlimTestInstance(row1, row2);
+        fixture.doTable(table);
+        assertEquals("value1", config.get("key1"));
+        assertEquals("value2", config.get("key2"));
+        assertEquals("", table.get(0).get(0));
+        assertEquals("pass:value1", table.get(0).get(1));
+        assertEquals("", table.get(1).get(0));
+        assertEquals("pass:value2", table.get(1).get(1));
+    }
+
+    private List<String> createSlimTestRow(String... cells) {
+        return Arrays.asList(cells);
+    }
+
+    private List<List<String>> createSlimTestInstance(List<String>... rows) {
+        List<List<String>> table = new ArrayList<List<String>>();
+        for(List<String> row : rows) {
+            table.add(row);
+        }
+        return table;
+    }
 
 	private Parse createFitTestInstance(String... rows) {
 		Parse t = null;

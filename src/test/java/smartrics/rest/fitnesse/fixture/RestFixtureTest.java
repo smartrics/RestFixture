@@ -557,6 +557,56 @@ public class RestFixtureTest {
         assertEquals("value1", new Variables().get("keytovalue"));
     }
 
+    @Test
+    public void mustAllowSetOfFileNameForFileUpload() {
+        wireMocks();
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+        RowWrapper<?> row = helper.createFitTestRow("setFileName", "/tmp/filename");
+        fixture.processRow(row);
+        assertEquals("/tmp/filename", fixture.getFileName());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void mustReportAsRTEWhenFileNameIsMissing() {
+        wireMocks();
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+        RowWrapper<?> row = helper.createFitTestRow("setFileName");
+        fixture.processRow(row);
+    }
+
+    @Test
+    public void mustAllowSetOfMultipartFileNameForFileUpload() {
+        wireMocks();
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+        RowWrapper<?> row = helper.createFitTestRow("setMultipartFileName", "/tmp/filename");
+        fixture.processRow(row);
+        assertEquals("/tmp/filename", fixture.getMultipartFileName());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void mustReportAsRTEWhenMultipartFileNameIsMissing() {
+        wireMocks();
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+        RowWrapper<?> row = helper.createFitTestRow("setMultipartFileName");
+        fixture.processRow(row);
+    }
+
+    @Test
+    public void mustAllowSetOfMultipartFileParameterNameForFileUpload() {
+        wireMocks();
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+        RowWrapper<?> row = helper.createFitTestRow("setMultipartFileParameterName", "thefile");
+        fixture.processRow(row);
+        assertEquals("thefile", fixture.getMultipartFileParameterName());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void mustReportAsRTEWhenMultipartFileParameterNameIsMissing() {
+        wireMocks();
+        RowWrapper<?> row = helper.createFitTestRow("setMultipartFileParameterName");
+        fixture.processRow(row);
+    }
+
     /**
      * tests for slim support
      */

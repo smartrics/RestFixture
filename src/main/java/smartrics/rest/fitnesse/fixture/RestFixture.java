@@ -59,7 +59,6 @@ import smartrics.rest.fitnesse.fixture.support.Url;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import fit.ActionFixture;
 import fit.Fixture;
-import fit.FixtureListener;
 import fit.Parse;
 import fit.exception.FitFailureException;
 
@@ -227,25 +226,11 @@ public class RestFixture extends ActionFixture {
         initialize(runner, args);
     }
 
-    public RowWrapper<?> getCurrentRow() {
-        return row;
-    }
-
     /**
      * @return the config used for this fixture instance
      */
     public Config getConfig() {
         return config;
-    }
-
-    /**
-     * allows overriding of the config for this instance.
-     * 
-     * @param conf
-     *            the new config to use
-     */
-    public void setConfig(Config conf) {
-        this.config = conf;
     }
 
     /**
@@ -358,7 +343,7 @@ public class RestFixture extends ActionFixture {
     private void configRestClient() {
         restClient = partsFactory.buildRestClient(getConfig());
         if (baseUrl != null) {
-            getRestClient().setBaseUrl(baseUrl.toString());
+            restClient.setBaseUrl(baseUrl.toString());
         }
     }
 
@@ -414,6 +399,10 @@ public class RestFixture extends ActionFixture {
         multipartFileName = variables.substitute(cell.text());
     }
 
+    public String getMultipartFileName() {
+        return multipartFileName;
+    }
+
     /**
      * <code>| setFileName | Name of file |</code>
      * <p/>
@@ -427,6 +416,10 @@ public class RestFixture extends ActionFixture {
         fileName = variables.substitute(cell.text());
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
     /**
      * <code>| setMultipartFileParameterName | Name of form parameter for the uploaded file |</code>
      * <p/>
@@ -437,6 +430,10 @@ public class RestFixture extends ActionFixture {
         if (cell == null)
             throw new FitFailureException("You must pass a parameter name to set");
         multipartFileParameterName = variables.substitute(cell.text());
+    }
+
+    public String getMultipartFileParameterName() {
+        return multipartFileParameterName;
     }
 
     /**
@@ -679,14 +676,6 @@ public class RestFixture extends ActionFixture {
         configRestClient();
     }
 
-    public RestClient getRestClient() {
-        return this.restClient;
-    }
-
-    public void setRestClient(RestClient restClient) {
-        this.restClient = restClient;
-    }
-
     private String handleRegexExpression(String label, String loc, String expression) {
         List<String> content = new ArrayList<String>();
         if ("header".equals(loc)) {
@@ -807,7 +796,7 @@ public class RestFixture extends ActionFixture {
             getLastRequest().setBody(rBody);
         }
         try {
-            RestResponse response = getRestClient().execute(getLastRequest());
+            RestResponse response = restClient.execute(getLastRequest());
             setLastResponse(response);
             completeHttpMethodExecution();
         } catch (RuntimeException e) {
@@ -828,7 +817,7 @@ public class RestFixture extends ActionFixture {
         if (query != null && !"".equals(query.trim())) {
             uri = uri + "?" + query;
         }
-        String u = getRestClient().getBaseUrl() + uri;
+        String u = restClient.getBaseUrl() + uri;
         CellWrapper uriCell = row.getCell(1);
         getFormatter().asLink(uriCell, u, uri);
         CellWrapper cellStatusCode = row.getCell(2);
@@ -939,14 +928,6 @@ public class RestFixture extends ActionFixture {
 
     private String stripTag(String somethingWithinATag) {
         return Tools.fromSimpleTag(somethingWithinATag);
-    }
-
-    public FixtureListener getListener() {
-        return listener;
-    }
-
-    public void setListener(FixtureListener l) {
-        listener = l;
     }
 
 }

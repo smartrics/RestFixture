@@ -108,6 +108,14 @@ public class RestFixtureConfig extends Fixture {
 
     private Config config;
 
+    public RestFixtureConfig() {
+
+    }
+
+    public RestFixtureConfig(String... args) {
+        super.args = args;
+    }
+
     /**
      * support for SLIM
      * 
@@ -122,12 +130,10 @@ public class RestFixtureConfig extends Fixture {
                 k = row.get(0);
                 String v = row.get(1);
                 c.add(k, v);
-                row.clear();
-                row.add("");
-                row.add("pass:" + Tools.toHtml(v));
+                row.set(0, "");
+                row.set(1, "pass:" + Tools.toHtml(v));
             } else {
-                row.remove(0);
-                row.add(0, "error:" + k + Tools.toHtml("\n\nthis line doesn't conform to NVP format (col 0 for name, col 1 for value) - content skipped"));
+                row.set(0, "error:" + k + Tools.toHtml("\n\nthis line doesn't conform to NVP format (col 0 for name, col 1 for value) - content skipped"));
             }
         }
         return rows;

@@ -123,6 +123,7 @@ public class ToolsTest {
     @Test
     public void shouldExtractXPathsFromXmlDocumentAsNodeLists() {
         String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
+        assertEquals(1, Tools.extractXPath(DEF_NS_CONTEXT, "/", xml).getLength());
         assertEquals(2, Tools.extractXPath(DEF_NS_CONTEXT, "/a/c", xml).getLength());
         assertEquals(1, Tools.extractXPath(DEF_NS_CONTEXT, "/a/b[text()='test']", xml).getLength());
         assertEquals("test", Tools.extractXPath(DEF_NS_CONTEXT, "/a/b/text()", xml).item(0).getNodeValue());
@@ -134,8 +135,8 @@ public class ToolsTest {
     @Test
     public void shouldExtractXPathsFromXmlDocumentAsStrings() {
         String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
+        assertEquals("1", Tools.extractXPath("count(/)", xml, XPathConstants.STRING));
         assertEquals("2", Tools.extractXPath("count(/a/c)", xml, XPathConstants.STRING));
-
     }
 
     @Test
