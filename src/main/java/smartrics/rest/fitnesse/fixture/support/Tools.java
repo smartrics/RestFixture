@@ -41,6 +41,11 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -48,6 +53,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -73,6 +79,28 @@ public final class Tools {
         // Use the java Xpath API to return a NodeList to the caller so they can
         // iterate through
         return extractXPath(new HashMap<String, String>(), xpathExpression, content, returnType);
+    }
+
+    public static String xPathResultToXmlString(Object result) {
+        if (result == null) {
+            return null;
+        }
+        try {
+            StringWriter sw = new StringWriter();
+            Transformer serializer = TransformerFactory.newInstance().newTransformer();
+            serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+            serializer.setOutputProperty(OutputKeys.MEDIA_TYPE, "text/xml");
+            if (result instanceof NodeList) {
+                serializer.transform(new DOMSource(((NodeList) result).item(0)), new StreamResult(sw));
+            } else if (result instanceof Node) {
+                serializer.transform(new DOMSource((Node) result), new StreamResult(sw));
+            } else {
+                return result.toString();
+            }
+            return sw.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Transformation caused an exception", e);
+        }
     }
 
     /**

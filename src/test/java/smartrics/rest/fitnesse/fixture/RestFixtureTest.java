@@ -354,11 +354,11 @@ public class RestFixtureTest {
 
         row = helper.createFitTestRow("POST", "/uri", "", "", "");
         fixture.processRow(row);
-        verify(mockLastRequest).setMethod(Method.Delete);
+        verify(mockLastRequest).setMethod(Method.Post);
 
         row = helper.createFitTestRow("PUT", "/uri", "", "", "");
         fixture.processRow(row);
-        verify(mockLastRequest).setMethod(Method.Delete);
+        verify(mockLastRequest).setMethod(Method.Put);
 
     }
 
@@ -476,6 +476,30 @@ public class RestFixtureTest {
     }
 
     @Test
+    public void mustSetValueOnSymbolAsXMLStringIfSourceIsBodyAsXml() {
+        wireMocks();
+        when(mockLastRequest.getQuery()).thenReturn("");
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        lastResponse.setBody("<root><header>some</header><body>text</body></root>");
+
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+
+        RowWrapper<?> row = helper.createFitTestRow("GET", "/uri", "", "", "");
+        fixture.processRow(row);
+        row = helper.createFitTestRow("let", "$content", "body_as_xml", "/", "");
+        fixture.processRow(row);
+
+        // correctly builds request
+        assertEquals("<root><header>some</header><body>text</body></root>", clean(new Variables().get("content")));
+        assertEquals("<root><header>some</header><body>text</body></root>", clean(new Variables().get("$content")));
+        assertEquals("<root><header>some</header><body>text</body></root>", clean(Fixture.getSymbol("content").toString()));
+    }
+
+    private String clean(String s) {
+        return s.trim().replaceAll("\n", "").replaceAll("\r", "");
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     public void mustCaptureErrorsOnExpectationsAndDisplayThemInTheSameCell() {
         wireMocks();
@@ -566,7 +590,7 @@ public class RestFixtureTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void mustReportAsRTEWhenFileNameIsMissing() {
+    public void mustReportAsRTEWhenSettingMissingFileName() {
         wireMocks();
         fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
         RowWrapper<?> row = helper.createFitTestRow("setFileName");
@@ -583,10 +607,11 @@ public class RestFixtureTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void mustReportAsRTEWhenMultipartFileNameIsMissing() {
+    public void mustReportAsRTEWhenSettingMissingMultipartFileName() {
         wireMocks();
         fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
         RowWrapper<?> row = helper.createFitTestRow("setMultipartFileName");
+        when(row.getCell(1)).thenReturn(null);
         fixture.processRow(row);
     }
 
@@ -599,10 +624,41 @@ public class RestFixtureTest {
         assertEquals("thefile", fixture.getMultipartFileParameterName());
     }
 
+    @Test
+    public void mustExecuteVariableSubstitutionOnBodyForNextRequest() {
+        wireMocks();
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+        new Variables().put("content", "<xml />");
+        when(mockCellFormatter.fromRaw("%content%")).thenReturn("%content%");
+        RowWrapper<?> row = helper.createFitTestRow("setBody", "%content%");
+        fixture.processRow(row);
+        row = helper.createFitTestRow("POST", "/uri", "", "", "");
+        fixture.processRow(row);
+        verify(mockLastRequest).setMethod(Method.Post);
+        verify(mockLastRequest).setBody("<xml />");
+    }
+
     @Test(expected = RuntimeException.class)
-    public void mustReportAsRTEWhenMultipartFileParameterNameIsMissing() {
+    public void mustReportAsRTEWhenSettingMissingMultipartFileParameterName() {
         wireMocks();
         RowWrapper<?> row = helper.createFitTestRow("setMultipartFileParameterName");
+        when(row.getCell(1)).thenReturn(null);
+        fixture.processRow(row);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void mustReportAsRTEWhenSettingAMissingBody() {
+        wireMocks();
+        RowWrapper<?> row = helper.createFitTestRow("setBody");
+        when(row.getCell(1)).thenReturn(null);
+        fixture.processRow(row);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void mustReportAsRTEWhenSettingAMissingHeader() {
+        wireMocks();
+        RowWrapper<?> row = helper.createFitTestRow("setHeader");
+        when(row.getCell(1)).thenReturn(null);
         fixture.processRow(row);
     }
 

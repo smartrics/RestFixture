@@ -440,11 +440,13 @@ public class RestFixture extends ActionFixture {
      * body text can either be a kvp or a xml. The <code>ClientHelper</code>
      * will figure it out
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setBody() {
-        CellWrapper<?> cell = row.getCell(1);
+        CellWrapper cell = row.getCell(1);
         if (cell == null)
             throw new FitFailureException("You must pass a body to set");
-        requestBody = variables.substitute(getFormatter().fromRaw(cell.text()));
+        String text = getFormatter().fromRaw(cell.text());
+        requestBody = variables.substitute(text);
     }
 
     /**
@@ -614,7 +616,9 @@ public class RestFixture extends ActionFixture {
             if ("header".equals(loc)) {
                 sValue = handleRegexExpression(label, loc, expr);
             } else if ("body".equals(loc)) {
-                sValue = handleXpathExpression(label, expr);
+                sValue = handleXpathExpression(label, expr, false);
+            } else if ("body_as_xml".equals(loc)) {
+                sValue = handleXpathExpression(label, expr, true);
             } else {
                 throw new FitFailureException("let handles 'xpath' in body or 'regex' in headers.");
             }
@@ -701,11 +705,11 @@ public class RestFixture extends ActionFixture {
         return value;
     }
 
-    private String handleXpathExpression(String label, String expr) throws IOException {
+    private String handleXpathExpression(String label, String expr, boolean resultAsXml) throws IOException {
         // def. match only last response body
         String val = null;
         try {
-            val = handleXPathAsNodeList(expr);
+            val = handleXPathAsNodeList(expr, resultAsXml);
         } catch (IllegalArgumentException e) {
             // ignore - may be that it's eval to a string
         }
@@ -718,13 +722,22 @@ public class RestFixture extends ActionFixture {
         return val;
     }
 
-    private String handleXPathAsNodeList(String expr) {
+    private String handleXPathAsNodeList(String expr, boolean resultAsXml) {
         BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(getContentTypeOfLastResponse());
         NodeList list = Tools.extractXPath(namespaceContext, expr, bodyTypeAdapter.toXmlString(getLastResponse().getBody()));
-        Node item = list.item(0);
         String val = null;
-        if (item != null) {
-            val = item.getTextContent();
+        if (resultAsXml) {
+            val = Tools.xPathResultToXmlString(list);
+            int pos = val.indexOf("?>");
+            if (pos >= 0) {
+                val = val.substring(pos + 2);
+            }
+
+        } else {
+            Node item = list.item(0);
+            if (item != null) {
+                val = item.getTextContent();
+            }
         }
         return val;
     }
