@@ -61,12 +61,12 @@ public class VariablesTest {
 		assertEquals("first 100. second 100.", newText);
 	}
 
-	@Test
-	public void nonExistentVariablesAreNotReplaced(){
-		Variables v1 = new Variables();
-		v1.put("ID", "100");
-		String newText = v1.substitute("non existent %XYZ%. it exists %ID%");
-		assertEquals("non existent %XYZ%. it exists 100", newText);
-	}
+    @Test
+    public void nonExistentVariablesAreNotReplaced() {
+        Variables v1 = new Variables();
+        v1.put("ID", "100");
+        String newText = v1.substitute("non existent %XYZ%. it exists %ID%");
+        assertEquals("non existent %XYZ%. it exists 100", newText);
+    }
 
 }

@@ -52,9 +52,8 @@ public class Variables {
         for (String entry : symbolNamesCache) {
             String qualifiedVariableName = "%" + entry + "%";
             if (textUpdatedWithVariableSubstitution.indexOf(qualifiedVariableName) >= 0) {
-                System.err.println("The use of %label% will be deprecated in favour of $label in the next major version of RestFixture (" + qualifiedVariableName + ")");
+                textUpdatedWithVariableSubstitution = textUpdatedWithVariableSubstitution.replaceAll(qualifiedVariableName, get(entry));
             }
-            textUpdatedWithVariableSubstitution = textUpdatedWithVariableSubstitution.replaceAll(qualifiedVariableName, get(entry));
 		}
 		return textUpdatedWithVariableSubstitution;
 	}
