@@ -622,6 +622,7 @@ public class RestFixture extends ActionFixture {
             } else {
                 throw new FitFailureException("let handles 'xpath' in body or 'regex' in headers.");
             }
+            new Variables().put(label, sValue);
             if (valueCell != null) {
                 StringTypeAdapter adapter = new StringTypeAdapter();
                 try {
