@@ -117,7 +117,7 @@ public class RestFixtureConfig extends Fixture {
     }
 
     /**
-     * support for SLIM
+     * Support for Slim runner.
      * 
      * @param rows
      * @return
@@ -163,8 +163,9 @@ public class RestFixtureConfig extends Fixture {
     }
 
     private Config getConfig() {
-        if (config != null)
+        if (config != null) {
             return config;
+        }
         if (super.args != null && super.args.length > 0) {
             config = new Config(super.args[0]);
         } else {

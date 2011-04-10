@@ -26,6 +26,12 @@ import java.util.List;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.RowWrapper;
 
+/**
+ * Wrapper class for a row when running with Slim.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class SlimRow implements RowWrapper<String> {
 
 	private final List<CellWrapper<String>> row;

@@ -25,12 +25,15 @@ import java.util.List;
 
 import javax.xml.xpath.XPathConstants;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.NodeList;
 
+/**
+ * Type adapter for body cells with XML content.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class XPathBodyTypeAdapter extends BodyTypeAdapter {
-    private static Log LOG = LogFactory.getLog(XPathBodyTypeAdapter.class);
 
     public XPathBodyTypeAdapter() {
     }
@@ -57,7 +60,7 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public boolean equals(Object expected, Object actual) {
+    public boolean equals(final Object expected, final Object actual) {
         if (checkNoBody(expected)) {
             return checkNoBody(actual);
         }
@@ -81,17 +84,14 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
     }
 
     protected boolean eval(String expr, String content) {
+        Boolean b;
         try {
-            LOG.info("CONTEXT: " + getContext());
-            LOG.info("   EXPR: " + expr);
-            LOG.info("CONTENT: " + content);
             NodeList ret = Tools.extractXPath(getContext(), expr, content);
             return !(ret == null || ret.getLength() == 0);
         } catch (IllegalArgumentException e) {
             // may be evaluated as BOOLEAN
-            LOG.debug("XPath does not evaluate to a node list. Trying to match to boolean: " + expr, e);
+            b = (Boolean) Tools.extractXPath(getContext(), expr, content, XPathConstants.BOOLEAN);
         }
-        Boolean b = (Boolean) Tools.extractXPath(getContext(), expr, content, XPathConstants.BOOLEAN);
         return b;
     }
 

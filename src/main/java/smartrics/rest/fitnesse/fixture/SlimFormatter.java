@@ -29,6 +29,12 @@ import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.Tools;
 
+/**
+ * Formatter of cells handled by Slim.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class SlimFormatter implements CellFormatter<String> {
 
     private boolean displayActual;

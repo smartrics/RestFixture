@@ -84,6 +84,7 @@ public class RestFixtureConfigTest {
         assertEquals("value2", config.get("key2"));
     }
 
+    @SuppressWarnings("unchecked")
     private void testStoreDataInNamedSlimConfig(RestFixtureConfig fixture, final Config config) {
         List<String> row1 = createSlimTestRow("key1", "value1");
         List<String> row2 = createSlimTestRow("key2", "value2");

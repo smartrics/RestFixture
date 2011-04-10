@@ -34,22 +34,22 @@ public final class Config {
 	/**
 	 * the default name of the named config.
 	 */
-	public final static String DEFAULT_CONFIG_NAME = "default";
+    public static final String DEFAULT_CONFIG_NAME = "default";
 
-	/**
-	 * the static bucket where the config data is stored
-	 */
-	private final static Map<String, Map<String, String>> CONFIGURATIONS = new HashMap<String, Map<String, String>>();
+    /**
+     * the static bucket where the config data is stored.
+     */
+    private static final Map<String, Map<String, String>> CONFIGURATIONS = new HashMap<String, Map<String, String>>();
 
-	/**
-	 * this instance name
-	 */
+    /**
+     * this instance name.
+     */
 	private final String name;
 
-	/**
-	 * the constructor for the configuration with default name
-	 * {@link Config.DEFAULT_CONFIG_NAME};
-	 */
+    /**
+     * the constructor for the configuration with default name.
+     * {@link Config.DEFAULT_CONFIG_NAME};
+     */
 	public Config() {
 		this(DEFAULT_CONFIG_NAME);
 	}
@@ -108,21 +108,22 @@ public final class Config {
 	 */
 	public String get(String key, String def) {
 		String v = get(key);
-		if (v == null)
+        if (v == null) {
 			v = def;
+        }
 		return v;
 	}
 
-	/**
-	 * returns a key/value from a named config, parsed as Long
-	 * 
-	 * @param key
-	 *            the key
-	 * @param def
-	 *            the default value for value not existent or not parseable
-	 * @return a Long representing the value, def if the value cannot be parsed
-	 *         as Long
-	 */
+    /**
+     * returns a key/value from a named config, parsed as Long.
+     * 
+     * @param key
+     *            the key
+     * @param def
+     *            the default value for value not existent or not parseable
+     * @return a Long representing the value, def if the value cannot be parsed
+     *         as Long
+     */
 	public Long getAsLong(String key, Long def) {
 		String val = get(key);
 		try {
@@ -132,33 +133,34 @@ public final class Config {
 		}
 	}
 
-	/**
-	 * returns a key/value from a named config, parsed as Boolean
-	 * 
-	 * @param key
-	 *            the key
-	 * @param def
-	 *            the default value for value not existent or not parseable
-	 * @return a Boolean representing the value, def if the value cannot be
-	 *         parsed as Boolean
-	 */
+    /**
+     * returns a key/value from a named config, parsed as Boolean.
+     * 
+     * @param key
+     *            the key
+     * @param def
+     *            the default value for value not existent or not parseable
+     * @return a Boolean representing the value, def if the value cannot be
+     *         parsed as Boolean
+     */
 	public Boolean getAsBoolean(String key, Boolean def) {
 		String val = get(key);
-		if (val == null)
+        if (val == null) {
 			return def;
+        }
 		return Boolean.parseBoolean(val);
 	}
 
-	/**
-	 * returns a key/value from a named config, parsed as Integer
-	 * 
-	 * @param key
-	 *            the key
-	 * @param def
-	 *            the default value for value not existent or not parseable
-	 * @return a Integer representing the value, def if the value cannot be
-	 *         parsed as Integer
-	 */
+    /**
+     * returns a key/value from a named config, parsed as Integer.
+     * 
+     * @param key
+     *            the key
+     * @param def
+     *            the default value for value not existent or not parseable
+     * @return a Integer representing the value, def if the value cannot be
+     *         parsed as Integer
+     */
 	public Integer getAsInteger(String key, Integer def) {
 		String val = get(key);
 		try {

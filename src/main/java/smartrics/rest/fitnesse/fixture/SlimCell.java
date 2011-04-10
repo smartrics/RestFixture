@@ -22,6 +22,12 @@ package smartrics.rest.fitnesse.fixture;
 
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 
+/**
+ * Wrapper for a cell in the table when running on Slim.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class SlimCell implements CellWrapper<String> {
 
     private String cell;

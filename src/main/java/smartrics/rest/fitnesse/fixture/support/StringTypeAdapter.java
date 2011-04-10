@@ -20,6 +20,12 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+/**
+ * Type adapter for cells containing strings.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class StringTypeAdapter extends RestDataTypeAdapter {
 
 	public StringTypeAdapter() {
@@ -28,30 +34,35 @@ public class StringTypeAdapter extends RestDataTypeAdapter {
 	@Override
 	public boolean equals(Object expected, Object actual) {
 		String se = "null";
-		if(expected!=null)
+        if (expected != null) {
 			se = expected.toString();
-		String sa = "null";
-		if(actual!=null)
+        }
+        String sa = "null";
+        if (actual != null) {
 			sa = actual.toString();
+        }
 		return se.equals(sa);
 	}
 
 	@Override
-	public Object parse(String s)
-	{
-		if("null".equals(s))
+    public Object parse(String s) {
+        if ("null".equals(s)) {
 			return null;
-		if("blank".equals(s))
+        }
+        if ("blank".equals(s)) {
 			return "";
+        }
 		return s;
 	}
 
 	@Override
 	public String toString(Object obj) {
-		if(obj==null)
+        if (obj == null) {
 			return "null";
-		if("".equals(obj.toString().trim()))
+        }
+        if ("".equals(obj.toString().trim())) {
 			return "blank";
+        }
 		return obj.toString();
 
 	}

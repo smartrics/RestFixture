@@ -28,6 +28,12 @@ import smartrics.rest.fitnesse.fixture.support.Tools;
 import fit.ActionFixture;
 import fit.Parse;
 
+/**
+ * Cell formatter for the Fit runner.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class FitFormatter implements CellFormatter<Parse> {
 
     private ActionFixture fixture;

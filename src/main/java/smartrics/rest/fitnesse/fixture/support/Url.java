@@ -23,47 +23,49 @@ package smartrics.rest.fitnesse.fixture.support;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+/**
+ * Facade to {@see java.net.URL}.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class Url {
 
-	private URL baseUrl;
+    private URL baseUrl;
 
-	public Url(String url) {
-		try {
-			if (url == null || "".equals(url.trim())) {
-				throw new IllegalArgumentException("Null or empty input: " + url);
-			}
-			String u = url;
-			if(url.endsWith("/")){
-				u = url.substring(0, u.length() - 1);
-			}
-			baseUrl = new URL(u);
-			if ("".equals(baseUrl.getHost())) {
-				throw new IllegalArgumentException("No host specified in base URL: " + url);
-			}
-		} catch (MalformedURLException e) {
-			throw new IllegalArgumentException("Malformed base URL: " + url, e);
-		}
-	}
+    public Url(String url) {
+        try {
+            if (url == null || "".equals(url.trim())) {
+                throw new IllegalArgumentException("Null or empty input: " + url);
+            }
+            String u = url;
+            if (url.endsWith("/")) {
+                u = url.substring(0, u.length() - 1);
+            }
+            baseUrl = new URL(u);
+            if ("".equals(baseUrl.getHost())) {
+                throw new IllegalArgumentException("No host specified in base URL: " + url);
+            }
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Malformed base URL: " + url, e);
+        }
+    }
 
-	public URL getBaseUrl() {
-		return baseUrl;
-	}
+    public URL getBaseUrl() {
+        return baseUrl;
+    }
 
-	// public String getBaseUrl() {
-	// return baseUrl.toExternalForm();
-	// }
+    @Override
+    public String toString() {
+        return getBaseUrl().toExternalForm();
+    }
 
-	@Override
-	public String toString() {
-		return getBaseUrl().toExternalForm();
-	}
-
-	public URL buildURL(String file) {
-		try {
-			return new URL(baseUrl, file);
-		} catch (MalformedURLException e) {
-			throw new IllegalArgumentException("Invalid URL part: " + file);
-		}
-	}
+    public URL buildURL(String file) {
+        try {
+            return new URL(baseUrl, file);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Invalid URL part: " + file);
+        }
+    }
 
 }

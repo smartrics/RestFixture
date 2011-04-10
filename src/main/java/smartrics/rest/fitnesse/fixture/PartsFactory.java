@@ -31,7 +31,7 @@ import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.HttpClientBuilder;
 
 /**
- * Factory of all dependencies the rest fixture needs
+ * Factory of all dependencies the rest fixture needs.
  * 
  * @author fabrizio
  * 

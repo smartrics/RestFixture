@@ -27,51 +27,53 @@ import java.util.Map;
 
 import fit.TypeAdapter;
 
+/**
+ * Base class for all Type Adapters used by RestFixture.
+ * 
+ * @author fabrizio
+ * 
+ */
 public abstract class RestDataTypeAdapter extends TypeAdapter implements fitnesse.slim.Converter {
-	private final List<String> errors = new ArrayList<String>();
+    private final List<String> errors = new ArrayList<String>();
 
-	private Object actual;
+    private Object actual;
 
-	private Map<String, String> context;
+    private Map<String, String> context;
 
-	@Override
-	public String toString(){
+    @Override
+    public String toString() {
         return toString(get());
-	}
+    }
 
-	@Override
-	public void set(Object actual){
-		this.actual = actual;
-	}
+    @Override
+    public void set(Object a) {
+        this.actual = a;
+    }
 
-	@Override
-	public Object get(){
-		return actual;
-	}
+    @Override
+    public Object get() {
+        return actual;
+    }
 
-	protected void addError(String e){
-		errors.add(e);
-	}
+    protected void addError(String e) {
+        errors.add(e);
+    }
 
-	public List<String> getErrors(){
-		return Collections.unmodifiableList(errors);
-	}
+    public List<String> getErrors() {
+        return Collections.unmodifiableList(errors);
+    }
 
-	/**
-	 * Used to pass some form of context to the adapter
-	 * 
-	 * @param context
-	 */
-	public void setContext(Map<String, String> context) {
-		this.context = context;
-	}
+    /**
+     * Used to pass some form of context to the adapter.
+     * 
+     * @param context
+     */
+    public void setContext(Map<String, String> c) {
+        this.context = c;
+    }
 
-	protected Map<String, String> getContext() {
-		return context;
-	}
-
-    public String toString(Object o) {
-        return super.toString(o);
+    protected Map<String, String> getContext() {
+        return context;
     }
 
     public Object fromString(String o) {

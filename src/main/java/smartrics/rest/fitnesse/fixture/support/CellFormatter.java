@@ -20,6 +20,13 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+/**
+ * Formatter of the content of a cell.
+ * 
+ * @author fabrizio
+ * 
+ * @param <E>
+ */
 public interface CellFormatter<E> {
 
 	void exception(CellWrapper<E> cellWrapper, Throwable exception);

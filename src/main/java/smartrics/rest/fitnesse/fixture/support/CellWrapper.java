@@ -20,6 +20,13 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+/**
+ * Wrapper of a Slim/Fit cell.
+ * 
+ * @author fabrizio
+ * 
+ * @param <E>
+ */
 public interface CellWrapper<E> {
 
 	E getWrapped();

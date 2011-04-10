@@ -25,12 +25,19 @@ import java.util.regex.PatternSyntaxException;
 
 import fit.Parse;
 
+/**
+ * Type adapter for body cell containing plain text.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class TextBodyTypeAdapter extends BodyTypeAdapter {
 
     @Override
     public boolean equals(Object r1, Object r2) {
-        if (r1 == null || r2 == null)
+        if (r1 == null || r2 == null) {
             return false;
+        }
         String expected = r1.toString();
         if (r1 instanceof Parse) {
             expected = ((Parse) r1).text();
@@ -51,8 +58,9 @@ public class TextBodyTypeAdapter extends BodyTypeAdapter {
 
     @Override
     public Object parse(String s) {
-        if (s == null)
+        if (s == null) {
             return "null";
+        }
         return s.trim();
     }
 

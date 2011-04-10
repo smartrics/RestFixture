@@ -25,9 +25,14 @@ import java.util.List;
 
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.RowWrapper;
-
 import fit.Parse;
 
+/**
+ * Wrapper class for table row for Fit Runner.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class FitRow implements RowWrapper<Parse> {
 
 	private final Parse cells;

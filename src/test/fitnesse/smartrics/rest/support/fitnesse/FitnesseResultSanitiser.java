@@ -214,6 +214,7 @@ public class FitnesseResultSanitiser {
         return content;
     }
 
+    @SuppressWarnings("unused")
     private String generateEncodedImgFromFileName(String matchingString, String filesRootLoc, String content) {
         int pos = content.indexOf(matchingString);
         pos = content.indexOf("\"", pos) + 1;

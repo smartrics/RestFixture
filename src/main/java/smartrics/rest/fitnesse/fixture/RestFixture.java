@@ -149,6 +149,14 @@ import fit.exception.FitFailureException;
  */
 public class RestFixture extends ActionFixture {
 
+    /**
+     * What runner this table is running on.
+     * 
+     * Note, the OTHER runner is primarily for testing purposes.
+     * 
+     * @author fabrizio
+     * 
+     */
     enum Runner {
         SLIM, FIT, OTHER;
     };
@@ -156,6 +164,10 @@ public class RestFixture extends ActionFixture {
     private static final String LINE_SEPARATOR = "\n";
 
     private static final String FILE = "file";
+
+    private static final Log LOG = LogFactory.getLog(RestFixture.class);
+
+    private static final Variables GLOBALS = new Variables();
 
     private RestResponse lastResponse;
 
@@ -171,9 +183,9 @@ public class RestFixture extends ActionFixture {
 
     private Map<String, String> requestHeaders;
 
-    protected RestClient restClient;
+    private RestClient restClient;
 
-    protected Config config;
+    private Config config;
 
     private boolean displayActualOnRight;
 
@@ -183,11 +195,10 @@ public class RestFixture extends ActionFixture {
      * the headers passed to each request by default.
      */
     private Map<String, String> defaultHeaders = new HashMap<String, String>();
+
     private Map<String, String> namespaceContext = new HashMap<String, String>();
 
     private static final Pattern FIND_VARS_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");
-    private static Log LOG = LogFactory.getLog(RestFixture.class);
-    private final static Variables variables = new Variables();
 
     private Url baseUrl;
 
@@ -199,7 +210,7 @@ public class RestFixture extends ActionFixture {
     private PartsFactory partsFactory;
 
     /**
-     * Fit constructor
+     * Constructor for Fit runner.
      */
     public RestFixture() {
         super();
@@ -208,7 +219,7 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
-     * Slim constructor
+     * Constructor for Slim runner.
      * 
      * @param args
      *            the cells following up the first cell in the first row.
@@ -233,9 +244,9 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
-     * the base url as defined by the rest fixture ctor or input args
+     * The base URL as defined by the rest fixture ctor or input args.
      * 
-     * @return the base url as string
+     * @return the base URL as string
      */
     public String getBaseUrl() {
         return baseUrl.toString();
@@ -252,7 +263,7 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
-     * The formatter for this instance of the RestFixture
+     * The formatter for this instance of the RestFixture.
      * 
      * @return
      */
@@ -272,7 +283,7 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
-     * Slim Table table hook
+     * Slim Table table hook.
      * 
      * @param rows
      * @return
@@ -318,33 +329,6 @@ public class RestFixture extends ActionFixture {
         }
     }
 
-    private void configFormatter(Runner runner) {
-        formatter = partsFactory.buildCellFormatter(runner);
-    }
-
-    /**
-     * Configure the fixture with data from {@link RestFixtureConfig}.
-     */
-    private void configFixture() {
-        displayActualOnRight = config.getAsBoolean("restfixture.display.actual.on.right", displayActualOnRight);
-        String str = config.get("restfixture.default.headers", "");
-        defaultHeaders = parseHeaders(str);
-        str = config.get("restfixture.xml.namespace.context", "");
-        namespaceContext = parseNamespaceContext(str);
-    }
-
-    /**
-     * Allows to config the rest client implementation. the method shoudl
-     * configure the instance attribute {@link RestFixture#restClient} created
-     * by the {@link RestFixture#buildRestClient()}.
-     */
-    private void configRestClient() {
-        restClient = partsFactory.buildRestClient(getConfig());
-        if (baseUrl != null) {
-            restClient.setBaseUrl(baseUrl.toString());
-        }
-    }
-
     /**
      * Overrideable method to validate the state of the instance in execution. A
      * {@link RestFixture} is valid if the baseUrl is not null.
@@ -353,6 +337,10 @@ public class RestFixture extends ActionFixture {
      */
     protected boolean validateState() {
         return baseUrl != null;
+    }
+
+    protected void setConfig(Config c) {
+        this.config = c;
     }
 
     /**
@@ -370,8 +358,9 @@ public class RestFixture extends ActionFixture {
     }
 
     protected void processArguments(String[] args) {
-        if (args == null)
+        if (args == null) {
             return;
+        }
         if (args.length > 0) {
             baseUrl = new Url(stripTag(args[0]));
             if (config == null) {
@@ -385,6 +374,8 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
+     * Allows setting of the name of the multi-part file to upload.
+     * 
      * <code>| setMultipartFileName | Name of file |</code>
      * <p/>
      * body text should be location of file which needs to be sent
@@ -394,7 +385,7 @@ public class RestFixture extends ActionFixture {
         if (cell == null) {
             throw new FitFailureException("You must pass a multipart file name to set");
         }
-        multipartFileName = variables.substitute(cell.text());
+        multipartFileName = GLOBALS.substitute(cell.text());
     }
 
     public String getMultipartFileName() {
@@ -402,6 +393,8 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
+     * Allows setting of the name of the file to upload.
+     * 
      * <code>| setFileName | Name of file |</code>
      * <p/>
      * body text should be location of file which needs to be sent
@@ -411,7 +404,7 @@ public class RestFixture extends ActionFixture {
         if (cell == null) {
             throw new FitFailureException("You must pass a file name to set");
         }
-        fileName = variables.substitute(cell.text());
+        fileName = GLOBALS.substitute(cell.text());
     }
 
     public String getFileName() {
@@ -419,15 +412,19 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
+     * Sets the parameter to send in the request storing the multi-part file to
+     * upload. If not specified the default is <code>file</code>
+     * <p/>
      * <code>| setMultipartFileParameterName | Name of form parameter for the uploaded file |</code>
      * <p/>
      * body text should be the name of the form parameter, defaults to 'file'
      */
     public void setMultipartFileParameterName() {
         CellWrapper<?> cell = row.getCell(1);
-        if (cell == null)
+        if (cell == null) {
             throw new FitFailureException("You must pass a parameter name to set");
-        multipartFileParameterName = variables.substitute(cell.text());
+        }
+        multipartFileParameterName = GLOBALS.substitute(cell.text());
     }
 
     public String getMultipartFileParameterName() {
@@ -440,13 +437,14 @@ public class RestFixture extends ActionFixture {
      * body text can either be a kvp or a xml. The <code>ClientHelper</code>
      * will figure it out
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes" })
     public void setBody() {
         CellWrapper cell = row.getCell(1);
-        if (cell == null)
+        if (cell == null) {
             throw new FitFailureException("You must pass a body to set");
+        }
         String text = getFormatter().fromRaw(cell.text());
-        requestBody = variables.substitute(text);
+        requestBody = GLOBALS.substitute(text);
     }
 
     /**
@@ -457,14 +455,16 @@ public class RestFixture extends ActionFixture {
      */
     public void setHeader() {
         CellWrapper<?> cell = row.getCell(1);
-        if (cell == null)
+        if (cell == null) {
             throw new FitFailureException("You must pass a header map to set");
-        String header = variables.substitute(cell.text());
+        }
+        String header = GLOBALS.substitute(cell.text());
         requestHeaders = parseHeaders(header);
     }
 
     /**
-     * Equivalent to setHeader - syntactic sugar to indicate that you can now
+     * Equivalent to setHeader - syntactic sugar to indicate that you can now.
+     * 
      * set multiple headers in a single call
      */
     public void setHeaders() {
@@ -472,16 +472,16 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
-     * <code> | PUT | uri | ?ret | ?headers | ?body |</code>
+     * <code> | PUT | URL | ?ret | ?headers | ?body |</code>
      * <p/>
-     * executes a PUT on the uri and checks the return (a string repr the
-     * operation return code), the http response headers and the http response
-     * body
+     * executes a PUT on the URL and checks the return (a string representation
+     * the operation return code), the HTTP response headers and the HTTP
+     * response body
      * 
-     * uri is resolved by replacing vars previously defined with
+     * URL is resolved by replacing global variables previously defined with
      * <code>let()</code>
      * 
-     * the http request headers can be set via <code>setHeaders()</code>. If not
+     * the HTTP request headers can be set via <code>setHeaders()</code>. If not
      * set, the list of default headers will be set. See
      * <code>DEF_REQUEST_HEADERS</code>
      */
@@ -706,18 +706,16 @@ public class RestFixture extends ActionFixture {
     }
 
     private String handleXpathExpression(String label, String expr, boolean resultAsXml) throws IOException {
-        // def. match only last response body
+        // defaults to match only last response body
         String val = null;
         try {
             val = handleXPathAsNodeList(expr, resultAsXml);
         } catch (IllegalArgumentException e) {
-            // ignore - may be that it's eval to a string
-        }
-        if (val == null) {
+            // ignore - may be that it's evaluating to a string
             val = handleXPathAsString(expr);
-        }
-        if (val != null) {
-            assignVariable(label, val);
+            if (val != null) {
+                assignVariable(label, val);
+            }
         }
         return val;
     }
@@ -744,8 +742,9 @@ public class RestFixture extends ActionFixture {
 
     private String handleXPathAsString(String expr) {
         String body = getLastResponse().getBody();
-        if (body == null)
+        if (body == null) {
             throw new FitFailureException("'xpath' cannot be applied to body of last response because it's null.");
+        }
         String val = (String) Tools.extractXPath(namespaceContext, expr, body, XPathConstants.STRING);
         return val;
     }
@@ -759,8 +758,7 @@ public class RestFixture extends ActionFixture {
     }
 
     private void assignVariable(String label, String val) {
-        String l = label;
-        variables.put(label, val);
+        GLOBALS.put(label, val);
     }
 
     public Map<String, String> getHeaders() {
@@ -791,7 +789,7 @@ public class RestFixture extends ActionFixture {
             getLastRequest().setMultipartFileName(multipartFileName);
         }
         getLastRequest().setMultipartFileParameterName(multipartFileParameterName);
-        String uri[] = resUrl.split("\\?");
+        String[] uri = resUrl.split("\\?");
         getLastRequest().setResource(uri[0]);
         if (uri.length == 2) {
             getLastRequest().setQuery(uri[1]);
@@ -848,7 +846,7 @@ public class RestFixture extends ActionFixture {
         } else {
             boolean success = false;
             try {
-                String substitute = variables.substitute(expected.text());
+                String substitute = GLOBALS.substitute(expected.text());
                 Object parse = ta.parse(substitute);
                 success = ta.equals(parse, actual);
             } catch (Exception e) {
@@ -879,8 +877,9 @@ public class RestFixture extends ActionFixture {
     }
 
     private String resolve(Pattern pattern, String text) {
-        if (text == null)
+        if (text == null) {
             return null;
+        }
         Matcher m = pattern.matcher(text);
         Map<String, String> replacements = new HashMap<String, String>();
         while (m.find()) {
@@ -888,7 +887,7 @@ public class RestFixture extends ActionFixture {
             if (gc == 1) {
                 String g0 = m.group(0);
                 String g1 = m.group(1);
-                String value = variables.get(g1);
+                String value = GLOBALS.get(g1);
                 replacements.put(g0, value);
             }
         }
@@ -896,8 +895,9 @@ public class RestFixture extends ActionFixture {
         for (Entry<String, String> en : replacements.entrySet()) {
             String k = en.getKey();
             String replacement = replacements.get(k);
-            if (replacement != null)
+            if (replacement != null) {
                 newText = newText.replace(k, replacement);
+            }
         }
         return newText;
     }
@@ -928,6 +928,33 @@ public class RestFixture extends ActionFixture {
 
     private String stripTag(String somethingWithinATag) {
         return Tools.fromSimpleTag(somethingWithinATag);
+    }
+
+    private void configFormatter(Runner runner) {
+        formatter = partsFactory.buildCellFormatter(runner);
+    }
+
+    /**
+     * Configure the fixture with data from {@link RestFixtureConfig}.
+     */
+    private void configFixture() {
+        displayActualOnRight = config.getAsBoolean("restfixture.display.actual.on.right", displayActualOnRight);
+        String str = config.get("restfixture.default.headers", "");
+        defaultHeaders = parseHeaders(str);
+        str = config.get("restfixture.xml.namespace.context", "");
+        namespaceContext = parseNamespaceContext(str);
+    }
+
+    /**
+     * Allows to config the rest client implementation. the method shoudl
+     * configure the instance attribute {@link RestFixture#restClient} created
+     * by the {@link RestFixture#buildRestClient()}.
+     */
+    private void configRestClient() {
+        restClient = partsFactory.buildRestClient(getConfig());
+        if (baseUrl != null) {
+            restClient.setBaseUrl(baseUrl.toString());
+        }
     }
 
 }

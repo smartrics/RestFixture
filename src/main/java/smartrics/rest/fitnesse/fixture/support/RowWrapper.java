@@ -20,6 +20,13 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+/**
+ * Wrapper to a table row.
+ * 
+ * @author fabrizio
+ * 
+ * @param <E>
+ */
 public interface RowWrapper<E> {
 
 	CellWrapper<E> getCell(int c);

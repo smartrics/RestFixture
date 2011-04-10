@@ -64,7 +64,7 @@ public class RestFixtureWithSeq extends RestFixture {
 
     /**
      * the name of the object representing the fixture (eg the client executing
-     * REST requests)
+     * REST requests).
      */
     private static final String FIXTURE = "fixture";
 
@@ -99,10 +99,10 @@ public class RestFixtureWithSeq extends RestFixture {
         super.processArguments(args);
         if (args.length == 2) {
             pictureName = args[1];
-            config = new Config();
+            super.setConfig(new Config());
         }
         if (args.length == 3) {
-            config = new Config(args[1]);
+            super.setConfig(new Config(args[1]));
             pictureName = args[2];
         }
     }
@@ -152,7 +152,7 @@ public class RestFixtureWithSeq extends RestFixture {
     }
 
     /**
-     * a DELETE generates a message and a return arrows
+     * a DELETE generates a message and a return arrows.
      */
     @Override
     public void DELETE() {
@@ -162,7 +162,7 @@ public class RestFixtureWithSeq extends RestFixture {
     }
 
     /**
-     * a GET generates a message and a return arrows
+     * a GET generates a message and a return arrows.
      */
     @Override
     public void GET() {
@@ -198,7 +198,7 @@ public class RestFixtureWithSeq extends RestFixture {
     }
 
     /**
-     * a PUT generates a message and a return arrows
+     * a PUT generates a message and a return arrows.
      */
     @Override
     public void PUT() {
@@ -208,7 +208,7 @@ public class RestFixtureWithSeq extends RestFixture {
     }
 
     /**
-     * the picture name is the second parameter of the fixture
+     * the picture name is the second parameter of the fixture.
      * 
      * @return the picture name
      */
@@ -297,7 +297,7 @@ class MyFixtureListener implements FixtureListener {
             try {
                 graphFile.delete();
             } catch (RuntimeException e) {
-                // ingore if cant delete
+                // Ignore if can't delete
                 // TODO: should throw exception if file not deleted?
             }
         }

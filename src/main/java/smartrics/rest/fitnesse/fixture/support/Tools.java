@@ -63,6 +63,12 @@ import com.thoughtworks.xstream.io.copy.HierarchicalStreamCopier;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 
+/**
+ * Misc tool methods for string/xml/xpath manipulation.
+ * 
+ * @author fabrizio
+ * 
+ */
 public final class Tools {
 
     private Tools() {
@@ -142,16 +148,18 @@ public final class Tools {
             @Override
             public String getNamespaceURI(String prefix) {
                 String u = ns.get(prefix);
-                if (null == u)
+                if (null == u) {
                     return XMLConstants.NULL_NS_URI;
+                }
                 return u;
             }
 
             @Override
             public String getPrefix(String namespaceURI) {
                 for (String k : ns.keySet()) {
-                    if (ns.get(k).equals(namespaceURI))
+                    if (ns.get(k).equals(namespaceURI)) {
                         return k;
+                    }
                 }
                 return null;
             }
@@ -194,7 +202,7 @@ public final class Tools {
                 try {
                     writer.close();
                 } catch (IOException e) {
-
+                    // ignore - nothing to do.
                 }
             }
         }
@@ -202,8 +210,9 @@ public final class Tools {
 
     public static String getStringFromInputStream(InputStream is) {
         String line = null;
-        if (is == null)
+        if (is == null) {
             return "";
+        }
         BufferedReader in = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
         try {
@@ -217,8 +226,9 @@ public final class Tools {
     }
 
     public static InputStream getInputStreamFromString(String string) {
-        if (string == null)
+        if (string == null) {
             throw new IllegalArgumentException("null input");
+        }
         byte[] byteArray = string.getBytes();
         return new ByteArrayInputStream(byteArray);
     }
@@ -252,10 +262,12 @@ public final class Tools {
 
     public static Map<String, String> convertStringToMap(final String expStr, final String nvSep, final String entrySep) {
         String sanitisedExpStr = expStr.trim();
-        if (sanitisedExpStr.startsWith("!-"))
+        if (sanitisedExpStr.startsWith("!-")) {
             sanitisedExpStr = sanitisedExpStr.substring(2);
-        if (sanitisedExpStr.endsWith("-!"))
+        }
+        if (sanitisedExpStr.endsWith("-!")) {
             sanitisedExpStr = sanitisedExpStr.substring(0, sanitisedExpStr.length() - 2);
+        }
         sanitisedExpStr = sanitisedExpStr.trim();
         String[] nvpArray = sanitisedExpStr.split(entrySep);
         Map<String, String> ret = new HashMap<String, String>();

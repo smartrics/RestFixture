@@ -25,38 +25,44 @@ import java.util.List;
 
 import fit.Fixture;
 
+/**
+ * Facade to Fixture global symbol map.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class Variables {
     private static List<String> symbolNamesCache = new ArrayList<String>();
 
-	public void put(String label, String val) {
+    public void put(String label, String val) {
         String l = fromFitNesseSymbol(label);
         Fixture.setSymbol(l, val);
         symbolNamesCache.add(l);
-	}
+    }
 
-	public String get(String label) {
+    public String get(String label) {
         String l = fromFitNesseSymbol(label);
         if (Fixture.hasSymbol(l)) {
             return Fixture.getSymbol(l).toString();
         }
         return null;
-	}
+    }
 
-	public void clearAll(){
+    public void clearAll() {
         Fixture.ClearSymbols();
         symbolNamesCache.clear();
-	}
+    }
 
-	public String substitute(String text) {
-		String textUpdatedWithVariableSubstitution = text;
+    public String substitute(String text) {
+        String textUpdatedWithVariableSubstitution = text;
         for (String entry : symbolNamesCache) {
             String qualifiedVariableName = "%" + entry + "%";
             if (textUpdatedWithVariableSubstitution.indexOf(qualifiedVariableName) >= 0) {
                 textUpdatedWithVariableSubstitution = textUpdatedWithVariableSubstitution.replaceAll(qualifiedVariableName, get(entry));
             }
-		}
-		return textUpdatedWithVariableSubstitution;
-	}
+        }
+        return textUpdatedWithVariableSubstitution;
+    }
 
     private String fromFitNesseSymbol(String label) {
         String l = label;

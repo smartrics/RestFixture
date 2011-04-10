@@ -32,17 +32,20 @@ package smartrics.rest.fitnesse.fixture.support;
  */
 public class BodyTypeAdapterFactory {
 
-	public static BodyTypeAdapter getBodyTypeAdapter(ContentType content) {
-		if (content == ContentType.JSON)
-			return new JSONBodyTypeAdapter();
-		else if (content == ContentType.XML)
-			return new XPathBodyTypeAdapter();
-		else if (content == ContentType.TEXT)
-			return new TextBodyTypeAdapter();
-		else if (content == ContentType.UNKNOWN)
-			return new XPathBodyTypeAdapter();
-		else
-			throw new IllegalArgumentException(
-					"Content-Type is UNKNOWN.  Unable to find a BodyTypeAdapter to instantiate.");
-	}
+    private BodyTypeAdapterFactory() {
+    }
+
+    public static BodyTypeAdapter getBodyTypeAdapter(ContentType content) {
+        if (content == ContentType.JSON) {
+            return new JSONBodyTypeAdapter();
+        } else if (content == ContentType.XML) {
+            return new XPathBodyTypeAdapter();
+        } else if (content == ContentType.TEXT) {
+            return new TextBodyTypeAdapter();
+        } else if (content == ContentType.UNKNOWN) {
+            return new XPathBodyTypeAdapter();
+        } else {
+            throw new IllegalArgumentException("Content-Type is UNKNOWN.  Unable to find a BodyTypeAdapter to instantiate.");
+        }
+    }
 }

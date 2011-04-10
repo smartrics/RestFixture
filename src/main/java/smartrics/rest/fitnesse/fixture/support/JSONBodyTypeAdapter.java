@@ -20,6 +20,12 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+/**
+ * Type adapted for cells containing JSON content.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
 
 	@Override
@@ -30,8 +36,9 @@ public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
 
 	@Override
 	public String toString(Object obj) {
-		if (obj == null || obj.toString().trim().equals(""))
+        if (obj == null || obj.toString().trim().equals("")) {
 			return "no-body";
+        }
 		// the actual value is passed as an xml string
 		// todo: pretty print?
         return obj.toString();
