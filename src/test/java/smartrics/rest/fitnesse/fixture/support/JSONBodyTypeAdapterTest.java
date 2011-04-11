@@ -35,10 +35,10 @@ import org.junit.Test;
 
 public class JSONBodyTypeAdapterTest {
 	private final BodyTypeAdapter adapter = new JSONBodyTypeAdapter();
-	private final static String json0 = "{\"a\": { b: [\"12\",\"23\"], \"c\": \"XY\" } }";
-	private final static String json1 = "{\"a\": \" 1&\"}";
-	private final static List<String> xPaths = Arrays.asList("/a", "//b");
-	private final static String xPathsAsString = "/a<br/>//b";
+    private static final String json0 = "{\"a\": { b: [\"12\",\"23\"], \"c\": \"XY\" } }";
+    private static final String json1 = "{\"a\": \" 1&\"}";
+    private static final List<String> xPaths = Arrays.asList("/a", "//b");
+    private static final String xPathsAsString = "/a<br/>//b";
 
 	@Test
 	public void shouldIdentifyContentObjectsWithNoBodyAsBeingEqual() {

@@ -37,10 +37,10 @@ import org.junit.Test;
 public class XPathBodyTypeAdapterTest {
 
     private final XPathBodyTypeAdapter adapter = new XPathBodyTypeAdapter();
-    private final static String xml0 = "<a><b>12</b><b>23</b><c>XY</c></a>";
-    private final static String xml1 = "<a> 1&</a>";
-    private final static List<String> xPaths = Arrays.asList("/a", "//b");
-    private final static String xPathsAsString = "/a<br/>//b";
+    private static final String xml0 = "<a><b>12</b><b>23</b><c>XY</c></a>";
+    private static final String xml1 = "<a> 1&</a>";
+    private static final List<String> xPaths = Arrays.asList("/a", "//b");
+    private static final String xPathsAsString = "/a<br/>//b";
 
     @Test
     public void shouldIdentifyContentObjectsWithNoBodyAsBeingEqual() {
