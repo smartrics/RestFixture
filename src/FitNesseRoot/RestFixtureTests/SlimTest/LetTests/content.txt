@@ -1,6 +1,6 @@
 !3 LET
 
-Usages of LET (See also RestFixtureTests.FitTests.PostTests for more examples) 
+Usages of LET (See also RestFixtureTests.SlimTests.PostTests for more examples) 
 
 ''LET used to extract values from header, using regular expressions''
 
