@@ -1,0 +1,16 @@
+!3 LET
+
+LET can use now the full power of JavaScript to extract data from the last response parts. The additions
+to support the new JavaScript extensions will not break the existing RestFixture API.
+
+The JavaScript extensions can be used to process more effectively JSON ''Content-Type''s.
+
+''LET can access the Fitnesse Symbols map to extract data previously stored''
+
+If the context of the let context is ''js'' the expression is evaluated as a javascript string.
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|setBody|<resource><name>Bill</name><data>Some data on Bill</data></resource>|
+|POST   | /resources/ | 201 | | no-body |
+|let    | id | header | Location:/resources/(.+) | |
+|let    | id_string | js | 'The id is: ' + symbols.get('id') |  |

@@ -20,10 +20,8 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +30,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.xpath.XPathConstants;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestData.Header;
@@ -50,6 +44,8 @@ import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
+import smartrics.rest.fitnesse.fixture.support.LetHandler;
+import smartrics.rest.fitnesse.fixture.support.LetHandlerFactory;
 import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.RowWrapper;
 import smartrics.rest.fitnesse.fixture.support.StatusCodeTypeAdapter;
@@ -613,15 +609,11 @@ public class RestFixture extends ActionFixture {
         CellWrapper valueCell = row.getCell(4);
         String sValue = null;
         try {
-            if ("header".equals(loc)) {
-                sValue = handleRegexExpression(label, loc, expr);
-            } else if ("body".equals(loc)) {
-                sValue = handleXpathExpression(label, expr, false);
-            } else if ("body_as_xml".equals(loc)) {
-                sValue = handleXpathExpression(label, expr, true);
-            } else {
+            LetHandler letHandler = LetHandlerFactory.getHandlerFor(loc);
+            if (letHandler == null) {
                 throw new FitFailureException("let handles 'xpath' in body or 'regex' in headers.");
             }
+            sValue = letHandler.handle(getLastResponse(), namespaceContext, expr);
             new Variables().put(label, sValue);
             if (valueCell != null) {
                 StringTypeAdapter adapter = new StringTypeAdapter();
@@ -632,8 +624,6 @@ public class RestFixture extends ActionFixture {
                     getFormatter().exception(valueCell, e);
                 }
             }
-        } catch (IOException e) {
-            getFormatter().exception(row.getCell(3), e);
         } catch (RuntimeException e) {
             getFormatter().exception(row.getCell(3), e);
         } finally {
@@ -678,88 +668,12 @@ public class RestFixture extends ActionFixture {
         configRestClient();
     }
 
-    private String handleRegexExpression(String label, String loc, String expression) {
-        List<String> content = new ArrayList<String>();
-        if ("header".equals(loc)) {
-            if (getLastResponse().getHeaders() != null) {
-                for (Header e : getLastResponse().getHeaders()) {
-                    String string = Tools.convertEntryToString(e.getName(), e.getValue(), ":");
-                    content.add(string);
-                }
-            }
-        } else {
-            content.add(getLastResponse().getBody());
-        }
-        String value = null;
-        if (content.size() > 0) {
-            Pattern p = Pattern.compile(expression);
-            for (String c : content) {
-                Matcher m = p.matcher(c);
-                if (m.find()) {
-                    int cc = m.groupCount();
-                    value = m.group(cc);
-                    assignVariable(label, value);
-                    break;
-                }
-            }
-        }
-        return value;
-    }
-
-    private String handleXpathExpression(String label, String expr, boolean resultAsXml) throws IOException {
-        // defaults to match only last response body
-        String val = null;
-        try {
-            val = handleXPathAsNodeList(expr, resultAsXml);
-        } catch (IllegalArgumentException e) {
-            // ignore - may be that it's evaluating to a string
-            val = handleXPathAsString(expr);
-            if (val != null) {
-                assignVariable(label, val);
-            }
-        }
-        return val;
-    }
-
-    private String handleXPathAsNodeList(String expr, boolean resultAsXml) {
-        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(getContentTypeOfLastResponse());
-        NodeList list = Tools.extractXPath(namespaceContext, expr, bodyTypeAdapter.toXmlString(getLastResponse().getBody()));
-        String val = null;
-        if (resultAsXml) {
-            val = Tools.xPathResultToXmlString(list);
-            int pos = val.indexOf("?>");
-            if (pos >= 0) {
-                val = val.substring(pos + 2);
-            }
-
-        } else {
-            Node item = list.item(0);
-            if (item != null) {
-                val = item.getTextContent();
-            }
-        }
-        return val;
-    }
-
-    private String handleXPathAsString(String expr) {
-        String body = getLastResponse().getBody();
-        if (body == null) {
-            throw new FitFailureException("'xpath' cannot be applied to body of last response because it's null.");
-        }
-        String val = (String) Tools.extractXPath(namespaceContext, expr, body, XPathConstants.STRING);
-        return val;
-    }
-
     private String emptifyBody(String b) {
         String body = b;
         if (body == null) {
             body = "";
         }
         return body;
-    }
-
-    private void assignVariable(String label, String val) {
-        GLOBALS.put(label, val);
     }
 
     public Map<String, String> getHeaders() {

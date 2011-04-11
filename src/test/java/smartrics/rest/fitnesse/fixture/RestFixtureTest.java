@@ -51,6 +51,12 @@ import smartrics.rest.fitnesse.fixture.support.Variables;
 import smartrics.rest.fitnesse.fixture.support.XPathBodyTypeAdapter;
 import fit.Fixture;
 
+/**
+ * Tests for the RestFixture class.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class RestFixtureTest {
 
     private static final String BASE_URL = "http://localhost:9090";
@@ -486,7 +492,7 @@ public class RestFixtureTest {
 
         RowWrapper<?> row = helper.createFitTestRow("GET", "/uri", "", "", "");
         fixture.processRow(row);
-        row = helper.createFitTestRow("let", "$content", "body_as_xml", "/", "");
+        row = helper.createFitTestRow("let", "$content", "body:xml", "/", "");
         fixture.processRow(row);
 
         // correctly builds request
