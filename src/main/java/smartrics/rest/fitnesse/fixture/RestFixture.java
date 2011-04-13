@@ -604,6 +604,9 @@ public class RestFixture extends ActionFixture {
         exprCell.body(GLOBALS.substitute(exprCell.body()));
         String expr = exprCell.text();
         CellWrapper valueCell = row.getCell(4);
+        String valueCellText = valueCell.body();
+        String valueCellTextReplaced = GLOBALS.substitute(valueCellText);
+        valueCell.body(valueCellTextReplaced);
         String sValue = null;
         try {
             LetHandler letHandler = LetHandlerFactory.getHandlerFor(loc);

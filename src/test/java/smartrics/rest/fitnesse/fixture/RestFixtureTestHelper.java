@@ -33,12 +33,13 @@ import smartrics.rest.fitnesse.fixture.support.RowWrapper;
 public class RestFixtureTestHelper {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public RowWrapper<?> createFitTestRow(String... rows) {
+    public RowWrapper<?> createFitTestRow(String... cells) {
         RowWrapper<?> row = mock(RowWrapper.class);
-        for (int i = 0; i < rows.length; i++) {
+        for (int i = 0; i < cells.length; i++) {
             CellWrapper cell = mock(CellWrapper.class);
-            when(cell.getWrapped()).thenReturn(rows[i]);
-            when(cell.text()).thenReturn(rows[i]);
+            when(cell.getWrapped()).thenReturn(cells[i], cells[i]);
+            when(cell.text()).thenReturn(cells[i], cells[i]);
+            when(cell.body()).thenReturn(cells[i], cells[i]);
             when(row.getCell(i)).thenReturn(cell, cell);
         }
 		return row;

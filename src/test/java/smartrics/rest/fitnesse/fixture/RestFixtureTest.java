@@ -482,6 +482,27 @@ public class RestFixtureTest {
     }
 
     @Test
+    public void mustReplaceVariablesInExpectedContentOfLetCell() {
+        wireMocks();
+        when(mockLastRequest.getQuery()).thenReturn("");
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        lastResponse.setBody("<body>text</body>");
+
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+
+        variables.put("the_content", "text");
+
+        RowWrapper<?> row = helper.createFitTestRow("GET", "/uri", "", "", "");
+        fixture.processRow(row);
+        row = helper.createFitTestRow("let", "$content", "body", "/body/text()", "%the_content%");
+        fixture.processRow(row);
+
+        verify(row.getCell(4)).body();
+        verify(row.getCell(4)).body("text");
+        verifyNoMoreInteractions(row.getCell(4));
+    }
+
+    @Test
     public void mustSetValueOnSymbolAsXMLStringIfSourceIsBodyAsXml() {
         wireMocks();
         when(mockLastRequest.getQuery()).thenReturn("");
