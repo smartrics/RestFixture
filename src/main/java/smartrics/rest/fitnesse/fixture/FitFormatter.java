@@ -61,6 +61,7 @@ public class FitFormatter implements CellFormatter<Parse> {
 
 	@Override
 	public void check(CellWrapper<Parse> valueCell, StringTypeAdapter adapter) {
+        valueCell.body(Tools.toHtml(valueCell.body()));
 		fixture.check(valueCell.getWrapped(), adapter);
 	}
 

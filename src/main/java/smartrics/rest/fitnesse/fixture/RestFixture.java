@@ -602,6 +602,7 @@ public class RestFixture extends ActionFixture {
         String loc = row.getCell(2).text();
         CellWrapper exprCell = row.getCell(3);
         exprCell.body(GLOBALS.substitute(exprCell.body()));
+        exprCell.body(getFormatter().gray(exprCell.body()));
         String expr = exprCell.text();
         CellWrapper valueCell = row.getCell(4);
         String valueCellText = valueCell.body();
@@ -611,10 +612,10 @@ public class RestFixture extends ActionFixture {
         try {
             LetHandler letHandler = LetHandlerFactory.getHandlerFor(loc);
             if (letHandler != null) {
+                StringTypeAdapter adapter = new StringTypeAdapter();
                 sValue = letHandler.handle(getLastResponse(), namespaceContext, expr);
                 GLOBALS.put(label, sValue);
                 if (valueCell != null) {
-                    StringTypeAdapter adapter = new StringTypeAdapter();
                     adapter.set(sValue);
                     getFormatter().check(valueCell, adapter);
                 }

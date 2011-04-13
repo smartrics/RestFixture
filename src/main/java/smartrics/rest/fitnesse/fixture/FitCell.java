@@ -63,7 +63,6 @@ public class FitCell implements CellWrapper<Parse> {
 
     @Override
     public Parse getWrapped() {
-        // TODO Auto-generated method stub
         return cell;
     }
 }

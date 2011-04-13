@@ -37,19 +37,21 @@ public class LetBodyJsHandler implements LetHandler {
     private void injectResponse(String jsName, Context cx, ScriptableObject scope, RestResponse r) {
         try {
             ScriptableObject.defineClass(scope, JsResponse.class);
-            Object[] arg = new Object[1];
-            arg[0] = r;
-            Scriptable response = cx.newObject(scope, "JsResponse", arg);
-            scope.put(jsName, scope, response);
-
-            putPropertyOnJsObject(response, "body", r.getBody());
-            putPropertyOnJsObject(response, "resource", r.getResource());
-            putPropertyOnJsObject(response, "statusText", r.getStatusText());
-            putPropertyOnJsObject(response, "statusCode", r.getStatusCode());
-            putPropertyOnJsObject(response, "transactionId", r.getTransactionId());
-            for (Header h : r.getHeaders()) {
-                callMethodOnJsObject(response, "addHeader", h.getName(), h.getValue());
+            Scriptable response = null;
+            if (r != null) {
+                Object[] arg = new Object[1];
+                arg[0] = r;
+                response = cx.newObject(scope, "JsResponse", arg);
+                putPropertyOnJsObject(response, "body", r.getBody());
+                putPropertyOnJsObject(response, "resource", r.getResource());
+                putPropertyOnJsObject(response, "statusText", r.getStatusText());
+                putPropertyOnJsObject(response, "statusCode", r.getStatusCode());
+                putPropertyOnJsObject(response, "transactionId", r.getTransactionId());
+                for (Header h : r.getHeaders()) {
+                    callMethodOnJsObject(response, "addHeader", h.getName(), h.getValue());
+                }
             }
+            scope.put(jsName, scope, response);
 
         } catch (IllegalAccessException e) {
             // TODO Auto-generated catch block
@@ -78,13 +80,14 @@ public class LetBodyJsHandler implements LetHandler {
      * 
      */
     public static class JsResponse extends ScriptableObject {
-        private Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        private Map<String, List<String>> headers;
 
         public JsResponse() {
 
         }
 
         public void jsConstructor() {
+            headers = new HashMap<String, List<String>>();
         }
 
         @Override
@@ -113,6 +116,14 @@ public class LetBodyJsHandler implements LetHandler {
                 return 0;
             }
             return vals.size();
+        }
+
+        public int jsFunction_headersSize() {
+            int sz = 0;
+            for (List<String> hList : headers.values()) {
+                sz += hList.size();
+            }
+            return sz;
         }
 
         public String jsFunction_header0(String name) {

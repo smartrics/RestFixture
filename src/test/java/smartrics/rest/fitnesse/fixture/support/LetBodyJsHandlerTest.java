@@ -43,6 +43,13 @@ public class LetBodyJsHandlerTest {
     }
 
     @Test
+    public void shouldNotProvideLastResponseBodyInJsContextIfResponseIsNull() {
+        LetBodyJsHandler h = new LetBodyJsHandler();
+        String res = h.handle(null, null, "'response is null: ' + (response == null)");
+        assertThat(res, is(equalTo("response is null: true")));
+    }
+
+    @Test
     public void shouldProvideLastResponseResourceInJsContext() {
         RestResponse response = createResponse();
         LetBodyJsHandler h = new LetBodyJsHandler();
@@ -96,6 +103,9 @@ public class LetBodyJsHandlerTest {
 
         res = h.handle(response, null, "'my last response Bespoke-Header: ' + response.headers('Bespoke-Header')");
         assertThat(res, is(equalTo("my last response Bespoke-Header: [jolly, good]")));
+
+        res = h.handle(response, null, "'my last response does not have Ciccio header: ' + response.header0('Ciccio')");
+        assertThat(res, is(equalTo("my last response does not have Ciccio header: null")));
     }
 
     private RestResponse createResponse() {
