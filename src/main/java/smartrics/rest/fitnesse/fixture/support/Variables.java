@@ -20,8 +20,11 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import fit.Fixture;
 
@@ -32,12 +35,11 @@ import fit.Fixture;
  * 
  */
 public class Variables {
-    private static List<String> symbolNamesCache = new ArrayList<String>();
+    public static final Pattern VARIABLES_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");
 
     public void put(String label, String val) {
         String l = fromFitNesseSymbol(label);
         Fixture.setSymbol(l, val);
-        symbolNamesCache.add(l);
     }
 
     public String get(String label) {
@@ -50,18 +52,32 @@ public class Variables {
 
     public void clearAll() {
         Fixture.ClearSymbols();
-        symbolNamesCache.clear();
     }
 
     public String substitute(String text) {
-        String textUpdatedWithVariableSubstitution = text;
-        for (String entry : symbolNamesCache) {
-            String qualifiedVariableName = "%" + entry + "%";
-            if (textUpdatedWithVariableSubstitution.indexOf(qualifiedVariableName) >= 0) {
-                textUpdatedWithVariableSubstitution = textUpdatedWithVariableSubstitution.replaceAll(qualifiedVariableName, get(entry));
+        if (text == null) {
+            return null;
+        }
+        Matcher m = VARIABLES_PATTERN.matcher(text);
+        Map<String, String> replacements = new HashMap<String, String>();
+        while (m.find()) {
+            int gc = m.groupCount();
+            if (gc == 1) {
+                String g0 = m.group(0);
+                String g1 = m.group(1);
+                String value = get(g1);
+                replacements.put(g0, value);
             }
         }
-        return textUpdatedWithVariableSubstitution;
+        String newText = text;
+        for (Entry<String, String> en : replacements.entrySet()) {
+            String k = en.getKey();
+            String replacement = replacements.get(k);
+            if (replacement != null) {
+                newText = newText.replaceAll(k, replacement);
+            }
+        }
+        return newText;
     }
 
     private String fromFitNesseSymbol(String label) {

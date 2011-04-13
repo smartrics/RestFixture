@@ -25,10 +25,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -193,8 +190,6 @@ public class RestFixture extends ActionFixture {
     private Map<String, String> defaultHeaders = new HashMap<String, String>();
 
     private Map<String, String> namespaceContext = new HashMap<String, String>();
-
-    private static final Pattern FIND_VARS_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");
 
     private Url baseUrl;
 
@@ -605,27 +600,26 @@ public class RestFixture extends ActionFixture {
         debugMethodCallStart();
         String label = row.getCell(1).text().trim();
         String loc = row.getCell(2).text();
-        String expr = row.getCell(3).text();
+        CellWrapper exprCell = row.getCell(3);
+        exprCell.body(GLOBALS.substitute(exprCell.body()));
+        String expr = exprCell.text();
         CellWrapper valueCell = row.getCell(4);
         String sValue = null;
         try {
             LetHandler letHandler = LetHandlerFactory.getHandlerFor(loc);
-            if (letHandler == null) {
-                throw new FitFailureException("let handles 'xpath' in body or 'regex' in headers.");
-            }
-            sValue = letHandler.handle(getLastResponse(), namespaceContext, expr);
-            new Variables().put(label, sValue);
-            if (valueCell != null) {
-                StringTypeAdapter adapter = new StringTypeAdapter();
-                try {
+            if (letHandler != null) {
+                sValue = letHandler.handle(getLastResponse(), namespaceContext, expr);
+                GLOBALS.put(label, sValue);
+                if (valueCell != null) {
+                    StringTypeAdapter adapter = new StringTypeAdapter();
                     adapter.set(sValue);
                     getFormatter().check(valueCell, adapter);
-                } catch (Exception e) {
-                    getFormatter().exception(valueCell, e);
                 }
+            } else {
+                getFormatter().exception(exprCell, new IllegalArgumentException("I don't know how to process the expression for '" + loc + "'"));
             }
         } catch (RuntimeException e) {
-            getFormatter().exception(row.getCell(3), e);
+            getFormatter().exception(exprCell, e);
         } finally {
             debugMethodCallEnd();
         }
@@ -693,7 +687,7 @@ public class RestFixture extends ActionFixture {
     protected void doMethod(String body, String method) {
         CellWrapper<?> urlCell = row.getCell(1);
         String url = urlCell.text();
-        String resUrl = resolve(FIND_VARS_PATTERN, url);
+        String resUrl = GLOBALS.substitute(url);
         setLastRequest(partsFactory.buildRestRequest());
         getLastRequest().setMethod(RestRequest.Method.valueOf(method));
         getLastRequest().addHeaders(getHeaders());
@@ -710,7 +704,7 @@ public class RestFixture extends ActionFixture {
             getLastRequest().setQuery(uri[1]);
         }
         if ("Post".equals(method) || "Put".equals(method)) {
-            String rBody = resolve(FIND_VARS_PATTERN, body);
+            String rBody = GLOBALS.substitute(body);
             getLastRequest().setBody(rBody);
         }
         try {
@@ -744,7 +738,7 @@ public class RestFixture extends ActionFixture {
         List<Header> lastHeaders = getLastResponse().getHeaders();
         process(row.getCell(3), lastHeaders, new HeadersTypeAdapter());
         CellWrapper bodyCell = row.getCell(4);
-        bodyCell.body(resolve(FIND_VARS_PATTERN, bodyCell.body()));
+        bodyCell.body(GLOBALS.substitute(bodyCell.body()));
         BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(getContentTypeOfLastResponse());
         bodyTypeAdapter.setContext(namespaceContext);
         process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
@@ -789,32 +783,6 @@ public class RestFixture extends ActionFixture {
             StackTraceElement el = Thread.currentThread().getStackTrace()[4];
             LOG.debug(h + el.getMethodName());
         }
-    }
-
-    private String resolve(Pattern pattern, String text) {
-        if (text == null) {
-            return null;
-        }
-        Matcher m = pattern.matcher(text);
-        Map<String, String> replacements = new HashMap<String, String>();
-        while (m.find()) {
-            int gc = m.groupCount();
-            if (gc == 1) {
-                String g0 = m.group(0);
-                String g1 = m.group(1);
-                String value = GLOBALS.get(g1);
-                replacements.put(g0, value);
-            }
-        }
-        String newText = text;
-        for (Entry<String, String> en : replacements.entrySet()) {
-            String k = en.getKey();
-            String replacement = replacements.get(k);
-            if (replacement != null) {
-                newText = newText.replace(k, replacement);
-            }
-        }
-        return newText;
     }
 
     protected RestResponse getLastResponse() {

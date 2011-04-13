@@ -97,7 +97,8 @@
 	<target name="fitnesse-copy" depends="package">
 		<delete dir="${fitnesse.test.root}" />
 		<mkdir dir="${fitnesse.test.root}/lib" />
-		<copy todir="${fitnesse.test.root}/lib" flatten="true">
+		<property name="verbose" value="false" />
+		<copy todir="${fitnesse.test.root}/lib" flatten="true" verbose="${verbose}">
 			<fileset dir="build">
 				<include name="*.jar" />
 			</fileset>
@@ -109,7 +110,7 @@
 				<include name="**/*.*" />
 			</fileset>
 		</copy>
-		<copy todir="${fitnesse.test.root}" overwrite="true">
+		<copy todir="${fitnesse.test.root}" overwrite="true" verbose="${verbose}">
 			<filterset>
 				<filter token="FITNESSE_HOME" value="${fitnesse.home}" />
 				<filter token="FITNESSE_TEST_ROOT" value="${fitnesse.test.root}" />
@@ -124,7 +125,8 @@
 		<antcall target="fitnesse-copy">
 			<param name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
 			<param name="fitnesse.test.root" value="${remote.fitnesse.root}/${fitnesse.path}" />
-			<param name="libs.excluded" value="**/fitnesse.jar" />
+            <param name="libs.excluded" value="**/fitnesse.jar" />
+            <param name="verbose" value="true" />
 		</antcall>
 	</target>
 

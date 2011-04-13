@@ -447,13 +447,13 @@ public class RestFixtureTest {
     }
 
     @Test
-    public void mustUseValueOnSymbolMapIfNoVariableIsFoundInTheLocalMap() {
-        Fixture.setSymbol("fred", "bloggs");
+    public void mustUseValueOnSymbolMapEvenIfNotSetViaVariables() {
         wireMocks();
         when(mockLastRequest.getQuery()).thenReturn("");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
         RowWrapper<?> row = helper.createFitTestRow("GET", "/uri/%fred%", "", "", "");
         fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+        Fixture.setSymbol("fred", "bloggs");
 
         fixture.processRow(row);
 
@@ -499,6 +499,17 @@ public class RestFixtureTest {
         assertEquals("<root><header>some</header><body>text</body></root>", clean(new Variables().get("content")));
         assertEquals("<root><header>some</header><body>text</body></root>", clean(new Variables().get("$content")));
         assertEquals("<root><header>some</header><body>text</body></root>", clean(Fixture.getSymbol("content").toString()));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void mustReportToTheUserIfLetCantFindTheHandlerToHandleTheDesiredExpression() {
+        wireMocks();
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+        RowWrapper<?> row = helper.createFitTestRow("let", "$content", "something_non_handled", "", "");
+        fixture.processRow(row);
+        verify(mockCellFormatter).exception(isA(CellWrapper.class), isA(IllegalArgumentException.class));
+        verifyNoMoreInteractions(mockCellFormatter);
     }
 
     private String clean(String s) {
