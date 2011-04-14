@@ -25,6 +25,12 @@ import java.io.FileWriter;
 
 import fit.ActionFixture;
 
+/**
+ * Action fixture to support file upload CATs in RestFixture.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class FileUtilFixture extends ActionFixture {
 
     private String fileContents;

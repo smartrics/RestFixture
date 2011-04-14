@@ -29,6 +29,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+/**
+ * The database of resources to support RestFixture CATs.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class Resources {
     private final Map<String, Map<String, Resource>> resourceDb = Collections.synchronizedMap(new HashMap<String, Map<String, Resource>>());
     private static Resources instance = new Resources();

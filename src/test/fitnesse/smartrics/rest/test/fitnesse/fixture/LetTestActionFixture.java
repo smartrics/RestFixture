@@ -23,6 +23,12 @@ package smartrics.rest.test.fitnesse.fixture;
 import fit.ActionFixture;
 import fit.Fixture;
 
+/**
+ * Supports Let CATs by providing a simple interface to FitNesse symbols map.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class LetTestActionFixture extends ActionFixture {
 	private String symbolName;
 

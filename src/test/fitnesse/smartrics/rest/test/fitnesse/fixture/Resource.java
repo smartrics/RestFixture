@@ -20,47 +20,56 @@
  */
 package smartrics.rest.test.fitnesse.fixture;
 
+/**
+ * A sample rest resource.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class Resource {
-	private String payload;
-	private String id;
-	private boolean deleted;
+    private String payload;
+    private String id;
+    private boolean deleted;
 
-	public Resource(String id, String payload) {
-		this.payload = payload;
-		this.id = id;
-	}
+    public Resource(String id, String payload) {
+        this.payload = payload;
+        this.id = id;
+    }
 
-	public Resource(String xmlContent) {
-		this(null, xmlContent);
-	}
+    public Resource(String xmlContent) {
+        this(null, xmlContent);
+    }
 
-	public void setPayload(String payload) {
-		this.payload = payload;
-	}
+    public void setPayload(String payload) {
+        this.payload = payload;
+    }
 
-	public String getPayload() {
-		return payload;
-	}
+    public String getPayload() {
+        return payload;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public boolean isDeleted() {
-		return deleted;
-	}
+    public boolean isDeleted() {
+        return deleted;
+    }
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
-	@Override
-	public String toString() {
-		return getPayload() == null ? "" : getPayload();
-	}
+    @Override
+    public String toString() {
+        if (getPayload() == null) {
+            return "";
+        }
+        return getPayload();
+    }
 
 }

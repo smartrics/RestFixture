@@ -45,11 +45,17 @@ import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.ParamPart;
 import com.oreilly.servlet.multipart.Part;
 
+/**
+ * The controller.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class ResourcesServlet extends HttpServlet {
-    public static String _CONTEXT_ROOT = "/resources";
+    private static final Log LOG = LogFactory.getLog(ResourcesServlet.class);
+    public static final String CONTEXT_ROOT = "/resources";
     private static final long serialVersionUID = -7012866414216034826L;
     private final Resources resources = Resources.getInstance();
-    private static Log LOG = LogFactory.getLog(ResourcesServlet.class);
 
     public ResourcesServlet() {
         LOG.info("Resources: " + resources.toString());
@@ -94,16 +100,18 @@ public class ResourcesServlet extends HttpServlet {
 
     private String sanitise(String rUri) {
         String uri = rUri;
-        if (uri.endsWith("/"))
+        if (uri.endsWith("/")) {
             uri = uri.substring(0, uri.length() - 1);
+        }
         return uri;
     }
 
     private void headers(HttpServletResponse resp, String extension, String optCharset) {
         resp.setStatus(HttpServletResponse.SC_OK);
         String s = "";
-        if (optCharset != null)
+        if (optCharset != null) {
             s = optCharset;
+        }
         resp.addHeader("Content-Type", "application/" + extension + s);
     }
 
@@ -113,36 +121,40 @@ public class ResourcesServlet extends HttpServlet {
         } else {
             StringBuffer buffer = new StringBuffer();
             String slashremoved = type.substring(1);
-            if ("json".equals(extension))
+            if ("json".equals(extension)) {
                 buffer.append("{ \"" + slashremoved + "\" : ");
-            else
+            } else {
                 buffer.append("<" + slashremoved + ">");
+            }
             for (Resource r : resources.asCollection(type)) {
                 buffer.append(r.getPayload());
             }
-            if ("json".equals(extension))
+            if ("json".equals(extension)) {
                 buffer.append("}");
-            else
+            } else {
                 buffer.append("</" + slashremoved + ">");
+            }
             resp.getOutputStream().write(buffer.toString().getBytes());
         }
     }
 
     private void list(HttpServletResponse resp, String extension) throws IOException {
         StringBuffer buffer = new StringBuffer();
-        if ("json".equals(extension))
+        if ("json".equals(extension)) {
             buffer.append("{ \"root-context\" : ");
-        else
+        } else {
             buffer.append("<root-context>");
+        }
         resp.getOutputStream().write(buffer.toString().getBytes());
         for (String s : resources.contexts()) {
             list(resp, s, extension);
         }
         buffer = new StringBuffer();
-        if ("json".equals(extension))
+        if ("json".equals(extension)) {
             buffer.append("}");
-        else
+        } else {
             buffer.append("</root-context>");
+        }
         resp.getOutputStream().write(buffer.toString().getBytes());
     }
 
@@ -164,12 +176,14 @@ public class ResourcesServlet extends HttpServlet {
     }
 
     private String getType(String uri) {
-        if (uri.length() <= 1)
+        if (uri.length() <= 1) {
             return "/root-context";
+        }
         int pos = uri.substring(1).indexOf('/');
         String ret = uri;
-        if (pos >= 0)
+        if (pos >= 0) {
             ret = uri.substring(0, pos + 1);
+        }
         return ret;
     }
 
@@ -181,8 +195,9 @@ public class ResourcesServlet extends HttpServlet {
 
     private void echoHeader(HttpServletRequest req, HttpServletResponse resp) {
         String s = req.getHeader("Echo-Header");
-        if (s != null)
+        if (s != null) {
             resp.setHeader("Echo-Header", s);
+        }
     }
 
     @Override
@@ -226,16 +241,19 @@ public class ResourcesServlet extends HttpServlet {
     }
 
     private String getId(String uri) {
-        if (uri.length() <= 1)
+        if (uri.length() <= 1) {
             return null;
+        }
         int pos = uri.substring(1).lastIndexOf("/");
         String sId = null;
-        if (pos > 0)
+        if (pos > 0) {
             sId = uri.substring(pos + 2);
+        }
         if (sId != null) {
             int pos2 = sId.lastIndexOf('.');
-            if (pos2 >= 0)
+            if (pos2 >= 0) {
                 sId = sId.substring(0, pos2);
+            }
         }
         return sId;
     }
@@ -321,8 +339,9 @@ public class ResourcesServlet extends HttpServlet {
     private String getContent(InputStream is) throws IOException {
         StringBuffer sBuff = new StringBuffer();
         int c;
-        while ((c = is.read()) != -1)
+        while ((c = is.read()) != -1) {
             sBuff.append((char) c);
+        }
         String content = sBuff.toString();
         return content;
     }

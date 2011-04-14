@@ -25,12 +25,17 @@ import org.apache.commons.logging.LogFactory;
 
 import fit.ActionFixture;
 
+/**
+ * Fixture to manage the HTTP server required to support RestFixture CATs.
+ * 
+ * @author fabrizio
+ * 
+ */
 public class HttpServerFixture extends ActionFixture {
 
+    private static final Log LOG = LogFactory.getLog(HttpServerFixture.class);
     private int port;
     private static HttpServer server;
-
-    private static Log LOG = LogFactory.getLog(HttpServerFixture.class);
 
     public HttpServerFixture() throws Exception {
         super();
