@@ -53,6 +53,15 @@ public class LetBodyJsHandlerTest {
     }
 
     @Test
+    public void shouldProvideLastResponseBodyAsJsonForContentThatLooksLikeJsonInJsContext() {
+        String json = "{ \"person\" : { \"name\" : \"Rokko\", \"age\" : \"30\" } }";
+        RestResponse response = createResponse(ContentType.TEXT, json);
+        LetBodyJsHandler h = new LetBodyJsHandler();
+        String res = h.handle(response, null, "'My friend ' + response.jsonbody.person.name + ' is ' + response.jsonbody.person.age + ' years old.'");
+        assertThat(res, is(equalTo("My friend Rokko is 30 years old.")));
+    }
+
+    @Test
     public void shouldNotProvideLastResponseBodyInJsContextIfResponseIsNull() {
         LetBodyJsHandler h = new LetBodyJsHandler();
         String res = h.handle(null, null, "'response is null: ' + (response == null)");

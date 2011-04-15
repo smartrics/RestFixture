@@ -31,7 +31,6 @@ import org.junit.Test;
 import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import fit.Parse;
-import fit.exception.FitFailureException;
 
 public class RestFixtureFitTest {
 
@@ -53,7 +52,7 @@ public class RestFixtureFitTest {
         config.clear();
     }
 
-    @Test(expected = FitFailureException.class)
+    @Test(expected = RuntimeException.class)
     public void mustNotifyCallerThatBaseUrlAsFixtureArgIsMandatory() {
         fixture = new RestFixture() {
             {

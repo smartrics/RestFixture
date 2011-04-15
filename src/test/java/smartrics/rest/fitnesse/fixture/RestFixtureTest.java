@@ -570,6 +570,25 @@ public class RestFixtureTest {
     }
 
     @Test
+    public void mustAllowRegexesWhenLetIsInvokedOnHeaders() {
+        wireMocks();
+        when(mockLastRequest.getQuery()).thenReturn("");
+        when(mockLastRequest.getBody()).thenReturn("<bovver />");
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        lastResponse.setBody("");
+        lastResponse.addHeader("Location", "/res/12321");
+
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+
+        RowWrapper<?> row = helper.createFitTestRow("POST", "/res", "", "", "");
+        fixture.processRow(row);
+        row = helper.createFitTestRow("let", "id", "header", "Location:/res/(\\d+)", "");
+        fixture.processRow(row);
+
+        assertEquals("12321", variables.get("id"));
+}
+
+    @Test
     @SuppressWarnings("unchecked")
     public void mustReportToTheUserIfLetCantFindTheHandlerToHandleTheDesiredExpression() {
         wireMocks();

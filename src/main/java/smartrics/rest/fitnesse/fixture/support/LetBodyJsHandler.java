@@ -41,9 +41,7 @@ public class LetBodyJsHandler implements LetHandler {
 
     private Object evaluateExpression(Context context, ScriptableObject scope, String expression) {
         try {
-            System.err.println("EVAL> " + expression);
             Object result = context.evaluateString(scope, expression, null, 1, null);
-            System.err.println("RES > " + result);
             return result;
         } catch (EvaluatorException e) {
             throw new JavascriptException(e.getMessage());
@@ -66,7 +64,8 @@ public class LetBodyJsHandler implements LetHandler {
             scope.put(jsName, scope, response);
             putPropertyOnJsObject(response, "body", r.getBody());
             putPropertyOnJsObject(response, "jsonbody", null);
-            if (ContentType.JSON.equals(ContentType.parse(r.getHeader("Content-Type")))) {
+            boolean isJson = isJsonResponse(r);
+            if (isJson) {
                 evaluateExpression(cx, scope, jsName + ".jsonbody=" + r.getBody());
             }
             putPropertyOnJsObject(response, "resource", r.getResource());
@@ -94,6 +93,16 @@ public class LetBodyJsHandler implements LetHandler {
 
     private void putPropertyOnJsObject(Scriptable o, String mName, Object value) {
         ScriptableObject.putProperty(o, mName, value);
+    }
+
+    private boolean isJsonResponse(RestResponse r) {
+        if (ContentType.JSON.equals(ContentType.parse(r.getHeader("Content-Type")))) {
+            return true;
+        }
+        if (r.getBody() != null && r.getBody().trim().matches("\\{.+\\}")) {
+            return Tools.isValidJson(r.getBody());
+        }
+        return false;
     }
 
     /**

@@ -235,4 +235,12 @@ public class ToolsTest {
         assertEquals("joe", Tools.extractXPath("/person/name", xml, XPathConstants.STRING));
         assertEquals("bloggs", Tools.extractXPath("/person/surname", xml, XPathConstants.STRING));
     }
+
+    @Test
+    public void shouldCheckIfAStringIsValidJson() {
+        String jsonPart0 = "{ \"person\" : { \"name\" : ";
+        String jsonPart1 = "\"Rokko\", \"age\" : \"30\" } }";
+        assertFalse(Tools.isValidJson(jsonPart0));
+        assertTrue(Tools.isValidJson(jsonPart0 + jsonPart1));
+    }
 }

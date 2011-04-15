@@ -52,6 +52,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.mortbay.log.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -188,6 +190,16 @@ public final class Tools {
         } catch (IOException e) {
             throw new IllegalArgumentException("IO Exception when reading the document", e);
         }
+    }
+
+    public static boolean isValidJson(String presumeblyJson) {
+        Object o = null;
+        try {
+            o = new JSONObject(presumeblyJson);
+        } catch (JSONException e) {
+            return false;
+        }
+        return o != null;
     }
 
     public static String fromJSONtoXML(String json) {
