@@ -1,0 +1,88 @@
+!3 LET
+
+LET can use now the full power of !-JavaScript-! to extract data from the last response parts. The additions
+to support the new !-JavaScript-! extensions will not break the existing !-RestFixture-! API.
+
+The !-JavaScript-! extensions can be used to process more effectively JSON ''Content-Type''s.
+
+''LET can access the Fitnesse Symbols map to extract data previously stored''
+
+If the context of the let context is ''js'' the expression is evaluated as a javascript string. The value assigned
+to the let label is the result of the evaluation of the content in the expression cell.
+
+For example:
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|let    | message | js | 'Hello, World!' |  Hello, World! |
+|let    | sum | js | '2 + 5 = ' + (2 + 5) |  2 + 5 = 7 |
+|let    | two_expressions | js | !-a=1;
+'a is ' + a-! |  a is 1 |
+|let    | json_expr | js | !-
+json = {
+    "widget": {
+        "debug": "on",
+        "window": {
+            "title": "Sample Konfabulator Widget",
+            "name": "main_window",
+            "width": 500,
+            "height": 500
+        },
+        "image": { 
+            "src": "Images/Sun.png",
+            "name": "sun1",
+            "hOffset": 250,
+            "vOffset": 250,
+            "alignment": "center"
+        },
+        "text": {
+            "data": "Click Here",
+            "size": 36,
+            "style": "bold",
+            "name": "text1",
+            "hOffset": 250,
+            "vOffset": 100,
+            "alignment": "center",
+            "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
+        }
+    }
+};
+json.widget.image.src
+-!| Images/Sun.png |
+
+(Example courtesy of http://json.org/example.html)
+
+It's also possible to access the !-FitNesse-! symbols map. The scope where expression is evaluated contains the 
+'symbols' object 
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|setBody|<resource><name>Bill</name><data>Some data on Bill</data></resource>|
+|POST   | /resources/ | 201 | | no-body |
+|let    | id | header | Location:/resources/(.+) | |
+|let    | id_string | js | 'The id is: ' + symbols.get('id') |  The id is: %id% |
+
+The scope also contains the 'response' object, populated with the data from the last Rest response executed
+
+For example
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/1 | 200 | | |
+|let    | body_value | js | response.body |  |
+|setBody|<resource><name>Bill</name><data>Some data on Bill</data></resource>|
+|POST   | /resources/ | 201 | | no-body |
+|let    | status_code_value | js | response.statusCode |  |
+|let    | status_text_value | js | response.statusText |  |
+|let    | c_len | js | response.header0('Content-Length') | 0 |
+|let    | loc_again | js | response.header('Location', 0) |  |
+|let    | h_size | js | response.headerListSize('Location') | 1 |
+|let    | all_h_size | js | response.headersSize() |  |
+
+A particoular case is when the response is JSON (Content-Type : application/json). In such case, the property '''jsonbody'''
+contains the JSON object that can be accessed using the dot notation. For example
+
+|!-Table:smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/1.json | 200 | | |
+|let    | body_value | js | response.jsonbody |  |
+|let    | body_value | js | response.jsonbody.resource.name | a funky name |
+
+
+
