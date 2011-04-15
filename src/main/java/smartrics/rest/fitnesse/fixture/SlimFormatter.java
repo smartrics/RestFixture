@@ -51,6 +51,11 @@ public class SlimFormatter implements CellFormatter<String> {
     }
 
     @Override
+    public void exception(CellWrapper<String> cell, String exceptionMessage) {
+        cell.body("error:" + exceptionMessage);
+    }
+
+    @Override
     public void exception(CellWrapper<String> cell, Throwable exception) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(out);

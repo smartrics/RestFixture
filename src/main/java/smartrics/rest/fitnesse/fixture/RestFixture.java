@@ -52,7 +52,6 @@ import smartrics.rest.fitnesse.fixture.support.Url;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import fit.ActionFixture;
 import fit.Parse;
-import fit.exception.FitFailureException;
 
 /**
  * A fixture that allows to simply test REST APIs with minimal efforts. The core
@@ -336,15 +335,15 @@ public class RestFixture extends ActionFixture {
 
     /**
      * Method invoked to notify that the state of the RestFixture is invalid. It
-     * throws a {@link FitFailureException} with a message displayed in the
-     * fitnesse page.
+     * throws a {@link RuntimeException} with a message displayed in the
+     * FitNesse page.
      * 
      * @param state
      *            as returned by {@link RestFixture#validateState()}
      */
     protected void notifyInvalidState(boolean state) {
         if (!state) {
-            throw new FitFailureException("You must specify a base url in the |start|, after the fixture to start");
+            throw new RuntimeException("You must specify a base url in the |start|, after the fixture to start");
         }
     }
 
@@ -371,12 +370,14 @@ public class RestFixture extends ActionFixture {
      * <p/>
      * body text should be location of file which needs to be sent
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setMultipartFileName() {
-        CellWrapper<?> cell = row.getCell(1);
+        CellWrapper cell = row.getCell(1);
         if (cell == null) {
-            throw new FitFailureException("You must pass a multipart file name to set");
+            getFormatter().exception(row.getCell(0), "You must pass a multipart file name to set");
+        } else {
+            multipartFileName = GLOBALS.substitute(cell.text());
         }
-        multipartFileName = GLOBALS.substitute(cell.text());
     }
 
     public String getMultipartFileName() {
@@ -390,12 +391,14 @@ public class RestFixture extends ActionFixture {
      * <p/>
      * body text should be location of file which needs to be sent
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setFileName() {
-        CellWrapper<?> cell = row.getCell(1);
+        CellWrapper cell = row.getCell(1);
         if (cell == null) {
-            throw new FitFailureException("You must pass a file name to set");
+            getFormatter().exception(row.getCell(0), "You must pass a file name to set");
+        } else {
+            fileName = GLOBALS.substitute(cell.text());
         }
-        fileName = GLOBALS.substitute(cell.text());
     }
 
     public String getFileName() {
@@ -410,12 +413,14 @@ public class RestFixture extends ActionFixture {
      * <p/>
      * body text should be the name of the form parameter, defaults to 'file'
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setMultipartFileParameterName() {
-        CellWrapper<?> cell = row.getCell(1);
+        CellWrapper cell = row.getCell(1);
         if (cell == null) {
-            throw new FitFailureException("You must pass a parameter name to set");
+            getFormatter().exception(cell, "You must pass a parameter name to set");
+        } else {
+            multipartFileParameterName = GLOBALS.substitute(cell.text());
         }
-        multipartFileParameterName = GLOBALS.substitute(cell.text());
     }
 
     public String getMultipartFileParameterName() {
@@ -428,14 +433,15 @@ public class RestFixture extends ActionFixture {
      * body text can either be a kvp or a xml. The <code>ClientHelper</code>
      * will figure it out
      */
-    @SuppressWarnings({ "rawtypes" })
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setBody() {
         CellWrapper cell = row.getCell(1);
         if (cell == null) {
-            throw new FitFailureException("You must pass a body to set");
+            getFormatter().exception(cell, "You must pass a body to set");
+        } else {
+            String text = getFormatter().fromRaw(cell.text());
+            requestBody = GLOBALS.substitute(text);
         }
-        String text = getFormatter().fromRaw(cell.text());
-        requestBody = GLOBALS.substitute(text);
     }
 
     /**
@@ -444,13 +450,15 @@ public class RestFixture extends ActionFixture {
      * header text must be nvp. name and value must be separated by ':' and each
      * header is in its own line
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setHeader() {
-        CellWrapper<?> cell = row.getCell(1);
+        CellWrapper cell = row.getCell(1);
         if (cell == null) {
-            throw new FitFailureException("You must pass a header map to set");
+            getFormatter().exception(cell, "You must pass a header map to set");
+        } else {
+            String header = GLOBALS.substitute(cell.text());
+            requestHeaders = parseHeaders(header);
         }
-        String header = GLOBALS.substitute(cell.text());
-        requestHeaders = parseHeaders(header);
     }
 
     /**
@@ -613,14 +621,18 @@ public class RestFixture extends ActionFixture {
             LetHandler letHandler = LetHandlerFactory.getHandlerFor(loc);
             if (letHandler != null) {
                 StringTypeAdapter adapter = new StringTypeAdapter();
-                sValue = letHandler.handle(getLastResponse(), namespaceContext, expr);
+                try {
+                    sValue = letHandler.handle(getLastResponse(), namespaceContext, expr);
+                } catch (RuntimeException e) {
+                    getFormatter().exception(exprCell, e.getMessage());
+                }
                 GLOBALS.put(label, sValue);
                 if (valueCell != null) {
                     adapter.set(sValue);
                     getFormatter().check(valueCell, adapter);
                 }
             } else {
-                getFormatter().exception(exprCell, new IllegalArgumentException("I don't know how to process the expression for '" + loc + "'"));
+                getFormatter().exception(exprCell, "I don't know how to process the expression for '" + loc + "'");
             }
         } catch (RuntimeException e) {
             getFormatter().exception(exprCell, e);
@@ -688,8 +700,9 @@ public class RestFixture extends ActionFixture {
         doMethod(null, m);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     protected void doMethod(String body, String method) {
-        CellWrapper<?> urlCell = row.getCell(1);
+        CellWrapper urlCell = row.getCell(1);
         String url = urlCell.text();
         String resUrl = GLOBALS.substitute(url);
         setLastRequest(partsFactory.buildRestRequest());
@@ -716,9 +729,7 @@ public class RestFixture extends ActionFixture {
             setLastResponse(response);
             completeHttpMethodExecution();
         } catch (RuntimeException e) {
-            String message = "Execution of " + method + " caused exception '" + e.getMessage() + "'";
-            LOG.error(message, e);
-            throw new FitFailureException(message);
+            getFormatter().exception(row.getCell(0), "Execution of " + method + " caused exception '" + e.getMessage() + "'");
         }
     }
 

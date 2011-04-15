@@ -65,9 +65,9 @@ The scope also contains the 'response' object, populated with the data from the 
 For example
 
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
-|setBody|<resource><name>Bill</name><data>Some data on Bill</data></resource>|
-|GET    | /resources/1.json | 200 | | |
+|GET    | /resources/1 | 200 | | |
 |let    | body_value | js | response.body |  |
+|setBody|<resource><name>Bill</name><data>Some data on Bill</data></resource>|
 |POST   | /resources/ | 201 | | no-body |
 |let    | status_code_value | js | response.statusCode |  |
 |let    | status_text_value | js | response.statusText |  |
@@ -76,6 +76,13 @@ For example
 |let    | h_size | js | response.headerListSize('Location') | 1 |
 |let    | all_h_size | js | response.headersSize() |  |
 
+A particoular case is when the response is JSON (Content-Type : application/json). In such case, the property '''jsonbody'''
+contains the JSON object that can be accessed using the dot notation. For example
+
+|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+|GET    | /resources/1 | 200 | | |
+|let    | body_value | js | response.jsonbody |  |
+|let    | body_value | js | response.jsonbody.resource.name | Bill  |
 
 
 

@@ -29,10 +29,9 @@ import java.util.regex.Pattern;
 import fit.Fixture;
 
 /**
- * Facade to Fixture global symbol map.
+ * Facade to FitNesse global symbols map.
  * 
  * @author fabrizio
- * 
  */
 public class Variables {
     public static final Pattern VARIABLES_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");

@@ -36,35 +36,35 @@ import fit.Parse;
 import fit.exception.FitParseException;
 
 public class RestFixtureConfigTest {
-	private static final String CONFIG_NAME = "configName";
-	private Config namedConfig;
-	private Config defaultNamedConfig;
+    private static final String CONFIG_NAME = "configName";
+    private Config namedConfig;
+    private Config defaultNamedConfig;
 
-	@Before
-	public void setUp(){
-		defaultNamedConfig = new Config();
-		namedConfig = new Config(CONFIG_NAME);
-	}
+    @Before
+    public void setUp() {
+        defaultNamedConfig = new Config();
+        namedConfig = new Config(CONFIG_NAME);
+    }
 
-	@After
-	public void tearDown(){
-		namedConfig.clear();
-		defaultNamedConfig.clear();
-	}
+    @After
+    public void tearDown() {
+        namedConfig.clear();
+        defaultNamedConfig.clear();
+    }
 
-	@Test
-	public void mustStoreDataInNamedConfigWhoseNameIsPassedAsFirstArgToTheFixture() {
-		RestFixtureConfig fixture = new RestFixtureConfig() {
-			{
-				super.args = new String[] { CONFIG_NAME };
-			}
-		};
+    @Test
+    public void mustStoreDataInNamedConfigWhoseNameIsPassedAsFirstArgToTheFixture() {
+        RestFixtureConfig fixture = new RestFixtureConfig() {
+            {
+                super.args = new String[] { CONFIG_NAME };
+            }
+        };
         testStoreDataInNamedFitConfig(fixture, namedConfig);
 
         fixture = new RestFixtureConfig(CONFIG_NAME);
         testStoreDataInNamedSlimConfig(fixture, namedConfig);
 
-	}
+    }
 
     @Test
     public void mustStoreDataInNamedConfigWhoseNameIsNotPassedHenceUsingDefault_FitVersion() {
@@ -73,8 +73,6 @@ public class RestFixtureConfigTest {
         testStoreDataInNamedSlimConfig(fixtureNoArg, defaultNamedConfig);
     }
 
-	
-	
     private void testStoreDataInNamedFitConfig(RestFixtureConfig fixture, final Config config) {
         String row1 = createFitTestRow("key1", "value1");
         String row2 = createFitTestRow("key2", "value2");
@@ -104,32 +102,30 @@ public class RestFixtureConfigTest {
 
     private List<List<String>> createSlimTestInstance(List<String>... rows) {
         List<List<String>> table = new ArrayList<List<String>>();
-        for(List<String> row : rows) {
+        for (List<String> row : rows) {
             table.add(row);
         }
         return table;
     }
 
-	private Parse createFitTestInstance(String... rows) {
-		Parse t = null;
-		StringBuffer rBuff = new StringBuffer();
-		rBuff.append("<table>");
-		for (String r : rows) {
-			rBuff.append(r);
-		}
-		rBuff.append("</table>");
-		try {
-			t = new Parse(rBuff.toString(), new String[] { "table", "row",
-					"col" }, 1, 0);
-		} catch (FitParseException e) {
-			fail("Unable to build Parse object");
-		}
-		return t;
-	}
+    private Parse createFitTestInstance(String... rows) {
+        Parse t = null;
+        StringBuffer rBuff = new StringBuffer();
+        rBuff.append("<table>");
+        for (String r : rows) {
+            rBuff.append(r);
+        }
+        rBuff.append("</table>");
+        try {
+            t = new Parse(rBuff.toString(), new String[] { "table", "row", "col" }, 1, 0);
+        } catch (FitParseException e) {
+            fail("Unable to build Parse object");
+        }
+        return t;
+    }
 
-	private String createFitTestRow(String cell1, String cell2) {
-		String row = String.format("<row><col>%s</col><col>%s</col></row>",
-				cell1, cell2);
-		return row;
-	}
+    private String createFitTestRow(String cell1, String cell2) {
+        String row = String.format("<row><col>%s</col><col>%s</col></row>", cell1, cell2);
+        return row;
+    }
 }

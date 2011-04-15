@@ -25,6 +25,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -42,10 +43,12 @@ import smartrics.rest.fitnesse.fixture.RestFixture.Runner;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
+import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.JSONBodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.RowWrapper;
 import smartrics.rest.fitnesse.fixture.support.StatusCodeTypeAdapter;
+import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.TextBodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import smartrics.rest.fitnesse.fixture.support.XPathBodyTypeAdapter;
@@ -476,8 +479,8 @@ public class RestFixtureTest {
         fixture.processRow(row);
 
         // correctly builds request
-        assertEquals("text", new Variables().get("content"));
-        assertEquals("text", new Variables().get("$content"));
+        assertEquals("text", variables.get("content"));
+        assertEquals("text", variables.get("$content"));
         assertEquals("text", Fixture.getSymbol("content"));
     }
 
@@ -503,11 +506,13 @@ public class RestFixtureTest {
     }
 
     @Test
-    public void mustSetValueOnSymbolAsXMLStringIfSourceIsBodyAsXml() {
+    @SuppressWarnings("unchecked")
+    public void mustSetValueOnSymbolMapAsXmlStringIfSourceIsBodyAsXml() {
         wireMocks();
         when(mockLastRequest.getQuery()).thenReturn("");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
-        lastResponse.setBody("<root><header>some</header><body>text</body></root>");
+        String xmlString = "<root><header>some</header><body>text</body></root>";
+        lastResponse.setBody(xmlString);
 
         fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
 
@@ -516,21 +521,63 @@ public class RestFixtureTest {
         row = helper.createFitTestRow("let", "$content", "body:xml", "/", "");
         fixture.processRow(row);
 
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("http://localhost:9090/uri"), eq("/uri"));
+        verify(mockCellFormatter).gray(eq("200"));
+        verify(mockCellFormatter).gray(eq("/"));
+        verify(mockCellFormatter).gray(eq(xmlString));
+        verify(mockCellFormatter).check(isA(CellWrapper.class), isA(StringTypeAdapter.class));
+
         // correctly builds request
-        assertEquals("<root><header>some</header><body>text</body></root>", clean(new Variables().get("content")));
-        assertEquals("<root><header>some</header><body>text</body></root>", clean(new Variables().get("$content")));
-        assertEquals("<root><header>some</header><body>text</body></root>", clean(Fixture.getSymbol("content").toString()));
+        assertEquals(xmlString, clean(variables.get("content")));
+        assertEquals(xmlString, clean(variables.get("$content")));
+        assertEquals(xmlString, clean(Fixture.getSymbol("content").toString()));
+
+        verifyNoMoreInteractions(mockCellFormatter);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
+    @SuppressWarnings("unchecked")
+    public void mustSetValiueOnSymbolMapAsJsonStringIfSourceIsJs() {
+        wireMocks();
+        when(mockLastRequest.getQuery()).thenReturn("");
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        String jsonString = "{ \"person\" : { \"name\" : \"fred\", \"age\" : \"20\"} }";
+        lastResponse.setBody(jsonString);
+        lastResponse.addHeader("Content-Type", ContentType.JSON.toMime());
+
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+
+        RowWrapper<?> row = helper.createFitTestRow("GET", "/uri", "", "", "");
+        fixture.processRow(row);
+        row = helper.createFitTestRow("let", "name", "js", "response.jsonbody.person.name", "");
+        fixture.processRow(row);
+        row = helper.createFitTestRow("let", "age", "js", "response.jsonbody.person.age", "");
+        fixture.processRow(row);
+
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("http://localhost:9090/uri"), eq("/uri"));
+        verify(mockCellFormatter).gray(eq("200"));
+        verify(mockCellFormatter).gray(eq("Content-Type : application/json"));
+        verify(mockCellFormatter).gray(eq(jsonString));
+        verify(mockCellFormatter).gray(eq("response.jsonbody.person.name"));
+        verify(mockCellFormatter).gray(eq("response.jsonbody.person.age"));
+        verify(mockCellFormatter, times(2)).check(isA(CellWrapper.class), isA(StringTypeAdapter.class));
+
+        // correctly builds request
+        assertEquals("fred", variables.get("name"));
+        assertEquals("20", variables.get("age"));
+
+        verifyNoMoreInteractions(mockCellFormatter);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     public void mustReportToTheUserIfLetCantFindTheHandlerToHandleTheDesiredExpression() {
         wireMocks();
         fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
         RowWrapper<?> row = helper.createFitTestRow("let", "$content", "something_non_handled", "-", "");
         fixture.processRow(row);
         verify(mockCellFormatter).gray("-");
-        verify(mockCellFormatter).exception(isA(CellWrapper.class), isA(IllegalArgumentException.class));
+        verify(mockCellFormatter).exception(isA(CellWrapper.class), isA(String.class));
         verifyNoMoreInteractions(mockCellFormatter);
     }
 
@@ -558,7 +605,7 @@ public class RestFixtureTest {
     }
 
     /**
-     * <code>| let | content |  body | /body/text() | |</code>
+     * <code>| let | content |  body | /body/text() | |</code>.
      */
     @Test
     public void mustAllowGlobalStorageOfValuesExtractedViaXPathFromBody() {
@@ -575,12 +622,12 @@ public class RestFixtureTest {
         assertEquals("text", Fixture.getSymbol("content"));
         row = helper.createFitTestRow("let", "content", "body", "/body/text()", "text");
         fixture.processRow(row);
-        assertEquals("text", new Variables().get("content"));
+        assertEquals("text", variables.get("content"));
 
     }
 
     /**
-     * <code>| let | content |  body | count(body) | |</code>
+     * <code>| let | content |  body | count(body) | |</code>.
      */
     @Test
     public void mustAllowStorageOfValuesExtractedViaXPathsReturningStringValues() {
@@ -597,11 +644,11 @@ public class RestFixtureTest {
         assertEquals("1", Fixture.getSymbol("count"));
         row = helper.createFitTestRow("let", "count", "body", "count(body)", "1");
         fixture.processRow(row);
-        assertEquals("1", new Variables().get("count"));
+        assertEquals("1", variables.get("count"));
     }
 
     /**
-     * <code>| let | val | header | h1 : (\w\d) | |</code>
+     * <code>| let | val | header | h1 : (\w\d) | |</code>.
      */
     @Test
     public void mustAllowGlobalStorageOfValuesExtractedViaRegexFromHeader() {
@@ -616,7 +663,7 @@ public class RestFixtureTest {
         fixture.processRow(row);
         row = helper.createFitTestRow("let", "keytovalue", "header", "header:(.+\\d)", "value1");
         fixture.processRow(row);
-        assertEquals("value1", new Variables().get("keytovalue"));
+        assertEquals("value1", variables.get("keytovalue"));
     }
 
     @Test
@@ -628,12 +675,15 @@ public class RestFixtureTest {
         assertEquals("/tmp/filename", fixture.getFileName());
     }
 
-    @Test(expected = RuntimeException.class)
-    public void mustReportAsRTEWhenSettingMissingFileName() {
+    @Test
+    @SuppressWarnings("unchecked")
+    public void mustReportAsExceptionWhenSettingMissingFileName() {
         wireMocks();
         fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
         RowWrapper<?> row = helper.createFitTestRow("setFileName");
         fixture.processRow(row);
+        verify(mockCellFormatter).exception(isA(CellWrapper.class), isA(String.class));
+        verifyNoMoreInteractions(mockCellFormatter);
     }
 
     @Test
@@ -645,13 +695,16 @@ public class RestFixtureTest {
         assertEquals("/tmp/filename", fixture.getMultipartFileName());
     }
 
-    @Test(expected = RuntimeException.class)
-    public void mustReportAsRTEWhenSettingMissingMultipartFileName() {
+    @Test
+    @SuppressWarnings("unchecked")
+    public void mustReportAsExceptionWhenAttemptingToSetMissingMultipartFileName() {
         wireMocks();
         fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
         RowWrapper<?> row = helper.createFitTestRow("setMultipartFileName");
         when(row.getCell(1)).thenReturn(null);
         fixture.processRow(row);
+        verify(mockCellFormatter).exception(isA(CellWrapper.class), isA(String.class));
+        verifyNoMoreInteractions(mockCellFormatter);
     }
 
     @Test
@@ -667,7 +720,7 @@ public class RestFixtureTest {
     public void mustExecuteVariableSubstitutionOnBodyForNextRequest() {
         wireMocks();
         fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
-        new Variables().put("content", "<xml />");
+        variables.put("content", "<xml />");
         when(mockCellFormatter.fromRaw("%content%")).thenReturn("%content%");
         RowWrapper<?> row = helper.createFitTestRow("setBody", "%content%");
         fixture.processRow(row);

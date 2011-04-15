@@ -3,6 +3,7 @@ package smartrics.rest.fitnesse.fixture.support;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +41,15 @@ public class LetBodyJsHandlerTest {
         LetBodyJsHandler h = new LetBodyJsHandler();
         String res = h.handle(response, null, "'my last response body is: ' + response.body");
         assertThat(res, is(equalTo("my last response body is: <xml />")));
+    }
+
+    @Test
+    public void shouldProvideLastResponseBodyAsJsonForJsonContentTypeInJsContext() {
+        String json = "{ \"person\" : { \"name\" : \"Rokko\", \"age\" : \"30\" } }";
+        RestResponse response = createResponse(ContentType.JSON, json);
+        LetBodyJsHandler h = new LetBodyJsHandler();
+        String res = h.handle(response, null, "'My friend ' + response.jsonbody.person.name + ' is ' + response.jsonbody.person.age + ' years old.'");
+        assertThat(res, is(equalTo("My friend Rokko is 30 years old.")));
     }
 
     @Test
@@ -108,13 +118,30 @@ public class LetBodyJsHandlerTest {
         assertThat(res, is(equalTo("my last response does not have Ciccio header: null")));
     }
 
+    @Test
+    public void shouldTrapJavascriptErrorAndWrapThemInErrors() {
+        RestResponse response = createResponse();
+        LetBodyJsHandler h = new LetBodyJsHandler();
+        try {
+            h.handle(response, null, "some erroneous javascript");
+            fail("Must throw a Javascript Exception");
+        } catch (JavascriptException e) {
+            assertThat(e.getMessage(), is(equalTo("missing ; before statement (unnamed script#1)")));
+        }
+    }
+
     private RestResponse createResponse() {
+        RestResponse r = createResponse(ContentType.XML, "<xml />");
+        return r;
+    }
+
+    private RestResponse createResponse(ContentType contentType, String body) {
         RestResponse response = new RestResponse();
-        response.setBody("<xml />");
         response.setResource("/resources");
         response.setStatusCode(200);
         response.setStatusText("OK");
-        response.addHeader("Content-Type", "application/xml");
+        response.setBody(body);
+        response.addHeader("Content-Type", contentType.toMime());
         response.addHeader("Bespoke-Header", "jolly");
         response.addHeader("Bespoke-Header", "good");
         response.addHeader("Content-Length", "7");

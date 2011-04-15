@@ -29,7 +29,9 @@ package smartrics.rest.fitnesse.fixture.support;
  */
 public interface CellFormatter<E> {
 
-	void exception(CellWrapper<E> cellWrapper, Throwable exception);
+    void exception(CellWrapper<E> cellWrapper, Throwable exception);
+
+    void exception(CellWrapper<E> cellWrapper, String exceptionMessage);
 
 	void check(CellWrapper<E> valueCell, StringTypeAdapter adapter);
 

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.EcmaError;
+import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -30,29 +32,50 @@ public class LetBodyJsHandler implements LetHandler {
         Object wrappedVariables = Context.javaToJS(v, scope);
         ScriptableObject.putProperty(scope, "symbols", wrappedVariables);
         injectResponse("response", context, scope, response);
-        Object result = context.evaluateString(scope, expression, null, 1, null);
+        Object result = evaluateExpression(context, scope, expression);
+        if (result == null) {
+            return null;
+        }
         return result.toString();
+    }
+
+    private Object evaluateExpression(Context context, ScriptableObject scope, String expression) {
+        try {
+            System.err.println("EVAL> " + expression);
+            Object result = context.evaluateString(scope, expression, null, 1, null);
+            System.err.println("RES > " + result);
+            return result;
+        } catch (EvaluatorException e) {
+            throw new JavascriptException(e.getMessage());
+        } catch (EcmaError e) {
+            throw new JavascriptException(e.getMessage());
+        }
     }
 
     private void injectResponse(String jsName, Context cx, ScriptableObject scope, RestResponse r) {
         try {
             ScriptableObject.defineClass(scope, JsResponse.class);
             Scriptable response = null;
-            if (r != null) {
-                Object[] arg = new Object[1];
-                arg[0] = r;
-                response = cx.newObject(scope, "JsResponse", arg);
-                putPropertyOnJsObject(response, "body", r.getBody());
-                putPropertyOnJsObject(response, "resource", r.getResource());
-                putPropertyOnJsObject(response, "statusText", r.getStatusText());
-                putPropertyOnJsObject(response, "statusCode", r.getStatusCode());
-                putPropertyOnJsObject(response, "transactionId", r.getTransactionId());
-                for (Header h : r.getHeaders()) {
-                    callMethodOnJsObject(response, "addHeader", h.getName(), h.getValue());
-                }
+            if (r == null) {
+                scope.put(jsName, scope, null);
+                return;
             }
+            Object[] arg = new Object[1];
+            arg[0] = r;
+            response = cx.newObject(scope, "JsResponse", arg);
             scope.put(jsName, scope, response);
-
+            putPropertyOnJsObject(response, "body", r.getBody());
+            putPropertyOnJsObject(response, "jsonbody", null);
+            if (ContentType.JSON.equals(ContentType.parse(r.getHeader("Content-Type")))) {
+                evaluateExpression(cx, scope, jsName + ".jsonbody=" + r.getBody());
+            }
+            putPropertyOnJsObject(response, "resource", r.getResource());
+            putPropertyOnJsObject(response, "statusText", r.getStatusText());
+            putPropertyOnJsObject(response, "statusCode", r.getStatusCode());
+            putPropertyOnJsObject(response, "transactionId", r.getTransactionId());
+            for (Header h : r.getHeaders()) {
+                callMethodOnJsObject(response, "addHeader", h.getName(), h.getValue());
+            }
         } catch (IllegalAccessException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -80,6 +103,8 @@ public class LetBodyJsHandler implements LetHandler {
      * 
      */
     public static class JsResponse extends ScriptableObject {
+        private static final long serialVersionUID = 5441026774653915695L;
+
         private Map<String, List<String>> headers;
 
         public JsResponse() {

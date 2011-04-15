@@ -159,6 +159,8 @@ public class ResourcesServlet extends HttpServlet {
     }
 
     private String getExtension(String uri) {
+        System.err.println("URI: " + uri);
+
         int extensionPoint = uri.lastIndexOf(".");
         if (extensionPoint != -1) {
             return uri.substring(extensionPoint + 1);

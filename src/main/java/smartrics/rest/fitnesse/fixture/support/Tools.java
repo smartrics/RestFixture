@@ -52,6 +52,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.mortbay.log.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -202,7 +203,7 @@ public final class Tools {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    // ignore - nothing to do.
+                    Log.warn(e);
                 }
             }
         }

@@ -27,6 +27,7 @@ import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.Tools;
 import fit.ActionFixture;
 import fit.Parse;
+import fit.exception.FitFailureException;
 
 /**
  * Cell formatter for the Fit runner.
@@ -51,6 +52,12 @@ public class FitFormatter implements CellFormatter<Parse> {
     @Override
     public void setDisplayActual(boolean d) {
         this.displayActual = d;
+    }
+
+    @Override
+    public void exception(CellWrapper<Parse> cell, String exceptionMessage) {
+        Parse wrapped = cell.getWrapped();
+        fixture.exception(wrapped, new FitFailureException(exceptionMessage));
     }
 
 	@Override

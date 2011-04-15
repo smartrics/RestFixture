@@ -299,6 +299,7 @@ class MyFixtureListener implements FixtureListener {
             } catch (RuntimeException e) {
                 // Ignore if can't delete
                 // TODO: should throw exception if file not deleted?
+                System.err.println("Exception: " + e.getMessage());
             }
         }
     }
