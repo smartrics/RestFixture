@@ -3,4 +3,9 @@ FitNesseRoot/
 bin/
 build/
 dist/
+TODO
+build.metrics.xml
+etc/metrics
+etc/restfixture/file.pic
+temp/*
 
