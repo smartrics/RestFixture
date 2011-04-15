@@ -80,9 +80,9 @@ A particoular case is when the response is JSON (Content-Type : application/json
 contains the JSON object that can be accessed using the dot notation. For example
 
 |!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
-|GET    | /resources/1 | 200 | | |
+|GET    | /resources/1.json | 200 | | |
 |let    | body_value | js | response.jsonbody |  |
-|let    | body_value | js | response.jsonbody.resource.name | Bill  |
+|let    | body_value | js | response.jsonbody.resource.name | a funky name |
 
 
 
