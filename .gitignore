@@ -2,6 +2,7 @@ file.pic
 temp
 etc/metrics
 build.metrics.xml
+TODO
 *.log
 bin/
 build/

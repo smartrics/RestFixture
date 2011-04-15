@@ -20,7 +20,11 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -69,22 +73,34 @@ public class RestDataTypeAdapterTest {
         assertEquals("error", adapter.getErrors().get(0));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void mustDisallowAddToTheErrorsList() {
-        adapter.getErrors().add("i am not allowed");
+        try {
+            adapter.getErrors().add("i am not allowed");
+        } catch (UnsupportedOperationException e) {
+
+        }
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void mustDisallowRemoveFromTheErrorsList() {
         adapter.addError("error");
-        adapter.getErrors().remove(0);
+        try {
+            adapter.getErrors().remove(0);
+        } catch (UnsupportedOperationException e) {
+
+        }
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void mustDisallowOpsOnTheErrorsList() {
         adapter.addError("error1");
         adapter.addError("error2");
-        Collections.sort(adapter.getErrors());
+        try {
+            Collections.sort(adapter.getErrors());
+            fail("Should have thrown an exception");
+        } catch (UnsupportedOperationException e) {
+        }
     }
 
     @Test
@@ -98,12 +114,17 @@ public class RestDataTypeAdapterTest {
         verifyNoMoreInteractions(mockFixture);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void fromRawStringMapsCheckedExceptionsOfParseIntoRuntimeException() throws Exception {
         Fixture mockFixture = mock(Fixture.class);
         adapter.init(mockFixture, String.class);
         when(mockFixture.parse("ss", String.class)).thenThrow(new Exception("some badness happened!"));
-        adapter.fromString("ss");
+        try {
+            adapter.fromString("ss");
+            fail("Should have thrown an exception");
+        } catch (RuntimeException e) {
+            assertThat(e.getMessage(), is(equalTo("Unable to parse as smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapterTest$1: ss")));
+        }
         verify(mockFixture).parse("ss", String.class);
         verifyNoMoreInteractions(mockFixture);
     }
