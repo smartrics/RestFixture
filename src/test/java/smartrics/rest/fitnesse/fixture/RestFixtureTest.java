@@ -595,7 +595,6 @@ public class RestFixtureTest {
         fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
         RowWrapper<?> row = helper.createFitTestRow("let", "$content", "something_non_handled", "-", "");
         fixture.processRow(row);
-        verify(mockCellFormatter).gray("-");
         verify(mockCellFormatter).exception(isA(CellWrapper.class), isA(String.class));
         verifyNoMoreInteractions(mockCellFormatter);
     }
