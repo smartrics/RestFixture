@@ -116,7 +116,7 @@
 				<filter token="FITNESSE_TEST_ROOT" value="${fitnesse.test.root}" />
 				<filter token="TEMP_DIRECTORY" value="${tmpdir}" />
 			</filterset>
-			<fileset dir="src/${fitnesse.root.name}/${fitnesse.path}" />
+			<fileset dir="src/cat/${fitnesse.root.name}/${fitnesse.path}" />
 		</copy>
 	</target>
 
