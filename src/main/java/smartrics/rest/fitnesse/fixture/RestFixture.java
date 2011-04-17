@@ -41,6 +41,8 @@ import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
+import smartrics.rest.fitnesse.fixture.support.JavascriptException;
+import smartrics.rest.fitnesse.fixture.support.JavascriptWrapper;
 import smartrics.rest.fitnesse.fixture.support.LetHandler;
 import smartrics.rest.fitnesse.fixture.support.LetHandlerFactory;
 import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
@@ -199,6 +201,8 @@ public class RestFixture extends ActionFixture {
 
     private PartsFactory partsFactory;
 
+    private String lastEvaluation;
+
     /**
      * Constructor for Fit runner.
      */
@@ -231,6 +235,13 @@ public class RestFixture extends ActionFixture {
      */
     public Config getConfig() {
         return config;
+    }
+
+    /**
+     * @return the result of the last evaluation performed via evalJs.
+     */
+    public String getLastEvaluation() {
+        return lastEvaluation;
     }
 
     /**
@@ -377,6 +388,7 @@ public class RestFixture extends ActionFixture {
             getFormatter().exception(row.getCell(0), "You must pass a multipart file name to set");
         } else {
             multipartFileName = GLOBALS.substitute(cell.text());
+            renderReplacement(cell, multipartFileName);
         }
     }
 
@@ -398,6 +410,7 @@ public class RestFixture extends ActionFixture {
             getFormatter().exception(row.getCell(0), "You must pass a file name to set");
         } else {
             fileName = GLOBALS.substitute(cell.text());
+            renderReplacement(cell, fileName);
         }
     }
 
@@ -420,6 +433,7 @@ public class RestFixture extends ActionFixture {
             getFormatter().exception(cell, "You must pass a parameter name to set");
         } else {
             multipartFileParameterName = GLOBALS.substitute(cell.text());
+            renderReplacement(cell, multipartFileParameterName);
         }
     }
 
@@ -441,6 +455,7 @@ public class RestFixture extends ActionFixture {
         } else {
             String text = getFormatter().fromRaw(cell.text());
             requestBody = GLOBALS.substitute(text);
+            renderReplacement(cell, requestBody);
         }
     }
 
@@ -641,6 +656,41 @@ public class RestFixture extends ActionFixture {
         }
     }
 
+    /**
+     * Evaluates a string using the internal JavaScript engine. Result of the
+     * last evaluation is set in the lastEvaluation field.
+     * 
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public void evalJs() {
+        CellWrapper jsCell = row.getCell(1);
+        if (jsCell == null) {
+            getFormatter().exception(row.getCell(0), "Missing string to evaluate)");
+            return;
+        }
+        JavascriptWrapper wrapper = new JavascriptWrapper();
+        Object result = null;
+        try {
+            result = wrapper.evaluateExpression(lastResponse, jsCell.body());
+        } catch (JavascriptException e) {
+            getFormatter().exception(row.getCell(1), e);
+            return;
+        }
+        lastEvaluation = null;
+        if (result != null) {
+            lastEvaluation = result.toString();
+        }
+        StringTypeAdapter adapter = new StringTypeAdapter();
+        adapter.set(lastEvaluation);
+        getFormatter().right(row.getCell(1), adapter);
+    }
+
+    /**
+     * Process the row in input. Abstracts the test runner via the wrapper
+     * interfaces.
+     * 
+     * @param currentRow
+     */
     @SuppressWarnings("rawtypes")
     public void processRow(RowWrapper<?> currentRow) {
         row = currentRow;
@@ -852,6 +902,16 @@ public class RestFixture extends ActionFixture {
         restClient = partsFactory.buildRestClient(getConfig());
         if (baseUrl != null) {
             restClient.setBaseUrl(baseUrl.toString());
+        }
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void renderReplacement(CellWrapper cell, String actual) {
+        StringTypeAdapter adapter = new StringTypeAdapter();
+        adapter.set(actual);
+        if (!adapter.equals(actual, cell.body())) {
+            // eg - a substitution has occurred
+            getFormatter().right(cell, adapter);
         }
     }
 

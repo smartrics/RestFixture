@@ -20,6 +20,8 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+import java.util.List;
+
 /**
  * Type adapted for cells containing JSON content.
  * 
@@ -28,25 +30,71 @@ package smartrics.rest.fitnesse.fixture.support;
  */
 public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
 
-	@Override
-	protected boolean eval(String expr, String json) {
-		String xml = Tools.fromJSONtoXML(json);
-		return super.eval(expr, xml);
-	}
+    private boolean forceJsEvaluation = false;
 
-	@Override
-	public String toString(Object obj) {
-        if (obj == null || obj.toString().trim().equals("")) {
-			return "no-body";
+    @Override
+    protected boolean eval(String expr, String json) {
+        // for backward compatibility we should keep for now xpath expectations
+        if (!forceJsEvaluation) {
+            if (Tools.isValidXPath(getContext(), expr)) {
+                System.err.println("XPath expectations in JSON content are deprecated. Please use JavaScript expressions.");
+                String xml = Tools.fromJSONtoXML(json);
+                return super.eval(expr, xml);
+            }
         }
-		// the actual value is passed as an xml string
-		// todo: pretty print?
-        return obj.toString();
-	}
+        JavascriptWrapper wrapper = new JavascriptWrapper();
+        Object result = wrapper.evaluateExpression(json, expr);
+        if (result == null) {
+            return false;
+        }
+        return Boolean.parseBoolean(result.toString());
+    }
 
-	@Override
-	public String toXmlString(String content) {
-		return Tools.fromJSONtoXML(content);
-	}
+    @Override
+    public Object parse(String possibleJsContent) throws Exception {
+        if (possibleJsContent.trim().indexOf("/* javascript */") < 0) {
+            forceJsEvaluation = false;
+            return super.parse(possibleJsContent);
+        }
+        forceJsEvaluation = true;
+        String content = Tools.fromHtml(possibleJsContent.trim());
+        return content;
+    }
+
+    @Override
+    public boolean equals(Object expected, Object actual) {
+        if (checkNoBody(expected)) {
+            return checkNoBody(actual);
+        }
+        if (checkNoBody(actual)) {
+            return checkNoBody(expected);
+        }
+        if (expected instanceof List<?>) {
+            return super.equals(expected, actual);
+        }
+        boolean result = false;
+        if (expected instanceof String) {
+            result = eval(expected.toString(), actual.toString());
+            if (!result) {
+                addError("not found: '" + expected.toString() + "'");
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public String toString(Object obj) {
+        if (obj == null || obj.toString().trim().equals("")) {
+            return "no-body";
+        }
+        // the actual value is passed as an xml string
+        // TODO: pretty print?
+        return obj.toString();
+    }
+
+    @Override
+    public String toXmlString(String content) {
+        return Tools.fromJSONtoXML(content);
+    }
 
 }

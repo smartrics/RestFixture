@@ -131,7 +131,16 @@ public final class Tools {
         }
     }
 
-    private static XPathExpression toExpression(Map<String, String> ns, String xpathExpression) {
+    public static boolean isValidXPath(Map<String, String> ns, String xpathExpression) {
+        try {
+            toExpression(ns, xpathExpression);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public static XPathExpression toExpression(Map<String, String> ns, String xpathExpression) {
         try {
             XPathFactory xpathFactory = XPathFactory.newInstance();
             XPath xpath = xpathFactory.newXPath();
@@ -312,8 +321,8 @@ public final class Tools {
     }
 
     public static String toHtml(String text) {
-        return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>").replaceAll("\t", "    ").replaceAll(" ", "&nbsp;")
-                .replaceAll("-----", "<hr/>");
+        return text.replaceAll("&", "&amp;").replaceAll("<pre>", "").replaceAll("</pre>", "").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>")
+                .replaceAll("\t", "    ").replaceAll(" ", "&nbsp;").replaceAll("-----", "<hr/>");
     }
 
     public static String toCode(String c) {

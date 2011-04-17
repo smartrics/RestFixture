@@ -20,7 +20,12 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -46,6 +51,7 @@ import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.JSONBodyTypeAdapter;
+import smartrics.rest.fitnesse.fixture.support.JavascriptException;
 import smartrics.rest.fitnesse.fixture.support.RowWrapper;
 import smartrics.rest.fitnesse.fixture.support.StatusCodeTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
@@ -105,6 +111,8 @@ public class RestFixtureTest {
         fixture = new RestFixture(BASE_URL, "configName");
         assertEquals("configName", fixture.getConfig().getName());
     }
+
+    @Test
     public void mustSetConfigNameToSpecifiedValueIfOptionalSecondParameterIsSpecified_SLIM() {
         fixture = new RestFixture(BASE_URL, "configName");
         assertEquals("configName", fixture.getConfig().getName());
@@ -748,12 +756,41 @@ public class RestFixtureTest {
         verify(mockLastRequest).setBody("<xml />");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
+    @SuppressWarnings("unchecked")
+    public void mustEvalJavascriptStringsWithEval() {
+        wireMocks();
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+        RowWrapper<?> row = helper.createFitTestRow("evalJs", "a=1; b=2; a + b;");
+        fixture.processRow(row);
+        verify(mockCellFormatter).right(isA(CellWrapper.class), isA(StringTypeAdapter.class));
+        assertThat(fixture.getLastEvaluation(), is(equalTo("3.0")));
+        verifyNoMoreInteractions(mockCellFormatter);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void mustNotifyExceptionsWhenEvalJavascriptStrings() {
+        wireMocks();
+        fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
+        RowWrapper<?> row = helper.createFitTestRow("evalJs", "a=");
+        fixture.processRow(row);
+        verify(mockCellFormatter).exception(isA(CellWrapper.class), isA(JavascriptException.class));
+        assertThat(fixture.getLastEvaluation(), is(nullValue()));
+        verifyNoMoreInteractions(mockCellFormatter);
+    }
+
+    @Test
     public void mustReportAsRTEWhenSettingMissingMultipartFileParameterName() {
         wireMocks();
         RowWrapper<?> row = helper.createFitTestRow("setMultipartFileParameterName");
         when(row.getCell(1)).thenReturn(null);
-        fixture.processRow(row);
+        try {
+            fixture.processRow(row);
+            fail("should throw RTE");
+        } catch (RuntimeException e) {
+
+        }
     }
 
     @Test(expected = RuntimeException.class)
@@ -764,12 +801,16 @@ public class RestFixtureTest {
         fixture.processRow(row);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void mustReportAsRTEWhenSettingAMissingHeader() {
         wireMocks();
         RowWrapper<?> row = helper.createFitTestRow("setHeader");
         when(row.getCell(1)).thenReturn(null);
-        fixture.processRow(row);
+        try {
+            fixture.processRow(row);
+        } catch (RuntimeException e) {
+
+        }
     }
 
     /**
@@ -777,24 +818,28 @@ public class RestFixtureTest {
      */
 
     @Test
-    public void testConstructingWithOneArgShoudlBeTheSUTUri() {
+    public void constructingWithOneArgShoudlBeTheSUTUri() {
         String uri = "http://localhost:9090";
         RestFixture f = new RestFixture(uri);
         assertEquals(uri, f.getBaseUrl());
     }
 
     @Test
-    public void testConstructingWithOneArgShoudlStripAnyTagAndSetTheSUTUri() {
+    public void constructingWithOneArgShoudlStripAnyTagAndSetTheSUTUri() {
         String uri = "http://localhost:9090";
         String taggedUri = "<sometag att='1'>" + uri + "</sometag>";
         RestFixture f = new RestFixture(taggedUri);
         assertEquals(uri, f.getBaseUrl());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testConstructingWithOneFailsIfArgIsNotAnUri() {
+    @Test
+    public void constructingWithOneFailsIfArgIsNotAnUri() {
         String uri = "rubbish";
-        new RestFixture(uri);
+        try {
+            new RestFixture(uri);
+        } catch (IllegalArgumentException e) {
+
+        }
     }
 
     /**

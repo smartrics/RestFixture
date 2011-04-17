@@ -23,15 +23,42 @@ import smartrics.rest.client.RestResponse;
  */
 public class JavascriptWrapper {
 
+    private static final String RESPONSE_OBJ_NAME = "response";
+    private static final String SYMBOLS_OBJ_NAME = "symbols";
+    private static final String JSON_OBJ_NAME = "jsonbody";
+
     public Object evaluateExpression(RestResponse response, String expression) {
+        if (expression == null) {
+            return null;
+        }
         Context context = Context.enter();
         ScriptableObject scope = context.initStandardObjects();
-        Variables v = new Variables();
-        Object wrappedVariables = Context.javaToJS(v, scope);
-        ScriptableObject.putProperty(scope, "symbols", wrappedVariables);
-        injectResponse("response", context, scope, response);
+        injectFitNesseSymbolMap(scope);
+        injectResponse(context, scope, response);
         Object result = evaluateExpression(context, scope, expression);
         return result;
+    }
+
+    public Object evaluateExpression(String json, String expression) {
+        if (json == null || expression == null) {
+            return null;
+        }
+        Context context = Context.enter();
+        ScriptableObject scope = context.initStandardObjects();
+        injectFitNesseSymbolMap(scope);
+        injectJson(context, scope, json);
+        Object result = evaluateExpression(context, scope, expression);
+        return result;
+    }
+
+    private void injectFitNesseSymbolMap(ScriptableObject scope) {
+        Variables v = new Variables();
+        Object wrappedVariables = Context.javaToJS(v, scope);
+        ScriptableObject.putProperty(scope, SYMBOLS_OBJ_NAME, wrappedVariables);
+    }
+
+    private void injectJson(Context cx, ScriptableObject scope, String json) {
+        evaluateExpression(cx, scope, "var " + JSON_OBJ_NAME + "=" + json);
     }
 
     private Object evaluateExpression(Context context, ScriptableObject scope, String expression) {
@@ -45,23 +72,23 @@ public class JavascriptWrapper {
         }
     }
 
-    private void injectResponse(String jsName, Context cx, ScriptableObject scope, RestResponse r) {
+    private void injectResponse(Context cx, ScriptableObject scope, RestResponse r) {
         try {
             ScriptableObject.defineClass(scope, JsResponse.class);
             Scriptable response = null;
             if (r == null) {
-                scope.put(jsName, scope, null);
+                scope.put(RESPONSE_OBJ_NAME, scope, response);
                 return;
             }
             Object[] arg = new Object[1];
             arg[0] = r;
             response = cx.newObject(scope, "JsResponse", arg);
-            scope.put(jsName, scope, response);
+            scope.put(RESPONSE_OBJ_NAME, scope, response);
             putPropertyOnJsObject(response, "body", r.getBody());
-            putPropertyOnJsObject(response, "jsonbody", null);
+            putPropertyOnJsObject(response, JSON_OBJ_NAME, null);
             boolean isJson = isJsonResponse(r);
             if (isJson) {
-                evaluateExpression(cx, scope, jsName + ".jsonbody=" + r.getBody());
+                evaluateExpression(cx, scope, RESPONSE_OBJ_NAME + "." + JSON_OBJ_NAME + "=" + r.getBody());
             }
             putPropertyOnJsObject(response, "resource", r.getResource());
             putPropertyOnJsObject(response, "statusText", r.getStatusText());
@@ -71,14 +98,11 @@ public class JavascriptWrapper {
                 callMethodOnJsObject(response, "addHeader", h.getName(), h.getValue());
             }
         } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new JavascriptException(e.getMessage());
         } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new JavascriptException(e.getMessage());
         } catch (InvocationTargetException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new JavascriptException(e.getMessage());
         }
     }
 

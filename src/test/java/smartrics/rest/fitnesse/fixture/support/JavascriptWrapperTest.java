@@ -65,14 +65,21 @@ public class JavascriptWrapperTest {
     @Test
     public void shouldNotProvideLastResponseBodyInJsContextIfResponseIsNull() {
         JavascriptWrapper h = new JavascriptWrapper();
-        Object res = h.evaluateExpression(null, "'response is null: ' + (response == null)");
+        Object res = h.evaluateExpression((RestResponse) null, "'response is null: ' + (response == null)");
         assertThat(res.toString(), is(equalTo("response is null: true")));
     }
 
     @Test
     public void shouldHandleNullReturnedByJsEvaluation() {
         JavascriptWrapper h = new JavascriptWrapper();
-        Object res = h.evaluateExpression(null, "null");
+        Object res = h.evaluateExpression((RestResponse) null, "null");
+        assertThat(res, is(nullValue()));
+    }
+
+    @Test
+    public void shouldHandleNullReturnedByStringJsEvaluation() {
+        JavascriptWrapper h = new JavascriptWrapper();
+        Object res = h.evaluateExpression((String) null, "null");
         assertThat(res, is(nullValue()));
     }
 
