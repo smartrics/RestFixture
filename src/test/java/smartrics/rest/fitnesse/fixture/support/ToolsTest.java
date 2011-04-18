@@ -222,7 +222,7 @@ public class ToolsTest {
         // not much of a test, I know, but guarantees minimal info on fitnesse
         // stylesheed/js
         int id = "someContent".hashCode();
-        String ret = Tools.makeToggleCollapseable("someContent");
+        String ret = Tools.makeToggleCollapseable("message", "someContent");
         assertTrue(ret.indexOf("javascript:toggleCollapsable('" + id + "')") > 0);
         assertTrue(ret.indexOf("<div class='hidden' id='" + id + "'>") > 0);
     }

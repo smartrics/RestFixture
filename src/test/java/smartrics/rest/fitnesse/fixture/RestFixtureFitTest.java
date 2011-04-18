@@ -21,8 +21,6 @@
 package smartrics.rest.fitnesse.fixture;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -84,18 +82,4 @@ public class RestFixtureFitTest {
         fixture.doCells(FitTestSupport.buildEmptyParse());
         assertEquals("configName", fixture.getConfig().getName());
     }
-
-    @Test
-    public void mustSetTheDisplayActualOnRightFlagFromConfigFile() {
-        config.add("restfixture.display.actual.on.right", Boolean.FALSE.toString());
-        fixture.doCells(FitTestSupport.buildEmptyParse());
-        assertFalse(fixture.isDisplayActualOnRight());
-    }
-
-    @Test
-    public void mustSetTheDisplayActualOnRightFlagDefaultValueToTrue() {
-        fixture.doCells(FitTestSupport.buildEmptyParse());
-        assertTrue(fixture.isDisplayActualOnRight());
-    }
-
 }
