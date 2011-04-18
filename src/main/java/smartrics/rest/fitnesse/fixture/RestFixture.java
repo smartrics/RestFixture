@@ -203,12 +203,15 @@ public class RestFixture extends ActionFixture {
 
     private String lastEvaluation;
 
+    private int minLenForCollapseToggle;
+
     /**
      * Constructor for Fit runner.
      */
     public RestFixture() {
         super();
         this.displayActualOnRight = true;
+        this.minLenForCollapseToggle = -1;
         this.partsFactory = new PartsFactory();
     }
 
@@ -273,17 +276,6 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
-     * The value of the flag controlling the display of the actual header or
-     * body in the cell containing the expectations.
-     * 
-     * @return true if the actual value of the headers or body is displayed when
-     *         expectation is true
-     */
-    public boolean isDisplayActualOnRight() {
-        return displayActualOnRight;
-    }
-
-    /**
      * Slim Table table hook.
      * 
      * @param rows
@@ -292,7 +284,8 @@ public class RestFixture extends ActionFixture {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<List<String>> doTable(List<List<String>> rows) {
         List<List<String>> res = new Vector<List<String>>();
-        getFormatter().setDisplayActual(isDisplayActualOnRight());
+        getFormatter().setDisplayActual(displayActualOnRight);
+        getFormatter().setMinLenghtForToggleCollapse(minLenForCollapseToggle);
         for (List<String> r : rows) {
             RowWrapper currentRow = new SlimRow(r);
             try {
@@ -320,7 +313,8 @@ public class RestFixture extends ActionFixture {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void doCells(Parse parse) {
         initialize(Runner.FIT, args);
-        getFormatter().setDisplayActual(isDisplayActualOnRight());
+        getFormatter().setDisplayActual(displayActualOnRight);
+        getFormatter().setMinLenghtForToggleCollapse(minLenForCollapseToggle);
         ((FitFormatter) getFormatter()).setActionFixtureDelegate(this);
         RowWrapper currentRow = new FitRow(parse);
         try {
@@ -887,6 +881,7 @@ public class RestFixture extends ActionFixture {
      */
     private void configFixture() {
         displayActualOnRight = config.getAsBoolean("restfixture.display.actual.on.right", displayActualOnRight);
+        minLenForCollapseToggle = config.getAsInteger("restfixture.display.toggle.for.cells.larger.than", minLenForCollapseToggle);
         String str = config.get("restfixture.default.headers", "");
         defaultHeaders = parseHeaders(str);
         str = config.get("restfixture.xml.namespace.context", "");

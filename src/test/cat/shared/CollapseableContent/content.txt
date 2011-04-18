@@ -1,0 +1,13 @@
+!3 Collapseable content
+
+In the interest of readability, cells with large content can be rendered with a toggle on/off button.
+The minimum length in characters of the cell, in order to enable the toggle button, is specified with the property
+
+restfixture.display.toggle.for.cells.larger.than
+
+If the value of the property is negative the toggle button will not be rendered.
+
+Currently only large HTTP response content cells (if the actual value is displayed) are enabled for toggling.
+
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
+|GET    | /resources/100 | 200 | |!-/resource/type[text()='large content']-! |

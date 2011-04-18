@@ -311,11 +311,11 @@ public final class Tools {
         return ret;
     }
 
-    public static String makeToggleCollapseable(String content) {
+    public static String makeToggleCollapseable(String message, String content) {
         String id = Integer.toString(content.hashCode());
         StringBuffer sb = new StringBuffer();
         sb.append("<a href=\"javascript:toggleCollapsable('" + id + "');\">");
-        sb.append("<img src='/files/images/collapsableClosed.gif' class='left' id='img" + id + "'/></a>");
+        sb.append("<img src='/files/images/collapsableClosed.gif' class='left' id='img" + id + "'/>" + message + "</a>");
         sb.append("<div class='hidden' id='" + id + "'>").append(content).append("</div>");
         return sb.toString();
     }
@@ -347,7 +347,7 @@ public final class Tools {
         return "<a href='" + href + "'>" + text + "</a>";
     }
 
-    public static String makeContentForWrongCell(String expected, RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter) {
+    public static String makeContentForWrongCell(String expected, RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter, int minLenForToggle) {
         StringBuffer sb = new StringBuffer();
         sb.append(toHtml(expected));
         if (formatter.isDisplayActual()) {
@@ -356,7 +356,11 @@ public final class Tools {
             String actual = typeAdapter.toString();
             sb.append(toHtml("-----"));
             sb.append(toHtml("\n"));
-            sb.append(toHtml(actual));
+            if (minLenForToggle >= 0 && actual.length() > minLenForToggle) {
+                sb.append(makeToggleCollapseable("toggle actual", toHtml(actual)));
+            } else {
+                sb.append(toHtml(actual));
+            }
             sb.append(toHtml("\n"));
             sb.append(formatter.label("actual"));
         }
@@ -373,7 +377,7 @@ public final class Tools {
         return sb.toString();
     }
 
-    public static String makeContentForRightCell(String expected, RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter) {
+    public static String makeContentForRightCell(String expected, RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter, int minLenForToggle) {
         StringBuffer sb = new StringBuffer();
         sb.append(Tools.toHtml(expected));
         String actual = typeAdapter.toString();
@@ -382,10 +386,15 @@ public final class Tools {
             sb.append(formatter.label("expected"));
             sb.append(toHtml("-----"));
             sb.append(toHtml("\n"));
-            sb.append(toHtml(actual));
+            if (minLenForToggle >= 0 && actual.length() > minLenForToggle) {
+                sb.append(makeToggleCollapseable("toggle actual", toHtml(actual)));
+            } else {
+                sb.append(toHtml(actual));
+            }
             sb.append(toHtml("\n"));
             sb.append(formatter.label("actual"));
         }
         return sb.toString();
     }
+
 }

@@ -108,6 +108,33 @@ public class Resources {
         add("/resources", new Resource("<resource>\n    <name>a funky name</name>\n    <data>an important message</data>"
                 + "\n    <nstag xmlns:ns1='http://smartrics/ns1'>\n        <ns1:number>3</ns1:number>\n    </nstag>" + "\n</resource>"));
         add("/resources", new Resource("{ \"resource\" : { \"name\" : \"a funky name\", " + "\"data\" : \"an important message\" } }"));
+        StringBuffer sb = new StringBuffer();
+        sb.append("<resource>\n");
+        sb.append("   <name>giant bob</name>\n");
+        sb.append("   <type>large content</type>\n");
+        sb.append("   <address>\n");
+        sb.append("       <street>\n");
+        sb.append("            Regent Street\n");
+        sb.append("       </street>\n");
+        sb.append("       <number>\n");
+        sb.append("            12345\n");
+        sb.append("       </number>\n");
+        sb.append("   </address>\n");
+        sb.append("   <data>\n");
+        sb.append("       <part id='0'>\n");
+        sb.append("           <source href='http://en.wikipedia.org/wiki/Inferno_(Dante)' />\n");
+        sb.append("           <content>\n");
+        sb.append("Inferno (Italian for 'Hell') is the first part of Dante Alighieri's 14th-century epic poem Divine Comedy. \n");
+        sb.append("It is followed by Purgatorio and Paradiso. It is an allegory telling of the journey of Dante through what is \n");
+        sb.append("largely the medieval concept of Hell, guided by the Roman poet Virgil. In the poem, Hell is depicted as nine \n");
+        sb.append("circles of suffering located within the Earth. Allegorically, the Divine Comedy represents the journey of the soul");
+        sb.append("towards God, with the Inferno describing the recognition and rejection of sin.\n");
+        sb.append("           </content>\n");
+        sb.append("       </part>\n");
+        sb.append("   </data>\n");
+        sb.append("</resource>\n");
+
+        add("/resources", new Resource("100", sb.toString()));
     }
 
     private synchronized int newCounter() {

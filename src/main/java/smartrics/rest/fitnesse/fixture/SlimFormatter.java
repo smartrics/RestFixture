@@ -37,13 +37,21 @@ import smartrics.rest.fitnesse.fixture.support.Tools;
  */
 public class SlimFormatter implements CellFormatter<String> {
 
+    private int minLenForToggle = -1;
     private boolean displayActual;
 
     public SlimFormatter() {
+
     }
 
+    @Override
     public void setDisplayActual(boolean d) {
         this.displayActual = d;
+    }
+
+    @Override
+    public void setMinLenghtForToggleCollapse(int minLen) {
+        this.minLenForToggle = minLen;
     }
 
     public boolean isDisplayActual() {
@@ -90,13 +98,13 @@ public class SlimFormatter implements CellFormatter<String> {
     @Override
     public void wrong(CellWrapper<String> expected, RestDataTypeAdapter ta) {
         String expectedContent = expected.body();
-        expected.body(Tools.makeContentForWrongCell(expectedContent, ta, this));
+        expected.body(Tools.makeContentForWrongCell(expectedContent, ta, this, minLenForToggle));
         expected.body("fail:" + expected.body());
     }
 
     @Override
     public void right(CellWrapper<String> expected, RestDataTypeAdapter typeAdapter) {
-        expected.body("pass:" + Tools.makeContentForRightCell(expected.body(), typeAdapter, this));
+        expected.body("pass:" + Tools.makeContentForRightCell(expected.body(), typeAdapter, this, minLenForToggle));
     }
 
     @Override
@@ -113,4 +121,5 @@ public class SlimFormatter implements CellFormatter<String> {
     public String fromRaw(String text) {
         return Tools.fromHtml(text);
     }
+
 }

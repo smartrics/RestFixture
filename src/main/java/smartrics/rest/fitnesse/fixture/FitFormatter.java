@@ -39,6 +39,7 @@ public class FitFormatter implements CellFormatter<Parse> {
 
     private ActionFixture fixture;
     private boolean displayActual;
+    private int minLenForToggle = -1;
 
     public void setActionFixtureDelegate(ActionFixture f) {
         this.fixture = f;
@@ -47,6 +48,11 @@ public class FitFormatter implements CellFormatter<Parse> {
     @Override
     public boolean isDisplayActual() {
         return displayActual;
+    }
+
+    @Override
+    public void setMinLenghtForToggleCollapse(int minLen) {
+        this.minLenForToggle = minLen;
     }
 
     @Override
@@ -80,7 +86,7 @@ public class FitFormatter implements CellFormatter<Parse> {
 	@Override
     public void wrong(CellWrapper<Parse> expected, RestDataTypeAdapter typeAdapter) {
         String expectedContent = expected.body();
-        String body = Tools.makeContentForWrongCell(expectedContent, typeAdapter, this);
+        String body = Tools.makeContentForWrongCell(expectedContent, typeAdapter, this, minLenForToggle);
         expected.body(body);
         fixture.wrong(expected.getWrapped());
 	}
@@ -88,7 +94,7 @@ public class FitFormatter implements CellFormatter<Parse> {
 	@Override
     public void right(CellWrapper<Parse> expected, RestDataTypeAdapter typeAdapter) {
         String expectedContent = expected.body();
-        expected.body(Tools.makeContentForRightCell(expectedContent, typeAdapter, this));
+        expected.body(Tools.makeContentForRightCell(expectedContent, typeAdapter, this, minLenForToggle));
         fixture.right(expected.getWrapped());
 	}
 

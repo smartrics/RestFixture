@@ -52,7 +52,7 @@ public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
 
     @Override
     public Object parse(String possibleJsContent) throws Exception {
-        if (possibleJsContent.trim().indexOf("/* javascript */") < 0) {
+        if (possibleJsContent == null || possibleJsContent.trim().indexOf("/* javascript */") < 0) {
             forceJsEvaluation = false;
             return super.parse(possibleJsContent);
         }

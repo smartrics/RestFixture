@@ -47,6 +47,8 @@ public interface CellFormatter<E> {
 
     void setDisplayActual(boolean displayActual);
 
+    void setMinLenghtForToggleCollapse(int minLen);
+
     boolean isDisplayActual();
 
     // in SLIM cell content is HTML escaped - we abstract this method to
