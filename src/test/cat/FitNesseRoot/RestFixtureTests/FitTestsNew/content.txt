@@ -1,0 +1,5 @@
+!1 Rest Fixture Acceptance Test Suite
+
+Tests in this subdirectory are executed with the default Fit Runner.
+
+!contents -g
