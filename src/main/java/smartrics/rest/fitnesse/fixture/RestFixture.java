@@ -909,7 +909,7 @@ public class RestFixture extends ActionFixture {
     private void renderReplacement(CellWrapper cell, String actual) {
         StringTypeAdapter adapter = new StringTypeAdapter();
         adapter.set(actual);
-        if (!adapter.equals(actual, cell.body())) {
+        if (!adapter.equals(actual, Tools.fromHtml(cell.body()))) {
             // eg - a substitution has occurred
             getFormatter().right(cell, adapter);
         }

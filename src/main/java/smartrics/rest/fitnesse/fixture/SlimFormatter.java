@@ -96,7 +96,6 @@ public class SlimFormatter implements CellFormatter<String> {
 
     @Override
     public void right(CellWrapper<String> expected, RestDataTypeAdapter typeAdapter) {
-
         expected.body("pass:" + Tools.makeContentForRightCell(expected.body(), typeAdapter, this));
     }
 
