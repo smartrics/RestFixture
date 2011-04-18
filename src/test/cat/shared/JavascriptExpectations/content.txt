@@ -9,7 +9,7 @@ For backward compatibility XPath expressions are maintained and executed
 After a successful response is received with content type "application/json" the expectation cell in a RestFixture row is 
 interpreted as a string with Javascript and executed within the context of the response body.
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |setBody|!- { "resource" : { "name" : "test post", "data" : "some data" } } -!|
 |POST   | /resources/ | 201 | | no-body |
 |let    | id | header | Location:/resources/(.+) | |
@@ -18,13 +18,13 @@ A variable <code>jsonbody</code> is defined holding the JSON in the response.
 
 The test passes if the result of the evaluation of the cell is a boolean.
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/%id%.json | 200 |Content-Type : application/json |!-<pre>
 jsonbody.resource.name=="test post" && jsonbody.resource.data=="some data" 
 </pre>-!|
 | let   | content | js |  response.body | |
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |setBody| %content% |
 |POST   | /resources/ | 201 | | no-body |
 |let    | id | header | Location:/resources/(.+) | |
@@ -32,7 +32,7 @@ jsonbody.resource.name=="test post" && jsonbody.resource.data=="some data"
 In some cases may be useful to force evaluation of the expectation cell as a javascript block. 
 By embedding the <code>/* javascript */</code> comment, the whole expectation cell will be parsed and evaluated entirely using the javascript interpreter.
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/%id%.json | 200 |Content-Type : application/json |!-<pre>
 /* javascript */
 var concat = jsonbody.resource.name + " and " + jsonbody.resource.data

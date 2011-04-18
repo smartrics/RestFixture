@@ -5,7 +5,8 @@
 	<property file="build.properties" />
 
 	<property name="src.unit" value="${basedir}/src/test/java" />
-	<property name="src.cat" value="${basedir}/src/test/fitnesse" />
+	<property name="src.cat.java" value="${basedir}/src/test/fitnesse" />
+	<property name="src.cat.fitnesse" value="${basedir}/src/test/cat" />
 	<property name="src" value="${basedir}/src/main/java" />
 	<property name="resources" value="${basedir}/src/main/resources" />
 	<property name="build" value="${basedir}/build" />
@@ -27,6 +28,8 @@
 	<property name="build.fitnesse.home" value="${basedir}/build/fitnesse" />
 	<property name="build.fitnesse.root" value="${build.fitnesse.home}/${fitnesse.root.name}" />
 	<property name="build.fitnesse.test.root" value="${build.fitnesse.root}/${fitnesse.path}" />
+	<property name="src.cat.temp" value="${build}/src-cat" />
+	<property name="src.cat.temp.root" value="${build}/src-cat/${fitnesse.root.name}/${fitnesse.test.suite}" />
 
 	<path id="project.classpath">
 		<pathelement location="${resources}" />
@@ -84,7 +87,7 @@
 	<target name="compile-cat" depends="compile">
 		<mkdir dir="${build}/classes/cat" />
 		<javac includes="**/*.java" debug="${build.debug}" target="${build.target}" destdir="${build}/classes/cat">
-			<src path="${src.cat}" />
+			<src path="${src.cat.java}" />
 			<classpath refid="test.classpath" />
 		</javac>
 	</target>
@@ -94,8 +97,80 @@
 		<jar destfile="${restfixture.fitnesse.jar}" basedir="${build}/classes/cat" includes="**/*" excludes="**/*.jar" />
 	</target>
 
-	<target name="fitnesse-copy" depends="package">
-		<delete dir="${fitnesse.test.root}" />
+	<target name="fitnesse-src-bundle" description="Takes the RestFixture tests for Fit runner and converts them in tests for Slim">
+		<property name="src.cat.shared" value="${build}/src-cat/shared" />
+
+		<delete dir="${src.cat.temp}" failonerror="false" />
+		<mkdir dir="${src.cat.temp}" />
+
+		<!-- copies all but shared -->
+		<copy todir="${src.cat.temp}" overwrite="true" verbose="${verbose}">
+			<filterset>
+				<filter token="FITNESSE_HOME" value="${fitnesse.home}" />
+				<filter token="FITNESSE_TEST_ROOT" value="${fitnesse.test.root}" />
+				<filter token="TEMP_DIRECTORY" value="${tmpdir}" />
+			</filterset>
+			<fileset dir="${src.cat.fitnesse}" />
+		</copy>
+
+		<copy todir="${src.cat.temp.root}/FitTests" overwrite="true" verbose="${verbose}">
+			<fileset dir="${src.cat.shared}" />
+		</copy>
+		<copy todir="${src.cat.temp.root}/SlimTests" overwrite="true" verbose="${verbose}">
+			<fileset dir="${src.cat.shared}" />
+		</copy>
+
+		<fileset id="fitnesse.source.files" dir="${src.cat.temp.root}/SlimTests">
+			<include name="**/content.txt" />
+		</fileset>
+
+		<!-- TODO: replace this with an ant task -->
+		<!-- matches and converst fit RestFixtures into Slim ones -->
+        <replaceregexp flags="g">
+            <regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixture\-\![\s]*\|" />
+            <substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixture-! |" />
+            <fileset refid="fitnesse.source.files" />
+        </replaceregexp>
+        <replaceregexp flags="g">
+            <regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixtureConfig\-\![\s]*\|" />
+            <substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureConfig-!  |" />
+            <fileset refid="fitnesse.source.files" />
+        </replaceregexp>
+		<!-- matches and converst paths to tests -->
+		<replaceregexp flags="g">
+			<regexp pattern="RestFixtureTests\.FitTests" />
+			<substitution expression="RestFixtureTests.SlimTests" />
+			<fileset refid="fitnesse.source.files" />
+		</replaceregexp>
+		<!-- converts ActionFixrures used to support tests in RestFixture CATs -->
+		<replaceregexp flags="g">
+			<regexp pattern="[\!]*\|[\s]*Action\s*Fixture[\.\s]*\|" />
+			<substitution expression="" />
+			<fileset refid="fitnesse.source.files" />
+		</replaceregexp>
+		<replaceregexp flags="g">
+			<regexp pattern="\|[\s]*start[\s]*\|[\s]*\!\-smartrics\.rest\.test\.fitnesse" />
+			<substitution expression="| script |!-smartrics.rest.test.fitnesse" />
+			<fileset refid="fitnesse.source.files" />
+		</replaceregexp>
+		<!-- removes press from fit action fixrure - not needed here -->
+		<replaceregexp flags="g">
+			<regexp pattern="\|[\s]*press[\s]*\|" />
+			<substitution expression="|" />
+			<fileset refid="fitnesse.source.files" />
+		</replaceregexp>
+		<!-- removes enter from fit action fixrure - not needed here -->
+		<replaceregexp flags="g">
+			<regexp pattern="\|[\s]*enter[\s]*\|" />
+			<substitution expression="|" />
+			<fileset refid="fitnesse.source.files" />
+		</replaceregexp>
+
+	</target>
+
+	<target name="fitnesse-copy" depends="package, fitnesse-src-bundle">
+		<fail unless="fitnesse.test.root" message="You call this via antcall defining the properties fitnesse.test.root" />
+		<delete dir="${fitnesse.test.root}" failonerror="false" />
 		<mkdir dir="${fitnesse.test.root}/lib" />
 		<property name="verbose" value="false" />
 		<copy todir="${fitnesse.test.root}/lib" flatten="true" verbose="${verbose}">
@@ -104,19 +179,15 @@
 			</fileset>
 			<fileset dir="lib">
 				<include name="**/*.jar" />
-				<exclude name="${libs.excluded}"/>
+				<exclude name="${libs.excluded}" />
 			</fileset>
 			<fileset dir="${resources}">
 				<include name="**/*.*" />
 			</fileset>
 		</copy>
 		<copy todir="${fitnesse.test.root}" overwrite="true" verbose="${verbose}">
-			<filterset>
-				<filter token="FITNESSE_HOME" value="${fitnesse.home}" />
-				<filter token="FITNESSE_TEST_ROOT" value="${fitnesse.test.root}" />
-				<filter token="TEMP_DIRECTORY" value="${tmpdir}" />
-			</filterset>
-			<fileset dir="src/cat/${fitnesse.root.name}/${fitnesse.path}" />
+			<!-- sources being bundled in Fit and Slim formats -->
+			<fileset dir="${src.cat.temp.root}" />
 		</copy>
 	</target>
 
@@ -125,8 +196,8 @@
 		<antcall target="fitnesse-copy">
 			<param name="fitnesse.root" value="${fitnesse.home}/${fitnesse.root.name}" />
 			<param name="fitnesse.test.root" value="${remote.fitnesse.root}/${fitnesse.path}" />
-            <param name="libs.excluded" value="**/fitnesse.jar" />
-            <param name="verbose" value="true" />
+			<param name="libs.excluded" value="**/fitnesse.jar" />
+			<param name="verbose" value="false" />
 		</antcall>
 	</target>
 
@@ -138,7 +209,7 @@
 		</antcall>
 		<!-- for local execution with in-process runner we need the fitnesse resources to be available -->
 		<mkdir dir="${build}/fitnesse.extract" />
-		<unzip dest="${build}/fitnesse.extract" src="${fitnesse.jar}" >
+		<unzip dest="${build}/fitnesse.extract" src="${fitnesse.jar}">
 			<patternset>
 				<include name="Resources/FitNesseRoot/files/**/*.*" />
 			</patternset>
@@ -147,7 +218,7 @@
 			<!-- this should reflect the internal fitnesse.jar structure -->
 			<fileset dir="${build}/fitnesse.extract/Resources/FitNesseRoot" />
 		</copy>
-		<delete dir="${build}/fitnesse.extract"/>
+		<delete dir="${build}/fitnesse.extract" />
 	</target>
 
 	<target name="fitnesse-test-remote" depends="fitnesse-deploy-remote,fitnesse-exec-test,check.fitnesse.failure,check.fitnesse.report.failure" if="execute.cat" />
@@ -179,8 +250,8 @@
 			<equals arg1="0" arg2="number.of.failed.tests" />
 		</condition>
 		<java classname="smartrics.rest.support.fitnesse.FitnesseResultSanitiser" failonerror="true" fork="true" resultproperty="fitnesse.report.exit.status">
-            <classpath location="${restfixture.fitnesse.jar}" />
-            <classpath refid="project.classpath" />
+			<classpath location="${restfixture.fitnesse.jar}" />
+			<classpath refid="project.classpath" />
 			<arg value="${fitnesse.reports}/results.html" />
 			<arg value="${build.fitnesse.root}" />
 		</java>

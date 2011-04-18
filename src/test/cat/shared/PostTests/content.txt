@@ -9,7 +9,7 @@ The follwoing cell indicates where to get the data from. That is either the ''he
 Then the expression to extract the value to be assigned to he variable. For ''header'' it has to be a regular expression, for _body_ it
 has to be an XPath whose execution must return a String node.
 ***!
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |setBody|<resource><name>test post</name><data>some data</data></resource>|
 |POST   | /resources | 201 | | no-body |
 |let    | id | header | Location:/resources/(.+) | |
@@ -30,7 +30,7 @@ Labels whose name starts with $ are defined in the Symbol map in the '''fit.Fixt
 can be shared across various fixtures.
 ***!
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/%id% | 200 | |!-
  /resource/name[text()='test post']<br/>
  /resource/data[text()='some data']
@@ -44,12 +44,12 @@ can be shared across various fixtures.
 Expectations can be asserted also in json format for responses whose content type is 'application/json'
 Variables may be substitued in the expected result
 ****!
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |setBody|!- { "resource" : { "name" : "test post", "data" : "some data" } } -!|
 |POST   | /resources/ | 201 | | no-body |
 |let    | id | header | Location:/resources/(.+) | |
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/%id%.json | 200 |Content-Type : application/json |!-
   /resource/name[text()='test post'] <br/>
   /resource/data[text()='some data']
@@ -58,28 +58,28 @@ Variables may be substitued in the expected result
 !**** File uploads
 Use the multipartFile property to upload files to a server
 ****!
-!|Action Fixture.|
+|Action Fixture.|
 |start|!-smartrics.rest.test.fitnesse.fixture.FileUtilFixture-!|
 |enter|content|!- { "resource" : { "name" : "test post", "data" : "some data" } } -!|
 |enter|name|${tempDirectory}/tempfile|
 |check|create| true |
 |check|exists| true |
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |setMultipartFileName|${tempDirectory}/tempfile|
 |POST   | /resources/ | 200 | | file: { "resource" : { "name" : "test post", "data" : "some data" } }|
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |setMultipartFileName|${tempDirectory}/tempfile|
 |setMultipartFileParameterName|abc123|
 |POST   | /resources/ | 200 | | abc123: { "resource" : { "name" : "test post", "data" : "some data" } }|
 
 Use simple file upload
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |setFileName|${tempDirectory}/tempfile|
 |POST   | /resources/ | 200 | | { "resource" : { "name" : "test post", "data" : "some data" } }|
 
-!|Action Fixture.|
+|Action Fixture.|
 |start|!-smartrics.rest.test.fitnesse.fixture.FileUtilFixture-!|
 |enter|name|${tempDirectory}/tempfile|
 |check|delete| true |

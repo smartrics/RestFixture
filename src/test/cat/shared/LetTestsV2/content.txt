@@ -12,7 +12,7 @@ to the let label is the result of the evaluation of the content in the expressio
 
 For example:
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |let    | message | js | 'Hello, World!' |  Hello, World! |
 |let    | sum | js | '2 + 5 = ' + (2 + 5) |  2 + 5 = 7 |
 |let    | two_expressions | js | !-a=1;
@@ -54,7 +54,7 @@ json.widget.image.src
 It's also possible to access the !-FitNesse-! symbols map. The scope where expression is evaluated contains the 
 'symbols' object 
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |setBody|<resource><name>Bill</name><data>Some data on Bill</data></resource>|
 |POST   | /resources/ | 201 | | no-body |
 |let    | id | header | Location:/resources/(.+) | |
@@ -64,7 +64,7 @@ The scope also contains the 'response' object, populated with the data from the 
 
 For example
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/1 | 200 | | |
 |let    | body_value | js | response.body |  |
 |setBody|<resource><name>Bill</name><data>Some data on Bill</data></resource>|
@@ -79,7 +79,7 @@ For example
 A particoular case is when the response is JSON (Content-Type : application/json). In such case, the property '''jsonbody'''
 contains the JSON object that can be accessed using the dot notation. For example
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/1.json | 200 | | |
 |let    | body_value | js | response.jsonbody |  |
 |let    | body_value | js | response.jsonbody.resource.name | a funky name |

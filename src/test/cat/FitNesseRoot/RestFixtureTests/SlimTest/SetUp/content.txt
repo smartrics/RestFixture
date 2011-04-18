@@ -1,6 +1,0 @@
-| script | smartrics.rest.test.fitnesse.fixture.HttpServerFixture |
-| check  | isStarted | true |
-| reset resources database  |
-| check  | isStopped | true |
-
-

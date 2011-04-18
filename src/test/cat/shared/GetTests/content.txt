@@ -9,7 +9,7 @@ The following cell indicate:
 returns at least one node
 ****!
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/0 | 200 | Content-Length : [\d]+ |!-
  /resource/name[text()='a funky name'] <br/>
  /resource/data[text()='an important message']
@@ -17,7 +17,7 @@ returns at least one node
 
 A GET request properly handles query strings. In this example the stub resource echoes the query string in a Query-String header
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/0?param=echome | 200 | !-Content-Length : [\d]+
 Query-String : param=echome -! |!-
  /resource/name[text()='a funky name'] <br/>
@@ -30,7 +30,7 @@ Get a non existing resource should not find it
 Instead of XPaths you can specify 'no-body' if the operation is expected to return an empty body
 ****!
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/20 | 404 | Content-Length : 0 | no-body |
 |GET    | /resources/20.json | 404 | Content-Length : 0 | no-body |
 
@@ -38,7 +38,7 @@ Instead of XPaths you can specify 'no-body' if the operation is expected to retu
 Namespaces are supported by declaring the alias/uri map in the RestFixtureConfig, using the key restfixture.xml.namespace.context (See SuiteSetup)
 ****!
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/0 | 200 | Content-Length : [\d]+ |!-
  /resource/nstag/ns1alias:number[text()='3']
 -!|
@@ -48,7 +48,7 @@ Namespaces are supported by declaring the alias/uri map in the RestFixtureConfig
 Expectations can be asserted also in json format for responses whose content type is 'application/json' or 'application/x-javascript'
 ****!
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/1.json | 200 |Content-Type : application/json;charset=ISO-8859-1 |!-
  /resource/name[text()='a funky name'] <br/>
  /resource/data[text()='an important message']

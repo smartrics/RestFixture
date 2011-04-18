@@ -4,7 +4,7 @@ Usages of LET (See also RestFixtureTests.FitTests.PostTests for more examples)
 
 ''LET used to extract values from header, using regular expressions''
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |setBody|<resource><name>Bill</name><data>Some data on Bill</data></resource>|
 |POST   | /resources/ | 201 | | no-body |
 |let    | id | header | Location:/resources/(.+) | |
@@ -20,7 +20,7 @@ Labels are global and can be shared across rest fixture instances.
 Here follows an usage of the previously extracted ''id''.
 This example also shows how to use let to extract data from the XML body of a response using XPath.
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/%id% | 200 | |!-
  /resource/name[text()='Bill']<br/>
  /resource/data[text()='Some data on Bill']
@@ -29,7 +29,7 @@ This example also shows how to use let to extract data from the XML body of a re
 
 ...or from a JSON body
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/1.json | 200 |Content-Type : application/json|!-
  /resource/name[text()='a funky name']<br/>
  /resource/data[text()='an important message']
@@ -45,16 +45,16 @@ Label values can be accessed from code using '''new Variables().get("labelname")
 !-LetTestActionFixture-! allows to get/set values in the Fixture Symbol map
 
 |Action Fixture|
-|start|!-smartrics.rest.test.fitnesse.fixture.LetTestActionFixture-!|
-|enter|symbolName|resType|
-|enter|symbolValue|/resources|
+| start |!-smartrics.rest.test.fitnesse.fixture.LetTestActionFixture-!|
+| enter |symbolName|resType|
+| enter |symbolValue|/resources|
 
 !*** Note
 Look at the source code of this page to see that the resource URI
 for the GET method below is defined as '''%resType%/%id%'''
 ***!
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | %resType%/%id% | 200 | | |
 |let    | $symName | body | /resource/name/text() | |
 
@@ -63,14 +63,14 @@ can be shared across various fixtures.
 
 ''LET defines symbols in the Fixture Symbol map if label starts with $''
 
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/%id% | 200 | | |
 |let    | $symName | body | /resource/name/text() | |
 
 |Action Fixture|
-|start|!-smartrics.rest.test.fitnesse.fixture.LetTestActionFixture-!|
-|enter|symbolName|symName|
-|check|symbolValue|Bill|
+| start |!-smartrics.rest.test.fitnesse.fixture.LetTestActionFixture-!|
+| enter |symbolName|symName|
+| check |symbolValue|Bill|
 
 Other fixtures can set a value in the symbol map with ''Fixture.setSymbol''.
 The RestFixture can then pick them up
@@ -78,10 +78,11 @@ The RestFixture can then pick them up
 This fixture sets ''symbolName=/resources''...
 
 |Action Fixture|
-|start|!-smartrics.rest.test.fitnesse.fixture.LetTestActionFixture-!|
-|enter|symbolName|aNameOfASymbol|
-|enter|symbolValue|/resources|
+| start |!-smartrics.rest.test.fitnesse.fixture.LetTestActionFixture-!|
+| enter |symbolName|aNameOfASymbol|
+| enter |symbolValue|/resources|
 
 ... then the value is used by the !-RestFixture-!
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | %aNameOfASymbol%/%id% | 200 | | |
+

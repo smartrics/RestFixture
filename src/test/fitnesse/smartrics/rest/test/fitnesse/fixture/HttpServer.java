@@ -116,7 +116,7 @@ public class HttpServer {
             getServer().start();
             // Wait for 3 seconds to start
             int watchdog = 30;
-            while (!getServer().isRunning() && watchdog > 0) {
+            while (!getServer().isRunning() && !getServer().isStarted() && watchdog > 0) {
                 Thread.sleep(100);
                 watchdog--;
             }

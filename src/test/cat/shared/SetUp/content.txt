@@ -1,4 +1,4 @@
-| Action Fixture. |
+|Action Fixture|
 | start |!-smartrics.rest.test.fitnesse.fixture.HttpServerFixture-!|
 | check | is started | true |
 | press | reset resources database |
