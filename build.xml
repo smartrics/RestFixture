@@ -99,7 +99,7 @@
 
 	<target name="metrics" depends="compile, compile-unit" if="calculate.metrics">
 		<property name="inherit.properties" value="true" />
-		<ant antfile="build.metrics.xml" inheritall="true" target="all" />
+		<ant antfile="build.metrics.xml" inheritall="true" target="ckjm" />
 	</target>
 
 	<target name="compile-cat" depends="compile">
