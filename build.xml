@@ -265,27 +265,7 @@
 	<target name="dist-doc" if="execute.cat">
 		<!-- distributable docs -->
 		<property name="docs.html.file" value="${artifacts}/docs/RestFixture-${version}.html" />
-		<copy tofile="${docs.html.file}" file="${reports}/fitnesse/results.html" failonerror="false" />
-
-		<copy todir="${artifacts}/docs" flatten="true">
-			<fileset dir="${fitnesse.reports}" includes="**/*.*" excludes="results.*" />
-		</copy>
-		<copy todir="${artifacts}/docs">
-			<fileset dir="${fitnesse.root.name}" includes="**/*.gif" />
-			<fileset dir="${fitnesse.reports.resources}" includes="**/*.*" />
-		</copy>
-		<replace file="${docs.html.file}" token="base href" value="ignore-base href" summary="true" />
-		<replace file="${docs.html.file}" token="/files" value="files" summary="true" />
-		<replace dir="${artifacts}/docs" token="/files/css/" value="" includes="**/*.css" summary="true" />
-
-		<!-- live deployed docs file -->
-		<property name="docs.html.live.file" value="${artifacts}/docs/RestFixture-live-${version}.html" />
-		<copy tofile="${docs.html.live.file}" file="${reports}/fitnesse/results.html" failonerror="false" />
-
-		<replace file="${docs.html.live.file}" token="base href" value="ignore-base href" summary="true" />
-		<replace file="${docs.html.live.file}" token="/files" value="http://fitnesse.org/files" summary="true" />
-		<replace file="${docs.html.live.file}" token="files/restfixture/" value="http://rest-fixture.googlecode.com/files/" summary="true" />
-
+		<copy tofile="${docs.html.file}" file="${reports}/fitnesse/result_sanitised.html" failonerror="false" />
 	</target>
 
 	<target name="dist">
@@ -297,7 +277,7 @@
 			<fileset dir="lib" includes="**/*.jar" excludes="test/**/*.jar, fitnesse/**/*.jar, log4j/**/*.jar" />
 		</copy>
 		<copy todir="${artifacts}/etc">
-			<fileset dir="etc" includes="**/*.*" />
+			<fileset dir="etc" includes="restfixture/*.*" />
 		</copy>
 		<copy todir="${artifacts}" file="CHANGELOG" />
 		<copy todir="${artifacts}" file="COPYING" />
