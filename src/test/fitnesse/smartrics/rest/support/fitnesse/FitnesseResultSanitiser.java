@@ -197,10 +197,13 @@ public class FitnesseResultSanitiser {
             int pos = content.indexOf("<img", posEnd);
             foundAll = pos < 0;
             if (!foundAll) {
-                posEnd = content.indexOf("/>", pos) + 2;
+                posEnd = content.indexOf("/>", pos) + 1;
                 String pre = content.substring(0, pos - 1);
-                String tag = content.substring(pos, posEnd);
+                String tag = content.substring(pos, posEnd).trim();
                 String post = content.substring(posEnd + 1);
+                if (post.startsWith(" ")) {
+                    post = post.substring(1);
+                }
                 content = pre + generateTagWithEmbeddedImage(filesRootLoc, tag) + post;
             }
         }
