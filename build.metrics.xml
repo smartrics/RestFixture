@@ -88,7 +88,7 @@
 			<exclude name="**/*Test.class" />
             <extdirs refid="lib.classpath" />
 		</ckjm>
-		<xslt in="${ckjm.report.dir}/ckjm.xml" style="${metrics.config.dir}/ckjm.xsl" out="${metrics.report.dir}/ckjm.html" />
+		<xslt in="${ckjm.report.dir}/ckjm.xml" style="${metrics.config.dir}/ckjm.xsl" out="${ckjm.report.dir}/ckjm.html" />
 		<xslt in="${ckjm.report.dir}/ckjm.xml" style="${metrics.config.dir}/ckjm_extra.xsl" out="${ckjm.report.dir}/ckjm_extra.html" />
 	</target>
 
