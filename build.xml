@@ -1,15 +1,15 @@
 <project name="RestFixture" default="full" basedir=".">
 	<record name="${basedir}/${ant.project.name}.build.log" loglevel="verbose" />
 
-    <property file="properties/${properties}.properties" />
-    <property file="properties/${user.name}.properties" />
+	<property file="properties/${properties}.properties" />
+	<property file="properties/${user.name}.properties" />
 	<property file="build.properties" />
 
 	<property name="src.unit" value="${basedir}/src/test/java" />
 	<property name="src.cat.java" value="${basedir}/src/test/fitnesse" />
 	<property name="src.cat.fitnesse" value="${basedir}/src/test/cat" />
-    <property name="src" value="${basedir}/src/main/java" />
-    <property name="etc" value="${basedir}/etc" />
+	<property name="src" value="${basedir}/src/main/java" />
+	<property name="etc" value="${basedir}/etc" />
 	<property name="resources" value="${basedir}/src/main/resources" />
 	<property name="build" value="${basedir}/build" />
 	<property name="dist" value="${basedir}/dist" />
@@ -37,6 +37,8 @@
 		<pathelement location="${resources}" />
 		<fileset dir="${lib}">
 			<include name="**/*.jar" />
+			<!-- build.metrics.xml will define this for his own purposes -->
+			<exclude name="**/metrics/**/*.jar" />
 		</fileset>
 	</path>
 
@@ -46,7 +48,7 @@
 		<pathelement location="${build}/classes/unit" />
 	</path>
 
-	<target name="full" depends="clean, package, fitnesse-test, dist" />
+	<target name="full" depends="clean, package, fitnesse-test, metrics, dist" />
 
 	<target name="init">
 		<mkdir dir="${build}" />
@@ -66,34 +68,40 @@
 		</javac>
 	</target>
 
-    <target name="compile-unit" depends="compile">
-        <mkdir dir="${build}/classes/unit" />
-        <mkdir dir="${reports}/unit" />
-        <javac debug="${build.debug}" destdir="${build}/classes/unit" target="${build.target}">
-            <classpath refid="test.classpath" />
-            <src path="${src.unit}" />
-            <include name="**/*.java" />
-        </javac>
-    </target>
-
-    <target name="test" depends="compile-unit">
-        <junit errorproperty="test.failed">
-            <classpath refid="test.classpath" />
-            <formatter type="plain" />
-            <batchtest fork="yes" todir="${reports}/unit">
-                <fileset dir="${src.unit}">
-                    <include name="**/*Test.java" />
-                </fileset>
-            </batchtest>
-        </junit>
-        <fail if="test.failed" />
-    </target>
-
-	<target name="metrics" depends="compile, compile-unit">
-		<property name="inherit.properties" value="true" />
-		<ant antfile="build.metrics.xml" inheritall="true" target="crap4j" />
+	<target name="compile-unit" depends="compile">
+		<mkdir dir="${build}/classes/unit" />
+		<mkdir dir="${reports}/unit" />
+		<javac debug="${build.debug}" destdir="${build}/classes/unit" target="${build.target}">
+			<classpath refid="test.classpath" />
+			<src path="${src.unit}" />
+			<include name="**/*.java" />
+		</javac>
 	</target>
-	
+
+	<target name="test" depends="compile-unit">
+		<junit errorproperty="test.failed">
+			<classpath refid="test.classpath" />
+			<formatter type="xml" />
+			<batchtest fork="yes" todir="${reports}/unit">
+				<fileset dir="${src.unit}">
+					<include name="**/*Test.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+		<junitreport todir="${reports}/unit">
+			<fileset dir="${reports}/unit">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${reports}/unit/html" />
+		</junitreport>
+		<fail if="test.failed" />
+	</target>
+
+	<target name="metrics" depends="compile, compile-unit" if="calculate.metrics">
+		<property name="inherit.properties" value="true" />
+		<ant antfile="build.metrics.xml" inheritall="true" target="all" />
+	</target>
+
 	<target name="compile-cat" depends="compile">
 		<mkdir dir="${build}/classes/cat" />
 		<javac includes="**/*.java" debug="${build.debug}" target="${build.target}" destdir="${build}/classes/cat">
@@ -136,16 +144,16 @@
 
 		<!-- TODO: replace this with an ant task -->
 		<!-- matches and converst fit RestFixtures into Slim ones -->
-        <replaceregexp flags="g">
-            <regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixture\-\![\s]*\|" />
-            <substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixture-! |" />
-            <fileset refid="fitnesse.source.files" />
-        </replaceregexp>
-        <replaceregexp flags="g">
-            <regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixtureConfig\-\![\s]*\|" />
-            <substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureConfig-!  |" />
-            <fileset refid="fitnesse.source.files" />
-        </replaceregexp>
+		<replaceregexp flags="g">
+			<regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixture\-\![\s]*\|" />
+			<substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixture-! |" />
+			<fileset refid="fitnesse.source.files" />
+		</replaceregexp>
+		<replaceregexp flags="g">
+			<regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixtureConfig\-\![\s]*\|" />
+			<substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureConfig-!  |" />
+			<fileset refid="fitnesse.source.files" />
+		</replaceregexp>
 		<!-- matches and converst paths to tests -->
 		<replaceregexp flags="g">
 			<regexp pattern="RestFixtureTests\.FitTests" />
