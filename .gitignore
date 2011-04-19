@@ -3,6 +3,7 @@ temp
 etc/metrics
 TODO
 *.log
+crap_build.xml
 bin/
 build/
 dist/

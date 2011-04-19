@@ -1,12 +1,17 @@
-Patched version of crap4j v1.1.6 with a fix for Windows platforms
-for an issue in the Ant task that prevents id of crap4j home
+Patched version of crap4j v1.1.6 with 
 
-With this fix, crap4j_home is passed to the ant task
+- a fix for Windows platforms for an issue in the Ant task that prevents id of crap4j home
 
-<taskdef name="crap4j" classname="org.crap4j.anttask.Crap4jAntTask">
- ...
-</taskdef>
+  With this fix, crap4j_home is passed to the ant task
 
-<crap4j crap4jhome="${crap4j.home}" ...>
- ...
-</crap4j>
+  <taskdef name="crap4j" classname="org.crap4j.anttask.Crap4jAntTask">
+   ...
+  </taskdef>
+
+  <crap4j crap4jhome="${crap4j.home}" ...>
+   ...
+  </crap4j>
+
+- updated version of ant (1.8.2)
+
+  the bundled version is not compatible with the crap4j_build.xml generated (error on BatchesTask not supporting file attribute)

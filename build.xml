@@ -66,29 +66,32 @@
 		</javac>
 	</target>
 
-	<target name="test" depends="compile">
-		<mkdir dir="${build}/classes/unit" />
-		<mkdir dir="${reports}/unit" />
-		<javac debug="${build.debug}" destdir="${build}/classes/unit" target="${build.target}">
-			<classpath refid="test.classpath" />
-			<src path="${src.unit}" />
-			<include name="**/*.java" />
-		</javac>
-		<junit errorproperty="test.failed">
-			<classpath refid="test.classpath" />
-			<formatter type="plain" />
-			<batchtest fork="yes" todir="${reports}/unit">
-				<fileset dir="${src.unit}">
-					<include name="**/*Test.java" />
-				</fileset>
-			</batchtest>
-		</junit>
-		<fail if="test.failed" />
-	</target>
+    <target name="compile-unit" depends="compile">
+        <mkdir dir="${build}/classes/unit" />
+        <mkdir dir="${reports}/unit" />
+        <javac debug="${build.debug}" destdir="${build}/classes/unit" target="${build.target}">
+            <classpath refid="test.classpath" />
+            <src path="${src.unit}" />
+            <include name="**/*.java" />
+        </javac>
+    </target>
 
-	<target name="metrics" depends="compile">
+    <target name="test" depends="compile-unit">
+        <junit errorproperty="test.failed">
+            <classpath refid="test.classpath" />
+            <formatter type="plain" />
+            <batchtest fork="yes" todir="${reports}/unit">
+                <fileset dir="${src.unit}">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+        <fail if="test.failed" />
+    </target>
+
+	<target name="metrics" depends="compile, compile-unit">
 		<property name="inherit.properties" value="true" />
-		<ant antfile="build.metrics.xml" inheritall="true" target="all" />
+		<ant antfile="build.metrics.xml" inheritall="true" target="crap4j" />
 	</target>
 	
 	<target name="compile-cat" depends="compile">
