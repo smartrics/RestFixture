@@ -8,14 +8,15 @@
 	<property name="src.unit" value="${basedir}/src/test/java" />
 	<property name="src.cat.java" value="${basedir}/src/test/fitnesse" />
 	<property name="src.cat.fitnesse" value="${basedir}/src/test/cat" />
-	<property name="src" value="${basedir}/src/main/java" />
+    <property name="src" value="${basedir}/src/main/java" />
+    <property name="etc" value="${basedir}/etc" />
 	<property name="resources" value="${basedir}/src/main/resources" />
 	<property name="build" value="${basedir}/build" />
 	<property name="dist" value="${basedir}/dist" />
 	<property name="lib" value="${basedir}/lib" />
 	<property name="reports" value="${build}/reports" />
 	<property name="fitnesse.reports" value="${reports}/fitnesse" />
-	<property name="fitnesse.reports.resources" value="etc/fitnesse" />
+	<property name="fitnesse.reports.resources" value="${etc}/fitnesse" />
 	<property name="artifacts" value="${dist}/artifacts" />
 
 	<property name="fitnesse.path" value="${ant.project.name}Tests" />
@@ -85,6 +86,11 @@
 		<fail if="test.failed" />
 	</target>
 
+	<target name="metrics" depends="compile">
+		<property name="inherit.properties" value="true" />
+		<ant antfile="build.metrics.xml" inheritall="true" target="all" />
+	</target>
+	
 	<target name="compile-cat" depends="compile">
 		<mkdir dir="${build}/classes/cat" />
 		<javac includes="**/*.java" debug="${build.debug}" target="${build.target}" destdir="${build}/classes/cat">
@@ -277,7 +283,7 @@
 			<fileset dir="lib" includes="**/*.jar" excludes="test/**/*.jar, fitnesse/**/*.jar, log4j/**/*.jar" />
 		</copy>
 		<copy todir="${artifacts}/etc">
-			<fileset dir="etc" includes="restfixture/*.*" />
+			<fileset dir="${etc}" includes="restfixture/*.*" />
 		</copy>
 		<copy todir="${artifacts}" file="CHANGELOG" />
 		<copy todir="${artifacts}" file="COPYING" />
