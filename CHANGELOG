@@ -1,15 +1,16 @@
 version 2.0
  * added support for SLIM
- * added support for expressions in javascript for JSON
+ * added support for expressions in JavaScript for JSON
  * abandoned local variable store for FitNesse symbols
  * added a toggle button to collapse on/off large content cells
+ * added metric build to gather some metrics of the RestFixture code
 
 version 1.1.1
- * bug fix: setHeader now parses multiline headers
- * API change: added setHeaders (sugarpop for multiline headers"
+ * bug fix: setHeader now parses multi-line headers
+ * API change: added setHeaders (syntactic sugar for multi-line headers)
  
  version 1.1
- * added namespace support on matcher queries
+ * added namespaces support on matcher queries
 
  version 1.0
  * first fully usable release
