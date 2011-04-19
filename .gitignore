@@ -4,6 +4,7 @@ etc/metrics
 TODO
 *.log
 crap_build.xml
+agitar/
 bin/
 build/
 dist/
