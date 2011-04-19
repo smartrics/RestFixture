@@ -228,8 +228,15 @@ public class FitnesseResultSanitiser {
     }
 
     private String generateTagWithEmbeddedImage(String filesRootLoc, String imgTag) {
-        int pos = imgTag.indexOf("src=\"") + 5;
+        int pos = imgTag.indexOf("src=\"");
+        if (pos == -1) {
+            pos = imgTag.indexOf("src='");
+        }
+        pos = pos + 5;
         int posEnd = imgTag.indexOf("\"", pos + 1);
+        if (posEnd == -1) {
+            posEnd = imgTag.indexOf("'", pos + 1);
+        }
         String file = imgTag.substring(pos, posEnd);
         String fileName = filesRootLoc + file;
         String encoded = encodeBase64(fileName);
