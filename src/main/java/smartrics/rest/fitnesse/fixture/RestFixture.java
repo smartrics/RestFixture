@@ -406,7 +406,7 @@ public class RestFixture extends ActionFixture {
     public void setMultipartFileParameterName() {
         CellWrapper cell = row.getCell(1);
         if (cell == null) {
-            getFormatter().exception(cell, "You must pass a parameter name to set");
+            getFormatter().exception(row.getCell(0), "You must pass a parameter name to set");
         } else {
             multipartFileParameterName = GLOBALS.substitute(cell.text());
             renderReplacement(cell, multipartFileParameterName);
@@ -427,7 +427,7 @@ public class RestFixture extends ActionFixture {
     public void setBody() {
         CellWrapper cell = row.getCell(1);
         if (cell == null) {
-            getFormatter().exception(cell, "You must pass a body to set");
+            getFormatter().exception(row.getCell(0), "You must pass a body to set");
         } else {
             String text = getFormatter().fromRaw(cell.text());
             requestBody = GLOBALS.substitute(text);
@@ -445,7 +445,7 @@ public class RestFixture extends ActionFixture {
     public void setHeader() {
         CellWrapper cell = row.getCell(1);
         if (cell == null) {
-            getFormatter().exception(cell, "You must pass a header map to set");
+            getFormatter().exception(row.getCell(0), "You must pass a header map to set");
         } else {
             String header = GLOBALS.substitute(cell.text());
             requestHeaders = parseHeaders(header);
@@ -618,10 +618,8 @@ public class RestFixture extends ActionFixture {
                     getFormatter().exception(exprCell, e.getMessage());
                 }
                 GLOBALS.put(label, sValue);
-                if (valueCell != null) {
-                    adapter.set(sValue);
-                    getFormatter().check(valueCell, adapter);
-                }
+                adapter.set(sValue);
+                getFormatter().check(valueCell, adapter);
             } else {
                 getFormatter().exception(exprCell, "I don't know how to process the expression for '" + loc + "'");
             }
