@@ -35,12 +35,10 @@ public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
     @Override
     protected boolean eval(String expr, String json) {
         // for backward compatibility we should keep for now xpath expectations
-        if (!forceJsEvaluation) {
-            if (Tools.isValidXPath(getContext(), expr)) {
-                System.err.println("XPath expectations in JSON content are deprecated. Please use JavaScript expressions.");
-                String xml = Tools.fromJSONtoXML(json);
-                return super.eval(expr, xml);
-            }
+        if (!forceJsEvaluation && Tools.isValidXPath(getContext(), expr)) {
+            System.err.println("XPath expectations in JSON content are deprecated. Please use JavaScript expressions.");
+            String xml = Tools.fromJSONtoXML(json);
+            return super.eval(expr, xml);
         }
         JavascriptWrapper wrapper = new JavascriptWrapper();
         Object result = wrapper.evaluateExpression(json, expr);

@@ -48,17 +48,17 @@ public abstract class BodyTypeAdapter extends RestDataTypeAdapter {
      * @return true if no-body
      */
     protected boolean checkNoBody(final Object value) {
-        boolean res = value == null;
-        if (!res && (value instanceof String)) {
-            res = checkNoBodyForString(value.toString());
+        if (value == null) {
+            return true;
         }
-        if (!res && (value instanceof Collection)) {
-            res = ((Collection<?>) value).size() == 0;
+        if (value instanceof Collection) {
+            return ((Collection<?>) value).size() == 0;
         }
-        if (!res && (value instanceof Parse)) {
-            res = checkNoBodyForString(((Parse) value).text().trim());
+        String s = value.toString();
+        if (value instanceof Parse) {
+            s = ((Parse) value).text().trim();
         }
-        return res;
+        return checkNoBodyForString(s);
     }
 
     private boolean checkNoBodyForString(final String value) {
