@@ -64,7 +64,7 @@
 
 	<target name="findbugs" depends="init">
 	    <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${metrics.lib}/findbugs-ant.jar" />
-		<findbugs home="${findbugs.home}" output="xml" outputFile="${findbugs.report.dir}/findbugs.xml" jvmargs="-Xms512M -Xmx512M " excludeFilter="${metrics.config.dir}/findBugs_exclude_filters.xml">
+		<findbugs home="${findbugs.home}" output="html" outputFile="${findbugs.report.dir}/findbugs.xml" jvmargs="-Xms512M -Xmx512M " excludeFilter="${metrics.config.dir}/findBugs_exclude_filters.xml">
 			<sourcePath path="${src.dir}" />
 			<class location="${build.classes.main.dir}" />
 		</findbugs>
@@ -112,7 +112,8 @@
 	</target>
 
 	<target name="crap4j" depends="init">
-		<echo message="version 1.1.6 of Crap4j doesn't work very well on Windows - here expecting patch to be available" />
+		<echo message="version 1.1.6 of Crap4j doesn't work on Windows - using patched version included in RestFixture/${metrics.lib}/crap4j" />
+	    <property name="crap4j.home" value="${metrics.lib}/crap4j" />
 
 	    <taskdef name="crap4j" classname="org.crap4j.anttask.Crap4jAntTask">
 	        <classpath>
@@ -123,7 +124,7 @@
 	    </taskdef>
 
 		<!-- patch allows passing crap4j.home to the task -->
-		<crap4j crap4jhome="${crap4j.home}" projectdir="${basedir}" outputDir="${crap4j.report.dir}" dontTest="true" debug="true">
+		<crap4j crap4jhome="${crap4j.home}" projectdir="${basedir}" outputDir="${crap4j.report.dir}" dontTest="false" debug="true">
 			<classes>
 				<pathElement location="${build.dir}/classes/main" />
 			</classes>

@@ -1,0 +1,147 @@
+<?xml version="1.0" ?>
+<project name="RestFixture" default="agitar-all">
+
+	<!-- Use of ${project.dir.RestFixture} allows for the resolution of relative paths even when this file is imported in another build file -->
+	<dirname file="${ant.file.RestFixture}" property="import.dir.RestFixture"/>
+	<condition property="project.dir.RestFixture" value="${import.dir.RestFixture}" else="${basedir}">
+<isset property="import.dir.RestFixture"/>
+	</condition>
+
+<taskdef name="super-runner" classname="com.agitar.junit.runner.SuperRunnerTask">
+<classpath>
+		<pathelement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/com.agitar.common.jar" />
+		<pathelement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/com.agitar.coverage.jar" />
+		<pathelement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/com.agitar.mockingbird.jar" />
+	  <pathelement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/com.agitar.testrunner.jar" />
+		<fileset dir="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib">
+		  <include name="**/*.jar" />
+    </fileset>
+    <fileset dir="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib">
+	    <include name="**/*.jar" />
+    </fileset>
+  </classpath>
+</taskdef>
+	
+	
+	<!-- Default target -->
+	<target name="agitar-all" depends="run-tests"/>
+	
+	
+	<!-- Cleans old agitation results and coverage -->
+	<target name="clean-results">
+		<delete dir="${basedir}/agitar/.results" quiet="true"/>
+	</target>
+	
+	<!-- Run the tests for this project -->
+
+	<target name="run-tests">
+		<property name="test.results.dir" value="${project.dir.RestFixture}/agitar/.junitresults"/>
+		<mkdir dir="${test.results.dir}"/>
+		<super-runner dir="${basedir}" batchSize="5" printsummary="yes" mergeCoverage="true" haltonfailure="no" resultsDir="${project.dir.RestFixture}/agitar/.results">
+			<jvmarg value="-Xmx512M"/>
+			<jvmarg value="-ea"/>
+			<jvmarg value="-Djava.awt.headless"/>
+			<formatter type="xml"/>
+			<classpath>
+         				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/build/classes/main"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/commons/commons-beanutils.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/commons/commons-codec-1.3.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/commons/commons-collections-3.2.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/commons/commons-httpclient-3.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/commons/commons-lang-2.3.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/commons/commons-logging-1.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/fitnesse/fitnesse.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/json-lib/ezmorph-1.0.4.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/json-lib/json-lib-2.2.2-jdk15.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/log4j/log4j-1.2.14.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/oreilly/cos.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/picbuilder/PicBuilder.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/restclient/RestClient.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/rhino/js.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/rhino/jsr173_1.0_api.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/rhino/xbean.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/jetty/jetty-6.1.5.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/jetty/jetty-util-6.1.5.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/jetty/servlet-api-2.5-6.1.5.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/junit-4.4.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/annotations.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/ant-jdepend.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/antlr-2.7.7.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/asm-3.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/asm-analysis-3.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/asm-commons-3.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/asm-tree-3.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/asm-util-3.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/asm-xml-3.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/checkstyle-5.3.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/commons-beanutils-core-1.8.3.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/commons-cli-1.2.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/commons-lang-2.4.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/commons-logging-1.1.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/args4j-2.0.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/asmlib.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/com.agitar.eclipse.api.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/com.agitar.mockingbird.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/com.agitar.testrunner.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ant-junit.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ant-launcher.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ant.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/commons-codec-1.3.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/commons-httpclient-3.0.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/commons-logging.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ext/cglib-nodep-2.1_3.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ext/commons-beanutils-1.6.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ext/commons-logging-1.0.4.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ext/jakarta-oro-2.0.8.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ext/jdom.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ext/mockejb.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ext/mockrunner-0.3.8.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ext/nekohtml.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ext/org.agitar.mock.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ext/org.agitar.mock5.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/junit.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.api_4.2.0.401405/lib/xalan.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/com.agitar.check.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/com.agitar.common.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/com.agitar.coverage.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/com.agitar.eclipse.core.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/com.agitar.eclipse.coverage.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/com.agitar.eclipse.project.mock.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib/asm-tree.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib/asm.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib/ezlicgen30.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib/ezlicrun30.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib/hsqldb.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib/ils10.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib/ilsadmin10.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib/ilsclient10.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib/ilscrypt10.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib/ilsdb10.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib/jvmdetector.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/com.agitar.eclipse.coverage_4.2.0.401405/lib/wdortl20.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/org.crap4j.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/crap4j/lib/retroweaver-all-2.0.2.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/dom4j-1.6.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/emma.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/emma_ant.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/findbugs-ant.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/findbugs.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/google-collections-1.0.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/jFormatString.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/jaxen-1.1.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/jdepend-2.9.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/jsr305.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/mysql-connector-java-5.1.7-bin.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/metrics/pmd-4.2.5.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/test/mockito/mockito-all-1.7.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/xstream/jettison-1.0.1.jar"/>
+				<pathElement location="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/lib/xstream/xstream-1.3.1.jar"/>
+			</classpath>
+			<batchtest todir="${test.results.dir}">
+               <file name="C:/Users/fabrizio/Projects/restfixture-workspace/RestFixture/build/classes/unit" />
+
+			</batchtest>
+		</super-runner>
+	</target>
+	
+</project>
