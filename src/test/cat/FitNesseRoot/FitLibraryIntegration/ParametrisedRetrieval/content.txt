@@ -1,0 +1,4 @@
+!1 Resource retrieval 
+
+| retrieve resource named | a funky name | with id | 0 | 
+

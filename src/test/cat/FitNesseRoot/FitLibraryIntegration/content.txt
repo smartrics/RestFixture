@@ -1,0 +1,9 @@
+!1 Running !-RestFixture-! with !-FitLibrary-!
+
+!define TEST_RUNNER {fitlibrary.suite.FitLibraryServer}
+
+!contents -R2 -g
+
+!*****> Classpath Settings
+!path @FITLIBRARY_HOME@/fitnesse/fitlibrary.jar
+****!

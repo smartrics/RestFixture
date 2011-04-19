@@ -124,7 +124,8 @@
 		<!-- copies all but shared -->
 		<copy todir="${src.cat.temp}" overwrite="true" verbose="${verbose}">
 			<filterset>
-				<filter token="FITNESSE_HOME" value="${fitnesse.home}" />
+                <filter token="FITNESSE_HOME" value="${fitnesse.home}" />
+                <filter token="FITLIBRARY_HOME" value="${fitlibrary.home}" />
 				<filter token="FITNESSE_TEST_ROOT" value="${fitnesse.test.root}" />
 				<filter token="TEMP_DIRECTORY" value="${tmpdir}" />
 			</filterset>
