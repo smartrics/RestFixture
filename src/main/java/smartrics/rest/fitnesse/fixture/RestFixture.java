@@ -281,30 +281,12 @@ public class RestFixture extends ActionFixture {
      * @param rows
      * @return
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<List<String>> doTable(List<List<String>> rows) {
         List<List<String>> res = new Vector<List<String>>();
         getFormatter().setDisplayActual(displayActualOnRight);
         getFormatter().setMinLenghtForToggleCollapse(minLenForCollapseToggle);
         for (List<String> r : rows) {
-            RowWrapper currentRow = new SlimRow(r);
-            try {
-                processRow(currentRow);
-            } catch (Exception e) {
-                LOG.error("Exception raised when executing method " + r.get(0));
-                getFormatter().exception(currentRow.getCell(0), e);
-            } finally {
-                List<String> rowAsList = ((SlimRow) currentRow).asList();
-                for (int c = 0; c < rowAsList.size(); c++) {
-                    // HACK: it seems that even if the content is unchanged,
-                    // Slim renders red cell
-                    String v = rowAsList.get(c);
-                    if (v.equals(r.get(c))) {
-                        rowAsList.set(c, "");
-                    }
-                }
-                res.add(rowAsList);
-            }
+            processSlimRow(res, r);
         }
         return res;
     }
@@ -910,4 +892,31 @@ public class RestFixture extends ActionFixture {
         }
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void processSlimRow(List<List<String>> resultTable, List<String> row) {
+        RowWrapper currentRow = new SlimRow(row);
+        try {
+            processRow(currentRow);
+        } catch (Exception e) {
+            LOG.error("Exception raised when executing method " + row.get(0));
+            getFormatter().exception(currentRow.getCell(0), e);
+        } finally {
+            List<String> rowAsList = mapSlimRow(row, currentRow);
+            resultTable.add(rowAsList);
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    private List<String> mapSlimRow(List<String> resultRow, RowWrapper currentRow) {
+        List<String> rowAsList = ((SlimRow) currentRow).asList();
+        for (int c = 0; c < rowAsList.size(); c++) {
+            // HACK: it seems that even if the content is unchanged,
+            // Slim renders red cell
+            String v = rowAsList.get(c);
+            if (v.equals(resultRow.get(c))) {
+                rowAsList.set(c, "");
+            }
+        }
+        return rowAsList;
+    }
 }

@@ -42,35 +42,41 @@ public class HttpClientBuilder {
     public static final Integer DEFAULT_PROXY_PORT = 80;
 
     public HttpClient createHttpClient(final Config config) {
+        HttpClient client = createConfiguredClient(config);
+        if (config != null) {
+            configureHost(config, client);
+            configureCredentials(config, client);
+        }
+        return client;
+    }
+
+    private HttpClient createConfiguredClient(final Config config) {
         HttpClientParams params = new HttpClientParams();
         params.setSoTimeout(DEFAULT_SO_TO);
         if (config != null) {
             params.setSoTimeout(config.getAsInteger("http.client.connection.timeout", DEFAULT_SO_TO));
         }
         HttpClient client = new HttpClient(params);
+        return client;
+    }
+
+    private void configureHost(final Config config, HttpClient client) {
         HostConfiguration hostConfiguration = client.getHostConfiguration();
-        String proxyHost = null;
-        if (config != null) {
-            proxyHost = config.get("http.proxy.host");
-        }
+        String proxyHost = config.get("http.proxy.host");
         if (proxyHost != null) {
             int proxyPort = config.getAsInteger("http.proxy.port", DEFAULT_PROXY_PORT);
             hostConfiguration.setProxy(proxyHost, proxyPort);
         }
         HostParams hostParams = new HostParams();
         hostConfiguration.setParams(hostParams);
-        String username = null;
-        if (config != null) {
-            username = config.get("http.basicauth.username");
-        }
-        String password = null;
-        if (config != null) {
-            password = config.get("http.basicauth.password");
-        }
+    }
+
+    private void configureCredentials(final Config config, HttpClient client) {
+        String username = config.get("http.basicauth.username");
+        String password = config.get("http.basicauth.password");
         if (username != null && password != null) {
             Credentials defaultcreds = new UsernamePasswordCredentials(username, password);
             client.getState().setCredentials(AuthScope.ANY, defaultcreds);
         }
-        return client;
     }
 }
