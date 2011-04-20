@@ -48,7 +48,7 @@
 		<pathelement location="${build}/classes/unit" />
 	</path>
 
-	<target name="full" depends="clean, package, fitnesse-test, metrics, dist" />
+	<target name="full" depends="clean, test, package, fitnesse-test, metrics, dist" />
 
 	<target name="init">
 		<mkdir dir="${build}" />
