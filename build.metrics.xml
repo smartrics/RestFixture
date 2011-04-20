@@ -178,6 +178,8 @@
 				</fileset -->
 			</libClasspath>
 		</crap4j>
+        <delete file="crap_build.xml" />
+        <delete dir="agitar" />
 	</target>
 
 </project>
