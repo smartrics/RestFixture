@@ -58,6 +58,8 @@
 	<target name="clean">
 		<delete dir="${build}" />
 		<delete dir="${dist}" />
+		<!-- This comes from the RestFixtureWithSeq hardcoded values -->
+		<delete dir="FitNesseRoot" />
 	</target>
 
 	<target name="compile" depends="init">
@@ -124,7 +126,7 @@
 		<!-- copies all but shared -->
 		<copy todir="${src.cat.temp}" overwrite="true" verbose="${verbose}">
 			<filterset>
-                <filter token="FITNESSE_HOME" value="${fitnesse.home}" />
+				<filter token="FITNESSE_HOME" value="${fitnesse.home}" />
 				<filter token="FITNESSE_TEST_ROOT" value="${fitnesse.test.root}" />
 				<filter token="TEMP_DIRECTORY" value="${tmpdir}" />
 			</filterset>
