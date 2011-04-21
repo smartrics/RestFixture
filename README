@@ -29,19 +29,25 @@ Documentation:
 
 Build
 -----
-To build RestFixture edit the build.properties and set the values of the
-properties to reflect your environment.
+To build RestFixture add a property file in the properties directory named <your.os.username>.properties 
+by copying and customising build.properties if necessary.
+
 Use
 > ant
+
 or
+
 > ant full
-to run the defaul target (this will build the Rest Fixture, start a local instance
-of FitNesse on port 7070 and run the fitnesse tests in fitdocs. If it all succeedes
-a build of the RestFixture is available in dist/ alongside with the latest documentation
 
-To build and run unit tests run
-> and test
+to run the default target (this will build the Rest Fixture, start a local instance
+of FitNesse on port 7070 and run the fitnesse tests in src/test/cat. 
 
+You can also pass a build properties file to ant with 
+
+> ant -Dproperties=<my.bespoke.file>.properties
+
+If it all succeeds a distribution of the RestFixture is available in dist/ alongside with the latest 
+documentation. Reports of tests and metrics are available in build/reports
 
 Note on dependencies
 --------------------
@@ -64,8 +70,9 @@ For example,
 !path @FITNESSE_HOME@/fitnesse.jar
 ****!
 
-@FITNESSE_TEST_ROOT@/lib is where the jars are
- @FITNESSE_HOME@ is where fitnesse.jar is
+@FITNESSE_TEST_ROOT@/lib is where the dependent jars are
+@FITNESSE_HOME@ is where fitnesse.jar is
 
  Any page which is child of the content.txt page where the !path is defined will be able to
- use the Rest Fixture (see fitdocs/ for a fully working example)
+ use the Rest Fixture. For an example look at how the RestFixture CAT tests are setup in
+ build/fitnesse/FinNesseRoot/RestFixtureTests
