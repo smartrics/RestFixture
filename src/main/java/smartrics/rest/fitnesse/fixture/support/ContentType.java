@@ -20,7 +20,10 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import smartrics.rest.client.RestData.Header;
 
@@ -31,40 +34,64 @@ import smartrics.rest.client.RestData.Header;
  */
 public enum ContentType {
 
-    UNKNOWN(null), 
-    XML("application/xml"), 
-    JSON("application/json"), 
-    TEXT("text/plain"), 
-    JS("application/x-javascript");
+    XML, JSON, TEXT, JS;
 
-    private String contentTypeString;
-
-    private ContentType(String c) {
-        this.contentTypeString = c;
+    private static Map<String, ContentType> contentTypeToEnum = new HashMap<String, ContentType>();
+    static {
+        resetDefaultMapping();
     }
 
-    public String toMime() {
-        return contentTypeString;
+    public List<String> toMime() {
+        List<String> types = new ArrayList<String>();
+        for (Map.Entry<String, ContentType> e : contentTypeToEnum.entrySet()) {
+            if(e.getValue().equals(this)) {
+                types.add(e.getKey());
+            }
+        }        
+        return types;
+    }
+
+    public static ContentType typeFor(String t) {
+        ContentType r = contentTypeToEnum.get(t);
+        if (r == null) {
+            r = contentTypeToEnum.get("default");
+        }
+        return r;
+    }
+
+    public static void config(String htmlConfig) {
+        String config = Tools.fromHtml(htmlConfig);
+        Map<String, String> map = Tools.convertStringToMap(config, "=", "\n");
+        for (Map.Entry<String, String> e : map.entrySet()) {
+            String enumName = e.getValue().toUpperCase();
+            ContentType ct = ContentType.valueOf(enumName);
+            if (null == ct) {
+                throw new IllegalArgumentException("I don't know how to handle " + e.getValue() + ". Use one of " + ContentType.values());
+            }
+            System.err.println(">> put " + e.getKey() + " = " + ct);
+            contentTypeToEnum.put(e.getKey(), ct);
+        }
+    }
+
+    public static void resetDefaultMapping() {
+        contentTypeToEnum.clear();
+        contentTypeToEnum.put("default", ContentType.XML);
+        contentTypeToEnum.put("application/xml", ContentType.XML);
+        contentTypeToEnum.put("application/json", ContentType.JSON);
+        contentTypeToEnum.put("text/plain", ContentType.TEXT);
+        contentTypeToEnum.put("application/x-javascript", ContentType.JS);
     }
 
     public static ContentType parse(List<Header> contentTypeHeaders) {
-        if (contentTypeHeaders.size() != 1 || !"Content-Type".equals(contentTypeHeaders.get(0).getName())) {
-            return UNKNOWN;
+        if (contentTypeHeaders.size() != 1 || !"Content-Type".equalsIgnoreCase(contentTypeHeaders.get(0).getName())) {
+            return contentTypeToEnum.get("default");
         }
         String typeString = contentTypeHeaders.get(0).getValue();
-        if (typeString == null) {
-            return UNKNOWN;
+        typeString = typeString.split(";")[0].trim();
+        ContentType ret = contentTypeToEnum.get(typeString);
+        if (ret == null) {
+            return contentTypeToEnum.get("default");
         }
-        if (typeString.contains(XML.contentTypeString)) {
-            return XML;
-        } else if (typeString.contains(JSON.contentTypeString)) {
-            return JSON;
-        } else if (typeString.contains(JS.contentTypeString)) {
-            return JS;
-        } else if (typeString.contains(TEXT.contentTypeString)) {
-            return TEXT;
-        } else {
-            return UNKNOWN;
-        }
+        return ret;
     }
 }

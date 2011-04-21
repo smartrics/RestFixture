@@ -20,6 +20,9 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Depending on Content-Type passed in it'll build the appropriate type adapter
  * for parsing/rendering the cell content
@@ -32,20 +35,32 @@ package smartrics.rest.fitnesse.fixture.support;
  */
 public class BodyTypeAdapterFactory {
 
+    @SuppressWarnings("rawtypes")
+    private static Map<ContentType, Class> contentTypeToBodyTypeAdapter = new HashMap<ContentType, Class>();
+    static {
+        contentTypeToBodyTypeAdapter.put(ContentType.JS, JSONBodyTypeAdapter.class);
+        contentTypeToBodyTypeAdapter.put(ContentType.JSON, JSONBodyTypeAdapter.class);
+        contentTypeToBodyTypeAdapter.put(ContentType.XML, XPathBodyTypeAdapter.class);
+        contentTypeToBodyTypeAdapter.put(ContentType.TEXT, TextBodyTypeAdapter.class);
+    }
+
     private BodyTypeAdapterFactory() {
     }
 
     public static BodyTypeAdapter getBodyTypeAdapter(ContentType content) {
-        if (content == ContentType.JSON) {
-            return new JSONBodyTypeAdapter();
-        } else if (content == ContentType.XML) {
-            return new XPathBodyTypeAdapter();
-        } else if (content == ContentType.TEXT) {
-            return new TextBodyTypeAdapter();
-        } else if (content == ContentType.UNKNOWN) {
-            return new XPathBodyTypeAdapter();
-        } else {
+        @SuppressWarnings("rawtypes")
+        Class aClass = contentTypeToBodyTypeAdapter.get(content);
+        if (aClass == null) {
             throw new IllegalArgumentException("Content-Type is UNKNOWN.  Unable to find a BodyTypeAdapter to instantiate.");
         }
+        BodyTypeAdapter instance = null;
+        try {
+            instance = (BodyTypeAdapter) aClass.newInstance();
+        } catch (InstantiationException e) {
+            throw new IllegalStateException("Unable to instantiate a the BodyTypeAdapter for " + content + "(" + aClass.getName() + ")");
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Unable access ctor to instantiate a the BodyTypeAdapter for " + content + "(" + aClass.getName() + ")");
+        }
+        return instance;
     }
 }

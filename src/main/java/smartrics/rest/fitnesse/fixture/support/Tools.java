@@ -295,9 +295,12 @@ public final class Tools {
         Map<String, String> ret = new HashMap<String, String>();
         for (String nvp : nvpArray) {
             try {
+                if ("".equals(nvp.trim())) {
+                    continue;
+                }
                 int pos = nvp.trim().indexOf(nvSep);
-                String v = "";
                 String k = nvp;
+                String v = "";
                 if (pos != -1) {
                     int pos2 = pos + nvSep.length();
                     v = nvp.substring(pos2).trim();

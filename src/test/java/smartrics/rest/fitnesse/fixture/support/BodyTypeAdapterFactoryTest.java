@@ -58,7 +58,7 @@ public class BodyTypeAdapterFactoryTest {
     @Test
     public void unknownContentTypeReturnsXPathBodyTypeAdapter() {
         // act
-        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ContentType.UNKNOWN);
+        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ContentType.typeFor("unknown"));
         // assert
         assertTrue(bodyTypeAdapter instanceof XPathBodyTypeAdapter);
     }

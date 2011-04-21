@@ -24,6 +24,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -118,6 +119,15 @@ public class ToolsTest {
         assertEquals(2, map.size());
         assertEquals("v2", map.get("k2"));
         assertEquals("v1", map.get("k1"));
+    }
+
+    @Test
+    public void shouldConvertAMultilineStringIntoAMapIgnoresEmptyLines() {
+        Map<String, String> map = Tools.convertStringToMap("!- k1=v1\n\nk2=v2\n-!", "=", "\n");
+        assertEquals(2, map.size());
+        assertEquals("v2", map.get("k2"));
+        assertEquals("v1", map.get("k1"));
+        assertNull(map.get(""));
     }
 
     @Test

@@ -1,4 +1,4 @@
-/*  Copyright 2008 Andrew Ochsner
+/*  Copyright 2011 Fabrizio Cannizzo
  *
  *  This file is part of RestFixture.
  *
@@ -25,96 +25,120 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import smartrics.rest.client.RestData;
 import smartrics.rest.client.RestData.Header;
 
 public class ContentTypeTest {
-	// make sure you can get the right ContentType when header is
-	// application/xml
+
+    @Before
+    @After
+    public void resetDefaultContentTypeMap() {
+        ContentType.resetDefaultMapping();
+    }
+
 	@Test
 	public void shouldReturnCorrectTypeGivenApplicationXml() {
-		// setup
 		List<Header> headers = new ArrayList<Header>();
 		headers.add(new RestData.Header("Content-Type", "application/xml"));
-		// act & assert
+
 		assertEquals(ContentType.XML, ContentType.parse(headers));
 	}
 	
-	// make sure you can get the right ContentType when header is
-	// application/json
 	@Test
 	public void shouldReturnCorrectTypeGivenApplicationJson() {
-		// setup
 		List<Header> headers = new ArrayList<Header>();
 		headers.add(new RestData.Header("Content-Type", "application/json"));
-		// act & assert
+
 		assertEquals(ContentType.JSON, ContentType.parse(headers));
 	}
 
-	// make sure you can get the right ContentType when header is
-	// text/plain
 	@Test
 	public void shouldReturnCorrectTypeGivenApplicationText() {
-		// setup
 		List<Header> headers = new ArrayList<Header>();
 		headers.add(new RestData.Header("Content-Type", "text/plain"));
-		// act & assert
+
 		assertEquals(ContentType.TEXT, ContentType.parse(headers));
 	}
 
-	// make sure you can get the right ContentType when header is
-	// text/plain with a charset
 	@Test
 	public void shouldReturnCorrectTypeGivenApplicationTextWithCharset() {
-		// setup
 		List<Header> headers = new ArrayList<Header>();
 		headers.add(new RestData.Header("Content-Type",
 				"text/plain; charset=iso-8859-1"));
-		// act & assert
+
 		assertEquals(ContentType.TEXT, ContentType.parse(headers));
 	}
 
-	// make sure you can get the UNKNOWN ContentType when header is
-	// anything else
 	@Test
-	public void shouldReturnUnknownGivenAnythingElse() {
-		// setup
+    public void shouldReturnDefaultGivenAnythingElse() {
 		List<Header> headers = new ArrayList<Header>();
 		headers.add(new RestData.Header("Content-Type", "blah/blah"));
-		// act & assert
-		assertEquals(ContentType.UNKNOWN, ContentType.parse(headers));
+
+        assertEquals(ContentType.typeFor("default"), ContentType.parse(headers));
 	}
 
-	// make sure you can get the UNKNOWN ContentType when headers are empty
 	@Test
-	public void shouldReturnUnknownGivenEmptyHeaders() {
-		// setup
+    public void shouldReturnDefaultGivenEmptyHeaders() {
 		List<Header> headers = new ArrayList<Header>();
-		// act & assert
-		assertEquals(ContentType.UNKNOWN, ContentType.parse(headers));
+
+        assertEquals(ContentType.typeFor("default"), ContentType.parse(headers));
 	}
 
-	// make sure you can get the UNKNOWN ContentType given more than one header
 	@Test
-	public void shouldReturnUnknownGivenMoreThanOneHeaders() {
-		// setup
+    public void shouldReturnDefaultGivenMoreThanOneHeaders() {
 		List<Header> headers = new ArrayList<Header>();
 		headers.add(new RestData.Header("Content-Type", "application/json"));
 		headers.add(new RestData.Header("Content-Type", "application/json"));
-		// act & assert
-		assertEquals(ContentType.UNKNOWN, ContentType.parse(headers));
+
+        assertEquals(ContentType.typeFor("default"), ContentType.parse(headers));
 	}
 
-	// make sure you can get the UNKNOWN ContentType given one header that is
-	// not Content-Type:
 	@Test
-	public void shouldReturnUnknownGivenOneHeaderThatIsNotContentType() {
-		// setup
+    public void shouldReturnDefaultGivenOneHeaderThatIsNotContentType() {
 		List<Header> headers = new ArrayList<Header>();
 		headers.add(new RestData.Header("Something-Else", "application/json"));
-		// act & assert
-		assertEquals(ContentType.UNKNOWN, ContentType.parse(headers));
+
+        assertEquals(ContentType.typeFor("default"), ContentType.parse(headers));
 	}
+
+    @Test
+    public void shouldSetupInternalStateFromConfig() {
+        StringBuffer config = new StringBuffer();
+        config.append("application/x-html=xml<br/>\n");
+        ContentType.config(config.toString());
+        assertEquals(ContentType.XML, ContentType.typeFor("application/x-html"));
+        assertEquals(ContentType.XML, ContentType.typeFor("default"));
+    }
+
+    @Test
+    public void shouldSetupTheContentTypeToAdaptersMapViaConfig() {
+        StringBuffer config = new StringBuffer();
+        config.append("application/xml=xml<br/>\n");
+        config.append("default = text <br/>\n");
+        config.append("application/xhtml=xml<br/>\n");
+        config.append("application/my-app-xml=xml<br/>\n");
+        config.append("text/plain=json<br/>\n\n");
+
+        ContentType.config(config.toString());
+
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new RestData.Header("Content-Type", "application/json"));
+        assertEquals(ContentType.JSON, ContentType.parse(headers));
+        headers.set(0, new RestData.Header("Content-Type", "application/xml; charset=iso12344"));
+        assertEquals(ContentType.XML, ContentType.parse(headers));
+        headers.set(0, new RestData.Header("Content-Type", "application/xhtml"));
+        assertEquals(ContentType.XML, ContentType.parse(headers));
+        headers.set(0, new RestData.Header("Content-Type", "application/my-app-xml"));
+        assertEquals(ContentType.XML, ContentType.parse(headers));
+        headers.set(0, new RestData.Header("Content-Type", "text/plain"));
+        assertEquals(ContentType.JSON, ContentType.parse(headers));
+
+        // overrides "default"
+        headers.set(0, new RestData.Header("Content-Type", "unhandled"));
+        assertEquals(ContentType.TEXT, ContentType.parse(headers));
+    }
 }

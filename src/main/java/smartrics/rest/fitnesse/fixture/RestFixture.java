@@ -778,7 +778,9 @@ public class RestFixture extends ActionFixture {
         process(row.getCell(3), lastHeaders, new HeadersTypeAdapter());
         CellWrapper bodyCell = row.getCell(4);
         bodyCell.body(GLOBALS.substitute(bodyCell.body()));
-        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(getContentTypeOfLastResponse());
+        ContentType ct = getContentTypeOfLastResponse();
+        System.err.println(ct.name());
+        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ct);
         bodyTypeAdapter.setContext(namespaceContext);
         process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
     }

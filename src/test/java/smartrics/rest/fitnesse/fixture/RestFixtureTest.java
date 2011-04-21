@@ -99,6 +99,8 @@ public class RestFixtureTest {
         lastResponse.setTransactionId(0L);
 
         config = new Config();
+
+        ContentType.resetDefaultMapping();
     }
 
     @After
@@ -409,6 +411,11 @@ public class RestFixtureTest {
 
         // correctly builds request
         verify(mockCellFormatter).right(isA(CellWrapper.class), isA(XPathBodyTypeAdapter.class));
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("http://localhost:9090/uri"), eq("/uri"));
+        verify(mockCellFormatter).gray("200");
+        verify(mockCellFormatter).gray("Content-Type : application/xml");
+
+        verifyNoMoreInteractions(mockCellFormatter);
     }
 
     /**
@@ -551,7 +558,7 @@ public class RestFixtureTest {
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
         String jsonString = "{ \"person\" : { \"name\" : \"fred\", \"age\" : \"20\"} }";
         lastResponse.setBody(jsonString);
-        lastResponse.addHeader("Content-Type", ContentType.JSON.toMime());
+        lastResponse.addHeader("Content-Type", ContentType.JSON.toMime().get(0));
 
         fixture = new RestFixture(Runner.OTHER, mockPartsFactory, config, BASE_URL);
 

@@ -165,7 +165,7 @@ public class JavascriptWrapperTest {
         response.setStatusCode(200);
         response.setStatusText("OK");
         response.setBody(body);
-        response.addHeader("Content-Type", contentType.toMime());
+        response.addHeader("Content-Type", contentType.toMime().get(0));
         response.addHeader("Bespoke-Header", "jolly");
         response.addHeader("Bespoke-Header", "good");
         response.addHeader("Content-Length", "7");
