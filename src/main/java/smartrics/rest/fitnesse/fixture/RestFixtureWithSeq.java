@@ -24,7 +24,6 @@ import java.io.File;
 import java.util.List;
 
 import smartrics.rest.client.RestData.Header;
-import smartrics.rest.config.Config;
 import smartrics.sequencediagram.Builder;
 import smartrics.sequencediagram.Create;
 import smartrics.sequencediagram.Event;
@@ -80,13 +79,24 @@ public class RestFixtureWithSeq extends RestFixture {
         super();
     }
 
-    public RestFixtureWithSeq(String... args) {
-        super(args);
+    public RestFixtureWithSeq(String hostName, String pictureName) {
+        super(hostName);
+        this.pictureName = pictureName;
+    }
+
+    public RestFixtureWithSeq(String hostName, String configName, String pictureName) {
+        super(hostName, configName);
+        this.pictureName = pictureName;
+    }
+
+    public RestFixtureWithSeq(PartsFactory partsFactory, String hostName, String configName, String pictureName) {
+        super(partsFactory, hostName, configName);
+        this.pictureName = pictureName;
     }
 
     @Override
-    protected void initialize(Runner runner, String[] args) {
-        super.initialize(runner, args);
+    protected void initialize(Runner runner) {
+        super.initialize(runner);
         create(new PicDiagram(), new Model());
         String picsDir = System.getProperty("restfixture.graphs.dir", "FitNesseRoot/files/restfixture");
         picsDir = getConfig().get("restfixture.graphs.dir", picsDir);
@@ -94,17 +104,27 @@ public class RestFixtureWithSeq extends RestFixture {
         setFixtureListener(new MyFixtureListener(this, builder, SUPPORT_FILES_DIR, graphFileDir));
     }
 
+    protected String getPictureNameFromArgs() {
+        if (args.length > 1) {
+            return args[args.length - 1];
+        }
+        return null;
+    }
+
     @Override
-    protected void processArguments(String[] args) {
-        super.processArguments(args);
-        if (args.length == 2) {
-            pictureName = args[1];
-            super.setConfig(new Config());
-        }
+    protected String getConfigNameFromArgs() {
         if (args.length == 3) {
-            super.setConfig(new Config(args[1]));
-            pictureName = args[2];
+            return args[1];
         }
+        return null;
+    }
+
+    @Override
+    protected String getBaseUrlFromArgs() {
+        if (args.length > 1) {
+            return args[0];
+        }
+        return null;
     }
 
     /**
@@ -149,6 +169,16 @@ public class RestFixtureWithSeq extends RestFixture {
     public void doTable(Parse table) {
         super.doTable(table);
         listener.tableFinished(table);
+    }
+
+    /**
+     * Overrides the RestFixture doCells to set up the mandatory pictureName
+     * when using Fit runner.
+     */
+    @Override
+    public void doCells(Parse table) {
+        this.pictureName = getPictureNameFromArgs();
+        super.doCells(table);
     }
 
     /**

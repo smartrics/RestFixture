@@ -23,6 +23,8 @@ package smartrics.rest.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import smartrics.rest.fitnesse.fixture.support.Tools;
+
 /**
  * Simple implementation of a named configuration store.
  * 
@@ -39,39 +41,55 @@ public final class Config {
     /**
      * the static bucket where the config data is stored.
      */
-    private static final Map<String, Map<String, String>> CONFIGURATIONS = new HashMap<String, Map<String, String>>();
+    private static final Map<String, Config> CONFIGURATIONS = new HashMap<String, Config>();
+
+    /**
+     * the configuration with default name. {@link Config.DEFAULT_CONFIG_NAME};
+     */
+    public static Config getConfig() {
+        return getConfig(DEFAULT_CONFIG_NAME);
+    }
+
+    /**
+     * the configuration with a name.
+     */
+    public static Config getConfig(String name) {
+        if(name==null) {
+            name = DEFAULT_CONFIG_NAME;
+        }
+        Config namedConfig = CONFIGURATIONS.get(name);
+        if (namedConfig == null) {
+            namedConfig = new Config(name);
+            CONFIGURATIONS.put(name, namedConfig);
+        }
+        return namedConfig;
+    }
 
     /**
      * this instance name.
      */
 	private final String name;
 
-    /**
-     * the constructor for the configuration with default name.
-     * {@link Config.DEFAULT_CONFIG_NAME};
-     */
-	public Config() {
-		this(DEFAULT_CONFIG_NAME);
-	}
+    private Map<String, String> data;
 
-	/**
-	 * This config name.
-	 * 
-	 * @return the name
-	 */
+    /**
+     * creates a config with a given name.
+     * 
+     * @param name
+     *            the name of this config
+     */
+    private Config(final String name) {
+        this.name = name;
+        this.data = new HashMap<String, String>();
+    }
+
+    /**
+     * This config name.
+     * 
+     * @return the name
+     */
 	public String getName() {
 		return name;
-	}
-
-	/**
-	 * creates a config with a given name.
-	 * 
-	 * @param name
-	 *            the name of this config
-	 */
-	public Config(final String name) {
-		this.name = name;
-		lazyCreateNamedConfig();
 	}
 
 	/**
@@ -83,8 +101,7 @@ public final class Config {
 	 *            the value
 	 */
 	public void add(String key, String value) {
-		Map<String, String> namedConfig = getNamedConfig();
-		namedConfig.put(key, value);
+        data.put(key, value);
 	}
 
 	/**
@@ -95,8 +112,7 @@ public final class Config {
 	 * @return the value
 	 */
 	public String get(String key) {
-		Map<String, String> namedConfig = getNamedConfig();
-		return namedConfig.get(key);
+        return data.get(key);
 	}
 
 	/**
@@ -170,34 +186,30 @@ public final class Config {
 		}
 	}
 
-	/**
-	 * Clears a named config store.
-	 * 
-	 * @param cName
-	 *            the named config to clear
-	 */
+    /**
+     * returns a key/value froma a named config, parsed as a Map<String, String>
+     */
+    public Map<String, String> getAsMap(String key, Map<String, String> def) {
+        String val = get(key);
+        try {
+            return Tools.convertStringToMap(val, "\n", "=");
+        } catch (RuntimeException e) {
+            return def;
+        }
+    }
+
+    /**
+     * Clears a named config store.
+     * 
+     * @param cName
+     *            the named config to clear
+     */
 	public void clear() {
-		Map<String, String> namedConfig = getNamedConfig();
-		namedConfig.clear();
-	}
-
-	private Map<String, String> getNamedConfig() {
-		return CONFIGURATIONS.get(name);
-	}
-
-	private Map<String, String> lazyCreateNamedConfig() {
-		Map<String, String> namedConfig = CONFIGURATIONS.get(name);
-		if (namedConfig == null) {
-			namedConfig = new HashMap<String, String>();
-			CONFIGURATIONS.put(name, namedConfig);
-		}
-		return namedConfig;
-	}
+        data.clear();
+    }
 
 	@Override
 	public String toString() {
-		return "name=" + getName() + ". Configurations: "
-				+ CONFIGURATIONS.toString() + " this: " + this.hashCode()
-				+ ", CONF: " + CONFIGURATIONS.hashCode();
+        return "[name=" + getName() + "] " + data.toString();
 	}
 }

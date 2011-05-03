@@ -18,7 +18,7 @@
   </appender>
 
   <category name="httpclient.wire" additivity="false">
-    <priority value="DEBUG" />
+    <priority value="WARN" />
     <appender-ref ref="CONSOLE" />
   </category>
 

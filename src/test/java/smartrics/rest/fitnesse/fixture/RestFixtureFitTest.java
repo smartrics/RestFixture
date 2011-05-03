@@ -36,13 +36,16 @@ public class RestFixtureFitTest {
     private RestFixture fixture;
     private final Variables variables = new Variables();
     private Config config;
+    private Parse emptyParse;
 
     @Before
     public void setUp() {
-        config = new Config();
+        config = Config.getConfig();
         // this is created for tests that don't need to verify expectations
         fixture = new RestFixture(BASE_URL);
         variables.clearAll();
+        RestFixtureTestHelper helper = new RestFixtureTestHelper();
+        emptyParse = helper.buildEmptyParse();
     }
 
     @After
@@ -57,7 +60,7 @@ public class RestFixtureFitTest {
                 super.args = new String[] {};
             }
         };
-        fixture.doCells(FitTestSupport.buildEmptyParse());
+        fixture.doCells(emptyParse);
     }
 
     @Test
@@ -67,8 +70,7 @@ public class RestFixtureFitTest {
                 super.args = new String[] { BASE_URL };
             }
         };
-        Parse parse = FitTestSupport.buildEmptyParse();
-        fixture.doCells(parse);
+        fixture.doCells(emptyParse);
         assertEquals(Config.DEFAULT_CONFIG_NAME, fixture.getConfig().getName());
     }
 
@@ -79,7 +81,7 @@ public class RestFixtureFitTest {
                 super.args = new String[] { BASE_URL, "configName" };
             }
         };
-        fixture.doCells(FitTestSupport.buildEmptyParse());
+        fixture.doCells(emptyParse);
         assertEquals("configName", fixture.getConfig().getName());
     }
 }

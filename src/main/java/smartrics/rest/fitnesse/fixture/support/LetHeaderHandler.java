@@ -32,7 +32,6 @@ public class LetHeaderHandler implements LetHandler {
         if (content.size() > 0) {
             Pattern p = Pattern.compile(expression);
             for (String c : content) {
-                System.err.println("matching " + c + " with " + expression);
                 Matcher m = p.matcher(c);
                 if (m.find()) {
                     int cc = m.groupCount();

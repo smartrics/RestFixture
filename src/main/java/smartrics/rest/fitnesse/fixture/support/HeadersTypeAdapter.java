@@ -46,10 +46,9 @@ public class HeadersTypeAdapter extends RestDataTypeAdapter {
         Collection<Header> expected = (Collection<Header>) expectedObj;
         Collection<Header> actual = (Collection<Header>) actualObj;
         for (Header k : expected) {
-            String eValue = k.getValue();
             Header aHdr = find(actual, k);
             if (aHdr == null) {
-                addError("not found: [" + k + ":" + eValue.trim() + "]");
+                addError("not found: [" + k.getName() + " : " + k.getValue() + "]");
             }
         }
         return getErrors().size() == 0;
@@ -57,7 +56,9 @@ public class HeadersTypeAdapter extends RestDataTypeAdapter {
 
     private Header find(Collection<Header> actual, Header k) {
         for (Header h : actual) {
-            if (h.getName().equals(k.getName()) && Tools.regex(h.getValue(), k.getValue())) {
+            boolean nameMatches = h.getName().equals(k.getName());
+            boolean valueMatches = Tools.regex(h.getValue(), k.getValue());
+            if (nameMatches && valueMatches) {
                 return h;
             }
         }

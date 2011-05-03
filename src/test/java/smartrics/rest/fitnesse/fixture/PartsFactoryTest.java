@@ -57,7 +57,7 @@ public class PartsFactoryTest {
 
     @Test
     public void buildsRestClient() {
-        Config c = new Config();
+        Config c = Config.getConfig();
         assertThat(f.buildRestClient(c), is(instanceOf(RestClient.class)));
     }
 

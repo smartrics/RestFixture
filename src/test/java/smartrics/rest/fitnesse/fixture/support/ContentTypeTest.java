@@ -31,6 +31,7 @@ import org.junit.Test;
 
 import smartrics.rest.client.RestData;
 import smartrics.rest.client.RestData.Header;
+import smartrics.rest.config.Config;
 
 public class ContentTypeTest {
 
@@ -107,23 +108,28 @@ public class ContentTypeTest {
 
     @Test
     public void shouldSetupInternalStateFromConfig() {
-        StringBuffer config = new StringBuffer();
-        config.append("application/x-html=xml<br/>\n");
-        ContentType.config(config.toString());
+        StringBuffer configEntry = new StringBuffer();
+        configEntry.append("application/x-html=xml<br/>\n");
+        Config c = Config.getConfig();
+        c.add("restfixture.content.handlers.map", configEntry.toString());
+        ContentType.config(c);
         assertEquals(ContentType.XML, ContentType.typeFor("application/x-html"));
         assertEquals(ContentType.XML, ContentType.typeFor("default"));
     }
 
     @Test
     public void shouldSetupTheContentTypeToAdaptersMapViaConfig() {
-        StringBuffer config = new StringBuffer();
-        config.append("application/xml=xml<br/>\n");
-        config.append("default = text <br/>\n");
-        config.append("application/xhtml=xml<br/>\n");
-        config.append("application/my-app-xml=xml<br/>\n");
-        config.append("text/plain=json<br/>\n\n");
+        StringBuffer configEntry = new StringBuffer();
+        configEntry.append("application/xml=xml<br/>\n");
+        configEntry.append("default = text <br/>\n");
+        configEntry.append("application/xhtml=xml<br/>\n");
+        configEntry.append("application/my-app-xml=xml<br/>\n");
+        configEntry.append("text/plain=json<br/>\n\n");
 
-        ContentType.config(config.toString());
+        Config c = Config.getConfig();
+        c.add("restfixture.content.handlers.map", configEntry.toString());
+
+        ContentType.config(c);
 
         List<Header> headers = new ArrayList<Header>();
         headers.add(new RestData.Header("Content-Type", "application/json"));

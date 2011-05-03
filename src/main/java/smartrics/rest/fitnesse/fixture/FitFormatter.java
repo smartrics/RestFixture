@@ -23,7 +23,6 @@ package smartrics.rest.fitnesse.fixture;
 import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.Tools;
 import fit.ActionFixture;
 import fit.Parse;
@@ -73,7 +72,7 @@ public class FitFormatter implements CellFormatter<Parse> {
 	}
 
 	@Override
-	public void check(CellWrapper<Parse> valueCell, StringTypeAdapter adapter) {
+    public void check(CellWrapper<Parse> valueCell, RestDataTypeAdapter adapter) {
         valueCell.body(Tools.toHtml(valueCell.body()));
 		fixture.check(valueCell.getWrapped(), adapter);
 	}

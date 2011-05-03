@@ -34,15 +34,15 @@ import fit.Parse;
 public class TextBodyTypeAdapter extends BodyTypeAdapter {
 
     @Override
-    public boolean equals(Object r1, Object r2) {
-        if (r1 == null || r2 == null) {
+    public boolean equals(Object exp, Object act) {
+        if (exp == null || act == null) {
             return false;
         }
-        String expected = r1.toString();
-        if (r1 instanceof Parse) {
-            expected = ((Parse) r1).text();
+        String expected = exp.toString();
+        if (exp instanceof Parse) {
+            expected = ((Parse) exp).text();
         }
-        String actual = (String) r2;
+        String actual = (String) act;
         try {
             if (!Pattern.matches(expected, actual)) {
                 addError("not match: " + expected);

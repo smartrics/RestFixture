@@ -39,14 +39,14 @@ public class HttpClientBuilderTest {
 
 	@Before
 	public void createConfig() {
-		config = new Config("complete");
+        config = Config.getConfig("complete");
 		config.add("http.client.connection.timeout", "111");
 		config.add("http.proxy.host", "HOST");
 		config.add("http.proxy.port", "1200");
 		config.add("http.basicauth.username", "UNAMEIT");
 		config.add("http.basicauth.password", "secr3t");
 		
-		incompleteConfig = new Config("incomplete");
+        incompleteConfig = Config.getConfig("incomplete");
 		incompleteConfig.add("http.proxy.host", "HOST");
 		incompleteConfig.add("http.basicauth.username", "UNAMEIT");
 
@@ -61,7 +61,7 @@ public class HttpClientBuilderTest {
 	@Test
 	public void mustSetDefaultsForNotSuppliedConfigValues() {
 		HttpClientBuilder b = new HttpClientBuilder();
-		HttpClient cli = b.createHttpClient(new Config());
+        HttpClient cli = b.createHttpClient(Config.getConfig());
 		assertEquals(HttpClientBuilder.DEFAULT_SO_TO.intValue(), cli
 				.getParams().getSoTimeout());
 		assertNull(cli.getHostConfiguration().getProxyHost());

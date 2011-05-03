@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import smartrics.rest.fitnesse.fixture.FitCell;
-import smartrics.rest.fitnesse.fixture.FitTestSupport;
+import smartrics.rest.fitnesse.fixture.RestFixtureTestHelper;
 import fit.Parse;
 
 public class FitCellTest {
@@ -16,7 +16,8 @@ public class FitCellTest {
 
     @Before
     public void setUp() throws Exception {
-        Parse p = new Parse(FitTestSupport.createFitTestRow("justone"));
+        RestFixtureTestHelper helper = new RestFixtureTestHelper();
+        Parse p = helper.createSingleRowFitTable("justone");
         c = new FitCell(p.parts.parts);
     }
 

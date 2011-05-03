@@ -28,20 +28,10 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import smartrics.rest.config.Config;
-import fit.exception.FitFailureException;
 
 public class RestFixtureWithSeqSlimTest {
 
     private RestFixtureWithSeq fixture;
-
-    @Test
-    public void itFailsToConstructWhenCreatedWithURLOnly() {
-        try {
-            fixture = new RestFixtureWithSeq("http://localhost:9090");
-        } catch (FitFailureException e) {
-
-        }
-    }
 
     @Test
     public void usesDefaultConfigWhenCreatedWithURLAndPicFileName() {

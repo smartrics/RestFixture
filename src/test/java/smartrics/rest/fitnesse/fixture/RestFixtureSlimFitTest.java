@@ -42,7 +42,7 @@ public class RestFixtureSlimFitTest {
 
     @Before
     public void setUp() {
-        config = new Config();
+        config = Config.getConfig();
         fixture = new RestFixture(BASE_URL);
     }
 

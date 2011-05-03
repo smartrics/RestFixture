@@ -167,9 +167,9 @@ public class RestFixtureConfig extends Fixture {
             return config;
         }
         if (super.args != null && super.args.length > 0) {
-            config = new Config(super.args[0]);
+            config = Config.getConfig(super.args[0]);
         } else {
-            config = new Config();
+            config = Config.getConfig();
         }
         return config;
     }

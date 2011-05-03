@@ -26,7 +26,6 @@ import java.io.PrintStream;
 import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.Tools;
 
 /**
@@ -73,7 +72,7 @@ public class SlimFormatter implements CellFormatter<String> {
     }
 
     @Override
-    public void check(CellWrapper<String> expected, StringTypeAdapter actual) {
+    public void check(CellWrapper<String> expected, RestDataTypeAdapter actual) {
         if (null == expected.body() || "".equals(expected.body())) {
             if (actual.get() == null) {
                 return;

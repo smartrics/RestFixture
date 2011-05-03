@@ -30,6 +30,7 @@ import java.io.PrintStream;
 import org.junit.Test;
 
 import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
+import smartrics.rest.fitnesse.fixture.support.TextBodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.Tools;
 
 public class SlimFormatterTest {
@@ -110,6 +111,17 @@ public class SlimFormatterTest {
         formatter.check(c, actual);
 
         assertThat(c.body(), is(equalTo("fail:abc123<br/><i><span class='fit_label'>expected</span></i><hr/><br/>def345<br/><i><span class='fit_label'>actual</span></i>")));
+    }
+
+    @Test
+    public void shouldDisplayXmlDataInActual() {
+        SlimCell c = new SlimCell("<xml />");
+        SlimFormatter formatter = new SlimFormatter();
+        formatter.setDisplayActual(true);
+        TextBodyTypeAdapter actual = new TextBodyTypeAdapter();
+        actual.set("<xml />");
+        formatter.check(c, actual);
+        assertThat(c.body(), is(equalTo(Tools.toHtml("pass:<xml />"))));
     }
 
     @Test

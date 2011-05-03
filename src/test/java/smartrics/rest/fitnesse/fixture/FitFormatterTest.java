@@ -27,15 +27,17 @@ public class FitFormatterTest {
     private ActionFixture mockDelegate = null;
     private FitFormatter formatter;
     private Parse dummyParse;
+    private RestFixtureTestHelper helper;
 
     @Before
     public void setUp() throws FitParseException {
         mockDelegate = mock(ActionFixture.class);
+        helper = new RestFixtureTestHelper();
         formatter = new FitFormatter();
         formatter.setActionFixtureDelegate(mockDelegate);
         // unless otherwise indicated this is the default - for simplicity
         formatter.setDisplayActual(false);
-        dummyParse = new Parse(FitTestSupport.createFitTestRow("some", "content"));
+        dummyParse = helper.createSingleRowFitTable("some", "content");
         dummyParse.body = "somebody";
     }
 

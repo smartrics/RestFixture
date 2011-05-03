@@ -41,10 +41,13 @@ public class HeadersTypeAdapterTest {
 	private final Header h = new Header("n", "v");
 	private final Header h2 = new Header("n1", "v1");
 	private final Header h3 = new Header("n3", "v3");
-	private final Header h4 = new Header("n", "http://something:port/blah:blah");
-	private final Collection<Header> expected = Arrays.asList(h, h2, h3);
-	private final Collection<Header> expectedWithColonsInValues = Arrays
-			.asList(h4, h2);
+    private final Header h4 = new Header("n", "http://something:port/blah:blah");
+    private final Collection<Header> expected = Arrays.asList(h, h2, h3);
+    private final Collection<Header> expectedWithColonsInValues = Arrays.asList(h4, h2);
+    private final Header h5actual = new Header("content-type", "application/my-xml;charset=UTF-8");
+    private final Header h5expected = new Header("content-type", "application/my-xml;.+");
+    private final Collection<Header> expectedWithSemiColonsInValues = Arrays.asList(h5expected);
+    private final Collection<Header> actualWithSemiColonsInValues = Arrays.asList(h5actual);
 	private final Collection<Header> actualSubset = Arrays.asList(h, h2);
 	private final Collection<Header> actualSame = Arrays.asList(h, h2, h3);
 	private final Collection<Header> actualSuperset = Arrays.asList(h0, h1, h, h2, h3);
@@ -102,10 +105,16 @@ public class HeadersTypeAdapterTest {
 		}
 	}
 
-	@Test
-	public void shouldTransformACollectionOfHeadersIntoAHtmlString(){
-		String result = adapter.toString(expected);
+    @Test
+    public void shouldTransformACollectionOfHeadersIntoAHtmlString() {
+        String result = adapter.toString(expected);
         assertEquals(headersAsOutputString, result);
-	}
+    }
+
+    @Test
+    public void shouldMatchHeadersWithRegex() {
+        boolean res = adapter.equals(expectedWithSemiColonsInValues, actualWithSemiColonsInValues);
+        assertTrue("regex didn't match: " + h5expected, res);
+    }
 
 }

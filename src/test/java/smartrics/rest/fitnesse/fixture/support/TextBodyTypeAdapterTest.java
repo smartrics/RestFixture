@@ -28,39 +28,39 @@ import org.junit.Test;
 
 public class TextBodyTypeAdapterTest {
 
-	private final TextBodyTypeAdapter adapter = new TextBodyTypeAdapter();
+    private final TextBodyTypeAdapter adapter = new TextBodyTypeAdapter();
 
-	@Test
-	public void shouldParseTextAsTrimmedStrings() {
-		assertEquals("abc 123", adapter.parse(" abc 123 "));
-		assertEquals("null", adapter.parse(null));
-	}
+    @Test
+    public void shouldParseTextAsTrimmedStrings() {
+        assertEquals("abc 123", adapter.parse(" abc 123 "));
+        assertEquals("null", adapter.parse(null));
+    }
 
-	@Test
-	public void shouldRenderCellContentAsStrings(){
-		assertEquals("abc123", adapter.toString("abc123"));
-		assertEquals("no-body", adapter.toString(" "));
-		assertEquals("no-body", adapter.toString(null));
+    @Test
+    public void shouldRenderCellContentAsStrings() {
+        assertEquals("abc123", adapter.toString("abc123"));
+        assertEquals("no-body", adapter.toString(" "));
+        assertEquals("no-body", adapter.toString(null));
         assertEquals("<fred />", adapter.toString("<fred />"));
-	}
+    }
 
-	@Test
-	public void shouldNotEqualiseIfOneHasCRLF() {
-		assertFalse(adapter.equals("abc123", "abc\r\n123"));
-	}
+    @Test
+    public void shouldNotEqualiseIfOneHasCRLF() {
+        assertFalse(adapter.equals("abc123", "abc\r\n123"));
+    }
 
-	@Test
-	public void shouldEqualiseIfBothHaveCRLF() {
-		assertTrue(adapter.equals("abc\r\n123", "abc\r\n123"));
-	}
+    @Test
+    public void shouldEqualiseIfBothHaveCRLF() {
+        assertTrue(adapter.equals("abc\r\n123", "abc\r\n123"));
+    }
 
-	@Test
-	public void shouldNotEqualiseIfExpectedOrActualAreNull(){
-		assertFalse(adapter.equals(null, "abc123"));
-		assertFalse(adapter.equals("sgsgd", null));
-	}
+    @Test
+    public void shouldNotEqualiseIfExpectedOrActualAreNull() {
+        assertFalse(adapter.equals(null, "abc123"));
+        assertFalse(adapter.equals("sgsgd", null));
+    }
 
-	@Test
+    @Test
     public void whenExpectedIsNotMatchedAnErrorShouldBeAdded() {
         adapter.equals("xyz", "abc");
         assertEquals(1, adapter.getErrors().size());
@@ -78,5 +78,19 @@ public class TextBodyTypeAdapterTest {
     @Test
     public void shouldConvertTextToXmlUsingTextTag() {
         assertEquals("<text>abc</text>", adapter.toXmlString("abc"));
+    }
+
+    @Test
+    public void shouldMatchRegexExpressions() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("<resource>\n");
+        sb.append("    <name>a funky name</name>\n");
+        sb.append("    <data>an important message</data>\n");
+        sb.append("    <nstag xmlns:ns1='http://smartrics/ns1'>\n");
+        sb.append("        <ns1:number>3</ns1:number>\n");
+        sb.append("    </nstag>\n");
+        sb.append("</resource>\n");
+        assertTrue(adapter.equals("<resource>[\\s.]*<name>a funky name</name>[\\s\\w\\d<>/=\\:'.]*</resource>[\\s]*", sb.toString()));
+
     }
 }

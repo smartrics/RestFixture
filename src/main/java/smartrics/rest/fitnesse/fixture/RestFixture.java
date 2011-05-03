@@ -125,8 +125,8 @@ import fit.Parse;
  * <td>restfixture.default.headers</td>
  * <td><i>comma separated list of key value pairs representing the default list
  * of headers to be passed for each request. key and values are separated by a
- * colon. Entries are sepatated by {@code System.getProperty("line.separator")}.
- * {@link RestFixture#setHeader()} will override this value. </i></td>
+ * colon. Entries are sepatated by \n. {@link RestFixture#setHeader()} will
+ * override this value. </i></td>
  * </tr>
  * <tr>
  * <td>restfixture.xml.namespaces.context</td>
@@ -137,6 +137,14 @@ import fit.Parse;
  * define the namespace context to be used in xpaths that are evaluated in the
  * results.</i></td>
  * </tr>
+ * <tr>
+ * <td>restfixture.content.handlers.map</td>
+ * <td><i>a map of contenty type to type adapters, entries separated by \n, and
+ * kye-value separated by '='. Available type adapters are JS, TEXT, JSON, XML
+ * (see {@link smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory}
+ * ).</i></td>
+ * </tr>
+ * *
  * </table>
  * 
  * @author smartrics
@@ -210,9 +218,9 @@ public class RestFixture extends ActionFixture {
      */
     public RestFixture() {
         super();
+        this.partsFactory = new PartsFactory();
         this.displayActualOnRight = true;
         this.minLenForCollapseToggle = -1;
-        this.partsFactory = new PartsFactory();
     }
 
     /**
@@ -221,16 +229,30 @@ public class RestFixture extends ActionFixture {
      * @param args
      *            the cells following up the first cell in the first row.
      */
-    public RestFixture(String... args) {
-        // here config will be picked up using the named config in args if any
-        this(Runner.SLIM, new PartsFactory(), null, args);
+    public RestFixture(String hostName) {
+        this(hostName, Config.DEFAULT_CONFIG_NAME);
     }
 
-    public RestFixture(Runner runner, PartsFactory partsFactory, Config config, String... args) {
+    /**
+     * Constructor for Slim runner.
+     * 
+     * @param args
+     *            the cells following up the first cell in the first row.
+     */
+    public RestFixture(String hostName, String configName) {
+        this(new PartsFactory(), hostName, configName);
+    }
+
+    RestFixture(PartsFactory partsFactory, String hostName) {
+        this(partsFactory, hostName, Config.DEFAULT_CONFIG_NAME);
+    }
+
+    RestFixture(PartsFactory partsFactory, String hostName, String configName) {
         this.displayActualOnRight = true;
+        this.minLenForCollapseToggle = -1;
         this.partsFactory = partsFactory;
-        this.config = config;
-        initialize(runner, args);
+        this.config = Config.getConfig(configName);
+        this.baseUrl = new Url(stripTag(hostName));
     }
 
     /**
@@ -253,7 +275,10 @@ public class RestFixture extends ActionFixture {
      * @return the base URL as string
      */
     public String getBaseUrl() {
-        return baseUrl.toString();
+        if (baseUrl != null) {
+            return baseUrl.toString();
+        }
+        return null;
     }
 
     /**
@@ -282,6 +307,7 @@ public class RestFixture extends ActionFixture {
      * @return
      */
     public List<List<String>> doTable(List<List<String>> rows) {
+        initialize(Runner.SLIM);
         List<List<String>> res = new Vector<List<String>>();
         getFormatter().setDisplayActual(displayActualOnRight);
         getFormatter().setMinLenghtForToggleCollapse(minLenForCollapseToggle);
@@ -294,7 +320,15 @@ public class RestFixture extends ActionFixture {
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void doCells(Parse parse) {
-        initialize(Runner.FIT, args);
+        config = Config.getConfig(getConfigNameFromArgs());
+
+        System.err.println("USING CONFIG " + config.toString());
+
+        String url = getBaseUrlFromArgs();
+        if (url != null) {
+            baseUrl = new Url(stripTag(url));
+        }
+        initialize(Runner.FIT);
         getFormatter().setDisplayActual(displayActualOnRight);
         getFormatter().setMinLenghtForToggleCollapse(minLenForCollapseToggle);
         ((FitFormatter) getFormatter()).setActionFixtureDelegate(this);
@@ -304,6 +338,31 @@ public class RestFixture extends ActionFixture {
         } catch (Exception exception) {
             getFormatter().exception(currentRow.getCell(0), exception);
         }
+    }
+
+    /**
+     * Process args to extract the optional config name.
+     * 
+     * @return
+     */
+    protected String getConfigNameFromArgs() {
+        if (args.length >= 2) {
+            return args[1];
+        }
+        return null;
+    }
+
+    /**
+     * Process args ({@see fit.Fixture}) for Fit runner to extract the baseUrl
+     * of each Rest request, first parameter of each RestFixture table.
+     * 
+     * @return
+     */
+    protected String getBaseUrlFromArgs() {
+        if (args.length > 0) {
+            return args[0];
+        }
+        return null;
     }
 
     /**
@@ -331,22 +390,6 @@ public class RestFixture extends ActionFixture {
     protected void notifyInvalidState(boolean state) {
         if (!state) {
             throw new RuntimeException("You must specify a base url in the |start|, after the fixture to start");
-        }
-    }
-
-    protected void processArguments(String[] args) {
-        if (args == null) {
-            return;
-        }
-        if (args.length > 0) {
-            baseUrl = new Url(stripTag(args[0]));
-            if (config == null) {
-                if (args.length == 2) {
-                    config = new Config(args[1]);
-                } else {
-                    config = new Config();
-                }
-            }
         }
     }
 
@@ -693,8 +736,7 @@ public class RestFixture extends ActionFixture {
         }
     }
 
-    protected void initialize(Runner runner, String[] args) {
-        processArguments(args);
+    protected void initialize(Runner runner) {
         boolean state = validateState();
         notifyInvalidState(state);
         configFormatter(runner);
@@ -779,7 +821,6 @@ public class RestFixture extends ActionFixture {
         CellWrapper bodyCell = row.getCell(4);
         bodyCell.body(GLOBALS.substitute(bodyCell.body()));
         ContentType ct = getContentTypeOfLastResponse();
-        System.err.println(ct.name());
         BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ct);
         bodyTypeAdapter.setContext(namespaceContext);
         process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
@@ -796,8 +837,11 @@ public class RestFixture extends ActionFixture {
         } else {
             boolean success = false;
             try {
-                String substitute = GLOBALS.substitute(expected.text());
+                String substitute = GLOBALS.substitute(Tools.fromHtml(expected.text()));
                 Object parse = ta.parse(substitute);
+
+                System.err.println("TA: " + ta.toString() + ", exp: " + parse.toString());
+
                 success = ta.equals(parse, actual);
             } catch (Exception e) {
                 getFormatter().exception(expected, e);
@@ -863,11 +907,17 @@ public class RestFixture extends ActionFixture {
      */
     private void configFixture() {
         displayActualOnRight = config.getAsBoolean("restfixture.display.actual.on.right", displayActualOnRight);
+
         minLenForCollapseToggle = config.getAsInteger("restfixture.display.toggle.for.cells.larger.than", minLenForCollapseToggle);
+
         String str = config.get("restfixture.default.headers", "");
         defaultHeaders = parseHeaders(str);
+
         str = config.get("restfixture.xml.namespace.context", "");
         namespaceContext = parseNamespaceContext(str);
+
+        ContentType.resetDefaultMapping();
+        ContentType.config(config);
     }
 
     /**
@@ -886,7 +936,7 @@ public class RestFixture extends ActionFixture {
     private void renderReplacement(CellWrapper cell, String actual) {
         StringTypeAdapter adapter = new StringTypeAdapter();
         adapter.set(actual);
-        if (!adapter.equals(actual, Tools.fromHtml(cell.body()))) {
+        if (!adapter.equals(actual, cell.body())) {
             // eg - a substitution has occurred
             getFormatter().right(cell, adapter);
         }

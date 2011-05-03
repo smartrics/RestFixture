@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import smartrics.rest.client.RestData.Header;
+import smartrics.rest.config.Config;
 
 /**
  * Supported content types.
@@ -59,16 +60,16 @@ public enum ContentType {
         return r;
     }
 
-    public static void config(String htmlConfig) {
-        String config = Tools.fromHtml(htmlConfig);
-        Map<String, String> map = Tools.convertStringToMap(config, "=", "\n");
+    public static void config(Config config) {
+        String htmlConfig = config.get("restfixture.content.handlers.map", "");
+        String configStr = Tools.fromHtml(htmlConfig);
+        Map<String, String> map = Tools.convertStringToMap(configStr, "=", "\n");
         for (Map.Entry<String, String> e : map.entrySet()) {
             String enumName = e.getValue().toUpperCase();
             ContentType ct = ContentType.valueOf(enumName);
             if (null == ct) {
                 throw new IllegalArgumentException("I don't know how to handle " + e.getValue() + ". Use one of " + ContentType.values());
             }
-            System.err.println(">> put " + e.getKey() + " = " + ct);
             contentTypeToEnum.put(e.getKey(), ct);
         }
     }

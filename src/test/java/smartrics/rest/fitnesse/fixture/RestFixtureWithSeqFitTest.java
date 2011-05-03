@@ -20,16 +20,26 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.config.Config;
+import smartrics.rest.fitnesse.fixture.RestFixture.Runner;
+import smartrics.rest.fitnesse.fixture.support.CellFormatter;
+import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.RowWrapper;
+import smartrics.rest.fitnesse.fixture.support.Variables;
 import smartrics.sequencediagram.Create;
 import smartrics.sequencediagram.Event;
 import smartrics.sequencediagram.Message;
@@ -43,15 +53,49 @@ import fit.exception.FitParseException;
 public class RestFixtureWithSeqFitTest {
 
     private RestFixtureWithSeq fixture;
+    private final Variables variables = new Variables();
     private RestFixtureTestHelper helper;
+    private PartsFactory mockPartsFactory;
+    private RestClient mockRestClient;
+    private RestRequest mockLastRequest;
+    @SuppressWarnings("rawtypes")
+    private CellFormatter mockCellFormatter;
+    private Config config;
+    private RestResponse lastResponse;
 
     @Before
     public void setUp() {
         helper = new RestFixtureTestHelper();
-        fixture = new RestFixtureWithSeq() {
+
+        mockCellFormatter = mock(CellFormatter.class);
+        mockRestClient = mock(RestClient.class);
+        mockLastRequest = mock(RestRequest.class);
+        mockPartsFactory = mock(PartsFactory.class);
+
+        variables.clearAll();
+
+        lastResponse = new RestResponse();
+        lastResponse.setStatusCode(200);
+        lastResponse.setBody("");
+        lastResponse.setResource("/uri");
+        lastResponse.setStatusText("OK");
+        lastResponse.setTransactionId(0L);
+
+        config = Config.getConfig();
+        config.add("restfixture.graphs.dir", "./build");
+
+        ContentType.resetDefaultMapping();
+
+        helper.wireMocks(config, mockPartsFactory, mockRestClient, mockLastRequest, lastResponse, mockCellFormatter);
+        fixture = new RestFixtureWithSeq(mockPartsFactory, "http://localhost:8080", null, "sequence.pic");
+        fixture.initialize(Runner.OTHER);
+    }
+
+    @Test
+    public void shouldInitializeFixtureForFitRunner() {
+        RestFixtureWithSeq seqFixture = new RestFixtureWithSeq() {
             {
                 super.args = new String[] { "http://localhost:8080", "sequence.gif" };
-                initialize(Runner.FIT, super.args);
             }
 
             public RestResponse getLastResponse() {
@@ -69,60 +113,65 @@ public class RestFixtureWithSeqFitTest {
             protected void doMethod(String body, String method) {
             }
         };
-    }
-
-    @Test
-    public void shouldHaveConfigNameAsOptionalSecondParameterToDefaultWhenNotSpecified() throws FitParseException {
-        fixture.doCells(new Parse("<table><tr><td></td></tr></table>"));
-        assertEquals(Config.DEFAULT_CONFIG_NAME, fixture.getConfig().getName());
+        seqFixture.doCells(helper.createSingleRowFitTable("GET", "/uri", "", "", ""));
+        assertThat(seqFixture.getConfig().getName(), is(equalTo(Config.DEFAULT_CONFIG_NAME)));
+        assertThat(seqFixture.getBaseUrl(), is(equalTo("http://localhost:8080")));
+        assertThat(seqFixture.getPictureName(), is(equalTo("sequence.gif")));
     }
 
     @Test
     public void shouldHaveConfigNameAsOptionalSecondParameterToBeSetToSpecifiedValue() throws FitParseException {
-        fixture = new RestFixtureWithSeq() {
+        RestFixtureWithSeq seqFixture = new RestFixtureWithSeq() {
             {
                 super.args = new String[] { "http://localhost:8080", "configName", "sequence.gif" };
             }
         };
-        fixture.doCells(new Parse("<table><tr><td></td></tr></table>"));
-        assertEquals("configName", fixture.getConfig().getName());
-        assertEquals("sequence.gif", fixture.getPictureName());
+        seqFixture.doCells(new Parse("<table><tr><td></td></tr></table>"));
+        assertThat(seqFixture.getConfig().getName(), is(equalTo("configName")));
+        assertThat(seqFixture.getBaseUrl(), is(equalTo("http://localhost:8080")));
+        assertThat(seqFixture.getPictureName(), is(equalTo("sequence.gif")));
     }
 
-    @Test(expected = FitFailureException.class)
+    @Test
     public void mustNotifyCallerThatPictureNameIsMandatory() throws FitParseException {
-        fixture = new RestFixtureWithSeq() {
+        RestFixtureWithSeq seqFixture = new RestFixtureWithSeq() {
             {
                 super.args = new String[] { "http://localhost:8080" };
             }
         };
-        fixture.doCells(new Parse("<table><tr><td></td></tr></table>"));
+        try {
+            seqFixture.doCells(new Parse("<table><tr><td></td></tr></table>"));
+            fail("Should have spotted that either/both baseUrl and/or pic name are missing");
+        } catch (FitFailureException e) {
+            assertThat(e.getMessage(), is(equalTo("Both baseUrl and picture name need to be passed to the fixture")));
+        }
     }
 
     @Test
     public void mustGenerateTwoEventsForPut() {
-        RowWrapper<?> row = helper.createFitTestRow("PUT", "/uri", "", "", "");
+        RowWrapper<?> row = helper.createTestRow("PUT", "/uri", "", "", "");
         fixture.processRow(row);
         assertOnMethods("PUT");
     }
 
     @Test
     public void mustGenerateTwoEventsForGet() {
-        RowWrapper<?> row = helper.createFitTestRow("GET", "/uri", "", "", "");
+        RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", "");
         fixture.processRow(row);
         assertOnMethods("GET");
     }
 
     @Test
     public void mustGenerateTwoEventsForDelete() {
-        RowWrapper<?> row = helper.createFitTestRow("DELETE", "/uri", "", "", "");
+        RowWrapper<?> row = helper.createTestRow("DELETE", "/uri", "", "", "");
         fixture.processRow(row);
         assertOnMethods("DELETE");
     }
 
     @Test
     public void mustGenerateThreeEventsForPost() {
-        RowWrapper<?> row = helper.createFitTestRow("POST", "/uri", "", "", "");
+        lastResponse.addHeader("Location", "/resources/999");
+        RowWrapper<?> row = helper.createTestRow("POST", "/uri", "", "", "");
         fixture.processRow(row);
         assertEquals(3, fixture.getModel().getEvents().size());
         Event event = fixture.getModel().getEvents().get(0);

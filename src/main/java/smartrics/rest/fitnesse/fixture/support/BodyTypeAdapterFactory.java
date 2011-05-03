@@ -24,11 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Depending on Content-Type passed in it'll build the appropriate type adapter
- * for parsing/rendering the cell content
- * 
- * TODO: allow configuration of DEFAULT Adapter (no recognised content type) and
- * what content types are associated with each adapter.
+ * Depending on Content-Type passed in, it'll build the appropriate type adapter
+ * for parsing/rendering the cell content.
  * 
  * @author fabrizio
  * 

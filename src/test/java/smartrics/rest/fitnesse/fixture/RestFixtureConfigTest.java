@@ -42,8 +42,8 @@ public class RestFixtureConfigTest {
 
     @Before
     public void setUp() {
-        defaultNamedConfig = new Config();
-        namedConfig = new Config(CONFIG_NAME);
+        defaultNamedConfig = Config.getConfig();
+        namedConfig = Config.getConfig(CONFIG_NAME);
     }
 
     @After

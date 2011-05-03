@@ -20,6 +20,7 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,13 +28,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import smartrics.rest.client.RestClient;
+import smartrics.rest.client.RestRequest;
+import smartrics.rest.client.RestResponse;
+import smartrics.rest.config.Config;
+import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.RowWrapper;
+import fit.Parse;
+import fit.exception.FitParseException;
 
 public class RestFixtureTestHelper {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public RowWrapper<?> createFitTestRow(String... cells) {
+    public RowWrapper<?> createTestRow(String... cells) {
         RowWrapper<?> row = mock(RowWrapper.class);
         for (int i = 0; i < cells.length; i++) {
             CellWrapper cell = mock(CellWrapper.class);
@@ -45,9 +53,47 @@ public class RestFixtureTestHelper {
 		return row;
 	}
 
+    public Parse createSingleRowFitTable(String... cells) {
+        Parse t = null;
+        StringBuffer rBuff = new StringBuffer();
+        rBuff.append("<table>");
+        rBuff.append(createFitRow(cells));
+        rBuff.append("</table>");
+        try {
+            t = new Parse(rBuff.toString());
+        } catch (FitParseException e) {
+            throw new RuntimeException(e);
+        }
+        return t;
+    }
+
+    private String createFitRow(String... cells) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("<tr>");
+        for (String c : cells) {
+            buffer.append("<td>").append(c).append("</td>");
+        }
+        buffer.append("</tr>");
+        return buffer.toString();
+    }
+
+    public Parse buildEmptyParse() {
+        return createSingleRowFitTable("&nbsp;");
+    }
+
     public List<List<String>> createSingleRowSlimTable(String... cells) {
         List<List<String>> table = new ArrayList<List<String>>();
         table.add(Arrays.asList(cells));
         return table;
     }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void wireMocks(Config conf, PartsFactory pf, RestClient rc, RestRequest req, RestResponse resp, CellFormatter cf) {
+        when(pf.buildRestClient(conf)).thenReturn(rc);
+        when(pf.buildRestRequest()).thenReturn(req);
+        when(rc.execute(req)).thenReturn(resp);
+        when(pf.buildCellFormatter(any(RestFixture.Runner.class))).thenReturn(cf);
+    }
+
 }
+    

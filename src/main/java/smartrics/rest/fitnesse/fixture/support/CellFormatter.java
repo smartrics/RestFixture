@@ -33,7 +33,7 @@ public interface CellFormatter<E> {
 
     void exception(CellWrapper<E> cellWrapper, String exceptionMessage);
 
-	void check(CellWrapper<E> valueCell, StringTypeAdapter adapter);
+    void check(CellWrapper<E> valueCell, RestDataTypeAdapter adapter);
 
 	String label(String string);
 
