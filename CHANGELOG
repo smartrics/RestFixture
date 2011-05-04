@@ -1,4 +1,7 @@
 version 2.0
+ * added support for setting custom content-type to adapter map
+ 
+version 2.0.beta.1
  * added support for SLIM
  * added support for expressions in JavaScript for JSON
  * abandoned local variable store for FitNesse symbols

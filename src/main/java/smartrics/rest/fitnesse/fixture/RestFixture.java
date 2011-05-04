@@ -839,9 +839,6 @@ public class RestFixture extends ActionFixture {
             try {
                 String substitute = GLOBALS.substitute(Tools.fromHtml(expected.text()));
                 Object parse = ta.parse(substitute);
-
-                System.err.println("TA: " + ta.toString() + ", exp: " + parse.toString());
-
                 success = ta.equals(parse, actual);
             } catch (Exception e) {
                 getFormatter().exception(expected, e);
