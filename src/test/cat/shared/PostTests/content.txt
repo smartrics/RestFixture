@@ -24,10 +24,9 @@ Label values can be accessed from code using '''new Variables().get("labelname")
 ***!
 
 !*** Note on fit.Fixture symbol map
-Labels are resolved in '''fit.Fixture.getSymbol()''' if not found in the local label value store.
+Labels are implemented on top of the Fitnesse symbols map. So every label set via !-RestFixture-! is accessible via '''fit.Fixture.getSymbol()'''.
 
-Labels whose name starts with $ are defined in the Symbol map in the '''fit.Fixture''' (and not in the local label store). In this way, values extracted with '''let''' 
-can be shared across various fixtures.
+If a label starts with $, the $ is ignored.
 ***!
 
 | !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
@@ -38,6 +37,30 @@ can be shared across various fixtures.
 |let    | name | body | /resource/name/text() | |
 |let    | $symName | body | /resource/name/text() | |
 
+Labels that are set to null are rendered using the default value for null, e.g. the string "null"
+
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
+|GET    | /resources/%id% | 200 | | |
+|let    | thisIsNull | body | /resource/somewhereelse/text() | |
+|comment| this is null: '%thisIsNull%' |
+
+Albeit, the value can be overridden
+
+| !-smartrics.rest.fitnesse.fixture.RestFixtureConfig-! | withBespokeNullRepresentation |
+| restfixture.null.value.representation | !--! |
+
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}| withBespokeNullRepresentation |
+|GET    | /resources/%id% | 200 | | |
+|let    | thisIsNull | body | /resource/somewhereelse/text() | |
+|comment| this is null: '%thisIsNull%' |
+
+| !-smartrics.rest.fitnesse.fixture.RestFixtureConfig-! | withBespokeNullRepresentation |
+| restfixture.null.value.representation | !-NIL-! |
+
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}| withBespokeNullRepresentation |
+|GET    | /resources/%id% | 200 | | |
+|let    | thisIsNull | body | /resource/somewhereelse/text() | |
+|comment| this is null: '%thisIsNull%' |
 
 
 !**** Json

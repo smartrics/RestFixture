@@ -298,13 +298,15 @@ public final class Tools {
                 if ("".equals(nvp.trim())) {
                     continue;
                 }
-                int pos = nvp.trim().indexOf(nvSep);
-                String k = nvp;
-                String v = "";
-                if (pos != -1) {
-                    int pos2 = pos + nvSep.length();
-                    v = nvp.substring(pos2).trim();
-                    k = nvp.substring(0, pos).trim();
+                String[] nvpArr = nvp.split(nvSep);
+                String k, v;
+                k = nvpArr[0].trim();
+                v = "";
+                if (nvpArr.length == 2) {
+                    v = nvpArr[1].trim();
+                } else if (nvpArr.length > 2) {
+                    int pos = nvp.indexOf(nvSep) + nvSep.length();
+                    v = nvp.substring(pos).trim();
                 }
                 ret.put(k, v);
             } catch (RuntimeException e) {

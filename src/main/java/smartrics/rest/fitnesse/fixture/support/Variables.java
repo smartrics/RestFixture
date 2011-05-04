@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import smartrics.rest.config.Config;
 import fit.Fixture;
 
 /**
@@ -35,6 +36,18 @@ import fit.Fixture;
  */
 public class Variables {
     public static final Pattern VARIABLES_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");
+    private static final String FitNullValue = fitSymbolForNull();
+    private String nullValue = "null";
+
+    public Variables() {
+        this(Config.getConfig());
+    }
+
+    public Variables(Config c) {
+        if (c != null) {
+            this.nullValue = c.get("restfixture.null.value.representation", "null");
+        }
+    }
 
     public void put(String label, String val) {
         String l = fromFitNesseSymbol(label);
@@ -65,6 +78,9 @@ public class Variables {
                 String g0 = m.group(0);
                 String g1 = m.group(1);
                 String value = get(g1);
+                if (FitNullValue.equals(value)) {
+                    value = nullValue;
+                }
                 replacements.put(g0, value);
             }
         }
@@ -87,5 +103,11 @@ public class Variables {
             l = l.substring(1);
         }
         return l;
+    }
+
+    private static String fitSymbolForNull() {
+        final String k = "somerandomvaluetogettherepresentationofnull-1234567890";
+        Fixture.setSymbol(k, null);
+        return Fixture.getSymbol(k).toString();
     }
 }

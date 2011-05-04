@@ -133,13 +133,14 @@ public class RestFixtureTest {
 
     @Test
     public void mustAllowMultilineHeadersWhenSettingHeaders() {
-        fixture = new RestFixture(BASE_URL);
-
-        String multilineHeaders = "!-header1:one" + System.getProperty("line.separator") + "header2:two" + System.getProperty("line.separator") + "-!";
+        String multilineHeaders = "!-header1:one \n header2:two \nheader3 : with:colon \nheader4 : \n header5 -!";
         RowWrapper<?> row = helper.createTestRow("setHeaders", multilineHeaders);
         fixture.processRow(row);
         assertEquals("one", fixture.getHeaders().get("header1"));
         assertEquals("two", fixture.getHeaders().get("header2"));
+        assertEquals("with:colon", fixture.getHeaders().get("header3"));
+        assertEquals("", fixture.getHeaders().get("header4"));
+        assertEquals("", fixture.getHeaders().get("header5"));
     }
 
     @Test(expected = RuntimeException.class)
@@ -547,6 +548,18 @@ public class RestFixtureTest {
         assertEquals("fred", variables.get("name"));
         assertEquals("20", variables.get("age"));
 
+        verifyNoMoreInteractions(mockCellFormatter);
+    }
+
+    public void mustRenderCommentMessagesWithSubstitutedLabels() {
+
+        RowWrapper<?> row = helper.createTestRow("let", "seven", "js", "3 + 4");
+        fixture.processRow(row);
+
+        row = helper.createTestRow("comment", "three plus four is: %seven%");
+        fixture.processRow(row);
+
+        verify(mockCellFormatter).gray("three plus four is: 7");
         verifyNoMoreInteractions(mockCellFormatter);
     }
 

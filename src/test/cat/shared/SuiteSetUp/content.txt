@@ -11,6 +11,7 @@ Default configuration parameters for each !-RestFixture-! instance
  * '''restfixture.default.headers''' list of http headers passed to each REST request (overridden by '''setHeader''')
  * '''restfixture.xml.namespace.context''' list of key/value defining a namespace context. (keys represent aliases used in !-XPaths-!, values are the ns URI as per xml)
  * '''restfixture.content.handlers.map''' key-value-pair mapping a Content-Type to a !-RestFixture-! content handler.
+ * '''restfixture.null.value.representation''' value used to replace the default Fitnesse symbols value for null (default is the string 'null')
  
 | !-smartrics.rest.fitnesse.fixture.RestFixtureConfig-! |
 | http.client.connection.timeout | 5000 |

@@ -76,24 +76,33 @@ public class RestFixtureConfigTest {
     private void testStoreDataInNamedFitConfig(RestFixtureConfig fixture, final Config config) {
         String row1 = createFitTestRow("key1", "value1");
         String row2 = createFitTestRow("key2", "value2");
-        Parse table = createFitTestInstance(row1, row2);
+        String row3 = createFitTestRow("keyEmpty", "");
+        Parse table = createFitTestInstance(row1, row2, row3);
         fixture.doRows(table);
         assertEquals("value1", config.get("key1"));
         assertEquals("value2", config.get("key2"));
+        assertEquals("", config.get("keyEmpty"));
     }
 
     @SuppressWarnings("unchecked")
     private void testStoreDataInNamedSlimConfig(RestFixtureConfig fixture, final Config config) {
         List<String> row1 = createSlimTestRow("key1", "value1");
         List<String> row2 = createSlimTestRow("key2", "value2");
-        List<List<String>> table = createSlimTestInstance(row1, row2);
+        List<String> row3 = createSlimTestRow("keyEmpty", "");
+        List<List<String>> table = createSlimTestInstance(row1, row2, row3);
         fixture.doTable(table);
         assertEquals("value1", config.get("key1"));
         assertEquals("value2", config.get("key2"));
+        assertEquals("", config.get("keyEmpty"));
+        // it's empty so that slim re-renders the original content
         assertEquals("", table.get(0).get(0));
         assertEquals("pass:value1", table.get(0).get(1));
+        // it's empty so that slim re-renders the original content
         assertEquals("", table.get(1).get(0));
         assertEquals("pass:value2", table.get(1).get(1));
+        // it's empty so that slim re-renders the original content
+        assertEquals("", table.get(2).get(0));
+        assertEquals("pass:", table.get(2).get(1));
     }
 
     private List<String> createSlimTestRow(String... cells) {

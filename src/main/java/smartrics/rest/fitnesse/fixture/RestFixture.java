@@ -144,7 +144,17 @@ import fit.Parse;
  * (see {@link smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory}
  * ).</i></td>
  * </tr>
- * *
+ * <tr>
+ * <td>restfixture.null.value.representation</td>
+ * <td><i>This string is used in replacement of the default string substituted
+ * when a null value is set for a symbol. Because now the RestFixture labels
+ * support is implemented on top of the Fitnesse symbols, such default value is
+ * defined in Fitnesse, and that is the string 'null'. Hence, every substitution
+ * that would result in rendering the string 'null' is replaced with the value
+ * set for this config key. This value can also be the empty string to replace
+ * null with empty.</i></td>
+ * </tr>
+ * 
  * </table>
  * 
  * @author smartrics
@@ -169,7 +179,7 @@ public class RestFixture extends ActionFixture {
 
     private static final Log LOG = LogFactory.getLog(RestFixture.class);
 
-    private static final Variables GLOBALS = new Variables();
+    private Variables GLOBALS;
 
     private RestResponse lastResponse;
 
@@ -673,6 +683,21 @@ public class RestFixture extends ActionFixture {
         }
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public void comment() {
+        debugMethodCallStart();
+        CellWrapper messageCell = row.getCell(1);
+        try {
+            String message = messageCell.text().trim();
+            message = GLOBALS.substitute(message);
+            messageCell.body(getFormatter().gray(message));
+        } catch (RuntimeException e) {
+            getFormatter().exception(messageCell, e);
+        } finally {
+            debugMethodCallEnd();
+        }
+    }
+
     /**
      * Evaluates a string using the internal JavaScript engine. Result of the
      * last evaluation is set in the lastEvaluation field.
@@ -903,6 +928,9 @@ public class RestFixture extends ActionFixture {
      * Configure the fixture with data from {@link RestFixtureConfig}.
      */
     private void configFixture() {
+
+        GLOBALS = new Variables(config);
+
         displayActualOnRight = config.getAsBoolean("restfixture.display.actual.on.right", displayActualOnRight);
 
         minLenForCollapseToggle = config.getAsInteger("restfixture.display.toggle.for.cells.larger.than", minLenForCollapseToggle);

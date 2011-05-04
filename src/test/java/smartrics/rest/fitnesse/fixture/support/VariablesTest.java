@@ -26,6 +26,7 @@ import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 
+import smartrics.rest.config.Config;
 
 public class VariablesTest {
 
@@ -67,6 +68,34 @@ public class VariablesTest {
         v1.put("ID", "100");
         String newText = v1.substitute("non existent %XYZ%. it exists %ID%");
         assertEquals("non existent %XYZ%. it exists 100", newText);
+    }
+
+    @Test
+    public void variablesContainingNullAreSubWithStringNullByDefault() {
+        Variables v1 = new Variables();
+        v1.put("ID", null);
+        String newText = v1.substitute("null is '%ID%'");
+        assertEquals("null is 'null'", newText);
+    }
+
+    @Test
+    public void variablesContainingNullAreSubWithValueSuppliedViaConfig() {
+        Config c = Config.getConfig();
+        c.add("restfixture.null.value.representation", "this-is-null-value");
+        Variables v1 = new Variables(c);
+        v1.put("ID", null);
+        String newText = v1.substitute("null is '%ID%'");
+        assertEquals("null is 'this-is-null-value'", newText);
+    }
+
+    @Test
+    public void variablesContainingNullAreSubWithEmptyValueSuppliedViaConfig() {
+        Config c = Config.getConfig();
+        c.add("restfixture.null.value.representation", "");
+        Variables v1 = new Variables(c);
+        v1.put("ID", null);
+        String newText = v1.substitute("null is '%ID%'");
+        assertEquals("null is ''", newText);
     }
 
 }

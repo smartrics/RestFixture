@@ -102,12 +102,12 @@ public class ToolsTest {
 
     @Test
     public void shouldConvertAStringIntoAMap() {
-        Map<String, String> map = Tools.convertStringToMap("k1|v1##k2|v2", "|", "##");
+        Map<String, String> map = Tools.convertStringToMap("k1~v1##k2~v2", "~", "##");
         assertEquals(2, map.size());
         assertEquals("v2", map.get("k2"));
         assertEquals("v1", map.get("k1"));
 
-        map = Tools.convertStringToMap("k1##k2|v2", "|", "##");
+        map = Tools.convertStringToMap("k1##k2~v2", "~", "##");
         assertEquals(2, map.size());
         assertEquals("", map.get("k1"));
         assertEquals("v2", map.get("k2"));
