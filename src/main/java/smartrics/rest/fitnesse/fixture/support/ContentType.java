@@ -45,10 +45,10 @@ public enum ContentType {
     public List<String> toMime() {
         List<String> types = new ArrayList<String>();
         for (Map.Entry<String, ContentType> e : contentTypeToEnum.entrySet()) {
-            if(e.getValue().equals(this)) {
+            if (e.getValue().equals(this)) {
                 types.add(e.getKey());
             }
-        }        
+        }
         return types;
     }
 

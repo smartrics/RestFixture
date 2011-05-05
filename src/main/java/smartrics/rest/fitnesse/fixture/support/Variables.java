@@ -36,7 +36,7 @@ import fit.Fixture;
  */
 public class Variables {
     public static final Pattern VARIABLES_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");
-    private static final String FitNullValue = fitSymbolForNull();
+    private static final String FIT_NULL_VALUE = fitSymbolForNull();
     private String nullValue = "null";
 
     public Variables() {
@@ -78,7 +78,7 @@ public class Variables {
                 String g0 = m.group(0);
                 String g1 = m.group(1);
                 String value = get(g1);
-                if (FitNullValue.equals(value)) {
+                if (FIT_NULL_VALUE.equals(value)) {
                     value = nullValue;
                 }
                 replacements.put(g0, value);

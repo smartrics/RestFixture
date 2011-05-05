@@ -33,9 +33,9 @@ import smartrics.rest.fitnesse.fixture.support.Tools;
  * static field), so beware!
  */
 public final class Config {
-	/**
-	 * the default name of the named config.
-	 */
+    /**
+     * the default name of the named config.
+     */
     public static final String DEFAULT_CONFIG_NAME = "default";
 
     /**
@@ -54,7 +54,7 @@ public final class Config {
      * the configuration with a name.
      */
     public static Config getConfig(String name) {
-        if(name==null) {
+        if (name == null) {
             name = DEFAULT_CONFIG_NAME;
         }
         Config namedConfig = CONFIGURATIONS.get(name);
@@ -68,7 +68,7 @@ public final class Config {
     /**
      * this instance name.
      */
-	private final String name;
+    private final String name;
 
     private Map<String, String> data;
 
@@ -88,47 +88,47 @@ public final class Config {
      * 
      * @return the name
      */
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * Adds a key/value pair to a named configuration.
-	 * 
-	 * @param key
-	 *            the key
-	 * @param value
-	 *            the value
-	 */
-	public void add(String key, String value) {
+    /**
+     * Adds a key/value pair to a named configuration.
+     * 
+     * @param key
+     *            the key
+     * @param value
+     *            the value
+     */
+    public void add(String key, String value) {
         data.put(key, value);
-	}
+    }
 
-	/**
-	 * Returns a key/value from a named config.
-	 * 
-	 * @param key
-	 *            the key
-	 * @return the value
-	 */
-	public String get(String key) {
+    /**
+     * Returns a key/value from a named config.
+     * 
+     * @param key
+     *            the key
+     * @return the value
+     */
+    public String get(String key) {
         return data.get(key);
-	}
+    }
 
-	/**
-	 * Returns a key/value from a named config.
-	 * 
-	 * @param key
-	 *            the key
-	 * @return the value, Returns the default if the key is not found in the map
-	 */
-	public String get(String key, String def) {
-		String v = get(key);
+    /**
+     * Returns a key/value from a named config.
+     * 
+     * @param key
+     *            the key
+     * @return the value, Returns the default if the key is not found in the map
+     */
+    public String get(String key, String def) {
+        String v = get(key);
         if (v == null) {
-			v = def;
+            v = def;
         }
-		return v;
-	}
+        return v;
+    }
 
     /**
      * returns a key/value from a named config, parsed as Long.
@@ -140,14 +140,14 @@ public final class Config {
      * @return a Long representing the value, def if the value cannot be parsed
      *         as Long
      */
-	public Long getAsLong(String key, Long def) {
-		String val = get(key);
-		try {
-			return Long.parseLong(val);
-		} catch (NumberFormatException e) {
-			return def;
-		}
-	}
+    public Long getAsLong(String key, Long def) {
+        String val = get(key);
+        try {
+            return Long.parseLong(val);
+        } catch (NumberFormatException e) {
+            return def;
+        }
+    }
 
     /**
      * returns a key/value from a named config, parsed as Boolean.
@@ -159,13 +159,13 @@ public final class Config {
      * @return a Boolean representing the value, def if the value cannot be
      *         parsed as Boolean
      */
-	public Boolean getAsBoolean(String key, Boolean def) {
-		String val = get(key);
+    public Boolean getAsBoolean(String key, Boolean def) {
+        String val = get(key);
         if (val == null) {
-			return def;
+            return def;
         }
-		return Boolean.parseBoolean(val);
-	}
+        return Boolean.parseBoolean(val);
+    }
 
     /**
      * returns a key/value from a named config, parsed as Integer.
@@ -177,14 +177,14 @@ public final class Config {
      * @return a Integer representing the value, def if the value cannot be
      *         parsed as Integer
      */
-	public Integer getAsInteger(String key, Integer def) {
-		String val = get(key);
-		try {
-			return Integer.parseInt(val);
-		} catch (NumberFormatException e) {
-			return def;
-		}
-	}
+    public Integer getAsInteger(String key, Integer def) {
+        String val = get(key);
+        try {
+            return Integer.parseInt(val);
+        } catch (NumberFormatException e) {
+            return def;
+        }
+    }
 
     /**
      * returns a key/value froma a named config, parsed as a Map<String, String>
@@ -204,12 +204,12 @@ public final class Config {
      * @param cName
      *            the named config to clear
      */
-	public void clear() {
+    public void clear() {
         data.clear();
     }
 
-	@Override
-	public String toString() {
+    @Override
+    public String toString() {
         return "[name=" + getName() + "] " + data.toString();
-	}
+    }
 }
