@@ -326,7 +326,7 @@ public final class Tools {
     }
 
     public static String toHtml(String text) {
-        return text.replaceAll("&", "&amp;").replaceAll("<pre>", "").replaceAll("</pre>", "").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>")
+        return text.replaceAll("<pre>", "").replaceAll("</pre>", "").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br/>")
                 .replaceAll("\t", "    ").replaceAll(" ", "&nbsp;").replaceAll("-----", "<hr/>");
     }
 
@@ -354,7 +354,7 @@ public final class Tools {
 
     public static String makeContentForWrongCell(String expected, RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter, int minLenForToggle) {
         StringBuffer sb = new StringBuffer();
-        sb.append(toHtml(expected));
+        sb.append(Tools.toHtml(expected));
         if (formatter.isDisplayActual()) {
             sb.append(toHtml("\n"));
             sb.append(formatter.label("expected"));
@@ -384,7 +384,7 @@ public final class Tools {
 
     public static String makeContentForRightCell(String expected, RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter, int minLenForToggle) {
         StringBuffer sb = new StringBuffer();
-        sb.append(Tools.toHtml(expected));
+        sb.append(toHtml(expected));
         String actual = typeAdapter.toString();
         if (formatter.isDisplayActual() && !expected.equals(actual)) {
             sb.append(toHtml("\n"));
