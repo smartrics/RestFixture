@@ -152,8 +152,7 @@ public class RestFixtureConfig extends Fixture {
             String value = cells.more.text();
             Config c = getConfig();
             c.add(key, value);
-            String fValue = value.replaceAll(System.getProperty("line.separator"), "<br>");
-            right(cells);
+            String fValue = Tools.toHtml(value);
             Parse valueParse = cells.more;
             valueParse.body = fValue;
             right(valueParse);
