@@ -34,6 +34,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,14 +51,11 @@ import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.JSONBodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.JavascriptException;
 import smartrics.rest.fitnesse.fixture.support.RowWrapper;
 import smartrics.rest.fitnesse.fixture.support.StatusCodeTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.TextBodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.Variables;
-import smartrics.rest.fitnesse.fixture.support.XPathBodyTypeAdapter;
 import fit.Fixture;
 
 /**
@@ -78,11 +77,13 @@ public class RestFixtureTest {
     private CellFormatter mockCellFormatter;
     private Config config;
     private RestResponse lastResponse;
+    private BodyTypeAdapter mockBodyTypeAdapter;
 
     @Before
     public void setUp() {
         helper = new RestFixtureTestHelper();
 
+        mockBodyTypeAdapter = mock(BodyTypeAdapter.class);
         mockCellFormatter = mock(CellFormatter.class);
         mockRestClient = mock(RestClient.class);
         mockLastRequest = mock(RestRequest.class);
@@ -101,7 +102,7 @@ public class RestFixtureTest {
 
         ContentType.resetDefaultMapping();
 
-        helper.wireMocks(config, mockPartsFactory, mockRestClient, mockLastRequest, lastResponse, mockCellFormatter);
+        helper.wireMocks(config, mockPartsFactory, mockRestClient, mockLastRequest, lastResponse, mockCellFormatter, mockBodyTypeAdapter);
         fixture = new RestFixture(mockPartsFactory, BASE_URL);
         fixture.initialize(Runner.OTHER);
     }
@@ -152,7 +153,7 @@ public class RestFixtureTest {
     @Test
     @SuppressWarnings("unchecked")
     public void mustExecuteVerbOnAUriWithNoExcpectationsOnRestResponseParts() {
-
+        when(mockBodyTypeAdapter.toString()).thenReturn("returned <body />");
         when(mockLastRequest.getQuery()).thenReturn("a=b");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
         lastResponse.setResource("/uri");
@@ -177,25 +178,32 @@ public class RestFixtureTest {
         verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri?a=b"), eq("/uri?a=b"));
         verify(mockCellFormatter).gray("200");
         verify(mockCellFormatter).gray("Header : some/thing");
-        verify(mockCellFormatter).gray("<body />");
+        verify(mockCellFormatter).gray("returned <body />");
+
+        verify(mockBodyTypeAdapter).setContext(isA(Map.class));
+        verify(mockBodyTypeAdapter).set("<body />");
 
         verifyNoMoreInteractions(mockRestClient);
         verifyNoMoreInteractions(mockCellFormatter);
-        verifyNoMoreInteractions(mockLastRequest);
+        verifyNoMoreInteractions(mockBodyTypeAdapter);
+
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void mustExecutePOSTWithFileUploadWhenFileParamNameIsDefault() {
+    public void mustExecutePOSTWithFileUploadWhenFileParamNameIsDefault() throws Exception {
+        String body = "file: { \"resource\" : { \"name\" : \"test post\", \"data\" : \"some data\" } }";
+        when(mockBodyTypeAdapter.toString()).thenReturn(body);
+        when(mockBodyTypeAdapter.parse(body)).thenReturn(body);
+        when(mockBodyTypeAdapter.equals(body, body)).thenReturn(true);
         when(mockLastRequest.getQuery()).thenReturn("");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
         lastResponse.setStatusCode(202);
         lastResponse.addHeader("Content-Type", "text/plain; charset=iso-8859-1");
         lastResponse.addHeader("Transfer-Encoding", "chunked");
-        String body = "file: { \"resource\" : { \"name\" : \"test post\", \"data\" : \"some data\" } }";
         lastResponse.setBody(body);
 
-        RowWrapper<?> row = helper.createTestRow("POST", "/uri", "", "", "file: { \"resource\" : { \"name\" : \"test post\", \"data\" : \"some data\" } }");
+        RowWrapper<?> row = helper.createTestRow("POST", "/uri", "", "", body);
 
         fixture.processRow(row);
 
@@ -212,9 +220,15 @@ public class RestFixtureTest {
 
         verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
         verify(mockCellFormatter).gray("202");
-        verify(mockCellFormatter).right(isA(CellWrapper.class), isA(TextBodyTypeAdapter.class));
+        verify(mockCellFormatter).right(isA(CellWrapper.class), eq(mockBodyTypeAdapter));
         verify(mockCellFormatter).gray("Content-Type : text/plain; charset=iso-8859-1\nTransfer-Encoding : chunked");
 
+        verify(mockBodyTypeAdapter).setContext(isA(Map.class));
+        verify(mockBodyTypeAdapter).set(body);
+        verify(mockBodyTypeAdapter).parse(body);
+        verify(mockBodyTypeAdapter).equals(body, body);
+
+        verifyNoMoreInteractions(mockBodyTypeAdapter);
         verifyNoMoreInteractions(mockLastRequest);
         verifyNoMoreInteractions(mockRestClient);
         verifyNoMoreInteractions(mockCellFormatter);
@@ -223,9 +237,12 @@ public class RestFixtureTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void mustExecuteVerbOnAUriWithExcpectationsSetOnEachResponsePart_ExpectationsMatched() {
+    public void mustExecuteVerbOnAUriWithExcpectationsSetOnEachResponsePart_ExpectationsMatched() throws Exception {
+        when(mockBodyTypeAdapter.toString()).thenReturn("returned <body />");
         when(mockLastRequest.getQuery()).thenReturn("a=b");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        when(mockBodyTypeAdapter.parse("//body")).thenReturn("//body");
+        when(mockBodyTypeAdapter.equals("//body", "<body />")).thenReturn(true);
         lastResponse.setResource("/uri");
         lastResponse.addHeader("Header", "some/thing");
         lastResponse.setBody("<body />");
@@ -249,8 +266,13 @@ public class RestFixtureTest {
         // status code cell
         verify(mockCellFormatter).right(isA(CellWrapper.class), isA(StatusCodeTypeAdapter.class));
         verify(mockCellFormatter).right(isA(CellWrapper.class), isA(HeadersTypeAdapter.class));
-        verify(mockCellFormatter).right(isA(CellWrapper.class), isA(XPathBodyTypeAdapter.class));
+        verify(mockCellFormatter).right(isA(CellWrapper.class), eq(mockBodyTypeAdapter));
+        verify(mockBodyTypeAdapter).setContext(isA(Map.class));
+        verify(mockBodyTypeAdapter).set("<body />");
+        verify(mockBodyTypeAdapter).parse("//body");
+        verify(mockBodyTypeAdapter).equals("//body", "<body />");
 
+        verifyNoMoreInteractions(mockBodyTypeAdapter);
         verifyNoMoreInteractions(mockRestClient);
         verifyNoMoreInteractions(mockCellFormatter);
         verifyNoMoreInteractions(mockLastRequest);
@@ -258,9 +280,13 @@ public class RestFixtureTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void mustExecuteVerbOnAUriWithExcpectationsSetOnEachResponsePart_ExpectationsNotMatched() {
+    public void mustExecuteVerbOnAUriWithExcpectationsSetOnEachResponsePart_ExpectationsNotMatched() throws Exception {
         when(mockLastRequest.getQuery()).thenReturn("a=b");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+
+        when(mockBodyTypeAdapter.parse("//count")).thenReturn("//count");
+        when(mockBodyTypeAdapter.equals("//count", "<body />")).thenReturn(false);
+
         lastResponse.setResource("/uri");
         lastResponse.addHeader("Header", "some/thing");
         lastResponse.setBody("<body />");
@@ -284,8 +310,14 @@ public class RestFixtureTest {
         // status code cell
         verify(mockCellFormatter).wrong(isA(CellWrapper.class), isA(StatusCodeTypeAdapter.class));
         verify(mockCellFormatter).wrong(isA(CellWrapper.class), isA(HeadersTypeAdapter.class));
-        verify(mockCellFormatter).wrong(isA(CellWrapper.class), isA(XPathBodyTypeAdapter.class));
+        verify(mockCellFormatter).wrong(isA(CellWrapper.class), eq(mockBodyTypeAdapter));
 
+        verify(mockBodyTypeAdapter).setContext(isA(Map.class));
+        verify(mockBodyTypeAdapter).set("<body />");
+        verify(mockBodyTypeAdapter).parse("//count");
+        verify(mockBodyTypeAdapter).equals("//count", "<body />");
+
+        verifyNoMoreInteractions(mockBodyTypeAdapter);
         verifyNoMoreInteractions(mockRestClient);
         verifyNoMoreInteractions(mockCellFormatter);
         verifyNoMoreInteractions(mockLastRequest);
@@ -293,7 +325,9 @@ public class RestFixtureTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void mustMatchRequestsWithNoBodyExpressedAsNoBodyString() {
+    public void mustMatchRequestsWithNoBodyExpressedAsNoBodyString() throws Exception {
+        when(mockBodyTypeAdapter.parse("no-body")).thenReturn("no-body");
+        when(mockBodyTypeAdapter.equals("no-body", "")).thenReturn(true);
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
         lastResponse.setResource("/uri");
         lastResponse.setBody("");
@@ -316,10 +350,16 @@ public class RestFixtureTest {
         verify(mockCellFormatter).gray("200");
         // matches no-body and format it with right - first arg should be
         // row.getCell(4) but mockito doesn't like it
-        verify(mockCellFormatter).right(isA(CellWrapper.class), isA(BodyTypeAdapter.class));
+        verify(mockCellFormatter).right(isA(CellWrapper.class), eq(mockBodyTypeAdapter));
 
-        verifyNoMoreInteractions(mockRestClient);
+        verify(mockBodyTypeAdapter).setContext(isA(Map.class));
+        verify(mockBodyTypeAdapter).set("");
+        verify(mockBodyTypeAdapter).parse("no-body");
+        verify(mockBodyTypeAdapter).equals("no-body", "");
+
+        verifyNoMoreInteractions(mockBodyTypeAdapter);
         verifyNoMoreInteractions(mockCellFormatter);
+        verifyNoMoreInteractions(mockRestClient);
         verifyNoMoreInteractions(mockLastRequest);
     }
 
@@ -383,7 +423,9 @@ public class RestFixtureTest {
      */
     @Test
     @SuppressWarnings("unchecked")
-    public void mustExecuteVerbOnAUriWithExcpectationsSetOnBody_XML() {
+    public void mustExecuteVerbOnAUriWithExcpectationsSetOnBody_XML() throws Exception {
+        when(mockBodyTypeAdapter.parse("//body")).thenReturn("//body");
+        when(mockBodyTypeAdapter.equals("//body", "<body />")).thenReturn(true);
         when(mockLastRequest.getQuery()).thenReturn("");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
         lastResponse.setResource("/uri");
@@ -395,10 +437,17 @@ public class RestFixtureTest {
         fixture.processRow(row);
 
         // correctly builds request
-        verify(mockCellFormatter).right(isA(CellWrapper.class), isA(XPathBodyTypeAdapter.class));
+        verify(mockCellFormatter).right(isA(CellWrapper.class), eq(mockBodyTypeAdapter));
         verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("http://localhost:9090/uri"), eq("/uri"));
         verify(mockCellFormatter).gray("200");
         verify(mockCellFormatter).gray("Content-Type : application/xml");
+
+        verify(mockBodyTypeAdapter).setContext(isA(Map.class));
+        verify(mockBodyTypeAdapter).set("<body />");
+        verify(mockBodyTypeAdapter).parse("//body");
+        verify(mockBodyTypeAdapter).equals("//body", "<body />");
+
+        verifyNoMoreInteractions(mockBodyTypeAdapter);
 
         verifyNoMoreInteractions(mockCellFormatter);
     }
@@ -409,19 +458,74 @@ public class RestFixtureTest {
      */
     @Test
     @SuppressWarnings("unchecked")
-    public void mustExecuteVerbOnAUriWithExcpectationsSetOnBody_TEXT() {
+    public void mustExecuteVerbOnAUriWithExcpectationsSetOnBody_TEXT() throws Exception {
+        String regex = ".+AD \\d\\d\\d\\d.+";
+        String content = "in AD 1492 Columbus discovered America";
+        when(mockBodyTypeAdapter.parse(regex)).thenReturn(regex);
+        when(mockBodyTypeAdapter.equals(regex, content)).thenReturn(true);
+
         when(mockLastRequest.getQuery()).thenReturn("");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
         lastResponse.setResource("/uri");
         lastResponse.addHeader("Content-Type", "text/plain");
-        lastResponse.setBody("in AD 1492 Columbus discovered America");
+        lastResponse.setBody(content);
 
-        RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", ".+AD \\d\\d\\d\\d.+");
+        RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", regex);
 
         fixture.processRow(row);
 
         // correctly builds request
-        verify(mockCellFormatter).right(isA(CellWrapper.class), isA(TextBodyTypeAdapter.class));
+        verify(mockCellFormatter).right(isA(CellWrapper.class), eq(mockBodyTypeAdapter));
+
+        verify(mockBodyTypeAdapter).setContext(isA(Map.class));
+        verify(mockBodyTypeAdapter).set(content);
+        verify(mockBodyTypeAdapter).parse(regex);
+        verify(mockBodyTypeAdapter).equals(regex, content);
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verify(mockCellFormatter).gray("200");
+        verify(mockCellFormatter).gray("Content-Type : text/plain");
+
+        verifyNoMoreInteractions(mockBodyTypeAdapter);
+        verifyNoMoreInteractions(mockCellFormatter);
+    }
+
+    /**
+     * expectations on body that parse into text will be processed w/ the Text
+     * body adapter. content type expected is text/plain.
+     * Make sure that if the expectation is some form of HTML or XML then it's 
+     * correctly handled
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void mustExecuteVerbOnAUriWithExcpectationsSetOnBody_TEXTWithHtml() throws Exception {
+        String regex = "<name>Columbus</name>";
+        String content = "in AD 1492 <name>Columbus</name> discovered America";
+        when(mockBodyTypeAdapter.parse(regex)).thenReturn(regex);
+        when(mockBodyTypeAdapter.equals(regex, content)).thenReturn(true);
+
+        when(mockLastRequest.getQuery()).thenReturn("");
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        lastResponse.setResource("/uri");
+        lastResponse.addHeader("Content-Type", "text/plain");
+        lastResponse.setBody(content);
+
+        RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", regex);
+
+        fixture.processRow(row);
+
+        // correctly builds request
+        verify(mockCellFormatter).right(isA(CellWrapper.class), eq(mockBodyTypeAdapter));
+
+        verify(mockBodyTypeAdapter).setContext(isA(Map.class));
+        verify(mockBodyTypeAdapter).set(content);
+        verify(mockBodyTypeAdapter).parse(regex);
+        verify(mockBodyTypeAdapter).equals(regex, content);
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verify(mockCellFormatter).gray("200");
+        verify(mockCellFormatter).gray("Content-Type : text/plain");
+
+        verifyNoMoreInteractions(mockBodyTypeAdapter);
+        verifyNoMoreInteractions(mockCellFormatter);
     }
 
     /**
@@ -430,19 +534,23 @@ public class RestFixtureTest {
      */
     @Test
     @SuppressWarnings("unchecked")
-    public void mustExecuteVerbOnAUriWithExcpectationsSetOnBody_JSON() {
+    public void mustExecuteVerbOnAUriWithExcpectationsSetOnBody_JSON() throws Exception {
+        String json = "{\"test\":\"me\"}";
+        String xpath = "/test[text()='me']";
+        when(mockBodyTypeAdapter.parse(xpath)).thenReturn(xpath);
+        when(mockBodyTypeAdapter.equals(xpath, json)).thenReturn(true);
         when(mockLastRequest.getQuery()).thenReturn("");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
         lastResponse.setResource("/uri");
         lastResponse.addHeader("Content-Type", "application/json");
-        lastResponse.setBody("{\"test\":\"me\"}");
+        lastResponse.setBody(json);
 
-        RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", "/test[text()='me']");
+        RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", xpath);
 
         fixture.processRow(row);
 
         // correctly builds request
-        verify(mockCellFormatter).right(isA(CellWrapper.class), isA(JSONBodyTypeAdapter.class));
+        verify(mockCellFormatter).right(isA(CellWrapper.class), eq(mockBodyTypeAdapter));
     }
 
     @Test
@@ -495,10 +603,14 @@ public class RestFixtureTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void mustSetValueOnSymbolMapAsXmlStringIfSourceIsBodyAsXml() {
+    public void mustSetValueOnSymbolMapAsXmlStringIfSourceIsBodyAsXml() throws Exception {
+        String xmlString = "<root><header>some</header><body>text</body></root>";
+
+        when(mockBodyTypeAdapter.toString()).thenReturn(xmlString);
+        when(mockBodyTypeAdapter.parse(xmlString)).thenReturn(xmlString);
+
         when(mockLastRequest.getQuery()).thenReturn("");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
-        String xmlString = "<root><header>some</header><body>text</body></root>";
         lastResponse.setBody(xmlString);
 
         RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", "");
@@ -512,20 +624,27 @@ public class RestFixtureTest {
         verify(mockCellFormatter).gray(eq(xmlString));
         verify(mockCellFormatter).check(isA(CellWrapper.class), isA(StringTypeAdapter.class));
 
+        verify(mockBodyTypeAdapter).set(xmlString);
+        verify(mockBodyTypeAdapter).setContext(isA(Map.class));
+
         // correctly builds request
         assertEquals(xmlString, clean(variables.get("content")));
         assertEquals(xmlString, clean(variables.get("$content")));
         assertEquals(xmlString, clean(Fixture.getSymbol("content").toString()));
 
+        verifyNoMoreInteractions(mockBodyTypeAdapter);
         verifyNoMoreInteractions(mockCellFormatter);
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void mustSetValiueOnSymbolMapAsJsonStringIfSourceIsJs() {
+    public void mustSetValiueOnSymbolMapAsJsonStringIfSourceIsJs() throws Exception {
+        String jsonString = "{ \"person\" : { \"name\" : \"fred\", \"age\" : \"20\"} }";
+        when(mockBodyTypeAdapter.toString()).thenReturn(jsonString);
+        when(mockBodyTypeAdapter.parse(jsonString)).thenReturn(jsonString);
+
         when(mockLastRequest.getQuery()).thenReturn("");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
-        String jsonString = "{ \"person\" : { \"name\" : \"fred\", \"age\" : \"20\"} }";
         lastResponse.setBody(jsonString);
         lastResponse.addHeader("Content-Type", ContentType.JSON.toMime().get(0));
 
@@ -654,7 +773,6 @@ public class RestFixtureTest {
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
         lastResponse.setBody("<body>text</body>");
         lastResponse.addHeader("header", "value1");
-
 
         RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", "");
         fixture.processRow(row);

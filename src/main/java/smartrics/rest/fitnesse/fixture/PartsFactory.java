@@ -27,7 +27,10 @@ import smartrics.rest.client.RestClientImpl;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.RestFixture.Runner;
+import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
+import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory;
 import smartrics.rest.fitnesse.fixture.support.CellFormatter;
+import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HttpClientBuilder;
 
 /**
@@ -79,4 +82,16 @@ public class PartsFactory {
         throw new IllegalStateException("Runner " + runner.name() + " not supported");
     }
 
+    /**
+     * returns a {@link smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter}
+     * for the content type in input.
+     * 
+     * @param ct
+     *            the content type
+     * @return the
+     *         {@link smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter}
+     */
+    public BodyTypeAdapter buildBodyTypeAdapter(ContentType ct) {
+        return BodyTypeAdapterFactory.getBodyTypeAdapter(ct);
+    }
 }

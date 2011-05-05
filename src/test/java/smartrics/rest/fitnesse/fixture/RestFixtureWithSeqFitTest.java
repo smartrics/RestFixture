@@ -36,6 +36,7 @@ import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.RestFixture.Runner;
+import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.RowWrapper;
@@ -58,6 +59,7 @@ public class RestFixtureWithSeqFitTest {
     private PartsFactory mockPartsFactory;
     private RestClient mockRestClient;
     private RestRequest mockLastRequest;
+    private BodyTypeAdapter mockBodyTypeAdapter;
     @SuppressWarnings("rawtypes")
     private CellFormatter mockCellFormatter;
     private Config config;
@@ -71,6 +73,7 @@ public class RestFixtureWithSeqFitTest {
         mockRestClient = mock(RestClient.class);
         mockLastRequest = mock(RestRequest.class);
         mockPartsFactory = mock(PartsFactory.class);
+        mockBodyTypeAdapter = mock(BodyTypeAdapter.class);
 
         variables.clearAll();
 
@@ -86,7 +89,7 @@ public class RestFixtureWithSeqFitTest {
 
         ContentType.resetDefaultMapping();
 
-        helper.wireMocks(config, mockPartsFactory, mockRestClient, mockLastRequest, lastResponse, mockCellFormatter);
+        helper.wireMocks(config, mockPartsFactory, mockRestClient, mockLastRequest, lastResponse, mockCellFormatter, mockBodyTypeAdapter);
         fixture = new RestFixtureWithSeq(mockPartsFactory, "http://localhost:8080", null, "sequence.pic");
         fixture.initialize(Runner.OTHER);
     }

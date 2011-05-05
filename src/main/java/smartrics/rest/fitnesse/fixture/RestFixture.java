@@ -36,7 +36,6 @@ import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory;
 import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
@@ -846,7 +845,7 @@ public class RestFixture extends ActionFixture {
         CellWrapper bodyCell = row.getCell(4);
         bodyCell.body(GLOBALS.substitute(bodyCell.body()));
         ContentType ct = getContentTypeOfLastResponse();
-        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ct);
+        BodyTypeAdapter bodyTypeAdapter = partsFactory.buildBodyTypeAdapter(ct);
         bodyTypeAdapter.setContext(namespaceContext);
         process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
     }
@@ -856,8 +855,9 @@ public class RestFixture extends ActionFixture {
         ta.set(actual);
         boolean ignore = "".equals(expected.text().trim());
         if (ignore) {
-            if (!"".equals(ta.toString())) {
-                expected.addToBody(getFormatter().gray(ta.toString()));
+            String actualString = ta.toString();
+            if (!"".equals(actualString)) {
+                expected.addToBody(getFormatter().gray(actualString));
             }
         } else {
             boolean success = false;
