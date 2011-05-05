@@ -81,6 +81,7 @@
 	</target>
 
 	<target name="test" depends="compile-unit">
+        <delete dir="${reports}/unit" />
 		<junit errorproperty="test.failed" printsummary="true">
 			<classpath refid="test.classpath" />
 			<formatter type="xml" />
