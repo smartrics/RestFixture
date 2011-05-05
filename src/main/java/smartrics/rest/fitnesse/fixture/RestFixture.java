@@ -330,9 +330,6 @@ public class RestFixture extends ActionFixture {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void doCells(Parse parse) {
         config = Config.getConfig(getConfigNameFromArgs());
-
-        System.err.println("USING CONFIG " + config.toString());
-
         String url = getBaseUrlFromArgs();
         if (url != null) {
             baseUrl = new Url(stripTag(url));
