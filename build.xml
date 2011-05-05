@@ -81,7 +81,7 @@
 	</target>
 
 	<target name="test" depends="compile-unit">
-		<junit errorproperty="test.failed">
+		<junit errorproperty="test.failed" printsummary="true">
 			<classpath refid="test.classpath" />
 			<formatter type="xml" />
 			<batchtest fork="yes" todir="${reports}/unit">
