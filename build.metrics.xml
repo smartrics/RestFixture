@@ -11,7 +11,8 @@
 		<property name="lib.dir" value="${lib}" />
 		<property name="etc.dir" value="${etc}" />
 		<property name="build.dir" value="${build}" />
-	    <path id="project.classpath" refid="project.classpath" />
+		<property name="coverage.staging.dir" value="${coverage.staging}" />
+		<path id="project.classpath" refid="project.classpath" />
 	</target>
 
 	<target name="define.properties" unless="inherit.properties">
@@ -20,9 +21,12 @@
 		<property name="lib.dir" value="lib" />
 		<property name="etc.dir" value="etc" />
 		<property name="build.dir" value="build" />
+		<property name="coverage.staging.dir"
+		          value="${build.dir}/coverage-staging" />
 	</target>
 
-	<target name="define.shared.structures" depends="inherit.properties, define.properties">
+	<target name="define.shared.structures"
+	        depends="inherit.properties, define.properties">
 		<echo message="Using reports.dir: ${reports.dir}" />
 		<echo message="Using src.dir: ${src.dir}" />
 		<echo message="Using lib.dir: ${reports.dir}" />
@@ -31,16 +35,27 @@
 
 		<property name="metrics.lib" value="${lib.dir}/test/metrics" />
 		<property name="metrics.config.dir" value="${etc.dir}/metrics" />
-		<property name="build.classes.main.dir" value="${build.dir}/classes/main" />
+		<property name="build.classes.main.dir"
+		          value="${build.dir}/classes/main" />
 		<property name="metrics.report.dir" value="${reports.dir}/metrics" />
+		<property name="coverage.filter" value="" />
 
-		<property name="checkstyle.report.dir" value="${metrics.report.dir}/checkstyle" />
-		<property name="jdepend.report.dir" value="${metrics.report.dir}/jdepend" />
-		<property name="findbugs.report.dir" location="${metrics.report.dir}/findbugs" />
+		<property name="checkstyle.report.dir"
+		          value="${metrics.report.dir}/checkstyle" />
+		<property name="jdepend.report.dir"
+		          value="${metrics.report.dir}/jdepend" />
+		<property name="findbugs.report.dir"
+		          location="${metrics.report.dir}/findbugs" />
+		<property name="coverage.report.dir"
+		          location="${metrics.report.dir}/coverage" />
 		<property name="pmd.report.dir" location="${metrics.report.dir}/pmd" />
 		<property name="cpd.report.dir" location="${metrics.report.dir}/cpd" />
-		<property name="crap4j.report.dir" location="${metrics.report.dir}/crap4j" />
-		<property name="ckjm.report.dir" location="${metrics.report.dir}/ckjm" />
+		<property name="crap4j.report.dir"
+		          location="${metrics.report.dir}/crap4j" />
+		<property name="ckjm.report.dir"
+		          location="${metrics.report.dir}/ckjm" />
+
+		<property name="coverage.enabled" value="true" />
 
 		<path id="metrics.classpath">
 			<fileset id="metrics.libs.id" dir="${metrics.lib}">
@@ -48,28 +63,90 @@
 			</fileset>
 		</path>
 
-        <path id="lib.classpath">
-            <fileset dir="${lib.dir}">
-                <include name="**/*.jar" />
-                <!-- captured in metrics.classpath -->
-                <exclude name="**/metrics/**/*.jar" />
-            </fileset>
-        </path>
+		<path id="lib.classpath">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+				<!-- captured in metrics.classpath -->
+				<exclude name="**/metrics/**/*.jar" />
+			</fileset>
+		</path>
 	</target>
 
-	<target name="all" depends="clean, init, cpd, pmd, findbugs, checkstyle, jdepend, ckjm, crap4j" />
+	<target name="all"
+	        depends="init, cpd, pmd, findbugs, checkstyle, jdepend, ckjm, crap4j" />
 
 	<target name="init" depends="define.shared.structures">
 	</target>
 
-	<target name="clean">
-		<delete dir="${metrics.report.dir}" />
+
+	<target name="coverage.instrument" depends="init">
+		<delete dir="${coverage.staging.dir}" />
+		<mkdir dir="${coverage.staging.dir}" />
+		<property name="emma.filter" value="${coverage.filter}" />
+
+		<path id="run.classpath">
+			<!-- class files we want to instrument -->
+			<pathelement location="${build.classes.main.dir}" />
+		</path>
+
+		<taskdef resource="emma_ant.properties"
+		         classpathref="metrics.classpath" />
+		<emma enabled="${coverage.enabled}">
+			<instr instrpathref="run.classpath"
+			       destdir="${coverage.staging.dir}"
+			       metadatafile="${coverage.staging.dir}/metadata.emma"
+			       merge="true">
+				<!-- note that coverage filters can be set through nested <filter>
+	             elements as well: many of EMMA setting are 'mergeable' in the
+	             sense that they can be specified multiple times and the result
+	             is a union of all such values. Here we are not merging several
+	             filters together but merely demonstrating that it is possible:
+	        -->
+				<filter value="${emma.filter}" />
+			</instr>
+		</emma>
+	</target>
+
+	<target name="coverage.report" depends="init">
+		<delete dir="${coverage.report.dir}" />
+		<mkdir dir="${coverage.report.dir}" />
+		<property name="coverage.threshold.method" value="70" />
+		<property name="coverage.threshold.block" value="80" />
+		<property name="coverage.threshold.line" value="80" />
+		<property name="coverage.threshold.class" value="100" />
+
+		<taskdef resource="emma_ant.properties"
+		         classpathref="metrics.classpath" />
+		<emma enabled="${coverage.enabled}">
+			<report sourcepath="${src.dir}"
+			        sort="+block,+name,+method,+class"
+			        metrics="method:${coverage.threshold.method},block:${coverage.threshold.block},line:${coverage.threshold.line},class:${coverage.threshold.class}">
+				<!-- collect all EMMA data dumps (metadata and runtime)
+                 [this can be done via nested <fileset> fileset elements
+                 or <file> elements pointing to a single file]:
+            -->
+				<fileset dir="${coverage.staging.dir}">
+					<include name="*.emma" />
+				</fileset>
+				<html outfile="${coverage.report.dir}/coverage_m.html"
+				      depth="method"
+				      columns="name,class,method,block,line" />
+			</report>
+		</emma>
+
 	</target>
 
 	<target name="findbugs" depends="init">
+		<delete dir="${findbugs.report.dir}" />
 		<mkdir dir="${findbugs.report.dir}" />
-		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${metrics.lib}/findbugs-ant.jar" />
-		<findbugs home="${findbugs.home}" output="html" outputFile="${findbugs.report.dir}/findbugs.html" jvmargs="-Xms512M -Xmx512M " excludeFilter="${metrics.config.dir}/findBugs_exclude_filters.xml">
+		<taskdef name="findbugs"
+		         classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
+		         classpath="${metrics.lib}/findbugs-ant.jar" />
+		<findbugs home="${findbugs.home}"
+		          output="html"
+		          outputFile="${findbugs.report.dir}/findbugs.html"
+		          jvmargs="-Xms512M -Xmx512M "
+		          excludeFilter="${metrics.config.dir}/findBugs_exclude_filters.xml">
 			<sourcePath path="${src.dir}" />
 			<class location="${build.classes.main.dir}" />
 		</findbugs>
@@ -77,26 +154,38 @@
 
 	<target name="ckjm" depends="init">
 		<!-- Chidamber and Kemerer Java Metrics (see http://www.spinellis.gr/sw/ckjm/) -->
+		<delete dir="${ckjm.report.dir}" />
 		<mkdir dir="${ckjm.report.dir}" />
 		<taskdef name="ckjm" classname="gr.spinellis.ckjm.ant.CkjmTask">
 			<classpath>
 				<pathelement location="${metrics.lib}/ckjm-1.9.jar" />
 			</classpath>
 		</taskdef>
-		<ckjm outputfile="${ckjm.report.dir}/ckjm.xml" format="xml" classdir="${build.classes.main.dir}">
+		<ckjm outputfile="${ckjm.report.dir}/ckjm.xml"
+		      format="xml"
+		      classdir="${build.classes.main.dir}">
 			<include name="**/*.class" />
 			<exclude name="**/*Test.class" />
-            <extdirs refid="lib.classpath" />
+			<extdirs refid="lib.classpath" />
 		</ckjm>
-		<xslt in="${ckjm.report.dir}/ckjm.xml" style="${metrics.config.dir}/ckjm.xsl" out="${ckjm.report.dir}/ckjm.html" />
-		<xslt in="${ckjm.report.dir}/ckjm.xml" style="${metrics.config.dir}/ckjm_extra.xsl" out="${ckjm.report.dir}/ckjm_extra.html" />
+		<xslt in="${ckjm.report.dir}/ckjm.xml"
+		      style="${metrics.config.dir}/ckjm.xsl"
+		      out="${ckjm.report.dir}/ckjm.html" />
+		<xslt in="${ckjm.report.dir}/ckjm.xml"
+		      style="${metrics.config.dir}/ckjm_extra.xsl"
+		      out="${ckjm.report.dir}/ckjm_extra.html" />
 	</target>
 
 	<target name="pmd" depends="init">
+		<delete dir="${pmd.report.dir}" />
 		<mkdir dir="${pmd.report.dir}" />
-		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="metrics.classpath" />
+		<taskdef name="pmd"
+		         classname="net.sourceforge.pmd.ant.PMDTask"
+		         classpathref="metrics.classpath" />
 		<pmd rulesetfiles="imports,basic">
-			<formatter type="html" toFile="${pmd.report.dir}/pmd.html" toConsole="true" />
+			<formatter type="html"
+			           toFile="${pmd.report.dir}/pmd.html"
+			           toConsole="true" />
 			<formatter type="xml" toFile="${pmd.report.dir}/pmd.xml" />
 			<fileset dir="${src.dir}">
 				<include name="**/*.java" />
@@ -105,39 +194,61 @@
 	</target>
 
 	<target name="cpd" depends="init">
+		<delete dir="${cpd.report.dir}" />
 		<mkdir dir="${cpd.report.dir}" />
-		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="metrics.classpath" />
-		<cpd minimumTokenCount="4" format="xml" outputFile="${cpd.report.dir}/cpd.xml">
+		<taskdef name="cpd"
+		         classname="net.sourceforge.pmd.cpd.CPDTask"
+		         classpathref="metrics.classpath" />
+		<cpd minimumTokenCount="4"
+		     format="xml"
+		     outputFile="${cpd.report.dir}/cpd.xml">
 			<fileset dir="${src.dir}">
 				<include name="**/*.java" />
 			</fileset>
 		</cpd>
-		<xslt in="${cpd.report.dir}/cpd.xml" style="${metrics.config.dir}/cpdhtml.xslt" out="${cpd.report.dir}/cpd.html" />
+		<xslt in="${cpd.report.dir}/cpd.xml"
+		      style="${metrics.config.dir}/cpdhtml.xslt"
+		      out="${cpd.report.dir}/cpd.html" />
 	</target>
 
 	<target name="jdepend" depends="init">
+		<delete dir="${jdepend.report.dir}" />
 		<mkdir dir="${jdepend.report.dir}" />
 		<!-- for this to work add jdepend-x.x.x.jar to your ANT_HOME/lib - note: if run in IDE, it's likely that ANT_HOME is that shipped with the IDE -->
-		<jdepend outputfile="${jdepend.report.dir}/jdepend-report.xml" format="xml">
+		<jdepend outputfile="${jdepend.report.dir}/jdepend-report.xml"
+		         format="xml">
 			<classespath>
 				<pathelement location="${build.classes.main.dir}" />
 			</classespath>
 		</jdepend>
-		<xslt in="${jdepend.report.dir}/jdepend-report.xml" out="${jdepend.report.dir}/jdepend-report.html" style="${metrics.config.dir}/jdepend.xsl" />
+		<xslt in="${jdepend.report.dir}/jdepend-report.xml"
+		      out="${jdepend.report.dir}/jdepend-report.html"
+		      style="${metrics.config.dir}/jdepend.xsl" />
 	</target>
 
-	<target name="checkstyle" depends="init" description="Generates a report of code convention violations.">
+	<target name="checkstyle"
+	        depends="init"
+	        description="Generates a report of code convention violations.">
+		<delete dir="${checkstyle.report.dir}" />
 		<mkdir dir="${checkstyle.report.dir}" />
-		<taskdef resource="checkstyletask.properties" classpathref="metrics.classpath" />
-		<checkstyle config="${metrics.config.dir}/restfixture_checkstyle.xml" failureProperty="checkstyle.failure" failOnViolation="false" classpathref="metrics.classpath">
-			<formatter type="xml" tofile="${checkstyle.report.dir}/checkstyle_report.xml" />
+		<taskdef resource="checkstyletask.properties"
+		         classpathref="metrics.classpath" />
+		<checkstyle config="${metrics.config.dir}/restfixture_checkstyle.xml"
+		            failureProperty="checkstyle.failure"
+		            failOnViolation="false"
+		            classpathref="metrics.classpath">
+			<formatter type="xml"
+			           tofile="${checkstyle.report.dir}/checkstyle_report.xml" />
 			<fileset dir="${src.dir}" includes="**/*.java" />
 		</checkstyle>
 
-		<xslt in="${checkstyle.report.dir}/checkstyle_report.xml" out="${checkstyle.report.dir}/checkstyle_report.html" style="${metrics.config.dir}/checkstyle-noframes-sorted.xsl" />
+		<xslt in="${checkstyle.report.dir}/checkstyle_report.xml"
+		      out="${checkstyle.report.dir}/checkstyle_report.html"
+		      style="${metrics.config.dir}/checkstyle-noframes-sorted.xsl" />
 	</target>
 
 	<target name="crap4j" depends="init">
+		<delete dir="${crap4j.report.dir}" />
 		<mkdir dir="${crap4j.report.dir}" />
 		<echo message="version 1.1.6 of Crap4j doesn't work on Windows - using patched version included in RestFixture/${metrics.lib}/crap4j" />
 		<property name="crap4j.home" value="${metrics.lib}/crap4j" />
@@ -151,7 +262,11 @@
 		</taskdef>
 
 		<!-- patch allows passing crap4j.home to the task -->
-		<crap4j crap4jhome="${crap4j.home}" projectdir="${basedir}" outputDir="${crap4j.report.dir}" dontTest="false" debug="true">
+		<crap4j crap4jhome="${crap4j.home}"
+		        projectdir="${basedir}"
+		        outputDir="${crap4j.report.dir}"
+		        dontTest="false"
+		        debug="true">
 			<classes>
 				<pathElement location="${build.dir}/classes/main" />
 			</classes>
@@ -178,8 +293,8 @@
 				</fileset -->
 			</libClasspath>
 		</crap4j>
-        <delete file="crap_build.xml" />
-        <delete dir="agitar" />
+		<delete file="crap_build.xml" />
+		<delete dir="agitar" />
 	</target>
 
 </project>
