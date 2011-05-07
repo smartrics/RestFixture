@@ -8,21 +8,19 @@
 	<target name="inherit.properties" if="inherit.properties">
 		<property name="reports.dir" value="${reports}" />
 		<property name="src.dir" value="${src}" />
+		<property name="src.unit.dir" value="${src.unit}" />
 		<property name="lib.dir" value="${lib}" />
 		<property name="etc.dir" value="${etc}" />
 		<property name="build.dir" value="${build}" />
-		<property name="coverage.staging.dir" value="${coverage.staging}" />
-		<path id="project.classpath" refid="project.classpath" />
 	</target>
 
 	<target name="define.properties" unless="inherit.properties">
 		<property name="reports.dir" value="build/reports" />
 		<property name="src.dir" value="src/main/java" />
+		<property name="src.unit.dir" value="src/test/java" />
 		<property name="lib.dir" value="lib" />
 		<property name="etc.dir" value="etc" />
 		<property name="build.dir" value="build" />
-		<property name="coverage.staging.dir"
-		          value="${build.dir}/coverage-staging" />
 	</target>
 
 	<target name="define.shared.structures"
@@ -48,6 +46,8 @@
 		          location="${metrics.report.dir}/findbugs" />
 		<property name="coverage.report.dir"
 		          location="${metrics.report.dir}/coverage" />
+		<property name="coverage.staging.dir"
+		          location="${build.dir}/coverage-staging" />
 		<property name="pmd.report.dir" location="${metrics.report.dir}/pmd" />
 		<property name="cpd.report.dir" location="${metrics.report.dir}/cpd" />
 		<property name="crap4j.report.dir"
@@ -70,16 +70,22 @@
 				<exclude name="**/metrics/**/*.jar" />
 			</fileset>
 		</path>
+
+		<path id="coverage.test.classpath">
+			<pathelement location="${coverage.staging.dir}" />
+			<fileset dir="${lib.dir}">
+				<include name="**/emma*.jar" />
+			</fileset>
+			<path refid="test.classpath" />
+		</path>
 	</target>
 
 	<target name="all"
-	        depends="init, cpd, pmd, findbugs, checkstyle, jdepend, ckjm, crap4j" />
+	        depends="init, cpd, pmd, findbugs, checkstyle, jdepend, ckjm, coverage, crap4j" />
 
-	<target name="init" depends="define.shared.structures">
-	</target>
+	<target name="init" depends="define.shared.structures" />
 
-
-	<target name="coverage.instrument" depends="init">
+	<target name="coverage" depends="init">
 		<delete dir="${coverage.staging.dir}" />
 		<mkdir dir="${coverage.staging.dir}" />
 		<property name="emma.filter" value="${coverage.filter}" />
@@ -105,9 +111,18 @@
 				<filter value="${emma.filter}" />
 			</instr>
 		</emma>
-	</target>
 
-	<target name="coverage.report" depends="init">
+		<junit errorproperty="test.failed" fork="false" printsummary="true">
+			<classpath refid="coverage.test.classpath" />
+			<batchtest fork="yes">
+				<fileset dir="${src.unit.dir}">
+					<include name="**/*Test.java" />
+				</fileset>
+			</batchtest>
+			<jvmarg value="-Demma.coverage.out.file=${coverage.staging.dir}/coverage.emma" />
+			<jvmarg value="-Demma.coverage.out.merge=true" />
+		</junit>
+
 		<delete dir="${coverage.report.dir}" />
 		<mkdir dir="${coverage.report.dir}" />
 		<property name="coverage.threshold.method" value="70" />
@@ -115,8 +130,6 @@
 		<property name="coverage.threshold.line" value="80" />
 		<property name="coverage.threshold.class" value="100" />
 
-		<taskdef resource="emma_ant.properties"
-		         classpathref="metrics.classpath" />
 		<emma enabled="${coverage.enabled}">
 			<report sourcepath="${src.dir}"
 			        sort="+block,+name,+method,+class"

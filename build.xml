@@ -20,8 +20,6 @@
 	<property name="fitnesse.reports.resources" value="${etc}/fitnesse" />
 	<property name="artifacts" value="${dist}/artifacts" />
 
-	<property name="coverage.staging" value="${build}/classes/instrumented" />
-
 	<property name="fitnesse.path" value="${ant.project.name}Tests" />
 	<property name="fitnesse.test.suite" value="${fitnesse.path}" />
 	<property name="fitnesse.root.name" value="FitNesseRoot" />
@@ -53,12 +51,8 @@
 	<path id="test.classpath">
 		<path refid="project.classpath" />
 		<!-- this will shadow the ones in classes/main -->
-		<pathelement location="${coverage.staging}" />
 		<pathelement location="${build}/classes/main" />
 		<pathelement location="${build}/classes/unit" />
-		<fileset dir="${lib}">
-			<include name="**/metrics/**/emma*.jar" />
-		</fileset>
 	</path>
 
 	<target name="full"
@@ -110,8 +104,6 @@
 					<include name="**/*Test.java" />
 				</fileset>
 			</batchtest>
-			<jvmarg value="-Demma.coverage.out.file=${coverage.staging}/coverage.emma" />
-			<jvmarg value="-Demma.coverage.out.merge=true" />
 		</junit>
 		<junitreport todir="${reports}/unit">
 			<fileset dir="${reports}/unit">
@@ -122,22 +114,14 @@
 		<fail if="test.failed" />
 	</target>
 
-	<target name="coverage" depends="compile, compile-unit, compile-cat">
-		<property name="inherit.properties" value="true" />
-		<ant antfile="build.metrics.xml"
-		     inheritall="true"
-		     target="coverage.instrument" />
-		<antcall target="test" />
-		<ant antfile="build.metrics.xml"
-		     inheritall="true"
-		     target="coverage.report" />
-	</target>
-
 	<target name="metrics"
 	        depends="compile, compile-unit"
 	        if="calculate.metrics">
 		<property name="inherit.properties" value="true" />
-		<ant antfile="build.metrics.xml" inheritall="true" target="all" />
+		<ant antfile="build.metrics.xml"
+		     inheritall="true"
+		     inheritrefs="true"
+		     target="all" />
 	</target>
 
 	<target name="compile-cat" depends="compile">
