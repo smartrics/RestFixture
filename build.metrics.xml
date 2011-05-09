@@ -85,7 +85,7 @@
 
 	<target name="init" depends="define.shared.structures" />
 
-	<target name="coverage" depends="init">
+	<target name="coverage" depends="init" unless="skip.metric.coverage">
 		<delete dir="${coverage.staging.dir}" />
 		<mkdir dir="${coverage.staging.dir}" />
 		<property name="emma.filter" value="${coverage.filter}" />
@@ -97,7 +97,7 @@
 
 		<taskdef resource="emma_ant.properties"
 		         classpathref="metrics.classpath" />
-		<emma enabled="${coverage.enabled}">
+		<emma enabled="true">
 			<instr instrpathref="run.classpath"
 			       destdir="${coverage.staging.dir}"
 			       metadatafile="${coverage.staging.dir}/metadata.emma"
@@ -130,7 +130,7 @@
 		<property name="coverage.threshold.line" value="80" />
 		<property name="coverage.threshold.class" value="100" />
 
-		<emma enabled="${coverage.enabled}">
+		<emma enabled="true">
 			<report sourcepath="${src.dir}"
 			        sort="+block,+name,+method,+class"
 			        metrics="method:${coverage.threshold.method},block:${coverage.threshold.block},line:${coverage.threshold.line},class:${coverage.threshold.class}">
@@ -149,7 +149,7 @@
 
 	</target>
 
-	<target name="findbugs" depends="init">
+	<target name="findbugs" depends="init" unless="skip.metric.findbugs">
 		<delete dir="${findbugs.report.dir}" />
 		<mkdir dir="${findbugs.report.dir}" />
 		<taskdef name="findbugs"
@@ -165,7 +165,7 @@
 		</findbugs>
 	</target>
 
-	<target name="ckjm" depends="init">
+	<target name="ckjm" depends="init" unless="skip.metric.ckjm">
 		<!-- Chidamber and Kemerer Java Metrics (see http://www.spinellis.gr/sw/ckjm/) -->
 		<delete dir="${ckjm.report.dir}" />
 		<mkdir dir="${ckjm.report.dir}" />
@@ -189,7 +189,7 @@
 		      out="${ckjm.report.dir}/ckjm_extra.html" />
 	</target>
 
-	<target name="pmd" depends="init">
+	<target name="pmd" depends="init" unless="skip.metric.pmd">
 		<delete dir="${pmd.report.dir}" />
 		<mkdir dir="${pmd.report.dir}" />
 		<taskdef name="pmd"
@@ -206,7 +206,7 @@
 		</pmd>
 	</target>
 
-	<target name="cpd" depends="init">
+	<target name="cpd" depends="init" unless="skip.metric.cpd">
 		<delete dir="${cpd.report.dir}" />
 		<mkdir dir="${cpd.report.dir}" />
 		<taskdef name="cpd"
@@ -224,7 +224,7 @@
 		      out="${cpd.report.dir}/cpd.html" />
 	</target>
 
-	<target name="jdepend" depends="init">
+	<target name="jdepend" depends="init" unless="skip.metric.jdepend">
 		<delete dir="${jdepend.report.dir}" />
 		<mkdir dir="${jdepend.report.dir}" />
 		<!-- for this to work add jdepend-x.x.x.jar to your ANT_HOME/lib - note: if run in IDE, it's likely that ANT_HOME is that shipped with the IDE -->
@@ -239,7 +239,7 @@
 		      style="${metrics.config.dir}/jdepend.xsl" />
 	</target>
 
-	<target name="checkstyle"
+	<target name="checkstyle" unless="skip.metric.checkstyle"
 	        depends="init"
 	        description="Generates a report of code convention violations.">
 		<delete dir="${checkstyle.report.dir}" />
@@ -260,7 +260,7 @@
 		      style="${metrics.config.dir}/checkstyle-noframes-sorted.xsl" />
 	</target>
 
-	<target name="crap4j" depends="init">
+	<target name="crap4j" depends="init" unless="skip.metric.crap4j">
 		<delete dir="${crap4j.report.dir}" />
 		<mkdir dir="${crap4j.report.dir}" />
 		<echo message="version 1.1.6 of Crap4j doesn't work on Windows - using patched version included in RestFixture/${metrics.lib}/crap4j" />
