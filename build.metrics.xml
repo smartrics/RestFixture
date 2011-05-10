@@ -59,7 +59,7 @@
 
 		<path id="metrics.classpath">
 			<fileset id="metrics.libs.id" dir="${metrics.lib}">
-				<include name="*.jar" />
+				<include name="**/*.jar" />
 			</fileset>
 		</path>
 
@@ -152,17 +152,22 @@
 	<target name="check.findbugs.home" unless="findbugs.home">
 		<echo>Unknown findbugs home</echo>
 		<echo>Define 'findbugs.home' in your property file or run ant with -Dfindbugs.home. Its value should be the directory where findbugs has been installed.</echo>
-        <echo>Otherwise define the property 'skip.metric.findbugs' to skip findbugs from the build.</echo>
+		<echo>Otherwise define the property 'skip.metric.findbugs' to skip findbugs from the build.</echo>
 		<fail message="findbugs.home not configured" />
 	</target>
-	
+
 	<target name="findbugs" depends="init" unless="skip.metric.findbugs">
 		<antcall inheritall="true" target="check.findbugs.home" />
 		<delete dir="${findbugs.report.dir}" />
 		<mkdir dir="${findbugs.report.dir}" />
+		<path id="findbugs.classpath">
+			<fileset dir="${findbugs.home}/lib">
+				<include name="*.jar"/>
+			</fileset>
+		</path>
 		<taskdef name="findbugs"
 		         classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
-		         classpath="${metrics.lib}/findbugs-ant.jar" />
+		         classpathref="findbugs.classpath" />
 		<findbugs home="${findbugs.home}"
 		          output="html"
 		          outputFile="${findbugs.report.dir}/index.html"
@@ -179,7 +184,7 @@
 		<mkdir dir="${ckjm.report.dir}" />
 		<taskdef name="ckjm" classname="gr.spinellis.ckjm.ant.CkjmTask">
 			<classpath>
-				<pathelement location="${metrics.lib}/ckjm-1.9.jar" />
+				<pathelement location="${metrics.lib}/ckjm/ckjm-1.9.jar" />
 			</classpath>
 		</taskdef>
 		<ckjm outputfile="${ckjm.report.dir}/ckjm.xml"
@@ -247,7 +252,8 @@
 		      style="${metrics.config.dir}/jdepend.xsl" />
 	</target>
 
-	<target name="checkstyle" unless="skip.metric.checkstyle"
+	<target name="checkstyle"
+	        unless="skip.metric.checkstyle"
 	        depends="init"
 	        description="Generates a report of code convention violations.">
 		<delete dir="${checkstyle.report.dir}" />
