@@ -141,7 +141,7 @@
 				<fileset dir="${coverage.staging.dir}">
 					<include name="*.emma" />
 				</fileset>
-				<html outfile="${coverage.report.dir}/coverage_m.html"
+				<html outfile="${coverage.report.dir}/index.html"
 				      depth="method"
 				      columns="name,class,method,block,line" />
 			</report>
@@ -157,7 +157,7 @@
 		         classpath="${metrics.lib}/findbugs-ant.jar" />
 		<findbugs home="${findbugs.home}"
 		          output="html"
-		          outputFile="${findbugs.report.dir}/findbugs.html"
+		          outputFile="${findbugs.report.dir}/index.html"
 		          jvmargs="-Xms512M -Xmx512M "
 		          excludeFilter="${metrics.config.dir}/findBugs_exclude_filters.xml">
 			<sourcePath path="${src.dir}" />
@@ -183,10 +183,10 @@
 		</ckjm>
 		<xslt in="${ckjm.report.dir}/ckjm.xml"
 		      style="${metrics.config.dir}/ckjm.xsl"
-		      out="${ckjm.report.dir}/ckjm.html" />
+		      out="${ckjm.report.dir}/index_minimal.html" />
 		<xslt in="${ckjm.report.dir}/ckjm.xml"
 		      style="${metrics.config.dir}/ckjm_extra.xsl"
-		      out="${ckjm.report.dir}/ckjm_extra.html" />
+		      out="${ckjm.report.dir}/index.html" />
 	</target>
 
 	<target name="pmd" depends="init" unless="skip.metric.pmd">
@@ -197,7 +197,7 @@
 		         classpathref="metrics.classpath" />
 		<pmd rulesetfiles="imports,basic">
 			<formatter type="html"
-			           toFile="${pmd.report.dir}/pmd.html"
+			           toFile="${pmd.report.dir}/index.html"
 			           toConsole="true" />
 			<formatter type="xml" toFile="${pmd.report.dir}/pmd.xml" />
 			<fileset dir="${src.dir}">
@@ -221,7 +221,7 @@
 		</cpd>
 		<xslt in="${cpd.report.dir}/cpd.xml"
 		      style="${metrics.config.dir}/cpdhtml.xslt"
-		      out="${cpd.report.dir}/cpd.html" />
+		      out="${cpd.report.dir}/index.html" />
 	</target>
 
 	<target name="jdepend" depends="init" unless="skip.metric.jdepend">
@@ -235,7 +235,7 @@
 			</classespath>
 		</jdepend>
 		<xslt in="${jdepend.report.dir}/jdepend-report.xml"
-		      out="${jdepend.report.dir}/jdepend-report.html"
+		      out="${jdepend.report.dir}/index.html"
 		      style="${metrics.config.dir}/jdepend.xsl" />
 	</target>
 
@@ -256,7 +256,7 @@
 		</checkstyle>
 
 		<xslt in="${checkstyle.report.dir}/checkstyle_report.xml"
-		      out="${checkstyle.report.dir}/checkstyle_report.html"
+		      out="${checkstyle.report.dir}/index.html"
 		      style="${metrics.config.dir}/checkstyle-noframes-sorted.xsl" />
 	</target>
 
