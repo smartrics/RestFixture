@@ -149,7 +149,15 @@
 
 	</target>
 
+	<target name="check.findbugs.home" unless="findbugs.home">
+		<echo>Unknown findbugs home</echo>
+		<echo>Define 'findbugs.home' in your property file or run ant with -Dfindbugs.home. Its value should be the directory where findbugs has been installed.</echo>
+        <echo>Otherwise define the property 'skip.metric.findbugs' to skip findbugs from the build.</echo>
+		<fail message="findbugs.home not configured" />
+	</target>
+	
 	<target name="findbugs" depends="init" unless="skip.metric.findbugs">
+		<antcall inheritall="true" target="check.findbugs.home" />
 		<delete dir="${findbugs.report.dir}" />
 		<mkdir dir="${findbugs.report.dir}" />
 		<taskdef name="findbugs"
