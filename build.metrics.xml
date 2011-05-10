@@ -155,7 +155,7 @@
 		<taskdef name="findbugs"
 		         classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
 		         classpath="${metrics.lib}/findbugs-ant.jar" />
-		<findbugs home="${metrics.lib}"
+		<findbugs home="${findbugs.home}"
 		          output="html"
 		          outputFile="${findbugs.report.dir}/findbugs.html"
 		          jvmargs="-Xms512M -Xmx512M "
