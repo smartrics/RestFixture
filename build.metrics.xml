@@ -27,8 +27,8 @@
 	        depends="inherit.properties, define.properties">
 		<echo message="Using reports.dir: ${reports.dir}" />
 		<echo message="Using src.dir: ${src.dir}" />
-        <echo message="Using etc.dir: ${etc.dir}" />
 		<echo message="Using lib.dir: ${reports.dir}" />
+		<echo message="Using etc.dir: ${etc.dir}" />
 		<echo message="Using build.dir: ${build.dir}" />
 
 		<property name="metrics.lib" value="${lib.dir}/test/metrics" />
