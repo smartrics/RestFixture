@@ -152,12 +152,4 @@ public class HttpServer {
         ctx.addServlet(new ServletHolder(servlet), "/*");
     }
 
-    public static void main(String[] args) {
-        // as in EventListener
-        HttpServer server = new HttpServer(8765);
-        server.addServlet(new ResourcesServlet(), "/");
-        server.start();
-        server.join();
-    }
-
 }

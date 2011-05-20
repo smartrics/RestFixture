@@ -107,3 +107,19 @@ Use simple file upload
 |enter|name|${tempDirectory}/tempfile|
 |check|delete| true |
 |check|exists| false |
+
+Other than the aforementioned content types you can emulate form POSTs
+
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
+|setHeader|Content-Type : application/x-www-form-urlencoded;charset=UTF-8|
+|setBody|name=test%20post&data=some%20data|
+|POST   | /resources | 201 | | no-body |
+|let    | id | header | Location:/resources/(.+) | |
+
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
+|GET    | /resources/%id% | 200 | |!-
+ /resource/name[text()='test post']
+ /resource/data[text()='some data']
+-! |
+
+

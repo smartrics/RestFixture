@@ -24,21 +24,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import smartrics.rest.client.RestClient;
-import smartrics.rest.client.RestClientImpl;
-import smartrics.rest.client.RestRequest;
-import smartrics.rest.client.RestRequest.Method;
-import smartrics.rest.client.RestResponse;
 
 import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
@@ -169,7 +164,8 @@ public class ResourcesServlet extends HttpServlet {
 
     private void found(HttpServletResponse resp, String type, String id) throws IOException {
         StringBuffer buffer = new StringBuffer();
-        buffer.append(resources.get(type, id));
+        Resource r = resources.get(type, id);
+        buffer.append(r);
         resp.getOutputStream().write(buffer.toString().getBytes());
         // resp.setHeader("Content-Lenght",
         // Integer.toString(buffer.toString().getBytes().length));
@@ -302,20 +298,24 @@ public class ResourcesServlet extends HttpServlet {
         String uri = sanitise(req.getRequestURI());
         String type = getType(uri);
         try {
-            if (req.getContentType().equals("application/octet-stream")) {
+            String contentType = req.getContentType();
+            if (contentType.equals("application/octet-stream")) {
                 LOG.debug("Resource POST REQUEST is a file upload");
                 processFileUpload(req, resp);
-            } else if (req.getContentType().startsWith("multipart")) {
+            } else if (contentType.startsWith("multipart")) {
                 LOG.debug("Resource POST REQUEST is a multipart file upload");
                 processMultiPart(req, resp);
             } else {
                 String content = getContent(req.getInputStream());
-                if (content.trim().startsWith("<") || content.trim().endsWith("}")) {
-                    Resource newResource = new Resource(content);
-                    resources.add(type, newResource);
-                    // TODO: should put the ID in
-                    resp.setStatus(HttpServletResponse.SC_CREATED);
-                    resp.addHeader("Location", type + "/" + newResource.getId());
+                if (contentType.contains("application/x-www-form-urlencoded")) {
+                    try {
+                        generateResponse(resp, type, noddyKvpToXml(content, "UTF-8"));
+                    } catch (Exception e) {
+                        LOG.warn("the content passed in isn't encoded as application/x-www-form-urlencoded: " + content);
+                        resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    }
+                } else if (content.trim().startsWith("<") || content.trim().endsWith("}")) {
+                    generateResponse(resp, type, content);
                 } else {
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 }
@@ -324,6 +324,30 @@ public class ResourcesServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
         LOG.debug("Resource POST RESPONSE ========= " + req.toString());
+    }
+
+    private String noddyKvpToXml(String content, String encoding) throws UnsupportedEncodingException {
+        StringBuffer sb = new StringBuffer();
+        sb.append("<resource>").append("\n");
+        String[] kvpArray = content.split("&");
+        for(String e : kvpArray) {
+            String[] kvp = e.split("=");
+            sb.append("<").append(kvp[0]).append(">");
+            if(kvp.length>1) {
+                sb.append(URLDecoder.decode(kvp[1], encoding));
+            }
+            sb.append("</").append(kvp[0]).append(">").append("\n");
+        }
+        sb.append("</resource>");
+        return sb.toString();
+    }
+
+    private void generateResponse(HttpServletResponse resp, String type, String content) {
+        Resource newResource = new Resource(content);
+        resources.add(type, newResource);
+        // TODO: should put the ID in
+        resp.setStatus(HttpServletResponse.SC_CREATED);
+        resp.addHeader("Location", type + "/" + newResource.getId());
     }
 
     private void processFileUpload(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -344,38 +368,6 @@ public class ResourcesServlet extends HttpServlet {
         }
         String content = sBuff.toString();
         return content;
-    }
-
-    public static void main(String[] args) {
-        RestClient c = new RestClientImpl(new HttpClient());
-        RestRequest req = new RestRequest();
-
-        req.setBody("<resource><name>n</name><data>d1</data></resource>");
-        req.setResource("/resources/");
-        req.setMethod(Method.Post);
-        RestResponse res = c.execute("http://localhost:8765", req);
-        System.out.println("=======>\n" + res + "\n<=======");
-
-        String loc = res.getHeader("Location").get(0).getValue();
-        req.setResource(loc + ".json");
-        req.setMethod(Method.Get);
-        res = c.execute("http://localhost:8765", req);
-        System.out.println("=======>\n" + res + "\n<=======");
-
-        req.setMethod(Method.Put);
-        req.setBody("<resource><name>another name</name><data>another data</data></resource>");
-        res = c.execute("http://localhost:8765", req);
-        System.out.println("=======>\n" + res + "\n<=======");
-
-        req.setResource("/resources/");
-        req.setMethod(Method.Get);
-        res = c.execute("http://localhost:8765", req);
-        System.out.println("=======>\n" + res + "\n<=======");
-
-        req.setMethod(Method.Delete);
-        req.setResource(loc);
-        res = c.execute("http://localhost:8765", req);
-        System.out.println("=======>\n" + res + "\n<=======");
     }
 
 }
