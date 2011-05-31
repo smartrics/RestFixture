@@ -336,9 +336,7 @@
 			<arg value="${build.fitnesse.root}" />
 		</java>
         <condition property="fitnesse.fail">
-            <not>
-            	   <equals arg1="0" arg2="number.of.failed.tests" />
-        	</not>
+    	   <equals arg1="0" arg2="number.of.failed.tests" />
         </condition>
 		<condition property="fitnesse.report.fail">
 			<equals arg1="0" arg2="fitnesse.report.exit.status" />
