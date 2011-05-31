@@ -316,10 +316,10 @@
 			<arg value="${fitnesse.root.name}" />
 			<arg value="-d" />
 			<arg value="build/fitnesse" />
-		</java>
+		</java>		
 		<!-- FitNesse doesn't return the number of failed tests in the java exit status -->
 		<java classname="smartrics.rest.support.fitnesse.FitnesseResultVerifier"
-		      failonerror="true"
+		      failonerror="false"
 		      fork="true"
 		      resultproperty="number.of.failed.tests">
 			<classpath location="${restfixture.fitnesse.jar}" />
@@ -327,7 +327,7 @@
 			<arg value="${fitnesse.reports}/results.html" />
 		</java>
 		<java classname="smartrics.rest.support.fitnesse.FitnesseResultSanitiser"
-		      failonerror="true"
+		      failonerror="false"
 		      fork="true"
 		      resultproperty="fitnesse.report.exit.status">
 			<classpath location="${restfixture.fitnesse.jar}" />
@@ -336,7 +336,9 @@
 			<arg value="${build.fitnesse.root}" />
 		</java>
         <condition property="fitnesse.fail">
-            <equals arg1="0" arg2="number.of.failed.tests" />
+            <not>
+            	   <equals arg1="0" arg2="number.of.failed.tests" />
+        	</not>
         </condition>
 		<condition property="fitnesse.report.fail">
 			<equals arg1="0" arg2="fitnesse.report.exit.status" />
