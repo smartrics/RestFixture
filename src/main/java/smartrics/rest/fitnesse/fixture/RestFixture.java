@@ -178,7 +178,7 @@ public class RestFixture extends ActionFixture {
 
     private static final Log LOG = LogFactory.getLog(RestFixture.class);
 
-    private Variables GLOBALS;
+    protected Variables GLOBALS;
 
     private RestResponse lastResponse;
 
@@ -212,7 +212,7 @@ public class RestFixture extends ActionFixture {
     private Url baseUrl;
 
     @SuppressWarnings("rawtypes")
-    private RowWrapper row;
+    protected RowWrapper row;
 
     private CellFormatter<?> formatter;
 
