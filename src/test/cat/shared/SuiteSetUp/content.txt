@@ -6,6 +6,7 @@
 
 Default configuration parameters for each !-RestFixture-! instance
  * '''http.client.connection.timeout''' the client http timeout
+ * '''http.client.use.new.http.uri.factory''' If set to true the Rest Fixture uses a more relaxed validation rule to validate URIs. It, for example, allows array parameters in the query string. Defaults to false.
  * '''restfixture.display.actual.on.right''' wether the actual value of headers and body are displayed when an expectation is met
  * '''restfixture.display.content.collapsed.larger.than''' minimum lenght of the content of a cell to enable a toggle on/off button (-1 to disable)
  * '''restfixture.default.headers''' list of http headers passed to each REST request (overridden by '''setHeader''')

@@ -21,6 +21,9 @@
 package smartrics.rest.fitnesse.fixture;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpURL;
+import org.apache.commons.httpclient.URI;
+import org.apache.commons.httpclient.URIException;
 
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestClientImpl;
@@ -47,9 +50,18 @@ public class PartsFactory {
      *            the configuration for the rest client to build
      * @return the rest client
      */
-    public RestClient buildRestClient(Config config) {
+    public RestClient buildRestClient(final Config config) {
         HttpClient httpClient = new HttpClientBuilder().createHttpClient(config);
-        return new RestClientImpl(httpClient);
+        return new RestClientImpl(httpClient) {
+            @Override
+            protected URI createUri(String uriString, boolean escaped) throws URIException {
+                boolean useNewHttpUriFactory = config.getAsBoolean("http.client.use.new.http.uri.factory", false);
+                if (useNewHttpUriFactory) {
+                    return new HttpURL(uriString);
+                }
+                return super.createUri(uriString, escaped);
+            }
+        };
     }
 
     /**

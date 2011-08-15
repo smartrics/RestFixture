@@ -25,6 +25,12 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import org.apache.commons.httpclient.HttpURL;
+import org.apache.commons.httpclient.URI;
+import org.apache.commons.httpclient.URIException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,6 +44,8 @@ public class PartsFactoryTest {
 
     @Before
     public void setUp() {
+        Config c = Config.getConfig();
+        c.add("http.client.use.new.http.uri.factory", "false");
         f = new PartsFactory();
     }
 
@@ -56,9 +64,57 @@ public class PartsFactoryTest {
     }
 
     @Test
-    public void buildsRestClient() {
+    public void buildsRestClientWithStandardUri() throws Exception {
         Config c = Config.getConfig();
-        assertThat(f.buildRestClient(c), is(instanceOf(RestClient.class)));
+        RestClient restClient = f.buildRestClient(c);
+        assertThat(restClient, is(instanceOf(RestClient.class)));
+        Method m = getCreateUriMethod(restClient);
+        m.setAccessible(true);
+        Object r = m.invoke(restClient, "http://localhost:9900?something", false);
+        assertThat(r, is(instanceOf(URI.class)));
+        assertThat(r.toString(), is(equalTo("http://localhost:9900?something")));
+    }
+
+    @Test
+    public void buildsRestClientWithoutSquareBracketsInUri() throws Exception {
+        // URI validation will throw an exception as per httpclient 3.1
+        Config c = Config.getConfig();
+        RestClient restClient = f.buildRestClient(c);
+        assertThat(restClient, is(instanceOf(RestClient.class)));
+        Method m = getCreateUriMethod(restClient);
+        m.setAccessible(true);
+        try {
+            m.invoke(restClient, "http://localhost:9900?something[data]=1", true);
+        } catch(InvocationTargetException e) {
+            assertThat(e.getCause(), is(instanceOf(URIException.class)));
+        }
+    }
+
+    @Test
+    public void buildsRestClientWithEscapedSquareBracketsInUri() throws Exception {
+        // URI will be escaped as per httpclient 3.1
+        Config c = Config.getConfig();
+        RestClient restClient = f.buildRestClient(c);
+        assertThat(restClient, is(instanceOf(RestClient.class)));
+        Method m = getCreateUriMethod(restClient);
+        m.setAccessible(true);
+        Object r = m.invoke(restClient, "http://localhost:9900?something[data]=1", false);
+        assertThat(r, is(instanceOf(URI.class)));
+        assertThat(r.toString(), is(equalTo("http://localhost:9900?something%5Bdata%5D=1")));
+    }
+
+    @Test
+    public void buildsRestClientWithSquareBracketsInUri() throws Exception {
+        Config c = Config.getConfig();
+        c.add("http.client.use.new.http.uri.factory", "true");
+        RestClient restClient = f.buildRestClient(c);
+        assertThat(restClient, is(instanceOf(RestClient.class)));
+        Method m = getCreateUriMethod(restClient);
+        m.setAccessible(true);
+        Object r = m.invoke(restClient, "http://localhost:9900?something[data]=1", false);
+        assertThat(r, is(instanceOf(HttpURL.class)));
+        HttpURL u = (HttpURL) r;
+        assertThat(u.getQuery(), is(equalTo("something[data]=1")));
     }
 
     @Test
@@ -78,5 +134,16 @@ public class PartsFactoryTest {
     @Test
     public void buildsASlimFormatterForFITRunner() {
         assertThat(f.buildCellFormatter(RestFixture.Runner.FIT), is(instanceOf(FitFormatter.class)));
+    }
+
+    private Method getCreateUriMethod(RestClient client) {
+        try {
+            Method m[] = client.getClass().getDeclaredMethods();
+            return client.getClass().getDeclaredMethod("createUri", String.class, boolean.class);
+        } catch (SecurityException e) {
+            throw new IllegalArgumentException("Can't access method");
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException("Method doesn't exist");
+        }
     }
 }

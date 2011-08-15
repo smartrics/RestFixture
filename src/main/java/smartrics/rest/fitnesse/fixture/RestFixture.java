@@ -116,6 +116,13 @@ import fit.Parse;
  * configutation)</i></td>
  * </tr>
  * <tr>
+ * <tr>
+ * <td>http.client.use.new.http.uri.factory</td>
+ * <td><i>If set to true uses a more relaxed validation rule to validate URIs.
+ * It, for example, allows array parameters in the query string. Defaults to
+ * false.</i></td>
+ * </tr>
+ * <tr>
  * <td>restfixture.display.actual.on.right</td>
  * <td><i>boolean value. if true, the actual value of the header or body in an
  * expectation cell is displayed even when the expectation is met.</i></td>
