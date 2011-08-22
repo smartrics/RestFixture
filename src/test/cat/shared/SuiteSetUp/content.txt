@@ -16,6 +16,7 @@ Default configuration parameters for each !-RestFixture-! instance
  
 | !-smartrics.rest.fitnesse.fixture.RestFixtureConfig-! |
 | http.client.connection.timeout | 5000 |
+| http.client.use.new.http.uri.factory | false |
 | restfixture.display.actual.on.right | true |
 | restfixture.display.toggle.for.cells.larger.than | 200 |
 | restfixture.default.headers | !-defHeader : 1

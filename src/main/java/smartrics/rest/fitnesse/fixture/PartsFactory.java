@@ -61,6 +61,15 @@ public class PartsFactory {
                 }
                 return super.createUri(uriString, escaped);
             }
+            
+            @Override
+            public String getMethodClassnameFromMethodName(String mName) {
+                boolean useOverriddenHttpMethodImpl = config.getAsBoolean("http.client.use.new.http.uri.factory", false);
+                if (useOverriddenHttpMethodImpl) {
+                    return String.format("smartrics.rest.fitnesse.fixture.support.http.%sMethod", mName);
+                }
+                return super.getMethodClassnameFromMethodName(mName);
+            }
         };
     }
 

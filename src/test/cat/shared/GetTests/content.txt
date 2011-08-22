@@ -53,3 +53,15 @@ Expectations can be asserted also in json format for responses whose content typ
  /resource/name[text()='a funky name'] <br/>
  /resource/data[text()='an important message']
 -!|
+
+!**** Rest requests with query string containing array parameters
+A query string can contain parameter arrays and they are correctly handled by Rest Fixture.
+****!
+
+To allow correct handling of array parameters a new configuration option must be set: *http.client.use.new.http.uri.factory*
+
+| !-smartrics.rest.fitnesse.fixture.RestFixtureConfig-! | withArrayParametersSupport|
+| http.client.use.new.http.uri.factory | true |
+
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}| withArrayParametersSupport |
+|GET    | /resources/0?a[0]=2&a[1]=4 | 200 | | |

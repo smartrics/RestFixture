@@ -118,6 +118,30 @@ public class PartsFactoryTest {
     }
 
     @Test
+    public void buildsRestClientWithDefaultURIFactory() throws Exception {
+        Config c = Config.getConfig();
+        RestClient restClient = f.buildRestClient(c);
+        assertThat(restClient, is(instanceOf(RestClient.class)));
+        Method m = getGetMethodClassnameFromMethodNameMethod(restClient);
+        m.setAccessible(true);
+        Object r = m.invoke(restClient, "Some");
+        assertThat(r.toString(), is(equalTo("org.apache.commons.httpclient.methods.SomeMethod")));
+    }
+
+    @Test
+    public void buildsRestClientWithNewURIFactory() throws Exception {
+        Config c = Config.getConfig();
+        c.add("http.client.use.new.http.uri.factory", "true");
+        RestClient restClient = f.buildRestClient(c);
+        assertThat(restClient, is(instanceOf(RestClient.class)));
+        Method m = getGetMethodClassnameFromMethodNameMethod(restClient);
+        m.setAccessible(true);
+        Object r = m.invoke(restClient, "Some");
+        assertThat(r.toString(), is(equalTo("smartrics.rest.fitnesse.fixture.support.http.SomeMethod")));
+    }
+    
+    
+    @Test
     public void cantBuildACellFormatterForNonFitOrSlimRunner() {
         try {
             f.buildCellFormatter(RestFixture.Runner.OTHER);
@@ -138,8 +162,17 @@ public class PartsFactoryTest {
 
     private Method getCreateUriMethod(RestClient client) {
         try {
-            Method m[] = client.getClass().getDeclaredMethods();
             return client.getClass().getDeclaredMethod("createUri", String.class, boolean.class);
+        } catch (SecurityException e) {
+            throw new IllegalArgumentException("Can't access method");
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException("Method doesn't exist");
+        }
+    }
+
+    private Method getGetMethodClassnameFromMethodNameMethod(RestClient client) {
+        try {
+            return client.getClass().getMethod("getMethodClassnameFromMethodName", String.class);
         } catch (SecurityException e) {
             throw new IllegalArgumentException("Can't access method");
         } catch (NoSuchMethodException e) {
