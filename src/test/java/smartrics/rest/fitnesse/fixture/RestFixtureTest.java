@@ -152,6 +152,41 @@ public class RestFixtureTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    public void mustNotifyClientIfExpectedBodyCellHasNotBeenSpecified() {
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "");
+        fixture.processRow(row);
+        verify(mockCellFormatter).exception(any(CellWrapper.class), eq("Execution of Get caused exception 'You must specify a body cell'"));
+        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verify(mockCellFormatter).gray("200");
+        verifyNoMoreInteractions(mockCellFormatter);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void mustNotifyClientIfExpectedHeadersCellHasNotBeenSpecified() {
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        RowWrapper<?> row = helper.createTestRow("GET", "/uri", "");
+        fixture.processRow(row);
+        verify(mockCellFormatter).exception(any(CellWrapper.class), eq("Execution of Get caused exception 'You must specify a headers cell'"));
+        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verify(mockCellFormatter).gray("200");
+        verifyNoMoreInteractions(mockCellFormatter);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void mustNotifyClientIfExpectedStatusCodeCellHasNotBeenSpecified() {
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        RowWrapper<?> row = helper.createTestRow("GET", "/uri");
+        fixture.processRow(row);
+        verify(mockCellFormatter).exception(any(CellWrapper.class), eq("Execution of Get caused exception 'You must specify a status code cell'"));
+        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verifyNoMoreInteractions(mockCellFormatter);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     public void mustExecuteVerbOnAUriWithNoExcpectationsOnRestResponseParts() {
         when(mockBodyTypeAdapter.toString()).thenReturn("returned <body />");
         when(mockLastRequest.getQuery()).thenReturn("a=b");

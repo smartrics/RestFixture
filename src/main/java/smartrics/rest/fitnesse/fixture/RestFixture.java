@@ -842,11 +842,17 @@ public class RestFixture extends ActionFixture {
         CellWrapper uriCell = row.getCell(1);
         getFormatter().asLink(uriCell, u, uri);
         CellWrapper cellStatusCode = row.getCell(2);
+        if (cellStatusCode == null) {
+            throw new IllegalStateException("You must specify a status code cell");
+        }
         Integer lastStatusCode = getLastResponse().getStatusCode();
         process(cellStatusCode, lastStatusCode.toString(), new StatusCodeTypeAdapter());
         List<Header> lastHeaders = getLastResponse().getHeaders();
         process(row.getCell(3), lastHeaders, new HeadersTypeAdapter());
         CellWrapper bodyCell = row.getCell(4);
+        if (bodyCell == null) {
+            throw new IllegalStateException("You must specify a body cell");
+        }
         bodyCell.body(GLOBALS.substitute(bodyCell.body()));
         ContentType ct = getContentTypeOfLastResponse();
         BodyTypeAdapter bodyTypeAdapter = partsFactory.buildBodyTypeAdapter(ct);
@@ -856,6 +862,9 @@ public class RestFixture extends ActionFixture {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void process(CellWrapper expected, Object actual, RestDataTypeAdapter ta) {
+        if (expected == null) {
+            throw new IllegalStateException("You must specify a headers cell");
+        }
         ta.set(actual);
         boolean ignore = "".equals(expected.text().trim());
         if (ignore) {
