@@ -161,9 +161,12 @@
 		<delete dir="${findbugs.report.dir}" />
 		<mkdir dir="${findbugs.report.dir}" />
 		<path id="findbugs.classpath">
-			<fileset dir="${findbugs.home}/lib">
-				<include name="*.jar"/>
-			</fileset>
+            <fileset dir="${findbugs.home}/lib">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${lib}">
+                <include name="**/*.jar"/>
+            </fileset>
 		</path>
 		<taskdef name="findbugs"
 		         classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
