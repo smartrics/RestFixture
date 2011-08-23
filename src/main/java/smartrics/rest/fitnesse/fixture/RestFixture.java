@@ -832,7 +832,7 @@ public class RestFixture extends ActionFixture {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void completeHttpMethodExecution() {
+    protected void completeHttpMethodExecution() {
         String uri = getLastResponse().getResource();
         String query = getLastRequest().getQuery();
         if (query != null && !"".equals(query.trim())) {
