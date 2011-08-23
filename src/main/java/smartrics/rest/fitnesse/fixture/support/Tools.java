@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -317,7 +318,8 @@ public final class Tools {
     }
 
     public static String makeToggleCollapseable(String message, String content) {
-        String id = Integer.toString(content.hashCode());
+    	Random random = new Random();
+        String id = Integer.toString(content.hashCode()) + Long.toString(random.nextLong());
         StringBuffer sb = new StringBuffer();
         sb.append("<a href=\"javascript:toggleCollapsable('" + id + "');\">");
         sb.append("<img src='/files/images/collapsableClosed.gif' class='left' id='img" + id + "'/>" + message + "</a>");
