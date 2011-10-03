@@ -178,6 +178,12 @@
 		          excludeFilter="${metrics.config.dir}/findBugs_exclude_filters.xml">
 			<sourcePath path="${src.dir}" />
 			<class location="${build.classes.main.dir}" />
+			<auxClasspath>
+                <pathelement location="${build.dir}/classes/cat" />
+	            <fileset dir="${lib}">
+	                <include name="**/*.jar"/>
+	            </fileset>
+			</auxClasspath>
 		</findbugs>
 	</target>
 
@@ -285,9 +291,16 @@
 
 		<taskdef name="crap4j" classname="org.crap4j.anttask.Crap4jAntTask">
 			<classpath>
-				<fileset dir="${crap4j.home}/lib">
-					<include name="**/*.jar" />
-				</fileset>
+                <fileset dir="${crap4j.home}/lib">
+                    <include name="**/*.jar" />
+                </fileset>
+				<!-- by adding httpclient and dependencies, crap4j ant task will (try to) upload 
+				    the results to http://www.crap4j.org/benchmark/
+				    effectively overriding whatever value is in server attribute... check the Crap4jAntTask#getServer - unbeliveable!!
+				    -->
+                <!-- fileset dir="${lib.dir}/commons">
+                    <include name="**/*.jar" />
+                </fileset -->
 			</classpath>
 		</taskdef>
 
@@ -296,6 +309,7 @@
 		        projectdir="${basedir}"
 		        outputDir="${crap4j.report.dir}"
 		        dontTest="false"
+			    
 		        debug="true">
 			<classes>
 				<pathElement location="${build.dir}/classes/main" />
