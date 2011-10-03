@@ -4,7 +4,7 @@ import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 
-public class GetMethod extends org.apache.commons.httpclient.methods.GetMethod {
+public class GetMethodWithArrayParamSupport extends org.apache.commons.httpclient.methods.GetMethod {
         
     @SuppressWarnings("deprecation")
     public URI getURI() throws URIException {

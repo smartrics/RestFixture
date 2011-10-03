@@ -65,10 +65,18 @@ public enum ContentType {
         String configStr = Tools.fromHtml(htmlConfig);
         Map<String, String> map = Tools.convertStringToMap(configStr, "=", "\n");
         for (Map.Entry<String, String> e : map.entrySet()) {
-            String enumName = e.getValue().toUpperCase();
+            String value = e.getValue();
+            String enumName = value.toUpperCase();
             ContentType ct = ContentType.valueOf(enumName);
             if (null == ct) {
-                throw new IllegalArgumentException("I don't know how to handle " + e.getValue() + ". Use one of " + ContentType.values());
+                ContentType[] values = ContentType.values();
+                StringBuffer sb = new StringBuffer();
+                sb.append("[");
+                for (ContentType cType : values) {
+                    sb.append("'").append(cType.toString()).append("' ");
+                }
+                sb.append("]");
+                throw new IllegalArgumentException("I don't know how to handle " + value + ". Use one of " + values);
             }
             contentTypeToEnum.put(e.getKey(), ct);
         }
