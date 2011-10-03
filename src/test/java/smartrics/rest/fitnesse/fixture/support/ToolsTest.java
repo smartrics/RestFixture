@@ -233,8 +233,8 @@ public class ToolsTest {
         // stylesheed/js
         int id = "someContent".hashCode();
         String ret = Tools.makeToggleCollapseable("message", "someContent");
-        assertTrue(ret.indexOf("javascript:toggleCollapsable('" + id + "')") > 0);
-        assertTrue(ret.indexOf("<div class='hidden' id='" + id + "'>") > 0);
+        assertTrue(ret.indexOf("javascript:toggleCollapsable('" + id) > 0);
+        assertTrue(ret.indexOf("<div class='hidden' id='" + id) > 0);
     }
 
     @Test
