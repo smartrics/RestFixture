@@ -74,4 +74,26 @@ public class UrlTest {
 		Url u = new Url("http://a.com");
 		u.buildURL(null);
 	}
+	
+    @Test
+    public void mustExtractPartsIfUrlIsComplete() {
+        Url u = new Url("http://a.com/resource");
+        assertEquals("/resource", u.getResource());
+        assertEquals("http://a.com", u.getBaseUrl());
+    }
+
+    @Test
+    public void mustExtractPartsIfUrlIsCompleteWithNoPathTerminatingWithSlash() {
+        Url u = new Url("http://a.com/");
+        assertEquals("http://a.com", u.getBaseUrl());
+        assertEquals("/", u.getResource());
+    }
+
+    @Test
+    public void mustExtractPartsIfUrlIsCompleteWithNoPathTerminatingWithoutSlash() {
+        Url u = new Url("http://a.com");
+        assertEquals("http://a.com", u.getBaseUrl());
+        assertEquals("/", u.getResource());
+    }
+
 }

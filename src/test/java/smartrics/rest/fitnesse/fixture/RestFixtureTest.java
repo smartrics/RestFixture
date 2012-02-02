@@ -187,6 +187,45 @@ public class RestFixtureTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    public void mustExecuteVerbOverridingBaseUriIfRowResourceIsAbsoluteUri() {
+        when(mockBodyTypeAdapter.toString()).thenReturn("returned <body />");
+        when(mockLastRequest.getQuery()).thenReturn("a=b");
+        when(mockRestClient.getBaseUrl()).thenReturn("http://some.url");
+        lastResponse.setResource("/path/to/resource");
+        lastResponse.addHeader("Header", "some/thing");
+        lastResponse.setBody("<body />");
+        RowWrapper<?> row = helper.createTestRow("GET", "http://some.url/path/to/resource?a=b", "", "", "");
+
+        fixture.processRow(row);
+
+        // correctly builds request
+        verify(mockLastRequest).addHeaders(fixture.getHeaders());
+        verify(mockLastRequest).setMethod(Method.Get);
+        verify(mockLastRequest).setResource("/path/to/resource");
+        verify(mockLastRequest).setQuery("a=b");
+        verify(mockLastRequest).setMultipartFileParameterName("file");
+        verify(mockLastRequest).getQuery();
+        // correctly executes request
+        verify(mockRestClient).setBaseUrl("http://some.url");
+        verify(mockRestClient).getBaseUrl();
+        verify(mockRestClient).execute(mockLastRequest);
+
+        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq("http://some.url/path/to/resource?a=b"), eq("/path/to/resource?a=b"));
+        verify(mockCellFormatter).gray("200");
+        verify(mockCellFormatter).gray("Header : some/thing");
+        verify(mockCellFormatter).gray("returned <body />");
+
+        verify(mockBodyTypeAdapter).setContext(isA(Map.class));
+        verify(mockBodyTypeAdapter).set("<body />");
+
+        verifyNoMoreInteractions(mockRestClient);
+        verifyNoMoreInteractions(mockCellFormatter);
+        verifyNoMoreInteractions(mockBodyTypeAdapter);
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     public void mustExecuteVerbOnAUriWithNoExcpectationsOnRestResponseParts() {
         when(mockBodyTypeAdapter.toString()).thenReturn("returned <body />");
         when(mockLastRequest.getQuery()).thenReturn("a=b");

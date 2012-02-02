@@ -22,6 +22,7 @@ package smartrics.rest.fitnesse.fixture;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -810,7 +811,8 @@ public class RestFixture extends ActionFixture {
         }
         getLastRequest().setMultipartFileParameterName(multipartFileParameterName);
         String[] uri = resUrl.split("\\?");
-        getLastRequest().setResource(uri[0]);
+        String[] thisRequestUrlParts = buildThisRequestUrl(uri[0]);
+        getLastRequest().setResource(thisRequestUrlParts[1]);
         if (uri.length == 2) {
             getLastRequest().setQuery(uri[1]);
         }
@@ -819,6 +821,8 @@ public class RestFixture extends ActionFixture {
             getLastRequest().setBody(rBody);
         }
         try {
+            restClient.setBaseUrl(thisRequestUrlParts[0]);
+
             RestResponse response = restClient.execute(getLastRequest());
             setLastResponse(response);
             completeHttpMethodExecution();
@@ -913,6 +917,26 @@ public class RestFixture extends ActionFixture {
         return lastRequest;
     }
 
+    private String[] buildThisRequestUrl(String uri) {
+        String[] parts = new String[2];
+        if (baseUrl == null || uri.startsWith(baseUrl.toString())) {
+            Url url = new Url(uri);
+            parts[0] = url.getBaseUrl();
+            parts[1] = url.getResource();
+        } else {
+            try {
+                Url attempted = new Url(uri);
+                parts[0] = attempted.getBaseUrl();
+                parts[1] = attempted.getResource();
+            } catch(RuntimeException e) {
+                parts[0] = baseUrl.toString();
+                parts[1] = uri;
+                
+            }
+        }
+        return parts;
+    }
+
     private void setLastResponse(RestResponse lastResponse) {
         this.lastResponse = lastResponse;
     }
@@ -965,9 +989,6 @@ public class RestFixture extends ActionFixture {
      */
     private void configRestClient() {
         restClient = partsFactory.buildRestClient(getConfig());
-        if (baseUrl != null) {
-            restClient.setBaseUrl(baseUrl.toString());
-        }
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
