@@ -44,16 +44,16 @@ public class InProcessRunner {
         ResponseSender sender = new ResponseSender() {
 
             @Override
-            public void send(byte[] bytes) throws Exception {
+            public void send(byte[] bytes) {
                 sb.append(new String(bytes));
             }
 
             @Override
-            public void close() throws Exception {
+            public void close() {
             }
 
             @Override
-            public Socket getSocket() throws Exception {
+            public Socket getSocket() {
                 return null;
             }
 
