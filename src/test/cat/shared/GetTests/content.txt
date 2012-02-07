@@ -1,5 +1,7 @@
 !3 GET
 
+tt
+
 !**** Notes
 A GET request is performed on the resource whose URI is specified in the second cell.
 The following cell indicate:
@@ -11,6 +13,16 @@ returns at least one node
 
 | !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
 |GET    | /resources/0 | 200 | Content-Length : [\d]+ |!-
+ /resource/name[text()='a funky name'] <br/>
+ /resource/data[text()='an important message']
+-!|
+
+!**** Absolute resource paths
+A GET (as all other verbs) accepts absolute resource paths.  
+****!
+
+| !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|
+|GET    | http://${jettyHost}:${jettyPort}/resources/0 | 200 | Content-Length : [\d]+ |!-
  /resource/name[text()='a funky name'] <br/>
  /resource/data[text()='an important message']
 -!|

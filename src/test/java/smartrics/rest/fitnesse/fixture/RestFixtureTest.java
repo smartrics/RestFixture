@@ -187,7 +187,7 @@ public class RestFixtureTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void mustExecuteVerbOverridingBaseUriIfRowResourceIsAbsoluteUri() {
+    public void mustExecuteVerbByOverridingBaseUriIfRowResourceIsAbsoluteUri() {
         when(mockBodyTypeAdapter.toString()).thenReturn("returned <body />");
         when(mockLastRequest.getQuery()).thenReturn("a=b");
         when(mockRestClient.getBaseUrl()).thenReturn("http://some.url");

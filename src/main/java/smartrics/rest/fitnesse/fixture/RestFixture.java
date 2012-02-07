@@ -22,7 +22,6 @@ package smartrics.rest.fitnesse.fixture;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -350,6 +349,7 @@ public class RestFixture extends ActionFixture {
         try {
             processRow(currentRow);
         } catch (Exception exception) {
+            LOG.error("Exception when processing row " + currentRow.getCell(0).text(), exception);
             getFormatter().exception(currentRow.getCell(0), exception);
         }
     }
@@ -798,7 +798,7 @@ public class RestFixture extends ActionFixture {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected void doMethod(String body, String method) {
         CellWrapper urlCell = row.getCell(1);
-        String url = urlCell.text();
+        String url = stripTag(urlCell.text());
         String resUrl = GLOBALS.substitute(url);
         setLastRequest(partsFactory.buildRestRequest());
         getLastRequest().setMethod(RestRequest.Method.valueOf(method));
@@ -822,7 +822,6 @@ public class RestFixture extends ActionFixture {
         }
         try {
             restClient.setBaseUrl(thisRequestUrlParts[0]);
-
             RestResponse response = restClient.execute(getLastRequest());
             setLastResponse(response);
             completeHttpMethodExecution();
@@ -842,7 +841,8 @@ public class RestFixture extends ActionFixture {
         if (query != null && !"".equals(query.trim())) {
             uri = uri + "?" + query;
         }
-        String u = restClient.getBaseUrl() + uri;
+        String clientBaseUri = restClient.getBaseUrl();
+        String u = clientBaseUri + uri;
         CellWrapper uriCell = row.getCell(1);
         getFormatter().asLink(uriCell, u, uri);
         CellWrapper cellStatusCode = row.getCell(2);
@@ -1007,7 +1007,7 @@ public class RestFixture extends ActionFixture {
         try {
             processRow(currentRow);
         } catch (Exception e) {
-            LOG.error("Exception raised when executing method " + row.get(0));
+            LOG.error("Exception raised when processing row " + row.get(0), e);
             getFormatter().exception(currentRow.getCell(0), e);
         } finally {
             List<String> rowAsList = mapSlimRow(row, currentRow);

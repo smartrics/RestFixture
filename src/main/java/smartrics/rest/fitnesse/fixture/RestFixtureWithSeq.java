@@ -213,10 +213,10 @@ public class RestFixtureWithSeq extends RestFixture {
         String res = getLastRequest().getResource();
         Event event = new Message(FIXTURE, res, "POST");
         model.addEvent(event);
-        Header list = getLastResponse().getHeader("Location").get(0);
+        List<Header> list = getLastResponse().getHeader("Location");
         String location = "";
-        if (list != null) {
-            location = list.getValue();
+        if (list != null && !list.isEmpty()) {
+            location = list.get(0).getValue();
         }
         model.addEvent(new Create(getLastRequest().getResource(), location, "POST"), true);
         String id = "";
