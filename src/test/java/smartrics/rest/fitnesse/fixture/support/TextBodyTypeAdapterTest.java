@@ -64,7 +64,7 @@ public class TextBodyTypeAdapterTest {
     public void whenExpectedIsNotMatchedAnErrorShouldBeAdded() {
         adapter.equals("xyz", "abc");
         assertEquals(1, adapter.getErrors().size());
-        assertEquals("not match: xyz", adapter.getErrors().get(0));
+        assertEquals("no regex match: xyz", adapter.getErrors().get(0));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class TextBodyTypeAdapterTest {
         String illegalRegex = "[xyz";
         adapter.equals(illegalRegex, "abc");
         assertEquals(1, adapter.getErrors().size());
-        assertEquals("not found: [xyz", adapter.getErrors().get(0));
+        assertEquals("no string match found: [xyz", adapter.getErrors().get(0));
     }
 
     @Test
