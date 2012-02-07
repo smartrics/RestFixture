@@ -4,7 +4,8 @@ import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 
-public class DeleteMethod extends org.apache.commons.httpclient.methods.DeleteMethod {
+public class GetMethod extends org.apache.commons.httpclient.methods.GetMethod {
+        
     @SuppressWarnings("deprecation")
     public URI getURI() throws URIException {
         HostConfiguration conf = super.getHostConfiguration();
@@ -17,4 +18,5 @@ public class DeleteMethod extends org.apache.commons.httpclient.methods.DeleteMe
     public void setURI(URI uri) throws URIException {
         new URIBuilder().setURI(this, uri);
     }
+
 }
