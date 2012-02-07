@@ -21,6 +21,7 @@
 package smartrics.rest.fitnesse.fixture.support;
 
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 
 import fit.Parse;
@@ -44,13 +45,15 @@ public class TextBodyTypeAdapter extends BodyTypeAdapter {
         }
         String actual = (String) act;
         try {
-            if (!Pattern.matches(expected, actual)) {
-                addError("not match: " + expected);
+            Pattern p = Pattern.compile(expected);
+            Matcher m = p.matcher(actual);
+            if (!m.matches() && !m.find()) {
+                addError("no regex match: " + expected);
             }
         } catch (PatternSyntaxException e) {
             // lets try to string match just to be kind
             if (!expected.equals(actual)) {
-                addError("not found: " + expected);
+                addError("no string match found: " + expected);
             }
         }
         return getErrors().size() == 0;
