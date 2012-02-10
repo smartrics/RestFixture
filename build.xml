@@ -225,7 +225,9 @@
 
 	<target name="fitnesse-copy" depends="package, fitnesse-src-bundle">
 		<fail unless="fitnesse.test.root"
-		      message="You call this via antcall defining the properties fitnesse.test.root" />
+		      message="You call this via antcall defining the property fitnesse.test.root" />
+        <echo message="Fitnesse.root=${fitnesse.root}" />
+        <echo message="Fitnesse.test.root=${fitnesse.test.root}" />
 		<delete dir="${fitnesse.test.root}" failonerror="false" />
 		<mkdir dir="${fitnesse.test.root}/lib" />
 		<property name="verbose" value="false" />
@@ -239,9 +241,9 @@
 				<include name="**/*.jar" />
 				<exclude name="${libs.excluded}" />
 			</fileset>
-			<fileset dir="${resources}">
-				<include name="**/*.*" />
-			</fileset>
+            <fileset dir="${resources}">
+                <include name="**/*.*" />
+            </fileset>
 		</copy>
 		<copy todir="${fitnesse.test.root}"
 		      overwrite="true"

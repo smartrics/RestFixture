@@ -27,11 +27,18 @@ sudo apt-get install groff
 sudo apt-get install groff_www
 sudo apt-get install netpbm
 *!
-- copy the content of the directory ''etc'' in your FITNESSE_HOME/etc 
+
+- copy the content of the directory ''etc'' in your FITNESSE_HOME/etc, or set the configuration property
+'restfixture.graphs.support.files.dir'. Make sure that the files sequence.pic and myps2img.sh file are in that directory.
 !*> Notes
--a full build will do that for you
+-a full build will install the two support files in FITNESSE_HOME/etc
 - at the moment, it's assumed that the fitnesse root directory is ''!-FitNesseRoot-!''
 - make sure that the script myps2img.sh has executable permission for the user running Fitnesse
+*!
+- define the config property ''restfixture.graphs.dir'' to the destination directory of the generated sequence diagrams. The default value is
+''!-FitNesseRoot-!/files/restfixture''.
+!*> Note
+The pictures are referenced in a page with the !img wiki command, which expects the path to the picture to be relative to ''!-FitNesseRoot-!''
 *!
 
 !3 Basic Sequence Diagrams
