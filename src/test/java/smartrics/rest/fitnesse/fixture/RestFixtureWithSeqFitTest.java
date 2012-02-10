@@ -28,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
+import org.junit.Ignore;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,6 +52,7 @@ import fit.Parse;
 import fit.exception.FitFailureException;
 import fit.exception.FitParseException;
 
+@Ignore
 public class RestFixtureWithSeqFitTest {
 
     private RestFixtureWithSeq fixture;
