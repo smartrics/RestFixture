@@ -1,9 +1,17 @@
 A sequence diagram is generated for the fixture below. 
 The diagram can be displayed anywhere using the !-!img-! wiki command.
 The filename for the diagram is the second parameter of the fixture. 
-Accepted formats for the files are ''.gif'' and ''.png'' (the format is inferred from the file extension).
+Currently the only format accepted is ''.svg''.
 Files are generated in the directory ''FITNESSE_HOME/files/restfixture''. Failure on generating the sequence diagram
 does not break the test. A stack trace is shown in standard error (see fixture output).
+
+!3 Usage
+Define the config property ''restfixture.graphs.dir'' to the destination directory of the generated sequence diagrams. The default value is
+''!-FitNesseRoot-!/files/restfixture''. 
+!*> Note
+The pictures are referenced in a page with the !img wiki command, which expects the path to the picture to be relative to ''!-FitNesseRoot-!''
+*!
+
 
 !3 Basic Sequence Diagrams
 
