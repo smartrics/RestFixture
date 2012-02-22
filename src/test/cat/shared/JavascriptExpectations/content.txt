@@ -22,6 +22,9 @@ The test passes if the result of the evaluation of the cell is a boolean.
 |GET    | /resources/%id%.json | 200 |Content-Type : application/json |!-<pre>
 jsonbody.resource.name=="test post" && jsonbody.resource.data=="some data" 
 </pre>-!|
+|GET    | /resources/%id%.json | 200 |Content-Type : application/json |!-<pre>
+jsonbody.resource.name.length>=0 
+</pre>-!|
 | let   | content | js |  response.body | |
 
 | !-smartrics.rest.fitnesse.fixture.RestFixture-! |http://${jettyHost}:${jettyPort}|

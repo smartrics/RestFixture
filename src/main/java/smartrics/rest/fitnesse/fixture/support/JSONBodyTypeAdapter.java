@@ -31,21 +31,21 @@ import java.util.List;
 public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
 
     private boolean forceJsEvaluation = false;
+    private JavascriptWrapper wrapper = new JavascriptWrapper();
 
     @Override
     protected boolean eval(String expr, String json) {
         // for backward compatibility we should keep for now xpath expectations
-        if (!forceJsEvaluation && Tools.isValidXPath(getContext(), expr)) {
+        if (!forceJsEvaluation && Tools.isValidXPath(getContext(), expr) && !wrapper.looksLikeAJsExpression(expr)) {
             System.err.println("XPath expectations in JSON content are deprecated. Please use JavaScript expressions.");
             String xml = Tools.fromJSONtoXML(json);
             return super.eval(expr, xml);
         }
-        JavascriptWrapper wrapper = new JavascriptWrapper();
-        Object result = wrapper.evaluateExpression(json, expr);
-        if (result == null) {
+        Object exprResult = wrapper.evaluateExpression(json, expr);
+        if (exprResult == null) {
             return false;
         }
-        return Boolean.parseBoolean(result.toString());
+        return Boolean.parseBoolean(exprResult.toString());
     }
 
     @Override

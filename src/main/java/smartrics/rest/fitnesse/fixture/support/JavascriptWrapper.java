@@ -51,6 +51,10 @@ public class JavascriptWrapper {
         return result;
     }
 
+    public boolean looksLikeAJsExpression(String json) {
+        return json != null && json.contains(JSON_OBJ_NAME + ".");
+    }
+
     private void injectFitNesseSymbolMap(ScriptableObject scope) {
         Variables v = new Variables();
         Object wrappedVariables = Context.javaToJS(v, scope);
