@@ -33,6 +33,9 @@ public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
     private boolean forceJsEvaluation = false;
     private JavascriptWrapper wrapper = new JavascriptWrapper();
 
+    public JSONBodyTypeAdapter() {
+    }
+
     @Override
     protected boolean eval(String expr, String json) {
         // for backward compatibility we should keep for now xpath expectations

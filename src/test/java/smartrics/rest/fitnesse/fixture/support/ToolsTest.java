@@ -96,8 +96,17 @@ public class ToolsTest {
 
     @Test
     public void shouldWrapAStringIntoAnInputStream() {
-        InputStream is = Tools.getInputStreamFromString("another string");
+        InputStream is = Tools.getInputStreamFromString("another string", "UTF-8");
         assertEquals("another string", Tools.getStringFromInputStream(is));
+    }
+
+    @Test
+    public void shouldThrowRTEWhenWrappingAStringIntoAnInputStreamWithUnknownEncoding() {
+        try {
+            Tools.getInputStreamFromString("another string", "crap");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Unsupported encoding: crap", e.getMessage());
+        }
     }
 
     @Test
@@ -156,22 +165,20 @@ public class ToolsTest {
     @Test
     public void shouldExtractXPathsFromXmlDocumentAsStrings() {
         String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
-        assertEquals("1", Tools.extractXPath("count(/)", xml, XPathConstants.STRING));
-        assertEquals("2", Tools.extractXPath("count(/a/c)", xml, XPathConstants.STRING));
+        assertEquals("1", Tools.extractXPath("count(/)", xml, XPathConstants.STRING, "UTF-8"));
+        assertEquals("2", Tools.extractXPath("count(/a/c)", xml, XPathConstants.STRING, "UTF-8"));
     }
 
     @Test
     public void shouldExtractXPathsFromXmlDocumentAsNumber() {
         String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
-        assertEquals(1.0, Tools.extractXPath("count(/a/b)", xml, XPathConstants.NUMBER));
-
+        assertEquals(1.0, Tools.extractXPath("count(/a/b)", xml, XPathConstants.NUMBER, "UTF-8"));
     }
 
     @Test
     public void shouldExtractXPathsFromXmlDocumentAsBoolean() {
         String xml = "<a><b>test</b><c>1</c><c>2</c></a>";
-        assertEquals(Boolean.TRUE, Tools.extractXPath("count(/a/c)=2", xml, XPathConstants.BOOLEAN));
-
+        assertEquals(Boolean.TRUE, Tools.extractXPath("count(/a/c)=2", xml, XPathConstants.BOOLEAN, "UTF-8"));
     }
 
     @Test
@@ -179,7 +186,7 @@ public class ToolsTest {
         String xml = "<a xmlns='http://ns.com'><b>test</b><c>1</c></a>";
         HashMap<String, String> ns = new HashMap<String, String>();
         ns.put("def", "http://ns.com");
-        assertEquals("test", Tools.extractXPath(ns, "/def:a/def:b", xml, XPathConstants.STRING));
+        assertEquals("test", Tools.extractXPath(ns, "/def:a/def:b", xml, XPathConstants.STRING, "UTF-8"));
     }
 
     @Test
@@ -187,7 +194,7 @@ public class ToolsTest {
         String xml = "<?xml version='1.0' ?><a xmlns:ns1='http://ns1.com'><b>test</b><ns1:c>tada</ns1:c></a>";
         HashMap<String, String> ns = new HashMap<String, String>();
         ns.put("alias", "http://ns1.com");
-        assertEquals("tada", Tools.extractXPath(ns, "/a/alias:c", xml, XPathConstants.STRING));
+        assertEquals("tada", Tools.extractXPath(ns, "/a/alias:c", xml, XPathConstants.STRING, "UTF-8"));
     }
 
     @Test
@@ -196,7 +203,7 @@ public class ToolsTest {
                 + "<nstag xmlns:ns1='http://smartrics/ns1'><ns1:number>3</ns1:number></nstag></resource>";
         HashMap<String, String> ns = new HashMap<String, String>();
         ns.put("ns1alias", "http://smartrics/ns1");
-        assertEquals("true", Tools.extractXPath(ns, "/resource/nstag/ns1alias:number[text()='3']", xml, XPathConstants.BOOLEAN).toString());
+        assertEquals("true", Tools.extractXPath(ns, "/resource/nstag/ns1alias:number[text()='3']", xml, XPathConstants.BOOLEAN, "UTF-8").toString());
     }
 
     @Test
@@ -204,7 +211,7 @@ public class ToolsTest {
         String xml = "<resource><name>test data</name><data>some data</data></resource>";
         HashMap<String, String> ns = new HashMap<String, String>();
         ns.put("ns1alias", "http://smartrics/ns1");
-        NodeList nodeList = (NodeList) Tools.extractXPath(ns, "/resource/name[text()='test data']", xml, XPathConstants.NODESET);
+        NodeList nodeList = (NodeList) Tools.extractXPath(ns, "/resource/name[text()='test data']", xml, XPathConstants.NODESET, "UTF-8");
         assertEquals(1, nodeList.getLength());
     }
 
@@ -251,10 +258,10 @@ public class ToolsTest {
     @Test
     public void shouldConvertJsonToXml() {
         String xml = Tools.fromJSONtoXML("{\"person\" : {\"address\" : { \"street\" : \"regent st\", \"number\" : \"1\"}, \"name\" : \"joe\", \"surname\" : \"bloggs\"} }");
-        assertEquals("1", Tools.extractXPath("/person/address/number", xml, XPathConstants.STRING));
-        assertEquals("regent st", Tools.extractXPath("/person/address/street", xml, XPathConstants.STRING));
-        assertEquals("joe", Tools.extractXPath("/person/name", xml, XPathConstants.STRING));
-        assertEquals("bloggs", Tools.extractXPath("/person/surname", xml, XPathConstants.STRING));
+        assertEquals("1", Tools.extractXPath("/person/address/number", xml, XPathConstants.STRING, "UTF-8"));
+        assertEquals("regent st", Tools.extractXPath("/person/address/street", xml, XPathConstants.STRING, "UTF-8"));
+        assertEquals("joe", Tools.extractXPath("/person/name", xml, XPathConstants.STRING, "UTF-8"));
+        assertEquals("bloggs", Tools.extractXPath("/person/surname", xml, XPathConstants.STRING, "UTF-8"));
     }
 
     @Test

@@ -144,6 +144,14 @@ import fit.Parse;
  * results.</i></td>
  * </tr>
  * <tr>
+ * <td>restfixture.content.default.charset</td>
+ * <td>The default charset name (e.g. UTF-8) to use when parsing the response
+ * body, when a response doesn't contain a valid value in the Content-Type
+ * header. If a default is not specified with this property, the fixture will
+ * use the default system charset, available via
+ * <code>Charset.defaultCharset().name()</code></td>
+ * </tr>
+ * <tr>
  * <td>restfixture.content.handlers.map</td>
  * <td><i>a map of contenty type to type adapters, entries separated by \n, and
  * kye-value separated by '='. Available type adapters are JS, TEXT, JSON, XML
@@ -836,6 +844,10 @@ public class RestFixture extends ActionFixture {
         return ContentType.parse(getLastResponse().getHeader("Content-Type"));
     }
 
+    private String getCharsetOfLastResponse() {
+        return ContentType.parseCharset(getLastResponse().getHeader("Content-Type"));
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected void completeHttpMethodExecution() {
         String uri = getLastResponse().getResource();
@@ -861,7 +873,8 @@ public class RestFixture extends ActionFixture {
         }
         bodyCell.body(GLOBALS.substitute(bodyCell.body()));
         ContentType ct = getContentTypeOfLastResponse();
-        BodyTypeAdapter bodyTypeAdapter = partsFactory.buildBodyTypeAdapter(ct);
+        String charset = getCharsetOfLastResponse();
+        BodyTypeAdapter bodyTypeAdapter = partsFactory.buildBodyTypeAdapter(ct, charset);
         bodyTypeAdapter.setContext(namespaceContext);
         process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
     }

@@ -50,6 +50,7 @@ public class ResourcesServlet extends HttpServlet {
     private static final Log LOG = LogFactory.getLog(ResourcesServlet.class);
     public static final String CONTEXT_ROOT = "/resources";
     private static final long serialVersionUID = -7012866414216034826L;
+    private static final String DEF_CHARSET = "ISO-8859-1";
     private final Resources resources = Resources.getInstance();
 
     public ResourcesServlet() {
@@ -68,7 +69,7 @@ public class ResourcesServlet extends HttpServlet {
         try {
             if (id == null) {
                 list(resp, type, extension);
-                headers(resp, extension, ";charset=ISO-8859-1");
+                headers(resp, extension, DEF_CHARSET);
             } else if (resources.get(type, id) == null) {
                 notFound(resp);
             } else {
@@ -76,7 +77,7 @@ public class ResourcesServlet extends HttpServlet {
                     notFound(resp);
                 } else {
                     found(resp, type, id);
-                    headers(resp, extension, ";charset=ISO-8859-1");
+                    headers(resp, extension, DEF_CHARSET);
                 }
             }
         } catch (RuntimeException e) {
@@ -105,7 +106,7 @@ public class ResourcesServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_OK);
         String s = "";
         if (optCharset != null) {
-            s = optCharset;
+            s = ";charset=" + optCharset;
         }
         resp.addHeader("Content-Type", "application/" + extension + s);
     }

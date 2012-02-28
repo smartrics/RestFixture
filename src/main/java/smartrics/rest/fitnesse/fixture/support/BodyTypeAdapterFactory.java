@@ -20,6 +20,7 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +45,11 @@ public class BodyTypeAdapterFactory {
     private BodyTypeAdapterFactory() {
     }
 
-    public static BodyTypeAdapter getBodyTypeAdapter(ContentType content) {
+    // public static BodyTypeAdapter getBodyTypeAdapter(ContentType content) {
+    // return getBodyTypeAdapter(content, Charset.defaultCharset().name());
+    // }
+
+    public static BodyTypeAdapter getBodyTypeAdapter(ContentType content, String charset) {
         @SuppressWarnings("rawtypes")
         Class aClass = contentTypeToBodyTypeAdapter.get(content);
         if (aClass == null) {
@@ -53,6 +58,11 @@ public class BodyTypeAdapterFactory {
         BodyTypeAdapter instance = null;
         try {
             instance = (BodyTypeAdapter) aClass.newInstance();
+            if(charset != null) {
+                instance.setCharset(charset);
+            } else {
+                instance.setCharset(Charset.defaultCharset().name());
+            }
         } catch (InstantiationException e) {
             throw new IllegalStateException("Unable to instantiate a the BodyTypeAdapter for " + content + "(" + aClass.getName() + ")");
         } catch (IllegalAccessException e) {

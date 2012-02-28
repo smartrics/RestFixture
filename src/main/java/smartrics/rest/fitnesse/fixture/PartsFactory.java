@@ -109,10 +109,12 @@ public class PartsFactory {
      * 
      * @param ct
      *            the content type
+     * @param charset
+     *            the charset the body is encoded as
      * @return the
      *         {@link smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter}
      */
-    public BodyTypeAdapter buildBodyTypeAdapter(ContentType ct) {
-        return BodyTypeAdapterFactory.getBodyTypeAdapter(ct);
+    public BodyTypeAdapter buildBodyTypeAdapter(ContentType ct, String charset) {
+        return BodyTypeAdapterFactory.getBodyTypeAdapter(ct, charset);
     }
 }

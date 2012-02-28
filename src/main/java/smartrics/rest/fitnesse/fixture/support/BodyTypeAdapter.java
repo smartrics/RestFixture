@@ -32,11 +32,21 @@ import fit.Parse;
  */
 public abstract class BodyTypeAdapter extends RestDataTypeAdapter {
 
+    private String charset;
+
     /**
      * Default constructor.
      */
     public BodyTypeAdapter() {
         super();
+    }
+
+    protected void setCharset(String charset) {
+        this.charset = charset;
+    }
+
+    public String getCharset() {
+        return charset;
     }
 
     /**

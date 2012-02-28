@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -81,15 +82,48 @@ public final class Tools {
     }
 
     public static NodeList extractXPath(Map<String, String> ns, String xpathExpression, String content) {
-        // Use the java Xpath API to return a NodeList to the caller so they
-        // can iterate through
-        return (NodeList) extractXPath(ns, xpathExpression, content, XPathConstants.NODESET);
+        return (NodeList) extractXPath(ns, xpathExpression, content, XPathConstants.NODESET, null);
+    }
+
+    public static NodeList extractXPath(Map<String, String> ns, String xpathExpression, String content, String encoding) {
+        return (NodeList) extractXPath(ns, xpathExpression, content, XPathConstants.NODESET, encoding);
     }
 
     public static Object extractXPath(String xpathExpression, String content, QName returnType) {
+        return extractXPath(xpathExpression, content, returnType, null);
+    }
+
+    public static Object extractXPath(String xpathExpression, String content, QName returnType, String encoding) {
         // Use the java Xpath API to return a NodeList to the caller so they can
         // iterate through
-        return extractXPath(new HashMap<String, String>(), xpathExpression, content, returnType);
+        return extractXPath(new HashMap<String, String>(), xpathExpression, content, returnType, encoding);
+    }
+
+    public static Object extractXPath(Map<String, String> ns, String xpathExpression, String content, QName returnType) {
+        return extractXPath(ns, xpathExpression, content, returnType, null);
+    }
+
+    /**
+     * extract the XPath from the content. the return value type is passed in
+     * input using one of the {@link XPathConstants}. See also
+     * {@link XPathExpression#evaluate(Object item, QName returnType)} ;
+     */
+    public static Object extractXPath(Map<String, String> ns, String xpathExpression, String content, QName returnType, String charset) {
+        if (null == ns) {
+            ns = new HashMap<String, String>();
+        }
+        String ch = charset;
+        if (ch == null) {
+            ch = Charset.defaultCharset().name();
+        }
+        Document doc = toDocument(content, charset);
+        XPathExpression expr = toExpression(ns, xpathExpression);
+        try {
+            Object o = expr.evaluate(doc, returnType);
+            return o;
+        } catch (XPathExpressionException e) {
+            throw new IllegalArgumentException("xPath expression cannot be executed: " + xpathExpression);
+        }
     }
 
     public static String xPathResultToXmlString(Object result) {
@@ -111,25 +145,6 @@ public final class Tools {
             return sw.toString();
         } catch (Exception e) {
             throw new RuntimeException("Transformation caused an exception", e);
-        }
-    }
-
-    /**
-     * extract the XPath from the content. the return value type is passed in
-     * input using one of the {@link XPathConstants}. See also
-     * {@link XPathExpression#evaluate(Object item, QName returnType)} ;
-     */
-    public static Object extractXPath(Map<String, String> ns, String xpathExpression, String content, QName returnType) {
-        if (null == ns) {
-            ns = new HashMap<String, String>();
-        }
-        Document doc = toDocument(content);
-        XPathExpression expr = toExpression(ns, xpathExpression);
-        try {
-            Object o = expr.evaluate(doc, returnType);
-            return o;
-        } catch (XPathExpressionException e) {
-            throw new IllegalArgumentException("xPath expression cannot be executed: " + xpathExpression);
         }
     }
 
@@ -187,12 +202,16 @@ public final class Tools {
         return ctx;
     }
 
-    private static Document toDocument(String content) {
+    private static Document toDocument(String content, String charset) {
+        String ch = charset;
+        if (ch == null) {
+            ch = Charset.defaultCharset().name();
+        }
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(getInputStreamFromString(content));
+            Document doc = builder.parse(getInputStreamFromString(content, ch));
             return doc;
         } catch (ParserConfigurationException e) {
             throw new IllegalArgumentException("parser for last response body caused an error", e);
@@ -233,7 +252,7 @@ public final class Tools {
     }
 
     public static String getStringFromInputStream(InputStream is) {
-        return getStringFromInputStream(is, "UTF-8");
+        return getStringFromInputStream(is, Charset.defaultCharset().name());
     }
 
     public static String getStringFromInputStream(InputStream is, String encoding) {
@@ -258,12 +277,16 @@ public final class Tools {
         return sb.toString();
     }
 
-    public static InputStream getInputStreamFromString(String string) {
+    public static InputStream getInputStreamFromString(String string, String charset) {
         if (string == null) {
             throw new IllegalArgumentException("null input");
         }
-        byte[] byteArray = string.getBytes();
-        return new ByteArrayInputStream(byteArray);
+        try {
+            byte[] byteArray = string.getBytes(charset);
+            return new ByteArrayInputStream(byteArray);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException("Unsupported encoding: " + charset);
+        }
     }
 
     public static String convertMapToString(Map<String, String> map, String nvSep, String entrySep) {

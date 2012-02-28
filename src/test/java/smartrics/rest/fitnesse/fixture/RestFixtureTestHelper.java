@@ -96,7 +96,7 @@ public class RestFixtureTestHelper {
         when(pf.buildRestRequest()).thenReturn(req);
         when(rc.execute(req)).thenReturn(resp);
         when(pf.buildCellFormatter(any(RestFixture.Runner.class))).thenReturn(cf);
-        when(pf.buildBodyTypeAdapter(isA(ContentType.class))).thenReturn(bta);
+        when(pf.buildBodyTypeAdapter(isA(ContentType.class), isA(String.class))).thenReturn(bta);
     }
 
 }

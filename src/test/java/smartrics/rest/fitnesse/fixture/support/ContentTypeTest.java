@@ -22,6 +22,7 @@ package smartrics.rest.fitnesse.fixture.support;
 
 import static org.junit.Assert.assertEquals;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,6 +108,35 @@ public class ContentTypeTest {
 	}
 
     @Test
+    public void shouldParseTheCharset() {
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new RestData.Header("Content-Type", "application/json; charset=UTF-8"));
+        assertEquals(ContentType.parseCharset(headers), "UTF-8");
+    }
+
+    @Test
+    public void shouldUseDefaultSystemCharsetIfCharsetNotParseableAndDefaultNotSpecifiedViaProperty() {
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new RestData.Header("Content-Type", "application/json"));
+        Config c = Config.getConfig();
+        c.add("restfixture.content.handlers.map", confMap());
+        c.add("restfixture.content.default.charset", null);
+        ContentType.config(c);
+        assertEquals(ContentType.parseCharset(headers), Charset.defaultCharset().name());
+    }
+
+    @Test
+    public void shouldUseSpecifieDefaultCharsetProperty() {
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new RestData.Header("Content-Type", "application/json"));
+        Config c = Config.getConfig();
+        c.add("restfixture.content.handlers.map", confMap());
+        c.add("restfixture.content.default.charset", "MY-CHARSET");
+        ContentType.config(c);
+        assertEquals(ContentType.parseCharset(headers), "MY-CHARSET");
+    }
+
+    @Test
     public void shouldSetupInternalStateFromConfig() {
         StringBuffer configEntry = new StringBuffer();
         configEntry.append("application/x-html=xml<br/>\n");
@@ -119,16 +149,10 @@ public class ContentTypeTest {
 
     @Test
     public void shouldSetupTheContentTypeToAdaptersMapViaConfig() {
-        StringBuffer configEntry = new StringBuffer();
-        configEntry.append("application/xml=xml<br/>\n");
-        configEntry.append("default = text <br/>\n");
-        configEntry.append("application/xhtml=xml<br/>\n");
-        configEntry.append("application/my-app-xml=xml<br/>\n");
-        configEntry.append("text/plain=json<br/>\n\n");
 
         Config c = Config.getConfig();
-        c.add("restfixture.content.handlers.map", configEntry.toString());
-
+        c.add("restfixture.content.handlers.map", confMap());
+        c.add("restfixture.content.default.charset", "MY-CHARSET");
         ContentType.config(c);
 
         List<Header> headers = new ArrayList<Header>();
@@ -146,5 +170,16 @@ public class ContentTypeTest {
         // overrides "default"
         headers.set(0, new RestData.Header("Content-Type", "unhandled"));
         assertEquals(ContentType.TEXT, ContentType.parse(headers));
+    }
+
+    private String confMap() {
+        StringBuffer configEntry = new StringBuffer();
+        configEntry.append("application/xml=xml<br/>\n");
+        configEntry.append("default = text <br/>\n");
+        configEntry.append("application/xhtml=xml<br/>\n");
+        configEntry.append("application/my-app-xml=xml<br/>\n");
+        configEntry.append("text/plain=json<br/>\n\n");
+
+        return configEntry.toString();
     }
 }

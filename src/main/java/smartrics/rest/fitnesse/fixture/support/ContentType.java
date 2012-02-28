@@ -20,10 +20,13 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.mortbay.log.Log;
 
 import smartrics.rest.client.RestData.Header;
 import smartrics.rest.config.Config;
@@ -38,6 +41,7 @@ public enum ContentType {
     XML, JSON, TEXT, JS;
 
     private static Map<String, ContentType> contentTypeToEnum = new HashMap<String, ContentType>();
+    private static String defaultCharset;
     static {
         resetDefaultMapping();
     }
@@ -61,6 +65,8 @@ public enum ContentType {
     }
 
     public static void config(Config config) {
+        // TODO: set default charset
+        defaultCharset = config.get("restfixture.content.default.charset", Charset.defaultCharset().name());
         String htmlConfig = config.get("restfixture.content.handlers.map", "");
         String configStr = Tools.fromHtml(htmlConfig);
         Map<String, String> map = Tools.convertStringToMap(configStr, "=", "\n");
@@ -82,6 +88,29 @@ public enum ContentType {
         }
     }
 
+    public static String parseCharset(List<Header> contentTypeHeaders) {
+        if (contentTypeHeaders.size() != 1 || !"Content-Type".equalsIgnoreCase(contentTypeHeaders.get(0).getName())) {
+            return defaultCharset;
+        }
+        String val = contentTypeHeaders.get(0).getValue();
+        String[] vals = val.split(";");
+        if (vals.length == 2) {
+            String s = vals[1].trim();
+            if (s.length() > 0) {
+                try {
+                    int pos = s.indexOf("charset=");
+                    if (pos >= 0) {
+                        s = s.substring(pos + "charset=".length());
+                        return Charset.forName(s).name();
+                    }
+                } catch (RuntimeException e) {
+                    Log.warn("Charset unknown or not possible to parse: " + s);
+                }
+            }
+        }
+        return defaultCharset;
+    }
+
     public static void resetDefaultMapping() {
         contentTypeToEnum.clear();
         contentTypeToEnum.put("default", ContentType.XML);
@@ -97,6 +126,7 @@ public enum ContentType {
         }
         String typeString = contentTypeHeaders.get(0).getValue();
         typeString = typeString.split(";")[0].trim();
+        // TODO: capture encoding
         ContentType ret = contentTypeToEnum.get(typeString);
         if (ret == null) {
             return contentTypeToEnum.get("default");
