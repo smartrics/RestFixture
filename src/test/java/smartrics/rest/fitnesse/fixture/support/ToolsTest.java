@@ -84,6 +84,17 @@ public class ToolsTest {
     }
 
     @Test
+    public void shouldThrowWhenReadingInputStreamToAStringWhenTryingToEncodeWithUnknownEncoding() throws Exception {
+        String encoding = "==========";
+        InputStream is = mock(InputStream.class);
+        try {
+            Tools.getStringFromInputStream(is, encoding);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Unsupported encoding: " + encoding, e.getMessage());
+        }
+    }
+
+    @Test
     public void shouldWrapAStringIntoAnInputStream() {
         InputStream is = Tools.getInputStreamFromString("another string");
         assertEquals("another string", Tools.getStringFromInputStream(is));

@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -232,11 +233,20 @@ public final class Tools {
     }
 
     public static String getStringFromInputStream(InputStream is) {
+        return getStringFromInputStream(is, "UTF-8");
+    }
+
+    public static String getStringFromInputStream(InputStream is, String encoding) {
         String line = null;
         if (is == null) {
             return "";
         }
-        BufferedReader in = new BufferedReader(new InputStreamReader(is));
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(is, encoding));
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException("Unsupported encoding: " + encoding, e);
+        }
         StringBuilder sb = new StringBuilder();
         try {
             while ((line = in.readLine()) != null) {
