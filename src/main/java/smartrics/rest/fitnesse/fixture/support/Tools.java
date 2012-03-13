@@ -375,8 +375,8 @@ public final class Tools {
 
     public static String fromHtml(String text) {
         String ls = "\n";
-        return text.replaceAll("<br[\\s]*/>", ls).replaceAll("<BR[\\s]*/>", ls).replaceAll("<pre>", "").replaceAll("</pre>", "").replaceAll("&nbsp;", " ").replaceAll("&gt;", ">")
-                .replaceAll("&lt;", "<").replaceAll("&nbsp;", " ");
+        return text.replaceAll("<br[\\s]*/>", ls).replaceAll("<BR[\\s]*/>", ls).replaceAll("<span[^>]*>", "").replaceAll("</span>", "").replaceAll("<pre>", "")
+                .replaceAll("</pre>", "").replaceAll("&nbsp;", " ").replaceAll("&gt;", ">").replaceAll("&lt;", "<").replaceAll("&nbsp;", " ");
     }
 
     public static String toHtmlLabel(String string) {

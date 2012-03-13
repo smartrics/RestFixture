@@ -1,4 +1,4 @@
-/*  Copyright 2011 Fabrizio Cannizzo
+/*  Copyright 2012 Fabrizio Cannizzo
  *
  *  This file is part of RestFixture.
  *
@@ -20,40 +20,53 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
+import java.awt.Rectangle;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.ImageTranscoder;
+import org.apache.batik.transcoder.image.JPEGTranscoder;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import smartrics.rest.client.RestData.Header;
-import smartrics.sequencediagram.Builder;
-import smartrics.sequencediagram.Create;
-import smartrics.sequencediagram.Event;
-import smartrics.sequencediagram.GraphGenerator;
-import smartrics.sequencediagram.Message;
-import smartrics.sequencediagram.Model;
-import smartrics.sequencediagram.PicDiagram;
-import smartrics.sequencediagram.Return;
+import smartrics.rest.fitnesse.fixture.RestFixtureWithSeq.Model;
+import smartrics.rest.fitnesse.fixture.support.CellWrapper;
+import smartrics.rest.fitnesse.fixture.support.Tools;
+
+import com.patternity.graphic.behavioral.Agent;
+import com.patternity.graphic.behavioral.Message;
+import com.patternity.graphic.behavioral.Note;
+import com.patternity.graphic.dag.Node;
+import com.patternity.graphic.layout.sequence.SequenceLayout;
+import com.patternity.util.TemplatedWriter;
+
 import fit.Counts;
 import fit.FixtureListener;
 import fit.Parse;
 import fit.exception.FitFailureException;
+import fitnesse.components.Base64;
 
 /**
  * An extension of RestFixture that generates a sequence diagrams for a table
- * fixture. Sequence diagrams are generated using PIC language templates defined
- * in <a href="http://www.umlgraph.org">UMLGraph</a>.
- * 
- * The deployment of the support files and the destination directory is
- * controlled by the following two configuration parameters
- * 
- * <table>
- * <tr>
- * <td>restfixture.graphs.support.files.dir</td>
- * <td>The directory where the support files are installed. The support files
- * are: file.pic, sequence.pic and myps2img.sh</td>
- * </tr>
+ * fixture. Sequence diagrams are generated as SVG files using <a
+ * href="">Patternity Graphic</a>. <br/>
+ * Each picture can then be transcoded into either PNG or JPG format (via <a
+ * href="">Batik transcoder API</a>). The format is inferred by the file
+ * extension. <br/>
+ * The fixture supports a configuration property.
+ * <table border="1">
  * <tr>
  * <td>restfixture.graphs.dir</td>
  * <td>destination directory where the images with sequence diagrams will be
@@ -61,22 +74,62 @@ import fit.exception.FitFailureException;
  * if the directory can't be created</td>
  * </tr>
  * </table>
+ * <br/>
+ * If the directory specified by restfixture.graphs.dir is created under
+ * <code><i>FitNesseRoot</i>/files</code> the generated images can be embedded
+ * in the FitNesse pages. <br/>
+ * Including images can be achieved via <code>!img</code> (for PNG or JPG) or
+ * via a specific FitNesse symbol, <code>!svg</code>, for native svg files
+ * {@see smartrics.rest.fitnesse.fixture.SvgImage} <br/>
+ * <b>NOTE</b>: This class only works with Fit runner (not Slim) <br/>
+ * Using the fixture is straightforward. Like the RestFixture, the hostname
+ * needs to be specified. Additionally a new cell needs to be supplied with some
+ * data pertaining the creation of the image file. <br/>
+ * <table border="1">
+ * <tr>
+ * <td>RestFixtureWithSeq</td>
+ * <td>hostname</td>
+ * <td>image data</td>
+ * </tr>
+ * </table>
+ * <br/>
+ * Image data is a string containing path to the image file, relative to the
+ * value of the <code>restfixture.graphs.dir</code> directory. <br/>
+ * The string is followed by a list of attributes passed to the SVG generator
+ * for inclusion in the SVG file. for example
  * 
- * NOTE: This class only works with Fit runner (not Slim)
+ * <table border="1">
+ * <tr>
+ * <td>RestFixtureWithSeq</td>
+ * <td>hostname</td>
+ * <td>post_images/a_post_image.svg viewBox="0 0 200 200" width="100"
+ * height="150"</td>
+ * </tr>
+ * </table>
+ * <br/>
+ * If the file path contains spaces, it must be included in double quotes. Each
+ * attribute value must be included in double quotes.
  * 
  * @author fabrizio
  * 
  */
 public class RestFixtureWithSeq extends RestFixture {
 
-    private static final Log LOG = LogFactory.getLog(RestFixtureWithSeq.class);
+    public interface Model {
 
-    /**
-     * directory where the support files needed to generate the seuqence
-     * diagrams are. The default value is <code>new File("pic")</code>, implying
-     * that the location is relative to the fitnesse server default directory.
-     */
-    public static final String DEFAULT_SUPPORT_FILES_DIR_NAME = "etc/restfixture";
+        void delete(String res, String args, String ret);
+
+        void comment(String body);
+
+        void get(String res, String args, String ret);
+
+        void post(String res, String args, String result);
+
+        void put(String res, String args, String ret);
+
+    }
+
+    static final Log LOG = LogFactory.getLog(RestFixtureWithSeq.class);
 
     /**
      * default directory where the diagrams are generated. The value is
@@ -86,59 +139,97 @@ public class RestFixtureWithSeq extends RestFixture {
     private File graphFileDir;
 
     /**
-     * the name of the object representing the fixture (eg the client executing
-     * REST requests).
+     * this fixture instance picture name
      */
-    private static final String FIXTURE = "fixture";
+    private String pictureName;
 
-    private PicDiagram diagram;
+    /**
+     * this fixture instance picture data. picture data is a composite string
+     * containig the path to the image file and a sequence of attributes in the
+     * form of name=value.
+     */
+    private String pictureData;
 
     private Model model;
 
-    private Builder builder;
+    private boolean initialised;
 
-    private String pictureName;
+    /**
+     * listens to events raised by the fixture and captures them in the model.
+     */
+    private MyFixtureListener myFixtureListener;
+
+    /**
+     * svg attributes
+     */
+    private Map<String, String> attributes;
+
+    /**
+     * file format
+     */
+    private String format;
+
+    @SuppressWarnings("rawtypes")
+    private CellWrapper cell;
 
     public RestFixtureWithSeq() {
         super();
+        this.initialised = false;
+        LOG.info("Default ctor");
     }
 
-    public RestFixtureWithSeq(String hostName, String pictureName) {
+    public RestFixtureWithSeq(String hostName, String pictureData) {
         super(hostName);
-        this.pictureName = pictureName;
+        this.pictureData = pictureData;
+        this.initialised = false;
     }
 
-    public RestFixtureWithSeq(String hostName, String configName, String pictureName) {
+    public RestFixtureWithSeq(String hostName, String configName, String pictureData) {
         super(hostName, configName);
-        this.pictureName = pictureName;
+        this.pictureData = pictureData;
+        this.initialised = false;
     }
 
-    public RestFixtureWithSeq(PartsFactory partsFactory, String hostName, String configName, String pictureName) {
+    public RestFixtureWithSeq(PartsFactory partsFactory, String hostName, String configName, String pictureData) {
         super(partsFactory, hostName, configName);
-        this.pictureName = pictureName;
+        this.pictureData = pictureData;
+        this.initialised = false;
+    }
+
+    /**
+     * embeds as a &lt;img> with content encoded the model caprured so far.
+     */
+    public void embed() {
+        cell = row.getCell(1);
+        byte[] content = PictureGenerator.generate(model.toString(), parseAttributes(cell.body()), "template.svg", format);
+        cell.body("<img src=\"data:image/" + format + ";base64," + new String(Base64.encode(content)) + "\" />");
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
     }
 
     @Override
     protected void initialize(Runner runner) {
         super.initialize(runner);
-        create(new PicDiagram(), new Model());
+        initializeFields();
+        createSequenceModel();
+        initialised = true;
         String defaultPicsDir = System.getProperty("restfixture.graphs.dir", "FitNesseRoot/files/restfixture");
         String picsDir = getConfig().get("restfixture.graphs.dir", defaultPicsDir);
         graphFileDir = new File(picsDir);
-        if(!graphFileDir.exists()) {
-            if(!graphFileDir.mkdirs()) {
+        if (!graphFileDir.exists()) {
+            if (!graphFileDir.mkdirs()) {
                 throw new FitFailureException("Unable to create the diagrams destination dir '" + graphFileDir.getAbsolutePath() + "'");
             } else {
                 LOG.info("Created diagrams destination directory '" + graphFileDir.getAbsolutePath() + "'");
             }
         }
-        String supportDirName = getConfig().get("restfixture.graphs.support.files.dir", DEFAULT_SUPPORT_FILES_DIR_NAME);
-        File supportDir = validateSupportDirContent(supportDirName);
-
-        setFixtureListener(new MyFixtureListener(this, builder, supportDir, graphFileDir));
+        myFixtureListener = new MyFixtureListener(new File(graphFileDir, this.getPictureName()).getAbsolutePath(), model, attributes);
+        setFixtureListener(myFixtureListener);
     }
 
-    protected String getPictureNameFromArgs() {
+    protected String getPictureDataFromArgs() {
         if (args.length > 1) {
             return args[args.length - 1];
         }
@@ -170,26 +261,30 @@ public class RestFixtureWithSeq extends RestFixture {
      */
     @Override
     protected boolean validateState() {
-        return getBaseUrl() != null && getPictureName() != null;
+        return getBaseUrl() != null && pictureData != null;
     }
 
     @Override
     protected void notifyInvalidState(boolean state) {
         if (!state) {
-            throw new FitFailureException("Both baseUrl and picture name need to be passed to the fixture");
+            throw new FitFailureException("Both baseUrl and picture data (containing the picture name) need to be passed to the fixture");
         }
     }
 
-    void create(PicDiagram d, Model m) {
-        diagram = d;
-        model = m;
-        builder = new Builder(model, diagram);
+    protected void createSequenceModel() {
+        if (!initialised) {
+            LOG.info("Initialising sequence model");
+            this.model = new SequenceModel();
+        }
     }
 
     @Override
     public List<List<String>> doTable(List<List<String>> rows) {
-        // return super.doTable(rows);
-        throw new RuntimeException("This fixture is not supported on SLIM runner. Please use it with FIT");
+        List<List<String>> result = super.doTable(rows);
+        listener.tableFinished(null);
+        return result;
+        // throw new
+        // RuntimeException("This fixture is not supported on SLIM runner. Please use it with FIT");
     }
 
     /**
@@ -211,8 +306,13 @@ public class RestFixtureWithSeq extends RestFixture {
      */
     @Override
     public void doCells(Parse table) {
-        this.pictureName = getPictureNameFromArgs();
+        this.pictureData = getPictureDataFromArgs();
         super.doCells(table);
+    }
+
+    @Override
+    public void setBody() {
+        super.setBody();
     }
 
     /**
@@ -221,8 +321,20 @@ public class RestFixtureWithSeq extends RestFixture {
     @Override
     public void DELETE() {
         super.DELETE();
-        model.addEvent(new Message(FIXTURE, getLastRequest().getResource(), "DELETE"));
-        model.addEvent(new Return(getLastRequest().getResource(), FIXTURE, getLastResponse().getStatusCode().toString()));
+        String res = getLastRequest().getResource();
+        String args = getLastRequest().getQuery();
+        String ret = "status=" + getLastResponse().getStatusCode().toString();
+        model.delete(res, args, ret);
+    }
+
+    @Override
+    public void comment() {
+        super.comment();
+        @SuppressWarnings("rawtypes")
+        CellWrapper messageCell = row.getCell(1);
+        String body = messageCell.body();
+        String plainBody = Tools.fromHtml(body).trim();
+        model.comment(plainBody);
     }
 
     /**
@@ -231,8 +343,10 @@ public class RestFixtureWithSeq extends RestFixture {
     @Override
     public void GET() {
         super.GET();
-        model.addEvent(new Message(FIXTURE, getLastRequest().getResource(), "GET", getLastRequest().getQuery()));
-        model.addEvent(new Return(getLastRequest().getResource(), FIXTURE, getLastResponse().getStatusCode().toString()));
+        String res = getResource();
+        String args = getLastRequest().getQuery();
+        String ret = "status=" + getLastResponse().getStatusCode().toString();
+        model.get(res, args, ret);
     }
 
     /**
@@ -244,21 +358,12 @@ public class RestFixtureWithSeq extends RestFixture {
     @Override
     public void POST() {
         super.POST();
-        String res = getLastRequest().getResource();
-        Event event = new Message(FIXTURE, res, "POST");
-        model.addEvent(event);
-        List<Header> list = getLastResponse().getHeader("Location");
-        String location = "";
-        if (list != null && !list.isEmpty()) {
-            location = list.get(0).getValue();
-        }
-        model.addEvent(new Create(getLastRequest().getResource(), location, "POST"), true);
-        String id = "";
-        int lastIndexOf = location.lastIndexOf("/");
-        if (lastIndexOf >= 0) {
-            id = location.substring(lastIndexOf);
-        }
-        model.addEvent(new Return(getLastRequest().getResource(), FIXTURE, getLastResponse().getStatusCode().toString(), id));
+        String res = getResource();
+        String id = getIdFromLocationHeader();
+        // could ever be that the POST to /abc returns a location of /qwe/1 ??
+        String result = String.format("id=%s, status=%s", id, getLastResponse().getStatusCode().toString());
+        String args = getLastRequest().getQuery();
+        model.post(res, args, result);
     }
 
     /**
@@ -267,8 +372,10 @@ public class RestFixtureWithSeq extends RestFixture {
     @Override
     public void PUT() {
         super.PUT();
-        model.addEvent(new Message(FIXTURE, getLastRequest().getResource(), "PUT"));
-        model.addEvent(new Return(getLastRequest().getResource(), FIXTURE, getLastResponse().getStatusCode().toString()));
+        String res = getResource();
+        String args = getLastRequest().getQuery();
+        String ret = "status=" + getLastResponse().getStatusCode().toString();
+        model.put(res, args, ret);
     }
 
     /**
@@ -280,32 +387,201 @@ public class RestFixtureWithSeq extends RestFixture {
         return pictureName;
     }
 
-    void setModel(Model m) {
-        this.model = m;
-    }
-
-    Model getModel() {
-        return this.model;
-    }
-
     void setFixtureListener(FixtureListener l) {
         super.listener = l;
     }
 
-    private File validateSupportDirContent(String supportDirName) {
-        File supportDir = new File(supportDirName);
-        if (!supportDir.exists()) {
-            throw new FitFailureException("Support files directory is missing '" + supportDir.getAbsolutePath() + "'");
+    private static String getPictureFormat(String pictureName) {
+        int pos = pictureName.indexOf(".");
+        if (pos >= 0) {
+            return pictureName.substring(pos + 1).toLowerCase();
         }
-        File sequence_pic = new File(supportDir, "sequence.pic");
-        if (!sequence_pic.exists()) {
-            throw new FitFailureException("Missing support file '" + sequence_pic.getAbsolutePath() + "'");
+        throw new IllegalArgumentException("The picture name must terminate with an extension of .svg, .png, .jpg");
+    }
+
+    private void initializeFields() {
+        if (!initialised) {
+            String data = pictureData;
+            LOG.info("Picture data = " + pictureData);
+            int[] pos = getPositionOfNextOfTokenOptionallyInDoubleQuotes(data);
+            this.pictureName = data.substring(pos[0], pos[1]);
+            LOG.info("Found picture name: " + pictureName);
+            if (pos[1] < data.length()) {
+                data = data.substring(pos[1] + 1);
+                this.attributes = parseAttributes(data);
+            }
+            this.format = getPictureFormat(pictureName);
         }
-        File myPs2Img_sh = new File(supportDir, "myps2img.sh");
-        if (!myPs2Img_sh.exists()) {
-            throw new FitFailureException("Missing support file '" + myPs2Img_sh.getAbsolutePath() + "'");
+    }
+
+    private static Map<String, String> parseAttributes(String data) {
+        Map<String, String> foundAttributes = new HashMap<String, String>();
+        while (true) {
+            int eqPos = data.indexOf("=");
+            if (eqPos < 0) {
+                break;
+            }
+            String aName = data.substring(0, eqPos);
+            LOG.info("Found attribute name: " + aName);
+            data = data.substring(eqPos + 1);
+            int[] pos = getPositionOfNextOfTokenOptionallyInDoubleQuotes(data);
+            String aVal = data.substring(pos[0], pos[1]);
+            LOG.info("Found attribute val: " + aVal + ", pos[" + pos[0] + ", " + pos[1] + "]");
+            foundAttributes.put(aName, aVal);
+            if (data.length() - aVal.length() == 0) {
+                break;
+            }
+            data = data.substring(pos[1] + 1);
         }
-        return supportDir;
+        return foundAttributes;
+    }
+
+    private static int[] getPositionOfNextOfTokenOptionallyInDoubleQuotes(String data) {
+        String del = " ";
+        int start = 0;
+        if (data.trim().startsWith("\"")) {
+            del = "\"";
+            start = 1;
+        }
+        int end = data.indexOf(del, start + 1);
+        if (end == -1) {
+            end = data.length();
+        }
+        return new int[] { start, end };
+    }
+
+    private String[] guessParts(String res) {
+        String[] empty = new String[] { "?", "" };
+        if (res == null) {
+            return empty;
+        }
+        String myRes = res.trim();
+        if (myRes.isEmpty()) {
+            return empty;
+        }
+        int pos = myRes.lastIndexOf("/");
+        if (pos == myRes.length() - 1) {
+            pos = -1;
+            myRes = myRes.substring(0, myRes.length() - 1);
+        }
+        String[] parts = new String[2];
+        if (pos >= 0) {
+            parts[0] = myRes.substring(0, pos);
+            parts[1] = myRes.substring(pos + 1);
+        } else {
+            parts[0] = myRes;
+            parts[1] = "";
+        }
+        return parts;
+    }
+
+    private String getIdFromLocationHeader() {
+        List<Header> list = getLastResponse().getHeader("Location");
+        String location = "";
+        if (list != null && !list.isEmpty()) {
+            location = list.get(0).getValue();
+        }
+        String[] parts = guessParts(location);
+        return parts[1];
+    }
+
+    private String getResource() {
+        String res = getLastRequest().getResource();
+        if (res.endsWith("/")) {
+            res = res.substring(0, res.length() - 1);
+        }
+        return res;
+    }
+}
+
+/**
+ * Holds the sequence diagram model, specifically abstratcs out the underlying
+ * library constructing the SVG picture.
+ * 
+ * @author fabrizio
+ * 
+ */
+class SequenceModel implements Model {
+    private Map<String, Resource> resourceToAgentMap;
+    private Node root;
+    private SequenceLayout layout;
+    /**
+     * Hints to the SVG files generator.
+     */
+    private static int DEFAULT_FONT_SIZE = 16;
+    private static int DEFAULT_AGENT_STEP = 150;
+    private static int DEFAULT_TIME_STEP = 25;
+
+    SequenceModel() {
+        Message message = new Message(null, null);
+        Node root = new Node(message);
+        SequenceLayout layout = new SequenceLayout(DEFAULT_FONT_SIZE);
+        layout.setAgentStep(DEFAULT_AGENT_STEP);
+        layout.setTimeStep(DEFAULT_TIME_STEP);
+
+        this.root = root;
+        this.layout = layout;
+        this.resourceToAgentMap = new HashMap<String, Resource>();
+    }
+
+    public void comment(String text) {
+        root.add(new Node(new Note(Tools.fromHtml(text))));
+    }
+
+    public void get(String resource, String query, String result) {
+        message(Message.SYNC, resource, "GET", query, result);
+    }
+
+    public void post(String resource, String query, String result) {
+        message(Message.SYNC, resource, "POST", query, result);
+    }
+
+    public void put(String resource, String query, String result) {
+        message(Message.SYNC, resource, "PUT", query, result);
+    }
+
+    public void delete(String resource, String query, String result) {
+        message(Message.DESTROY, resource, "DELETE", query, result);
+    }
+
+    public String toString() {
+        return layout.layout(root);
+    }
+
+    private void message(int type, String resourceTo, String method, String args, String result) {
+        Agent agentTo = agentFor(resourceTo);
+        String methodSignature = args == null ? method : method + "(" + args + ")";
+        String resultString = result == null ? "" : result;
+        Message message = new Message(type, agentTo, methodSignature, resultString);
+        root.add(new Node(message));
+    }
+
+    private Resource agentFor(String resource) {
+        Resource a = resourceToAgentMap.get(resource);
+        if (a == null) {
+            boolean isActivable = true;
+            a = new Resource(resource, isActivable);
+            resourceToAgentMap.put(resource, a);
+        }
+        return a;
+    }
+}
+
+/**
+ * A representation of a resource for the purposes of generating the sequence
+ * diagram.
+ * 
+ * @author fabrizio
+ * 
+ */
+class Resource extends Agent {
+
+    public Resource(String type, boolean isActivable) {
+        super(type, "", isActivable);
+    }
+
+    public String toString() {
+        return isEllipsis() ? "..." : (new StringBuilder()).append(getType()).toString();
     }
 }
 
@@ -317,69 +593,65 @@ public class RestFixtureWithSeq extends RestFixture {
  */
 class MyFixtureListener implements FixtureListener {
 
-    private final Builder sequenceBuilder;
-    private final RestFixtureWithSeq thisFixture;
-    private final GraphGenerator graphGenerator;
-    private final File graphDirectory;
+    private final Model model;
+    private final String picFileName;
+    private final Map<String, String> attributes;
 
     /**
      * @param f
      *            the fixture instance backing up a table. it's necessary as the
      *            file name is only know at execution time and the
      *            <code>args</code> array containing the file name for the
-     *            diagram is not known until the fixture has been created
-     * @param b
-     *            the sequence diagram builder
+     *            diagram is not known until the fixture has been created @
      * @param supportFilesDir
      *            the directory containing the support files needed to generate
      *            the diagram
      * @param graphDir
      *            the directory where the sequence diagram is generated
      */
-    public MyFixtureListener(RestFixtureWithSeq f, Builder b, File supportFilesDir, File graphDir) {
-        sequenceBuilder = b;
-        thisFixture = f;
-        graphDirectory = graphDir;
-        graphGenerator = new GraphGenerator(supportFilesDir.getAbsolutePath());
+    public MyFixtureListener(String outFileName, Model m, Map<String, String> attr) {
+        model = m;
+        attributes = attr != null ? attr : new HashMap<String, String>();
+        picFileName = outFileName;
     }
 
     /**
      * generates the sequence diagram with the events collected in the model.
      */
     public void tableFinished(Parse parse) {
-        sequenceBuilder.build();
-        String diag = sequenceBuilder.getDiagram().toString();
+        int pos = picFileName.lastIndexOf(".");
+        String format = "svg";
+        if (pos > 0) {
+            format = picFileName.substring(pos + 1).toLowerCase();
+        }
+        byte[] content = PictureGenerator.generate(model.toString(), attributes, "template.svg", format);
+        File f = new File(picFileName);
         try {
-            File graphFile = new File(graphDirectory, thisFixture.getPictureName());
-            init(graphFile);
-            System.out.println("Generating sequence diagram in " + graphFile.getAbsolutePath());
-            graphGenerator.generateGif(diag, graphFile);
-        } catch (Exception e) {
-            // ignore error -
-            e.printStackTrace();
+            f.createNewFile();
+        } catch (IOException e1) {
+            throw new IllegalArgumentException("Unable to create output picture file: " + f.getAbsolutePath(), e1);
         }
-    }
-
-    protected void init(File graphFile) {
-        if (!graphDirectory.exists()) {
-            try {
-                graphDirectory.mkdirs();
-            } catch (RuntimeException e) {
-                throw new IllegalStateException("Cannot create " + graphDirectory.getAbsolutePath(), e);
-            }
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(f);
+        } catch (FileNotFoundException e1) {
+            throw new IllegalArgumentException("Unable to find output picture file: " + f.getAbsolutePath(), e1);
         }
-        // if (!graphFile.canWrite()) {
-        // throw new IllegalStateException("Cannot write "
-        // + graphFile.getAbsolutePath());
-        // }
-        if (graphFile.exists()) {
-            try {
-                graphFile.delete();
-            } catch (RuntimeException e) {
-                // Ignore if can't delete
-                // TODO: should throw exception if file not deleted?
-                System.err.println("Exception: " + e.getMessage());
+        try {
+            fos.write(content);
+        } catch (IOException e1) {
+            throw new IllegalArgumentException("Unable to write output picture file: " + f.getAbsolutePath(), e1);
+        }
+        try {
+            fos.flush();
+        } catch (IOException e1) {
+            throw new IllegalArgumentException("Unable to flush output picture file: " + f.getAbsolutePath());
+        }
+        try {
+            if (fos != null) {
+                fos.close();
             }
+        } catch (IOException e) {
         }
     }
 
@@ -387,6 +659,83 @@ class MyFixtureListener implements FixtureListener {
      * not used.
      */
     public void tablesFinished(Counts counts) {
+    }
+
+}
+
+class PictureGenerator {
+
+    public static byte[] generate(String content, Map<String, String> attributes, String svgTemplate, String format) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final TemplatedWriter writer = new TemplatedWriter(baos, svgTemplate);
+        StringBuffer sb = new StringBuffer();
+        for (Map.Entry<String, String> e : attributes.entrySet()) {
+            sb.append(e.getKey()).append("=\"").append(e.getValue()).append("\" ");
+        }
+        writer.write(content, sb.toString());
+        byte[] ret = baos.toByteArray();
+        try {
+            baos.close();
+        } catch (IOException e) {
+        }
+        if (format.equals("svg")) {
+            return ret;
+        } else {
+            Integer w = null;
+            if (attributes.get("width") != null) {
+                try {
+                    w = Integer.parseInt(attributes.get("width"));
+                } catch (NumberFormatException e) {
+
+                }
+            }
+            Integer h = null;
+            if (attributes.get("height") != null) {
+                try {
+                    h = Integer.parseInt(attributes.get("height"));
+                } catch (NumberFormatException e) {
+
+                }
+            }
+            return transcode(ret, format, w, h);
+        }
+    }
+
+    public static byte[] transcode(byte[] svg, String format, Integer w, Integer h) {
+        ImageTranscoder trans = null;
+        if (format.equals("jpg")) {
+            trans = new JPEGTranscoder();
+        } else if (format.equals("png")) {
+            trans = new PNGTranscoder();
+        } else {
+            throw new IllegalArgumentException("Unsupported raster format. Only jpg and png: " + format);
+        }
+        TranscoderInput input = new TranscoderInput(new ByteArrayInputStream(svg));
+        ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+        TranscoderOutput output = new TranscoderOutput(ostream);
+        if (w != null && h != null) {
+            Rectangle aoi = new Rectangle(w, h);
+            trans.addTranscodingHint(JPEGTranscoder.KEY_WIDTH, new Float(aoi.width));
+            trans.addTranscodingHint(JPEGTranscoder.KEY_HEIGHT, new Float(aoi.height));
+            trans.addTranscodingHint(ImageTranscoder.KEY_FORCE_TRANSPARENT_WHITE, Boolean.FALSE);
+            trans.addTranscodingHint(JPEGTranscoder.KEY_AOI, aoi);
+        }
+        try {
+            trans.transcode(input, output);
+        } catch (TranscoderException e) {
+            throw new IllegalStateException("Unable to transcode to format: " + format, e);
+        }
+        try {
+            ostream.flush();
+        } catch (IOException e) {
+            // should be safe to ignore
+        }
+        try {
+            ostream.close();
+        } catch (IOException e) {
+            // should be safe to ignore
+        }
+        return ostream.toByteArray();
     }
 
 }

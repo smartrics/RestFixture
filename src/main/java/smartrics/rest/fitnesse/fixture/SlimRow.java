@@ -50,6 +50,13 @@ public class SlimRow implements RowWrapper<String> {
 		return null;
 	}
 
+    public int size() {
+        if (row != null) {
+            return row.size();
+        }
+        return 0;
+    }
+
     public List<String> asList() {
         List<String> ret = new ArrayList<String>();
         for (CellWrapper<String> w : row) {
@@ -58,4 +65,10 @@ public class SlimRow implements RowWrapper<String> {
         return ret;
     }
 
+    public CellWrapper<String> removeCell(int c) {
+        if (c < this.row.size()) {
+            return this.row.remove(c);
+        }
+        return null;
+    }
 }

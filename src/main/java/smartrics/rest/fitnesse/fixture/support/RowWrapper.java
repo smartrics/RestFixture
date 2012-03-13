@@ -31,4 +31,7 @@ public interface RowWrapper<E> {
 
 	CellWrapper<E> getCell(int c);
 
+    int size();
+
+    CellWrapper<E> removeCell(int c);
 }

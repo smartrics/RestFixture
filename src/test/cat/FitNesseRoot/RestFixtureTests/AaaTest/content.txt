@@ -1,0 +1,2 @@
+|!-smartrics.rest.fitnesse.fixture.RestFixtureWithSeq-!|http://${jettyHost}:${jettyPort}|!-SequenceDiagGet.png viewBox="0 0 200 200" width="200" height="200"-!|
+|GET    | /resources/%id1% | 200 | | |

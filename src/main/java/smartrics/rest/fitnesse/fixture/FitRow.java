@@ -49,11 +49,24 @@ public class FitRow implements RowWrapper<Parse> {
 		}
 	}
 
-	public CellWrapper<Parse> getCell(int c) {
-		if (c < row.size()) {
-			return row.get(c);
-		}
-		return null;
-	}
+    public int size() {
+        if (row != null) {
+            return row.size();
+        }
+        return 0;
+    }
 
+    public CellWrapper<Parse> getCell(int c) {
+        if (c < row.size()) {
+            return row.get(c);
+        }
+        return null;
+    }
+
+    public CellWrapper<Parse> removeCell(int c) {
+        if (c < row.size()) {
+            return row.remove(c);
+        }
+        return null;
+    }
 }

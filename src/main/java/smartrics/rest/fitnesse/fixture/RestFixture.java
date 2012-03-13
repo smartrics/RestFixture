@@ -701,9 +701,7 @@ public class RestFixture extends ActionFixture {
         CellWrapper messageCell = row.getCell(1);
         try {
             String message = messageCell.text().trim();
-            LOG.info("@@@@ b ?>" + message);
             message = GLOBALS.substitute(message);
-            LOG.info("@@@@ a ?>" + message);
             messageCell.body(getFormatter().gray(message));
         } catch (RuntimeException e) {
             getFormatter().exception(messageCell, e);
