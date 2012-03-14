@@ -188,7 +188,7 @@
         </replaceregexp>
         <replaceregexp flags="g">
             <regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixtureWithSeq\-\![\s]*\|" />
-            <substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureWithSeq-! |" />
+            <substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureWithSeqForSlim-! |" />
             <fileset refid="fitnesse.source.files" />
         </replaceregexp>
 		<replaceregexp flags="g">
