@@ -15,7 +15,12 @@ public class RunFromJUnitTest {
     }
 
     @Test
-    public void run_RestFixtureTests_SlimTests_SequenceDiagrams() throws Exception {
-        helper.assertTestPasses("RestFixtureTests.SlimTests.SequenceDiagrams");
+    public void run_RestFixtureTests_SlimTests() throws Exception {
+        helper.assertTestPasses("RestFixtureTests.SlimTests");
+    }
+
+    @Test
+    public void run_RestFixtureTests_FitTests() throws Exception {
+        helper.assertTestPasses("RestFixtureTests.FitTests");
     }
 }

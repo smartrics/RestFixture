@@ -31,6 +31,9 @@ For example
 
 !-| smartrics.rest.fitnesse.fixture.RestFixtureWithSeq | host | /path/to/file.gif viewBox="0 0 500 500" width="400" height="500" | -!
 
+or for Slim: 
+!-| Table:smartrics.rest.fitnesse.fixture.RestFixtureWithSeq | host | /path/to/file.gif viewBox="0 0 500 500" width="400" height="500" | -!
+
 Use width and height to determine the final dimensions of the output image and viewBox to further restrict the visible part of the image
 
 In the example, a gif file is generated and the viewBox="0 0 500 500" width="400" height="500" are included in the &lt;svg> root tag.
@@ -48,10 +51,6 @@ To override the default directory, use the config property ''restfixture.graphs.
 For files to be included in the test pages, they need to be under ''FITNESSE_ROOT/files''.
 
 !3 Basic Sequence Diagrams
-
-|!-smartrics.rest.fitnesse.fixture.RestFixture-!|http://${jettyHost}:${jettyPort}|
-|GET   | /resources/ | 200 | | |
-
 
 !img files/restfixture/SequenceDiagPost.png
 |!-smartrics.rest.fitnesse.fixture.RestFixtureWithSeq-!|http://${jettyHost}:${jettyPort}|!-SequenceDiagPost.png viewBox="0 0 200 200" width="200" height="200" -!|

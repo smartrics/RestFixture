@@ -202,7 +202,7 @@ public class RestFixtureWithSeq extends RestFixture {
     public void embed() {
         cell = row.getCell(1);
         byte[] content = PictureGenerator.generate(model.toString(), parseAttributes(cell.body()), "template.svg", format);
-        cell.body("<img src=\"data:image/" + format + ";base64," + new String(Base64.encode(content)) + "\" />");
+        cell.body(getFormatter().gray("<img src=\"data:image/" + format + ";base64," + new String(Base64.encode(content)) + "\" />"));
     }
 
     public void setModel(Model model) {
@@ -278,14 +278,6 @@ public class RestFixtureWithSeq extends RestFixture {
         }
     }
 
-    @Override
-    public List<List<String>> doTable(List<List<String>> rows) {
-        List<List<String>> result = super.doTable(rows);
-        listener.tableFinished(null);
-        return result;
-        // throw new
-        // RuntimeException("This fixture is not supported on SLIM runner. Please use it with FIT");
-    }
 
     /**
      * Method invoked to start processing the current table. Action fixtures
@@ -298,6 +290,17 @@ public class RestFixtureWithSeq extends RestFixture {
     public void doTable(Parse table) {
         super.doTable(table);
         listener.tableFinished(table);
+    }
+
+    /**
+     * Note: for SLIM to find this method it has to be defined in the java file
+     * after the override of the ActionFixture method
+     */
+    @Override
+    public List<List<String>> doTable(List<List<String>> rows) {
+        List<List<String>> result = super.doTable(rows);
+        listener.tableFinished(null);
+        return result;
     }
 
     /**
