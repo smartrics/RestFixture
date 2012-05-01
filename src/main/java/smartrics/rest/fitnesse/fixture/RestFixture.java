@@ -829,10 +829,11 @@ public class RestFixture extends ActionFixture {
         	completeHttpMethodExecution();
         } catch (RuntimeException e) {
         	getFormatter().exception(row.getCell(0), "Execution of " + method + " caused exception '" + e.getMessage() + "'");
+        	e.printStackTrace();
         }
     }
 
-    protected void doMethod(String method, String rBody, String resUrl) {
+    protected void doMethod(String method, String resUrl, String rBody) {
         setLastRequest(partsFactory.buildRestRequest());
         getLastRequest().setMethod(RestRequest.Method.valueOf(method));
         getLastRequest().addHeaders(getHeaders());
