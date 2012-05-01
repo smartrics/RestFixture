@@ -199,11 +199,14 @@ public class RestFixture extends ActionFixture {
 
     private RestRequest lastRequest;
 
-    private String fileName = null;
+    // Made protected so RestScriptFixture can modify
+    protected String fileName = null;
 
-    private String multipartFileName = null;
+    // Made protected so RestScriptFixture can modify
+    protected String multipartFileName = null;
 
-    private String multipartFileParameterName = FILE;
+    // Made protected so RestScriptFixture can modify
+    protected String multipartFileParameterName = FILE;
 
     private String requestBody;
 
@@ -781,7 +784,8 @@ public class RestFixture extends ActionFixture {
         configRestClient();
     }
 
-    private String emptifyBody(String b) {
+    // Made protected for RestScriptFixture
+    protected String emptifyBody(String b) {
         String body = b;
         if (body == null) {
             body = "";
@@ -798,16 +802,37 @@ public class RestFixture extends ActionFixture {
         }
         return headers;
     }
+    
+    // added for RestScriptFixture
+    protected String getRequestBody() {
+    	return requestBody;
+    }
+    
+    // added for RestScriptFixture
+    protected Map<String, String> getNamespaceContext() {
+    	return namespaceContext;
+    }
 
     private void doMethod(String m) {
         doMethod(null, m);
     }
-
+    
+    // Split method so RestScriptFixture can feed in the url
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected void doMethod(String body, String method) {
         CellWrapper urlCell = row.getCell(1);
         String url = stripTag(urlCell.text());
         String resUrl = GLOBALS.substitute(url);
+        String rBody = GLOBALS.substitute(body);
+        try {
+        	doMethod(method, resUrl, rBody);
+        	completeHttpMethodExecution();
+        } catch (RuntimeException e) {
+        	getFormatter().exception(row.getCell(0), "Execution of " + method + " caused exception '" + e.getMessage() + "'");
+        }
+    }
+
+    protected void doMethod(String method, String rBody, String resUrl) {
         setLastRequest(partsFactory.buildRestRequest());
         getLastRequest().setMethod(RestRequest.Method.valueOf(method));
         getLastRequest().addHeaders(getHeaders());
@@ -825,17 +850,11 @@ public class RestFixture extends ActionFixture {
             getLastRequest().setQuery(uri[1]);
         }
         if ("Post".equals(method) || "Put".equals(method)) {
-            String rBody = GLOBALS.substitute(body);
             getLastRequest().setBody(rBody);
         }
-        try {
-            restClient.setBaseUrl(thisRequestUrlParts[0]);
-            RestResponse response = restClient.execute(getLastRequest());
-            setLastResponse(response);
-            completeHttpMethodExecution();
-        } catch (RuntimeException e) {
-            getFormatter().exception(row.getCell(0), "Execution of " + method + " caused exception '" + e.getMessage() + "'");
-        }
+        restClient.setBaseUrl(thisRequestUrlParts[0]);
+        RestResponse response = restClient.execute(getLastRequest());
+        setLastResponse(response);
     }
 
     private ContentType getContentTypeOfLastResponse() {
@@ -870,11 +889,18 @@ public class RestFixture extends ActionFixture {
             throw new IllegalStateException("You must specify a body cell");
         }
         bodyCell.body(GLOBALS.substitute(bodyCell.body()));
+        BodyTypeAdapter bodyTypeAdapter = createBodyTypeAdapter();
+        process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
+    }
+
+    // Split out of completeHttpMethodExecution so RestScriptFixture can call this
+    protected BodyTypeAdapter createBodyTypeAdapter()
+    {
         ContentType ct = getContentTypeOfLastResponse();
         String charset = getCharsetOfLastResponse();
         BodyTypeAdapter bodyTypeAdapter = partsFactory.buildBodyTypeAdapter(ct, charset);
         bodyTypeAdapter.setContext(namespaceContext);
-        process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
+        return bodyTypeAdapter;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
