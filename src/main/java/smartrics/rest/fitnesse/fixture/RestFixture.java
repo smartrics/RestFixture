@@ -829,11 +829,12 @@ public class RestFixture extends ActionFixture {
         	completeHttpMethodExecution();
         } catch (RuntimeException e) {
         	getFormatter().exception(row.getCell(0), "Execution of " + method + " caused exception '" + e.getMessage() + "'");
+        	e.printStackTrace();
         }
     }
 
-    protected void doMethod(String method, String rBody, String resUrl) {
-		setLastRequest(partsFactory.buildRestRequest());
+    protected void doMethod(String method, String resUrl, String rBody) {
+        setLastRequest(partsFactory.buildRestRequest());
 		getLastRequest().setMethod(RestRequest.Method.valueOf(method));
 		getLastRequest().addHeaders(getHeaders());
 		if (fileName != null) {
@@ -842,8 +843,7 @@ public class RestFixture extends ActionFixture {
 		if (multipartFileName != null) {
 			getLastRequest().setMultipartFileName(multipartFileName);
 		}
-		getLastRequest().setMultipartFileParameterName(
-				multipartFileParameterName);
+        getLastRequest().setMultipartFileParameterName(multipartFileParameterName);
 		String[] uri = resUrl.split("\\?");
 		String[] thisRequestUrlParts = buildThisRequestUrl(uri[0]);
 		getLastRequest().setResource(thisRequestUrlParts[1]);
@@ -862,9 +862,8 @@ public class RestFixture extends ActionFixture {
 		return ContentType.parse(getLastResponse().getHeader("Content-Type"));
 	}
 
-	private String getCharsetOfLastResponse() {
-		return ContentType.parseCharset(getLastResponse().getHeader(
-				"Content-Type"));
+    private String getCharsetOfLastResponse() {
+        return ContentType.parseCharset(getLastResponse().getHeader("Content-Type"));
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -899,10 +898,9 @@ public class RestFixture extends ActionFixture {
     protected BodyTypeAdapter createBodyTypeAdapter()
     {
 		ContentType ct = getContentTypeOfLastResponse();
-		String charset = getCharsetOfLastResponse();
-		BodyTypeAdapter bodyTypeAdapter = partsFactory.buildBodyTypeAdapter(ct,
-				charset);
-		bodyTypeAdapter.setContext(namespaceContext);
+        String charset = getCharsetOfLastResponse();
+        BodyTypeAdapter bodyTypeAdapter = partsFactory.buildBodyTypeAdapter(ct, charset);
+        bodyTypeAdapter.setContext(namespaceContext);
         return bodyTypeAdapter;
 	}
 
