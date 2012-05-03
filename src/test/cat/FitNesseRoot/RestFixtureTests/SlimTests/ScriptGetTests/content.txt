@@ -1,0 +1,92 @@
+!3 GET
+
+|script|!-smartrics.rest.fitnesse.fixture.RestScriptFixture-!|http://${jettyHost}:${jettyPort}|
+|get  | /resources/0 |
+|check|status code|200|
+|ensure|has header|Content-Length : [\d]+|
+|ensure|has body|!-
+ /resource/name[text()='a funky name'] <br/>
+ /resource/data[text()='an important message']
+-!|
+
+!**** Absolute resource paths
+A GET (as all other verbs) accepts absolute resource paths.  
+****!
+
+!|script|!-smartrics.rest.fitnesse.fixture.RestScriptFixture-!|http://${jettyHost}:${jettyPort}|
+|get|http://${jettyHost}:${jettyPort}/resources/0|
+|check|status code|200|
+|ensure|has headers|Content-Length : [\d]+|
+|ensure|has body|!-
+ /resource/name[text()='a funky name'] <br/>
+ /resource/data[text()='an important message']
+-!|
+
+A GET request properly handles query strings. In this example the stub resource echoes the query string in a Query-String header
+
+|script|!-smartrics.rest.fitnesse.fixture.RestScriptFixture-!|http://${jettyHost}:${jettyPort}|
+|get|/resources/0?param=echome|
+|check|status code|200|
+|ensure|has headers|!-Content-Length : [\d]+
+Query-String : param=echome -!|
+|ensure|has body|!-
+ /resource/name[text()='a funky name'] <br/>
+ /resource/data[text()='an important message']
+-!|
+
+Get a non existing resource should not find it
+
+!**** Note
+Instead of XPaths you can specify 'no-body' if the operation is expected to return an empty body
+****!
+
+TODO?
+
+|script|!-smartrics.rest.fitnesse.fixture.RestScriptFixture-!|http://${jettyHost}:${jettyPort}|
+|get|/resources/20|
+|check|status code|404|
+|ensure|has headers|Content-Length : 0|
+|check|response body||
+|get|/resources/20.json|
+|check|status code|404|
+|ensure|has header|Content-Length : 0|
+|check|response body||
+
+!**** XPaths and namespaces
+Namespaces are supported by declaring the alias/uri map in the RestFixtureConfig, using the key restfixture.xml.namespace.context (See SuiteSetup)
+****!
+
+|script|!-smartrics.rest.fitnesse.fixture.RestScriptFixture-!|http://${jettyHost}:${jettyPort}|
+|get|/resources/0|
+|check|status code|200|
+|ensure|has headers|Content-Length : [\d]+|
+|ensure|has body|!-
+ /resource/nstag/ns1alias:number[text()='3']
+-!|
+
+
+!**** Json
+Expectations can be asserted also in json format for responses whose content type is 'application/json' or 'application/x-javascript'
+****!
+
+|script|!-smartrics.rest.fitnesse.fixture.RestScriptFixture-!|http://${jettyHost}:${jettyPort}|
+|get|/resources/1.json|
+|check|status code|200|
+|ensure|has headers|Content-Type : application/json;charset=ISO-8859-1|
+|ensure|has body|!-
+ /resource/name[text()='a funky name'] <br/>
+ /resource/data[text()='an important message']
+-!|
+
+!**** Rest requests with query string containing array parameters
+A query string can contain parameter arrays and they are correctly handled by Rest Fixture.
+****!
+
+To allow correct handling of array parameters a new configuration option must be set: *http.client.use.new.http.uri.factory*
+
+| !-smartrics.rest.fitnesse.fixture.RestFixtureConfig-! | withArrayParametersSupport|
+| http.client.use.new.http.uri.factory | true |
+
+|script|!-smartrics.rest.fitnesse.fixture.RestScriptFixture-!|http://${jettyHost}:${jettyPort}| withArrayParametersSupport|
+|get|/resources/0?a[0]=2&a[1]=4|
+|check|status code|200|
