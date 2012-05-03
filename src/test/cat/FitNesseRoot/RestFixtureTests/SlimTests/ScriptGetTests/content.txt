@@ -40,17 +40,15 @@ Get a non existing resource should not find it
 Instead of XPaths you can specify 'no-body' if the operation is expected to return an empty body
 ****!
 
-TODO?
-
 |script|!-smartrics.rest.fitnesse.fixture.RestScriptFixture-!|http://${jettyHost}:${jettyPort}|
 |get|/resources/20|
 |check|status code|404|
 |ensure|has headers|Content-Length : 0|
-|check|response body||
+|ensure|has body|no-body|
 |get|/resources/20.json|
 |check|status code|404|
 |ensure|has header|Content-Length : 0|
-|check|response body||
+|ensure|has body|no-body|
 
 !**** XPaths and namespaces
 Namespaces are supported by declaring the alias/uri map in the RestFixtureConfig, using the key restfixture.xml.namespace.context (See SuiteSetup)
