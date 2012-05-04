@@ -58,11 +58,6 @@ public class RestScriptFixture extends RestFixture {
         return applyExpressionToLastResponse("js", expr);
     }
 
-    private String applyExpressionToLastResponse(String type, String expr) {
-        LetHandler letHandler = LetHandlerFactory.getHandlerFor(type);
-        return GLOBALS.replaceNull(letHandler.handle(getLastResponse(), getNamespaceContext(), expr));
-    }
-
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
@@ -114,5 +109,10 @@ public class RestScriptFixture extends RestFixture {
         typeAdapter.set(actual);
         Object parse = typeAdapter.parse(expected);
         return typeAdapter.equals(parse, actual);
+    }
+
+    private String applyExpressionToLastResponse(String type, String expr) {
+        LetHandler letHandler = LetHandlerFactory.getHandlerFor(type);
+        return GLOBALS.replaceNull(letHandler.handle(getLastResponse(), getNamespaceContext(), expr));
     }
 }
