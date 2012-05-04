@@ -809,6 +809,11 @@ public class RestFixture extends ActionFixture {
     }
     
     // added for RestScriptFixture
+    protected void setRequestBody(String text) {
+    	requestBody = text;
+    }
+
+    // added for RestScriptFixture
     protected Map<String, String> getNamespaceContext() {
     	return namespaceContext;
     }

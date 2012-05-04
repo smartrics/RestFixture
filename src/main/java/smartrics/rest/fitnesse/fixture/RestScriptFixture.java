@@ -104,6 +104,10 @@ public class RestScriptFixture extends RestFixture {
     public boolean hasHeader(String expected) throws Exception {
         return equalsWithAdapter(expected, headers(), new HeadersTypeAdapter());
     }
+    
+    public void setBody(String text) {
+        setRequestBody(GLOBALS.substitute(text));
+    }
 
     protected boolean equalsWithAdapter(String expected, Object actual, RestDataTypeAdapter typeAdapter) throws Exception {
         typeAdapter.set(actual);
