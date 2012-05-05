@@ -208,7 +208,8 @@ public class RestFixture extends ActionFixture {
     // Made protected so RestScriptFixture can modify
     protected String multipartFileParameterName = FILE;
 
-	private String requestBody;
+    // Made protected so RestScriptFixture can modify
+    protected String requestBody;
 
 	private Map<String, String> requestHeaders;
 

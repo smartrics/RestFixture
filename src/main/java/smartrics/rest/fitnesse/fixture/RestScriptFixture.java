@@ -31,18 +31,38 @@ public class RestScriptFixture extends RestFixture {
         initialize(Runner.SLIM);
     }
 
+    /**
+     * <code> | get | URL |</code>
+     * <p/>
+     * executes a GET on the URL
+     */
     public void get(String resourceUrl) {
         doMethod("Get", resourceUrl, null);
     }
 
+    /**
+     * <code> | post | URL |</code>
+     * <p/>
+     * executes a POST on the URL
+     */
     public void post(String resourceUrl) {
-        doMethod("Post", resourceUrl, emptifyBody(getRequestBody()));
+        doMethod("Post", resourceUrl, emptifyBody(requestBody));
     }
 
+    /**
+     * <code> | put | URL |</code>
+     * <p/>
+     * executes a PUT on the URL
+     */
     public void put(String resourceUrl) {
-        doMethod("Put", resourceUrl, emptifyBody(getRequestBody()));
+        doMethod("Put", resourceUrl, emptifyBody(requestBody));
     }
 
+    /**
+     * <code> | delete | URL |</code>
+     * <p/>
+     * executes a DELETE on the URL
+     */
     public void delete(String resourceUrl) {
         doMethod("Delete", resourceUrl, null);
     }
@@ -71,6 +91,13 @@ public class RestScriptFixture extends RestFixture {
         this.multipartFileParameterName = multipartFileParameterName;
     }
 
+    /**
+     * <code> | check | status code | ?code |</code>
+     * <code> | show  | status code |</code>
+     * <p/>
+     * Checks if the last url action returned a status code matching CODE. Show can
+     * be used to output the status code
+     */
     public Integer statusCode() {
         if (getLastResponse() == null) {
             return -1;
@@ -85,6 +112,13 @@ public class RestScriptFixture extends RestFixture {
         return getLastResponse().getHeaders();
     }
 
+    /**
+     * <code> | show  | response body |</code>
+     * <code> | check | response body | ?body |</code>
+     * <p/>
+     * Show the body from the last url action. Can be also used to check the contents
+     * but is only recommended for simple text body values
+     */
     public String responseBody() {
         if (getLastResponse() == null) {
             return null;
@@ -92,12 +126,27 @@ public class RestScriptFixture extends RestFixture {
         return getLastResponse().getBody();
     }
 
+    /**
+     * <code> | ensure  | has body | ?body | </code>
+     * <code> | reject  | has body | ?body | </code>
+     * <p/>
+     * Compare the body from the last url action using a body value or
+     * special comparator type
+     */
     public boolean hasBody(String expected) throws Exception {
         BodyTypeAdapter bodyTypeAdapter = createBodyTypeAdapter();
         String actual = responseBody();
         return equalsWithAdapter(expected, actual, bodyTypeAdapter);
     }
 
+    /**
+     * <code> | ensure  | has body | ?body | using type | TYPE | </code>
+     * <code> | reject  | has body | ?body | using type | TYPE | </code>
+     * <p/>
+     * Compare the body from the last url action using special comparator type
+     * where the type application/json, text/plain or application/x-javascript
+     * can be forced 
+     */
     public boolean hasBodyUsingType(String expected, String type) throws Exception {
         ContentType ct = ContentType.typeFor(type);
         BodyTypeAdapter bodyTypeAdapter = createBodyTypeAdapter(ct);
@@ -105,16 +154,31 @@ public class RestScriptFixture extends RestFixture {
         return equalsWithAdapter(expected, actual, bodyTypeAdapter);
     }
     
+    /**
+     * Wrapper for hasHeaders
+     */
     public boolean hasHeaders(String expected) throws Exception {
         return hasHeader(expected);
     }
 
+    /**
+     * <code> | ensure  | has headers | ?header | </code>
+     * <code> | reject  | has headers | ?header | </code>
+     * <p/>
+     * Compare the headers from the last url action using a header value or
+     * special comparator type
+     */
     public boolean hasHeader(String expected) throws Exception {
         return equalsWithAdapter(expected, headers(), new HeadersTypeAdapter());
     }
     
+    /**
+     * <code> | set body  | BODY | </code>
+     * <p/>
+     * Set the body used for a PUT or POST url action
+     */
     public void setBody(String text) {
-        setRequestBody(GLOBALS.substitute(text));
+    	requestBody = GLOBALS.substitute(text);
     }
 
     protected boolean equalsWithAdapter(String expected, Object actual, RestDataTypeAdapter typeAdapter) throws Exception {
