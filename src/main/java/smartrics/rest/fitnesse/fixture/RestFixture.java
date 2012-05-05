@@ -902,7 +902,12 @@ public class RestFixture extends ActionFixture {
     // Split out of completeHttpMethodExecution so RestScriptFixture can call this
     protected BodyTypeAdapter createBodyTypeAdapter()
     {
-		ContentType ct = getContentTypeOfLastResponse();
+        return createBodyTypeAdapter(getContentTypeOfLastResponse());
+    }
+
+    // Split out of completeHttpMethodExecution so RestScriptFixture can call this
+    protected BodyTypeAdapter createBodyTypeAdapter(ContentType ct)
+    {
         String charset = getCharsetOfLastResponse();
         BodyTypeAdapter bodyTypeAdapter = partsFactory.buildBodyTypeAdapter(ct, charset);
         bodyTypeAdapter.setContext(namespaceContext);

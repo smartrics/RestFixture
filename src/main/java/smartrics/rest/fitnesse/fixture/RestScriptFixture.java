@@ -4,6 +4,7 @@ import java.util.List;
 
 import smartrics.rest.client.RestData.Header;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
+import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.LetHandler;
 import smartrics.rest.fitnesse.fixture.support.LetHandlerFactory;
@@ -97,6 +98,13 @@ public class RestScriptFixture extends RestFixture {
         return equalsWithAdapter(expected, actual, bodyTypeAdapter);
     }
 
+    public boolean hasBodyUsingType(String expected, String type) throws Exception {
+        ContentType ct = ContentType.typeFor(type);
+        BodyTypeAdapter bodyTypeAdapter = createBodyTypeAdapter(ct);
+        String actual = responseBody();
+        return equalsWithAdapter(expected, actual, bodyTypeAdapter);
+    }
+    
     public boolean hasHeaders(String expected) throws Exception {
         return hasHeader(expected);
     }
