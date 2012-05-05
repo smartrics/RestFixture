@@ -142,13 +142,6 @@ public class RestScriptFixture extends RestFixture {
         return getLastResponse().getStatusCode();
     }
 
-    public List<Header> headers() {
-        if (getLastResponse() == null) {
-            return null;
-        }
-        return getLastResponse().getHeaders();
-    }
-
     /**
      * <code> | show  | response body |</code>
      * <code> | check | response body | ?body |</code>
@@ -207,7 +200,7 @@ public class RestScriptFixture extends RestFixture {
      * special comparator type
      */
     public boolean hasHeader(String expected) throws Exception {
-        return equalsWithAdapter(expected, headers(), new HeadersTypeAdapter());
+        return equalsWithAdapter(expected, getResponseHeaders(), new HeadersTypeAdapter());
     }
     
     /**
@@ -228,7 +221,7 @@ public class RestScriptFixture extends RestFixture {
     	setHeaders(text);
     }
 
-    protected boolean equalsWithAdapter(String expected, Object actual, RestDataTypeAdapter typeAdapter) throws Exception {
+    private boolean equalsWithAdapter(String expected, Object actual, RestDataTypeAdapter typeAdapter) throws Exception {
         typeAdapter.set(actual);
         Object parse = typeAdapter.parse(expected);
         return typeAdapter.equals(parse, actual);
@@ -238,4 +231,12 @@ public class RestScriptFixture extends RestFixture {
         LetHandler letHandler = LetHandlerFactory.getHandlerFor(type);
         return GLOBALS.replaceNull(letHandler.handle(getLastResponse(), getNamespaceContext(), expr));
     }
+
+    public List<Header> getResponseHeaders() {
+        if (getLastResponse() == null) {
+            return null;
+        }
+        return getLastResponse().getHeaders();
+    }
+
 }
