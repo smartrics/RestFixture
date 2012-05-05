@@ -100,14 +100,29 @@ public class RestScriptFixture extends RestFixture {
         return applyExpressionToLastResponse("js", expr);
     }
 
+    /**
+     * <code> |set file name |FILE| </code>
+     * <p/>
+     * Set a file to use for a simple file post operation
+     */
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-
+    
+    /**
+     * <code> |set multipart file name |FILE| </code>
+     * <p/>
+     * Set a file to use for a post operation
+     */
     public void setMultipartFileName(String multipartFileName) {
         this.multipartFileName = multipartFileName;
     }
 
+    /**
+     * <code> |set multipart file parameter name |FILENAME| </code>
+     * <p/>
+     * Set a filename to use with a mutlipart file for a post operation
+     */
     public void setMultipartFileParameterName(String multipartFileParameterName) {
         this.multipartFileParameterName = multipartFileParameterName;
     }
@@ -202,6 +217,15 @@ public class RestScriptFixture extends RestFixture {
      */
     public void setBody(String text) {
     	requestBody = GLOBALS.substitute(text);
+    }
+
+    /**
+     * <code> | set header  | HEADER | </code>
+     * <p/>
+     * Set the headers used for a url action
+     */
+    public void setHeader(String text) {
+    	setHeaders(text);
     }
 
     protected boolean equalsWithAdapter(String expected, Object actual, RestDataTypeAdapter typeAdapter) throws Exception {
