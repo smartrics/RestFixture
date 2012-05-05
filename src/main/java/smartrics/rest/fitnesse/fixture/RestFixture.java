@@ -208,7 +208,8 @@ public class RestFixture extends ActionFixture {
     // Made protected so RestScriptFixture can modify
     protected String multipartFileParameterName = FILE;
 
-    private String requestBody;
+    // Made protected so RestScriptFixture can modify
+    protected String requestBody;
 
     private Map<String, String> requestHeaders;
 
@@ -803,16 +804,6 @@ public class RestFixture extends ActionFixture {
         return headers;
     }
     
-    // added for RestScriptFixture
-    protected String getRequestBody() {
-    	return requestBody;
-    }
-    
-    // added for RestScriptFixture
-    protected void setRequestBody(String text) {
-    	requestBody = text;
-    }
-
     // added for RestScriptFixture
     protected Map<String, String> getNamespaceContext() {
     	return namespaceContext;
