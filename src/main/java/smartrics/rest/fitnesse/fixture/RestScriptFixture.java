@@ -67,14 +67,35 @@ public class RestScriptFixture extends RestFixture {
         doMethod("Delete", resourceUrl, null);
     }
 
+    /**
+     * <code> | $var= | header | HEADER |</code>
+     * <code> | show  | header | HEADER |</code>
+     * <code> | check | header | HEADER | ?value |</code>
+     * <p/>
+     * Can extract value of a header element using a regular expression
+     */
     public String header(String expr) {
         return applyExpressionToLastResponse("header", expr);
     }
 
+    /**
+     * <code> | $var= | body | BODY |</code>
+     * <code> | show  | body | BODY |</code>
+     * <code> | check | body | BODY | ?value |</code>
+     * <p/>
+     * Can extract part of the body using a xpath or regular expression
+     */
     public String body(String expr) {
         return applyExpressionToLastResponse("body", expr);
     }
 
+    /**
+     * <code> | $var= | js | BODY |</code>
+     * <code> | show  | js | BODY |</code>
+     * <code> | check | js | BODY | ?value |</code>
+     * <p/>
+     * Can extract part of the body using a javascript expression
+     */
     public String js(String expr) {
         return applyExpressionToLastResponse("js", expr);
     }
@@ -94,9 +115,10 @@ public class RestScriptFixture extends RestFixture {
     /**
      * <code> | check | status code | ?code |</code>
      * <code> | show  | status code |</code>
+     * <code> | $var= | status code |</code>
      * <p/>
      * Checks if the last url action returned a status code matching CODE. Show can
-     * be used to output the status code
+     * be used to output the status code or it can be assigned to a variable
      */
     public Integer statusCode() {
         if (getLastResponse() == null) {
@@ -115,6 +137,7 @@ public class RestScriptFixture extends RestFixture {
     /**
      * <code> | show  | response body |</code>
      * <code> | check | response body | ?body |</code>
+     * <code> | $var= | response body |</code>
      * <p/>
      * Show the body from the last url action. Can be also used to check the contents
      * but is only recommended for simple text body values
