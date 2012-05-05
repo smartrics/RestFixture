@@ -516,8 +516,7 @@ public class RestFixture extends ActionFixture {
         if (cell == null) {
             getFormatter().exception(row.getCell(0), "You must pass a header map to set");
         } else {
-            String header = GLOBALS.substitute(cell.text());
-            requestHeaders = parseHeaders(header);
+        	setHeaders(cell.text());
         }
     }
 
@@ -528,6 +527,12 @@ public class RestFixture extends ActionFixture {
      */
     public void setHeaders() {
         setHeader();
+    }
+    
+    public void setHeaders(String headers)
+    {
+        String header = GLOBALS.substitute(headers);
+        requestHeaders = parseHeaders(header);    	
     }
 
     /**
