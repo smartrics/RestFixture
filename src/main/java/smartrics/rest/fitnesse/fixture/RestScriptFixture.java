@@ -3,6 +3,7 @@ package smartrics.rest.fitnesse.fixture;
 import java.util.List;
 
 import smartrics.rest.client.RestData.Header;
+import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
@@ -26,6 +27,21 @@ public class RestScriptFixture extends RestFixture {
         super(hostName, configName);
         initialize();
     }
+    
+    /**
+     * Constructor for test interfaces
+     */
+    RestScriptFixture(PartsFactory partsFactory, String hostName) {
+        this(partsFactory, hostName, Config.DEFAULT_CONFIG_NAME);
+    }
+
+    /**
+     * Constructor for test interfaces
+     */
+    RestScriptFixture(PartsFactory partsFactory, String hostName, String configName) {
+    	super(partsFactory, hostName, configName);
+    }
+    
 
     private void initialize() {
         initialize(Runner.SLIM);
@@ -232,7 +248,7 @@ public class RestScriptFixture extends RestFixture {
         return GLOBALS.replaceNull(letHandler.handle(getLastResponse(), getNamespaceContext(), expr));
     }
 
-    public List<Header> getResponseHeaders() {
+    private List<Header> getResponseHeaders() {
         if (getLastResponse() == null) {
             return null;
         }
