@@ -13,7 +13,7 @@ import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
 
 /**
  * Based on work on https://github.com/ggramlich/RestFixture
- * @author Geoffreyd
+ * @author Geoffrey Dunn <geoff@warmage.com>
  *
  */
 public class RestScriptFixture extends RestFixture {
