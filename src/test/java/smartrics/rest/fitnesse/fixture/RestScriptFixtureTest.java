@@ -6,6 +6,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -216,35 +218,47 @@ public class RestScriptFixtureTest {
 		assertEquals(true, fixture.hasBodyUsingType(match, "application/xml"));
 	}
 
-	/*@Test
-	public void testHasHeaders() {
-		fail("Not yet implemented");
+	@Test
+	public void testHasHeaders() throws Exception {
+		setupLastResponse();
+
+		lastResponse.addHeader("Wingle", "44");
+		
+		assertTrue(fixture.hasHeaders("Wingle:44"));
+		assertFalse(fixture.hasHeaders("Wongle:44"));
 	}
 
 	@Test
-	public void testHasHeader() {
-		fail("Not yet implemented");
+	public void testHasHeader() throws Exception {
+		setupLastResponse();
+
+		lastResponse.addHeader("Speed", "fast");
+		
+		assertTrue(fixture.hasHeader("Speed:.*"));
+		assertFalse(fixture.hasHeader("Accelerate:.*"));
 	}
 
 	@Test
 	public void testSetBodyString() {
-		fail("Not yet implemented");
+		String body = "{\"welcoming\" : {\"name\" : \"harry\", \"age\" : 44}}";
+		fixture.setBody(body);
+		
+		doPut();
+		
+		verify(mockLastRequest).setBody(body);
 	}
 
 	@Test
 	public void testSetHeaderString() {
-		fail("Not yet implemented");
+		fixture.setHeader("Browser: unit test");
+		
+		Map<String, String> headers = fixture.getHeaders();
+		assertEquals("unit test", headers.get("Browser"));
 	}
 
-	@Test
-	public void testGetResponseHeaders() {
-		fail("Not yet implemented");
-	}*/
-
-	private void expectBodyMatch(String match) throws Exception {
-		Object a = new Object();
-		when(mockBodyTypeAdapter.parse(match)).thenReturn(a);
-		when(mockBodyTypeAdapter.equals(a, lastResponse.getBody())).thenReturn(true);
+	private void doPut() {
+		when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        fixture.put("/uri");
 	}
 
 	private void setupLastResponse() {
@@ -252,4 +266,9 @@ public class RestScriptFixtureTest {
         fixture.get("/uri");
 	}
 
+	private void expectBodyMatch(String match) throws Exception {
+		Object a = new Object();
+		when(mockBodyTypeAdapter.parse(match)).thenReturn(a);
+		when(mockBodyTypeAdapter.equals(a, lastResponse.getBody())).thenReturn(true);
+	}
 }
