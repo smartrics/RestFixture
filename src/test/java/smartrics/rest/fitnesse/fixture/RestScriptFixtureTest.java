@@ -18,7 +18,6 @@ import smartrics.rest.fitnesse.fixture.RestFixture.Runner;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
-import smartrics.rest.fitnesse.fixture.support.RowWrapper;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 
 public class RestScriptFixtureTest {
@@ -189,22 +188,35 @@ public class RestScriptFixtureTest {
 		assertEquals("Simple text", fixture.responseBody());
 	}
 
-	/*@Test
+	@Test
 	public void testHasBody() throws Exception {
 		setupLastResponse();
 
 		lastResponse.addHeader("Content-type", "application/xml");
 		lastResponse.setBody("<node><greeting>Hi there</greeting><name>Person</name></node>");
 		
-		assertEquals(true, fixture.hasBody("//greeting[text()='Hi there']"));
+		String match = "//greeting[text()='Hi there']";
+		
+		expectBodyMatch(match);
+		
+		assertEquals(true, fixture.hasBody(match));
 	}
 
 	@Test
-	public void testHasBodyUsingType() {
-		fail("Not yet implemented");
+	public void testHasBodyUsingType() throws Exception {
+		setupLastResponse();
+
+		lastResponse.addHeader("Content-type", "text/plain");
+		lastResponse.setBody("<node><greeting>Hi there</greeting><name>Person</name></node>");
+		
+		String match = "//greeting[text()='Hi there']";
+		
+		expectBodyMatch(match);
+		
+		assertEquals(true, fixture.hasBodyUsingType(match, "application/xml"));
 	}
 
-	@Test
+	/*@Test
 	public void testHasHeaders() {
 		fail("Not yet implemented");
 	}
@@ -228,6 +240,12 @@ public class RestScriptFixtureTest {
 	public void testGetResponseHeaders() {
 		fail("Not yet implemented");
 	}*/
+
+	private void expectBodyMatch(String match) throws Exception {
+		Object a = new Object();
+		when(mockBodyTypeAdapter.parse(match)).thenReturn(a);
+		when(mockBodyTypeAdapter.equals(a, lastResponse.getBody())).thenReturn(true);
+	}
 
 	private void setupLastResponse() {
 		when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
