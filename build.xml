@@ -114,7 +114,7 @@
 	</target>
 
 	<target name="metrics"
-	        depends="compile, compile-unit"
+	        depends="compile, compile-unit, compile-cat"
 	        if="calculate.metrics">
 		<property name="inherit.properties" value="true" />
 		<ant antfile="build.metrics.xml"
