@@ -218,8 +218,8 @@ public class SvgImage extends SymbolType implements Rule, Translation {
             loc = "FitNesseRoot" + path.trim();
         }
         String content = null;
+        File f = new File(loc);
         try {
-            File f = new File(loc);
             if (f.exists()) {
                 content = readFile(f);
             } else {
@@ -229,12 +229,13 @@ public class SvgImage extends SymbolType implements Rule, Translation {
             content = error("File not found: " + loc + ", path=" + path + ", err=" + e.getMessage());
         } catch (RuntimeException e) {
             content = error("Unable to read: " + loc + ", path=" + path);
-        }
+        } 
         return content;
     }
 
     private String readFile(File f) throws FileNotFoundException {
-        BufferedReader r = new BufferedReader(new FileReader(f));
+    	FileReader reader = new FileReader(f);
+        BufferedReader r = new BufferedReader(reader);
         StringBuilder sb = new StringBuilder();
         String line;
         try {
@@ -243,6 +244,11 @@ public class SvgImage extends SymbolType implements Rule, Translation {
             }
         } catch (IOException e) {
             throw new IllegalArgumentException("Unable to read from stream", e);
+        } finally {
+        	try {
+				r.close();
+			} catch (IOException e) {
+			}
         }
         return sb.toString();
     }
