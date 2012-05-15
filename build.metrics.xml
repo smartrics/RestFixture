@@ -117,7 +117,7 @@ Metrics build directly run - defining properties not inherited by master build f
 	</target>
 	
 	<target name="all"
-	        depends="init, check.findbugs, check.jdepend, cpd, pmd, findbugs, checkstyle, jdepend, ckjm, coverage, crap4j" />
+	        depends="init, check.findbugs, check.jdepend, cpd, pmd, findbugs, checkstyle, jdepend, ckjm, coverage" />
 
 	<target name="init" depends="define.shared.structures" />
 
