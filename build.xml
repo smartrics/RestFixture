@@ -1,6 +1,5 @@
 <project name="RestFixture" default="full" basedir=".">
-	<record name="${basedir}/${ant.project.name}.build.log"
-	        loglevel="verbose" />
+	<record name="${basedir}/${ant.project.name}.build.log" loglevel="verbose" />
 
 	<property file="properties/${properties}.properties" />
 	<property file="properties/${user.name}.properties" />

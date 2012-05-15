@@ -4,7 +4,6 @@
 	<property file="properties/${properties}.properties" />
 	<property file="properties/${user.name}.properties" />
 
-
 	<target name="inherit.properties" if="inherit.properties">
 		<property name="reports.dir" value="${reports}" />
 		<property name="src.dir" value="${src}" />
@@ -15,12 +14,29 @@
 	</target>
 
 	<target name="define.properties" unless="inherit.properties">
+		<echo>
+Metrics build directly run - defining properties not inherited by master build file.
+		</echo>
 		<property name="reports.dir" value="build/reports" />
 		<property name="src.dir" value="src/main/java" />
+		<property name="resources.dir" value="src/main/resources" />
 		<property name="src.unit.dir" value="src/test/java" />
 		<property name="lib.dir" value="lib" />
 		<property name="etc.dir" value="etc" />
 		<property name="build.dir" value="build" />
+		<path id="project.classpath">
+			<pathelement location="${resources.dir}" />
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+				<exclude name="**/metrics/**/*.jar" />
+			</fileset>
+		</path>
+		<path id="test.classpath">
+			<path refid="project.classpath" />
+			<!-- this will shadow the ones in classes/main -->
+			<pathelement location="${build.dir}/classes/main" />
+			<pathelement location="${build.dir}/classes/unit" />
+		</path>
 	</target>
 
 	<target name="define.shared.structures"
@@ -28,32 +44,23 @@
 		<echo message="Using reports.dir: ${reports.dir}" />
 		<echo message="Using src.dir: ${src.dir}" />
         <echo message="Using etc.dir: ${etc.dir}" />
-		<echo message="Using lib.dir: ${reports.dir}" />
+		<echo message="Using lib.dir: ${lib.dir}" />
 		<echo message="Using build.dir: ${build.dir}" />
 
 		<property name="metrics.lib" value="${lib.dir}/test/metrics" />
 		<property name="metrics.config.dir" value="${etc.dir}/metrics" />
-		<property name="build.classes.main.dir"
-		          value="${build.dir}/classes/main" />
+		<property name="build.classes.main.dir" value="${build.dir}/classes/main" />
 		<property name="metrics.report.dir" value="${reports.dir}/metrics" />
 		<property name="coverage.filter" value="" />
 
-		<property name="checkstyle.report.dir"
-		          value="${metrics.report.dir}/checkstyle" />
-		<property name="jdepend.report.dir"
-		          value="${metrics.report.dir}/jdepend" />
-		<property name="findbugs.report.dir"
-		          location="${metrics.report.dir}/findbugs" />
-		<property name="coverage.report.dir"
-		          location="${metrics.report.dir}/coverage" />
-		<property name="coverage.staging.dir"
-		          location="${build.dir}/coverage-staging" />
+		<property name="checkstyle.report.dir" value="${metrics.report.dir}/checkstyle" />
+		<property name="jdepend.report.dir" value="${metrics.report.dir}/jdepend" />
+		<property name="findbugs.report.dir" location="${metrics.report.dir}/findbugs" />
+		<property name="coverage.report.dir" location="${metrics.report.dir}/coverage" />
+		<property name="coverage.staging.dir" location="${build.dir}/coverage-staging" />
 		<property name="pmd.report.dir" location="${metrics.report.dir}/pmd" />
 		<property name="cpd.report.dir" location="${metrics.report.dir}/cpd" />
-		<property name="crap4j.report.dir"
-		          location="${metrics.report.dir}/crap4j" />
-		<property name="ckjm.report.dir"
-		          location="${metrics.report.dir}/ckjm" />
+		<property name="ckjm.report.dir" location="${metrics.report.dir}/ckjm" />
 
 		<property name="coverage.enabled" value="true" />
 
@@ -80,8 +87,37 @@
 		</path>
 	</target>
 
+	<target name="check.findbugs" unless="skip.metric.findbugs">
+		<fail unless="findbugs.home">
+			Unknown findbugs home.
+			Define 'findbugs.home' in your property file or run ant with -Dfindbugs.home=/path/to/findbugs.
+			To skip findbugs metric run again with -Dskip.metric.findbugs=true.
+		</fail>
+		<available classname="edu.umd.cs.findbugs.anttask.FindBugsTask" 
+			classpath="${findbugs.home}/lib/findbugs.jar" property="findbugs.home.properly.set" />
+		<fail unless="findbugs.home.properly.set">
+			findbugs.home property does not point to a findbugs home: ${findbugs.home}			
+		</fail>
+	</target>
+	
+	<target name="check.jdepend" unless="skip.metric.jdepend">
+		<path id="jdepend.lib">
+			<fileset dir="${ant.home}/lib">
+				<include name="jdepend*.jar" />
+			</fileset>			
+		</path>
+		<available classname="jdepend.framework.JDepend" 
+			classpathref="jdepend.lib" property="jdepend.lib.deployed" />
+		<fail unless="jdepend.lib.deployed">
+			jdepend lib not found.
+			JDepend lib not available in ANT_HOME/lib. You need to copy jdepend-x.x.x.jar in ANT_LIB to run the jdepend metrics. 
+			If you have run this target within the IDE, check what ANT_HOME your IDE is using.
+			To skip the jdepend metric run again with -Dskip.metric.jdepend=true.
+		</fail>
+	</target>
+	
 	<target name="all"
-	        depends="init, cpd, pmd, findbugs, checkstyle, jdepend, ckjm, coverage, crap4j" />
+	        depends="init, check.findbugs, check.jdepend, cpd, pmd, findbugs, checkstyle, jdepend, ckjm, coverage, crap4j" />
 
 	<target name="init" depends="define.shared.structures" />
 
@@ -148,23 +184,15 @@
 		</emma>
 
 	</target>
-
-	<target name="check.findbugs.home" unless="findbugs.home">
-		<echo>Unknown findbugs home</echo>
-		<echo>Define 'findbugs.home' in your property file or run ant with -Dfindbugs.home. Its value should be the directory where findbugs has been installed.</echo>
-		<echo>Otherwise define the property 'skip.metric.findbugs' to skip findbugs from the build.</echo>
-		<fail message="findbugs.home not configured" />
-	</target>
-
-	<target name="findbugs" depends="init" unless="skip.metric.findbugs">
-		<antcall inheritall="true" target="check.findbugs.home" />
+	
+	<target name="findbugs" depends="init, check.findbugs" unless="skip.metric.findbugs">
 		<delete dir="${findbugs.report.dir}" />
 		<mkdir dir="${findbugs.report.dir}" />
 		<path id="findbugs.classpath">
             <fileset dir="${findbugs.home}/lib">
                 <include name="*.jar"/>
             </fileset>
-            <fileset dir="${lib}">
+            <fileset dir="${lib.dir}">
                 <include name="**/*.jar"/>
             </fileset>
 		</path>
@@ -180,7 +208,7 @@
 			<class location="${build.classes.main.dir}" />
 			<auxClasspath>
                 <pathelement location="${build.dir}/classes/cat" />
-	            <fileset dir="${lib}">
+	            <fileset dir="${lib.dir}">
 	                <include name="**/*.jar"/>
 	            </fileset>
 			</auxClasspath>
@@ -246,7 +274,7 @@
 		      out="${cpd.report.dir}/index.html" />
 	</target>
 
-	<target name="jdepend" depends="init" unless="skip.metric.jdepend">
+	<target name="jdepend" depends="init, check.jdepend" unless="skip.metric.jdepend">
 		<delete dir="${jdepend.report.dir}" />
 		<mkdir dir="${jdepend.report.dir}" />
 		<!-- for this to work add jdepend-x.x.x.jar to your ANT_HOME/lib - note: if run in IDE, it's likely that ANT_HOME is that shipped with the IDE -->
@@ -282,63 +310,4 @@
 		      out="${checkstyle.report.dir}/index.html"
 		      style="${metrics.config.dir}/checkstyle-noframes-sorted.xsl" />
 	</target>
-
-	<target name="crap4j" depends="init" unless="skip.metric.crap4j">
-		<delete dir="${crap4j.report.dir}" />
-		<mkdir dir="${crap4j.report.dir}" />
-		<echo message="version 1.1.6 of Crap4j doesn't work on Windows - using patched version included in RestFixture/${metrics.lib}/crap4j" />
-		<property name="crap4j.home" value="${metrics.lib}/crap4j" />
-
-		<taskdef name="crap4j" classname="org.crap4j.anttask.Crap4jAntTask">
-			<classpath>
-                <fileset dir="${crap4j.home}/lib">
-                    <include name="**/*.jar" />
-                </fileset>
-				<!-- by adding httpclient and dependencies, crap4j ant task will (try to) upload 
-				    the results to http://www.crap4j.org/benchmark/
-				    effectively overriding whatever value is in server attribute... check the Crap4jAntTask#getServer - unbeliveable!!
-				    -->
-                <!-- fileset dir="${lib.dir}/commons">
-                    <include name="**/*.jar" />
-                </fileset -->
-			</classpath>
-		</taskdef>
-
-		<!-- patch allows passing crap4j.home to the task -->
-		<crap4j crap4jhome="${crap4j.home}"
-		        projectdir="${basedir}"
-		        outputDir="${crap4j.report.dir}"
-		        dontTest="false"
-			    
-		        debug="true">
-			<classes>
-				<pathElement location="${build.dir}/classes/main" />
-			</classes>
-
-			<srces>
-				<!-- The project's src folders -->
-				<pathElement location="${src.dir}/main/java" />
-				<pathElement location="${src.dir}/test/java" />
-			</srces>
-
-			<testClasses>
-				<pathElement location="${build.dir}/classes/unit" />
-			</testClasses>
-
-			<libClasspath>
-				<!-- Put the dependent paths and libraries here. 
-                         This is for stuff necessary to your project, but not stuff you want analyzed -->
-				<fileset dir="${lib.dir}">
-					<include name="**/*.jar" />
-				</fileset>
-				<!-- if you get errors loading any agitar classes, like the mock classes, add this entry - ->
-				<fileset dir="${crap4j.home}/lib/com.agitar.eclipse.api_4.2.0.401405/lib/ext">
-					<include name="**/*.jar" />
-				</fileset -->
-			</libClasspath>
-		</crap4j>
-		<delete file="crap_build.xml" />
-		<delete dir="agitar" />
-	</target>
-
 </project>
