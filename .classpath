@@ -28,5 +28,30 @@
 	<classpathentry kind="lib" path="lib/test/mockito/mockito-all-1.7.jar"/>
 	<classpathentry kind="lib" path="lib/commons/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/restclient/RestClient.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-anim.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-awt-util.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-bridge.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-codec.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-css.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-dom.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-ext.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-extension.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-gui-util.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-gvt.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-parser.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-script.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-svg-dom.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-svggen.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-swing.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-transcoder.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-util.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-xml.jar"/>
+	<classpathentry kind="lib" path="lib/batik/pdf-transcoder.jar"/>
+	<classpathentry kind="lib" path="lib/batik/xalan-2.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/batik/xerces_2_5_0.jar"/>
+	<classpathentry kind="lib" path="lib/batik/xml-apis-ext.jar"/>
+	<classpathentry kind="lib" path="lib/batik/xml-apis.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik.jar"/>
+	<classpathentry kind="lib" path="lib/patternitygraphic/PatternityGraphic.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
