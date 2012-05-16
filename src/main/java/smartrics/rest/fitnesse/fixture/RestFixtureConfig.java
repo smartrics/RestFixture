@@ -106,70 +106,86 @@ import fit.Parse;
  */
 public class RestFixtureConfig extends Fixture {
 
-    private Config config;
+	private Config config;
 
-    public RestFixtureConfig() {
+	/**
+	 * Default constructor.
+	 * 
+	 * For fixtures with no args.
+	 * 
+	 * @param args
+	 */
+	public RestFixtureConfig() {
 
-    }
+	}
 
-    public RestFixtureConfig(String... args) {
-        super.args = args;
-    }
+	/**
+	 * Constructor with args. Arguments are extracted from the first row of the
+	 * fixture.
+	 * 
+	 * @param args
+	 */
+	public RestFixtureConfig(String... args) {
+		super.args = args;
+	}
 
-    /**
-     * Support for Slim runner.
-     * 
-     * @param rows
-     * @return
-     */
-    public List<List<String>> doTable(List<List<String>> rows) {
-        Config c = getConfig();
-        for (List<String> row : rows) {
-            String k = row.get(0);
-            if (row.size() == 2) {
-                k = row.get(0);
-                String v = row.get(1);
-                c.add(k, v);
-                row.set(0, "");
-                row.set(1, "pass:" + Tools.toHtml(v));
-            } else {
-                row.set(0, "error:" + k + Tools.toHtml("\n\nthis line doesn't conform to NVP format (col 0 for name, col 1 for value) - content skipped"));
-            }
-        }
-        return rows;
-    }
+	/**
+	 * Support for Slim runner.
+	 * 
+	 * @param rows
+	 * @return
+	 */
+	public List<List<String>> doTable(List<List<String>> rows) {
+		Config c = getConfig();
+		for (List<String> row : rows) {
+			String k = row.get(0);
+			if (row.size() == 2) {
+				k = row.get(0);
+				String v = row.get(1);
+				c.add(k, v);
+				row.set(0, "");
+				row.set(1, "pass:" + Tools.toHtml(v));
+			} else {
+				row.set(0,
+						"error:"
+								+ k
+								+ Tools.toHtml("\n\nthis line doesn't conform to NVP format (col 0 for name, col 1 for value) - content skipped"));
+			}
+		}
+		return rows;
+	}
 
-    /**
-     * processes each row in the config fixture table and loads the key/value
-     * pairs. The fixture optional first argument is the config name. If not
-     * supplied the value is defaulted. See {@link Config.DEFAULT_CONFIG_NAME}.
-     */
-    @Override
-    public void doRow(Parse p) {
-        Parse cells = p.parts;
-        try {
-            String key = cells.text();
-            String value = cells.more.text();
-            Config c = getConfig();
-            c.add(key, value);
-            String fValue = Tools.toHtml(value);
-            Parse valueParse = cells.more;
-            valueParse.body = fValue;
-            right(valueParse);
-        } catch (Exception e) {
-            exception(p, e);
-        }
-    }
+	/**
+	 * Processes each row in the config fixture table and loads the key/value pairs. 
+	 * The fixture optional first argument is the config name. If not
+	 * supplied the value is defaulted. See {@link Config.DEFAULT_CONFIG_NAME}.
+	 */
+	@Override
+	public void doRow(Parse p) {
+		Parse cells = p.parts;
+		try {
+			String key = cells.text();
+			String value = cells.more.text();
+			Config c = getConfig();
+			c.add(key, value);
+			String fValue = Tools.toHtml(value);
+			Parse valueParse = cells.more;
+			valueParse.body = fValue;
+			right(valueParse);
+		} catch (Exception e) {
+			exception(p, e);
+		}
+	}
 
-    private Config getConfig() {
-        if (config != null) {
-            return config;
-        }
-        if (super.args != null && super.args.length > 0) {
-            config = Config.getConfig(super.args[0]);
-        } else {
-            config = Config.getConfig();
-        }
-        return config;
-    }
+	private Config getConfig() {
+		if (config != null) {
+			return config;
+		}
+		if (super.args != null && super.args.length > 0) {
+			config = Config.getConfig(super.args[0]);
+		} else {
+			config = Config.getConfig();
+		}
+		return config;
+	}
 }

@@ -4,6 +4,12 @@ import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 
+/**
+ * Delete method, enhanced with support of query parameters.
+ * 
+ * @author smartrics
+ * 
+ */
 public class DeleteMethod extends org.apache.commons.httpclient.methods.DeleteMethod {
     @SuppressWarnings("deprecation")
     public URI getURI() throws URIException {

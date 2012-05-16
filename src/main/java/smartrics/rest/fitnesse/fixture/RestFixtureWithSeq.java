@@ -115,6 +115,12 @@ import fitnesse.components.Base64;
  */
 public class RestFixtureWithSeq extends RestFixture {
 
+	/**
+	 * Model interface for storing http events.
+	 * 
+	 * @author smartrics
+	 *
+	 */
     public interface Model {
 
         void delete(String res, String args, String ret);
@@ -132,21 +138,23 @@ public class RestFixtureWithSeq extends RestFixture {
     static final Log LOG = LogFactory.getLog(RestFixtureWithSeq.class);
 
     /**
-     * default directory where the diagrams are generated. The value is
-     * <code>new File("restfixture")</code>, a directory relative to the default
+     * Default directory where the diagrams are generated. 
+     * 
+     * The value is <code>new File("restfixture")</code>, a directory relative to the default
      * fitnesse root directory.
      */
     private File graphFileDir;
 
     /**
-     * this fixture instance picture name
+     * This fixture instance picture name.
      */
     private String pictureName;
 
     /**
-     * this fixture instance picture data. picture data is a composite string
-     * containig the path to the image file and a sequence of attributes in the
-     * form of name=value.
+     * This fixture instance picture data. 
+     * 
+     * Picture data is a composite string containig the path to the image file 
+     * and a sequence of attributes in the form of name=value.
      */
     private String pictureData;
 
@@ -155,17 +163,17 @@ public class RestFixtureWithSeq extends RestFixture {
     private boolean initialised;
 
     /**
-     * listens to events raised by the fixture and captures them in the model.
+     * Listens to events raised by the fixture and captures them in the model.
      */
     private MyFixtureListener myFixtureListener;
 
     /**
-     * svg attributes
+     * Svg attributes.
      */
     private Map<String, String> attributes;
 
     /**
-     * file format
+     * File format.
      */
     private String format;
 
@@ -293,6 +301,8 @@ public class RestFixtureWithSeq extends RestFixture {
     }
 
     /**
+     * Overridden as SLIM can't find it.
+     * 
      * Note: for SLIM to find this method it has to be defined in the java file
      * after the override of the ActionFixture method
      */
@@ -439,62 +449,62 @@ public class RestFixtureWithSeq extends RestFixture {
         return foundAttributes;
     }
 
-    private static int[] getPositionOfNextOfTokenOptionallyInDoubleQuotes(String data) {
-        String del = " ";
-        int start = 0;
-        if (data.trim().startsWith("\"")) {
-            del = "\"";
-            start = 1;
-        }
-        int end = data.indexOf(del, start + 1);
-        if (end == -1) {
-            end = data.length();
-        }
-        return new int[] { start, end };
-    }
+	private static int[] getPositionOfNextOfTokenOptionallyInDoubleQuotes(String data) {
+		String del = " ";
+		int start = 0;
+		if (data.trim().startsWith("\"")) {
+			del = "\"";
+			start = 1;
+		}
+		int end = data.indexOf(del, start + 1);
+		if (end == -1) {
+			end = data.length();
+		}
+		return new int[] { start, end };
+	}
 
-    private String[] guessParts(String res) {
-        String[] empty = new String[] { "?", "" };
-        if (res == null) {
-            return empty;
-        }
-        String myRes = res.trim();
-        if (myRes.isEmpty()) {
-            return empty;
-        }
-        int pos = myRes.lastIndexOf("/");
-        if (pos == myRes.length() - 1) {
-            pos = -1;
-            myRes = myRes.substring(0, myRes.length() - 1);
-        }
-        String[] parts = new String[2];
-        if (pos >= 0) {
-            parts[0] = myRes.substring(0, pos);
-            parts[1] = myRes.substring(pos + 1);
-        } else {
-            parts[0] = myRes;
-            parts[1] = "";
-        }
-        return parts;
-    }
+	private String[] guessParts(String res) {
+		String[] empty = new String[] { "?", "" };
+		if (res == null) {
+			return empty;
+		}
+		String myRes = res.trim();
+		if (myRes.isEmpty()) {
+			return empty;
+		}
+		int pos = myRes.lastIndexOf("/");
+		if (pos == myRes.length() - 1) {
+			pos = -1;
+			myRes = myRes.substring(0, myRes.length() - 1);
+		}
+		String[] parts = new String[2];
+		if (pos >= 0) {
+			parts[0] = myRes.substring(0, pos);
+			parts[1] = myRes.substring(pos + 1);
+		} else {
+			parts[0] = myRes;
+			parts[1] = "";
+		}
+		return parts;
+	}
 
-    private String getIdFromLocationHeader() {
-        List<Header> list = getLastResponse().getHeader("Location");
-        String location = "";
-        if (list != null && !list.isEmpty()) {
-            location = list.get(0).getValue();
-        }
-        String[] parts = guessParts(location);
-        return parts[1];
-    }
+	private String getIdFromLocationHeader() {
+		List<Header> list = getLastResponse().getHeader("Location");
+		String location = "";
+		if (list != null && !list.isEmpty()) {
+			location = list.get(0).getValue();
+		}
+		String[] parts = guessParts(location);
+		return parts[1];
+	}
 
-    private String getResource() {
-        String res = getLastRequest().getResource();
-        if (res.endsWith("/")) {
-            res = res.substring(0, res.length() - 1);
-        }
-        return res;
-    }
+	private String getResource() {
+		String res = getLastRequest().getResource();
+		if (res.endsWith("/")) {
+			res = res.substring(0, res.length() - 1);
+		}
+		return res;
+	}
 }
 
 /**
@@ -511,9 +521,9 @@ class SequenceModel implements Model {
     /**
      * Hints to the SVG files generator.
      */
-    private static int DEFAULT_FONT_SIZE = 16;
-    private static int DEFAULT_AGENT_STEP = 150;
-    private static int DEFAULT_TIME_STEP = 25;
+    private static final int DEFAULT_FONT_SIZE = 16;
+    private static final int DEFAULT_AGENT_STEP = 150;
+    private static final int DEFAULT_TIME_STEP = 25;
 
     SequenceModel() {
         Message message = new Message(null, null);
@@ -553,8 +563,14 @@ class SequenceModel implements Model {
 
     private void message(int type, String resourceTo, String method, String args, String result) {
         Agent agentTo = agentFor(resourceTo);
-        String methodSignature = args == null ? method : method + "(" + args + ")";
-        String resultString = result == null ? "" : result;
+        String methodSignature = method;
+        if(args != null) {
+        	methodSignature = method + "(" + args + ")";
+        }
+        String resultString = ""; 
+        if(result != null) {
+            resultString = result;
+        }
         Message message = new Message(type, agentTo, methodSignature, resultString);
         root.add(new Node(message));
     }
@@ -562,7 +578,7 @@ class SequenceModel implements Model {
     private Resource agentFor(String resource) {
         Resource a = resourceToAgentMap.get(resource);
         if (a == null) {
-            boolean isActivable = true;
+            final boolean isActivable = true;
             a = new Resource(resource, isActivable);
             resourceToAgentMap.put(resource, a);
         }
@@ -666,8 +682,32 @@ class MyFixtureListener implements FixtureListener {
 
 }
 
+/**
+ * Utility class to generate picture wrapping the Patternity Graphic svg utility.
+ * 
+ * @author smartrics
+ *
+ */
 class PictureGenerator {
 
+	private PictureGenerator() {
+		
+	}
+	
+	/**
+	 * generates a byte array with the content of the picture from an svg
+	 * template.
+	 * 
+	 * @param content
+	 *            the picture content.
+	 * @param attributes
+	 *            the diagram attributes.
+	 * @param svgTemplate
+	 *            the svg template to use.
+	 * @param format
+	 *            the format of the output rasterised image.
+	 * @return a byte array of the picture in the given format.
+	 */
     public static byte[] generate(String content, Map<String, String> attributes, String svgTemplate, String format) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final TemplatedWriter writer = new TemplatedWriter(baos, svgTemplate);
@@ -680,24 +720,27 @@ class PictureGenerator {
         try {
             baos.close();
         } catch (IOException e) {
+        	RestFixtureWithSeq.LOG.debug("Exception closing byte array output stream");
         }
         if (format.equals("svg")) {
             return ret;
         } else {
             Integer w = null;
-            if (attributes.get("width") != null) {
+            String widthString = attributes.get("width");
+			if (widthString != null) {
                 try {
-                    w = Integer.parseInt(attributes.get("width"));
+                    w = Integer.parseInt(widthString);
                 } catch (NumberFormatException e) {
-
+                	RestFixtureWithSeq.LOG.debug("Unable to parse width as integer: " + widthString);
                 }
             }
             Integer h = null;
-            if (attributes.get("height") != null) {
+            String heightString = attributes.get("height");
+			if (heightString != null) {
                 try {
-                    h = Integer.parseInt(attributes.get("height"));
+                    h = Integer.parseInt(heightString);
                 } catch (NumberFormatException e) {
-
+                	RestFixtureWithSeq.LOG.debug("Unable to parse height as integer: " + heightString);
                 }
             }
             return transcode(ret, format, w, h);
@@ -731,11 +774,13 @@ class PictureGenerator {
         try {
             ostream.flush();
         } catch (IOException e) {
+        	RestFixtureWithSeq.LOG.debug("Unable to flush output stream");
             // should be safe to ignore
         }
         try {
             ostream.close();
         } catch (IOException e) {
+        	RestFixtureWithSeq.LOG.debug("Unable to close output stream");
             // should be safe to ignore
         }
         return ostream.toByteArray();

@@ -7,8 +7,15 @@ import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 
+/**
+ * Builds URIs with query strings.
+ * 
+ * @author 702161900
+ *
+ */
 class URIBuilder {
-    public URI getURI(String scheme, String host, int port, String path, String queryString, HttpMethodParams params) throws URIException {
+
+	public URI getURI(String scheme, String host, int port, String path, String queryString, HttpMethodParams params) throws URIException {
         HttpHost httphost = new HttpHost(host, port);
         StringBuffer buffer = new StringBuffer();
         if (httphost != null) {

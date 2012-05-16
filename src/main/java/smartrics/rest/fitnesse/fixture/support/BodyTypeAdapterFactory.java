@@ -58,7 +58,7 @@ public class BodyTypeAdapterFactory {
         BodyTypeAdapter instance = null;
         try {
             instance = (BodyTypeAdapter) aClass.newInstance();
-            if(charset != null) {
+            if (charset != null) {
                 instance.setCharset(charset);
             } else {
                 instance.setCharset(Charset.defaultCharset().name());

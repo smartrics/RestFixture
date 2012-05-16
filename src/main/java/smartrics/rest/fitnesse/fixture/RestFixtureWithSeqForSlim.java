@@ -47,6 +47,8 @@ public class RestFixtureWithSeqForSlim extends RestFixtureWithSeq {
     }
 
     /**
+     * Overrides of slim as it doesn't find it from the base class.
+     * 
      * Note: for SLIM to find this method it has to be defined in the java file
      * after the override of the ActionFixture method
      */

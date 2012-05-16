@@ -26,6 +26,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import util.Maybe;
 import fitnesse.html.HtmlTag;
 import fitnesse.wikitext.parser.Matcher;
@@ -53,7 +56,7 @@ import fitnesse.wikitext.parser.Translator;
  * To use the symbol, is sufficient to specify in a line in the test page the
  * following:
  * 
- * <code>!svg <i>/files/path/to/image.svg< rendering_mode/i></code>
+ * <code>!svg <i>/files/path/to/image.svg rendering_mode</i></code>
  * 
  * The <code><i>rendering_mode</i></code> is one of the following:
  * 
@@ -100,6 +103,8 @@ import fitnesse.wikitext.parser.Translator;
  */
 public class SvgImage extends SymbolType implements Rule, Translation {
 
+    static final Log LOG = LogFactory.getLog(SvgImage.class);
+
     /**
      * The selected rendering mode.
      */
@@ -145,10 +150,12 @@ public class SvgImage extends SymbolType implements Rule, Translation {
         wikiRule(this);
     }
 
-    public Maybe<Symbol> parse(Symbol current, Parser parser) {
-        Symbol targetList = parser.parseToEnds(-1, SymbolProvider.pathRuleProvider, new SymbolType[] { SymbolType.Newline });
-        return new Maybe<Symbol>(current.add(targetList));
-    }
+	public Maybe<Symbol> parse(Symbol current, Parser parser) {
+		Symbol targetList = parser.parseToEnds(-1,
+				SymbolProvider.pathRuleProvider,
+				new SymbolType[] { SymbolType.Newline });
+		return new Maybe<Symbol>(current.add(targetList));
+	}
 
     public String toTarget(Translator translator, Symbol symbol) {
         String symContent = symbol.getContent();
@@ -238,6 +245,7 @@ public class SvgImage extends SymbolType implements Rule, Translation {
         BufferedReader r = new BufferedReader(reader);
         StringBuilder sb = new StringBuilder();
         String line;
+        LOG.debug("Reading file " + f.getAbsolutePath());
         try {
             while ((line = r.readLine()) != null) {
                 sb.append(line);
@@ -248,6 +256,7 @@ public class SvgImage extends SymbolType implements Rule, Translation {
         	try {
 				r.close();
 			} catch (IOException e) {
+		        LOG.debug("Exception closing file reader for file " + f.getAbsolutePath());
 			}
         }
         return sb.toString();

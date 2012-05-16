@@ -187,7 +187,7 @@ public final class Config {
     }
 
     /**
-     * returns a key/value froma a named config, parsed as a Map<String, String>
+     * returns a key/value froma a named config, parsed as a Map<String, String>.
      */
     public Map<String, String> getAsMap(String key, Map<String, String> def) {
         String val = get(key);
