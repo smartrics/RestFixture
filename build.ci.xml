@@ -1,0 +1,56 @@
+<project name="RestFixture-CI" default="continuous-integration">
+
+	<property name="fitnesse-clone-dir" value="build/ci/fitnesse-git-ro" />
+
+	<path id="git.classpath">
+		<fileset dir="lib/ci">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<taskdef resource="jgit-ant.properties" classpathref="git.classpath" />
+
+	<target name="continuous-integration" depends="do-fitnesse, run-cat-tests" />
+
+    <target name="do-fitnesse" depends="pull-remote-fitnesse, clone-remote-fitnesse, build-fitnesse" />
+	
+	<target name="build-fitnesse" if="is-fitnesse-not-uptodate">
+		<!-- 
+		all of this because fitnesse build jar target can't be called via <ant> because
+		the working directory of the java task in createUpdateLists can't be set.
+		fitnesse/build.xml expects to be invoked from within the fitnesse directory.
+		
+		Note: this task requires tools.jar to be avaialble in the classpath for <javac> to work
+		-->
+		<java fork="true"
+		      classpathref="git.classpath"
+		      dir="${fitnesse-clone-dir}"
+		      classname="org.apache.tools.ant.launch.Launcher">
+			<jvmarg value="-Dant.home=${basedir}/lib/ant" />
+			<arg value="jar" />
+		</java>
+	</target>
+
+	<target name="pull-remote-fitnesse">
+		<git localDirectory="${fitnesse-clone-dir}" verbose="true">
+			<pull pullFailedProperty="pull-fitnesse-failed" modificationExistProperty="is-fitnesse-not-uptodate"/>
+		</git>
+	</target>
+
+	<target name="clone-remote-fitnesse" depends="pull-remote-fitnesse" if="pull-fitnesse-failed">
+		<echo>Cloning FitNesse</echo>
+		<delete dir="${fitnesse-clone-dir}" />
+		<mkdir dir="${fitnesse-clone-dir}" />
+		<git localDirectory="${fitnesse-clone-dir}" verbose="true">
+			<clone uri="git://github.com/unclebob/fitnesse.git" />
+		</git>
+	</target>
+
+	<target name="run-cat-tests">
+		<property name="fitnesse.home" value="${fitnesse-clone-dir}/dist" />
+		<property name="fitnesse.jar" value="${fitnesse.home}/fitnesse.jar" />
+		<property name="fitnesse.reports" value="build/reports/fitnesse-ci" />
+		<ant antfile="build.xml" target="fitnesse-test-run" inheritall="true" inheritrefs="true"/>
+	</target>
+	
+</project>

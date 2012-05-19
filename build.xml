@@ -182,16 +182,16 @@
 
 		<!-- TODO: replace this with an ant task -->
 		<!-- matches and converst fit RestFixtures into Slim ones -->
-        <replaceregexp flags="g">
-            <regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixture\-\![\s]*\|" />
-            <substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixture-! |" />
-            <fileset refid="fitnesse.source.files" />
-        </replaceregexp>
-        <replaceregexp flags="g">
-            <regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixtureWithSeq\-\![\s]*\|" />
-            <substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureWithSeqForSlim-! |" />
-            <fileset refid="fitnesse.source.files" />
-        </replaceregexp>
+		<replaceregexp flags="g">
+			<regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixture\-\![\s]*\|" />
+			<substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixture-! |" />
+			<fileset refid="fitnesse.source.files" />
+		</replaceregexp>
+		<replaceregexp flags="g">
+			<regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixtureWithSeq\-\![\s]*\|" />
+			<substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureWithSeqForSlim-! |" />
+			<fileset refid="fitnesse.source.files" />
+		</replaceregexp>
 		<replaceregexp flags="g">
 			<regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixtureConfig\-\![\s]*\|" />
 			<substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureConfig-!  |" />
@@ -232,8 +232,8 @@
 	<target name="fitnesse-copy" depends="package, fitnesse-src-bundle">
 		<fail unless="fitnesse.test.root"
 		      message="You call this via antcall defining the property fitnesse.test.root" />
-        <echo message="Fitnesse.root=${fitnesse.root}" />
-        <echo message="Fitnesse.test.root=${fitnesse.test.root}" />
+		<echo message="Fitnesse.root=${fitnesse.root}" />
+		<echo message="Fitnesse.test.root=${fitnesse.test.root}" />
 		<delete dir="${fitnesse.test.root}" failonerror="false" />
 		<mkdir dir="${fitnesse.test.root}/lib" />
 		<property name="verbose" value="false" />
@@ -247,9 +247,9 @@
 				<include name="**/*.jar" />
 				<exclude name="${libs.excluded}" />
 			</fileset>
-            <fileset dir="${resources}">
-                <include name="**/*.*" />
-            </fileset>
+			<fileset dir="${resources}">
+				<include name="**/*.*" />
+			</fileset>
 		</copy>
 		<copy todir="${fitnesse.test.root}"
 		      overwrite="true"
@@ -294,12 +294,14 @@
 	</target>
 
 	<target name="fitnesse-test-remote"
-	        depends="fitnesse-deploy-remote,fitnesse-exec-test,check.fitnesse.failure,check.fitnesse.report.failure"
+	        depends="fitnesse-deploy-remote,fitnesse-test-run"
 	        if="execute.cat" />
 
 	<target name="fitnesse-test"
-	        depends="fitnesse-deploy,fitnesse-exec-test,check.fitnesse.failure,check.fitnesse.report.failure"
+	        depends="fitnesse-deploy,fitnesse-test-run"
 	        if="execute.cat" />
+
+	<target name="fitnesse-test-run" depends="fitnesse-exec-test,check.fitnesse.failure,check.fitnesse.report.failure" />
 
 	<target name="check.fitnesse.failure" if="fitnesse.fail">
 		<fail message="FitNesse tests failed (# of failed tests: ${number.of.failed.tests}), see reports in '${fitnesse.reports}/results_sanitised.html' for details." />
@@ -312,6 +314,10 @@
 	<target name="fitnesse-exec-test" if="execute.cat">
 		<property name="fitnesse.suite.root" value="${fitnesse.test.suite}" />
 		<mkdir dir="${fitnesse.reports}" />
+		<echo>
+Executing CAT tests - FitNesse home: ${fitnesse.home}
+java -jar ${fitnesse.jar}
+		</echo>
 		<java jar="${fitnesse.jar}"
 		      failonerror="false"
 		      fork="true"
@@ -324,7 +330,7 @@
 			<arg value="${fitnesse.root.name}" />
 			<arg value="-d" />
 			<arg value="build/fitnesse" />
-		</java>		
+		</java>
 		<!-- FitNesse doesn't return the number of failed tests in the java exit status -->
 		<java classname="smartrics.rest.support.fitnesse.FitnesseResultVerifier"
 		      failonerror="false"
@@ -343,14 +349,26 @@
 			<arg value="${fitnesse.reports}/results.html" />
 			<arg value="${build.fitnesse.root}" />
 		</java>
-        <condition property="fitnesse.fail">
-    	   <equals arg1="0" arg2="number.of.failed.tests" />
-        </condition>
-		<condition property="fitnesse.report.fail">
-			<equals arg1="0" arg2="fitnesse.report.exit.status" />
+		<condition property="fitnesse.fail">
+			<not>
+				<equals arg1="0" arg2="${number.of.failed.tests}" />
+			</not>
 		</condition>
+		<condition property="fitnesse.report.fail">
+			<not>
+				<equals arg1="0" arg2="${fitnesse.report.exit.status}" />
+			</not>
+		</condition>
+		<echo>
+Number of failed tests: ${number.of.failed.tests} - fitnesse fail: ${fitnesse.fail}
+Fitnesse report exit status: ${fitnesse.report.exit.status} - fitnesse report fail: ${fitnesse.report.fail} 
+		</echo>
 	</target>
 
+	<target name="continuous-integration" depends="full">
+		<!-- This target runs a CI with fitnesse directly cloned/pulled from the master github branch -->
+		<ant antfile="build.ci.xml" target="continuous-integration" inheritall="false" inheritrefs="false"/>
+	</target>
 
 	<target name="dist-doc" if="execute.cat">
 		<!-- distributable docs -->
