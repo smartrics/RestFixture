@@ -37,6 +37,7 @@ Metrics build directly run - defining properties not inherited by master build f
 			<pathelement location="${build.dir}/classes/main" />
 			<pathelement location="${build.dir}/classes/unit" />
 		</path>
+		<property name="findbugs.home" value="${lib.dir}/test/metrics/findbugs" />
 	</target>
 
 	<target name="define.shared.structures"

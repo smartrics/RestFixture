@@ -37,6 +37,7 @@
 	<property name="src.cat.temp" value="${build}/src-cat" />
 	<property name="src.cat.temp.root"
 	          value="${build}/src-cat/${fitnesse.root.name}/${fitnesse.test.suite}" />
+	<property name="findbugs.home" value="${lib}/test/metrics/findbugs" />
 
 	<path id="project.classpath">
 		<pathelement location="${resources}" />
@@ -44,6 +45,7 @@
 			<include name="**/*.jar" />
 			<!-- build.metrics.xml will define this for his own purposes -->
 			<exclude name="**/metrics/**/*.jar" />
+			<exclude name="**/ci/**/*.jar" />
 		</fileset>
 	</path>
 
@@ -368,7 +370,7 @@
 		<copy todir="${artifacts}/lib" flatten="true">
 			<fileset dir="lib"
 			         includes="**/*.jar"
-			         excludes="test/**/*.jar, fitnesse/**/*.jar, log4j/**/*.jar" />
+			         excludes="ci/**/*.*, test/**/*.jar, fitnesse/**/*.jar, log4j/**/*.jar" />
 		</copy>
 		<copy todir="${artifacts}/etc">
 			<fileset dir="${etc}" includes="restfixture/*.*" />
