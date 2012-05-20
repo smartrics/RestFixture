@@ -315,8 +315,7 @@
 		<property name="fitnesse.suite.root" value="${fitnesse.test.suite}" />
 		<mkdir dir="${fitnesse.reports}" />
 		<echo>
-Executing CAT tests - FitNesse home: ${fitnesse.home}
-java -jar ${fitnesse.jar}
+Executing CAT tests - FitNesse jar: ${fitnesse.jar}
 		</echo>
 		<java jar="${fitnesse.jar}"
 		      failonerror="false"
@@ -360,8 +359,8 @@ java -jar ${fitnesse.jar}
 			</not>
 		</condition>
 		<echo>
-Number of failed tests: ${number.of.failed.tests} - fitnesse fail: ${fitnesse.fail}
-Fitnesse report exit status: ${fitnesse.report.exit.status} - fitnesse report fail: ${fitnesse.report.fail} 
+Number of failed tests: ${number.of.failed.tests} 
+Fitnesse report exit status: ${fitnesse.report.exit.status}
 		</echo>
 	</target>
 
