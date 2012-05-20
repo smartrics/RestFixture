@@ -809,6 +809,7 @@ public class RestFixture extends ActionFixture {
 		return headers;
 	}
     
+
     // added for RestScriptFixture
     protected String getRequestBody() {
     	return requestBody;
