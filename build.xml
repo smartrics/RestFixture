@@ -369,6 +369,23 @@ Fitnesse report exit status: ${fitnesse.report.exit.status}
 		<ant antfile="build.ci.xml" target="continuous-integration" inheritall="false" inheritrefs="false"/>
 	</target>
 
+	<target name="javadoc">
+		 <javadoc destdir="${build}/docs/api" 
+		 	classpathref="project.classpath"
+		 	author="true" 
+		 	version="true" 
+		 	use="true" 
+		 	windowtitle="RestFixture API">
+		    <fileset dir="${src}" defaultexcludes="yes">
+		      <include name="**"/>
+		    </fileset>
+		    <doctitle><![CDATA[<h1>RestFixture</h1>]]></doctitle>
+		    <bottom><![CDATA[<i>Copyright &#169; 2012 Smartrics. All Rights Reserved.</i>]]></bottom>
+		    <tag name="todo" scope="all" description="To do:"/>
+		    <group title="Packages" packages="smartrics.*"/>
+		  </javadoc>
+	</target>
+
 	<target name="dist-doc" if="execute.cat" description="creates distributable docs">
 		<!-- distributable docs -->
 		<property name="docs.html.file"
