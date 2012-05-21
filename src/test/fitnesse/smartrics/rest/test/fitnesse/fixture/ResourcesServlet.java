@@ -261,11 +261,11 @@ public class ResourcesServlet extends HttpServlet {
         MultipartParser mp = new MultipartParser(req, 2048);
         Part part = null;
         while ((part = mp.readNextPart()) != null) {
-            String name = part.getName();
+            String name = part.getName().trim();
             if (part.isParam()) {
                 // it's a parameter part
                 ParamPart paramPart = (ParamPart) part;
-                String value = paramPart.getStringValue();
+                String value = paramPart.getStringValue().trim();
                 LOG.info("param; name=" + name + ", value=" + value);
                 out.print("param; name=" + name + ", value=" + value);
             } else if (part.isFile()) {
@@ -281,7 +281,7 @@ public class ResourcesServlet extends HttpServlet {
                     long size = filePart.writeTo(baos);
                     LOG.info("file; name=" + name + "; filename=" + fileName + ", filePath=" + filePart.getFilePath() + ", content type=" + filePart.getContentType() + ", size="
                             + size);
-                    out.print(String.format("%s: %s", name, new String(baos.toByteArray())));
+                    out.print(String.format("%s: %s", name, new String(baos.toByteArray()).trim()));
                 } else {
                     // the field did not contain a file
                     LOG.info("file; name=" + name + "; EMPTY");
@@ -356,7 +356,7 @@ public class ResourcesServlet extends HttpServlet {
         PrintWriter out = resp.getWriter();
         resp.setContentType("text/plain");
         String fileContents = getContent(is);
-        out.print(fileContents);
+        out.print(fileContents.trim());
         out.flush();
         resp.setStatus(HttpServletResponse.SC_OK);
     }
