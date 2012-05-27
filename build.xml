@@ -315,11 +315,12 @@
 		<property name="fitnesse.suite.root" value="${fitnesse.test.suite}" />
 		<mkdir dir="${fitnesse.reports}" />
 		<echo>
-Executing CAT tests - FitNesse jar: ${fitnesse.jar}
+Executing CAT tests - FitNesse home: '${fitnesse.home}', jar: '${fitnesse.jar}'
 		</echo>
 		<java jar="${fitnesse.jar}"
 		      failonerror="false"
 		      fork="true"
+			  dir="build/fitnesse"
 		      output="${fitnesse.reports}/results.html">
 			<arg value="-c" />
 			<arg value="${fitnesse.suite.root}?suite&amp;format=html" />
@@ -327,8 +328,6 @@ Executing CAT tests - FitNesse jar: ${fitnesse.jar}
 			<arg value="${fitnesse.port}" />
 			<arg value="-r" />
 			<arg value="${fitnesse.root.name}" />
-			<arg value="-d" />
-			<arg value="build/fitnesse" />
 		</java>
 		<!-- FitNesse doesn't return the number of failed tests in the java exit status -->
 		<java classname="smartrics.rest.support.fitnesse.FitnesseResultVerifier"
@@ -362,23 +361,12 @@ Executing CAT tests - FitNesse jar: ${fitnesse.jar}
 Number of failed tests: ${number.of.failed.tests} 
 Fitnesse report exit status: ${fitnesse.report.exit.status}
 		</echo>
-	</target>
-
-	<target name="fast-ci" depends="clean, package">
-		<ant antfile="build.ci.xml" target="continuous-integration" inheritall="false" inheritrefs="false" />
+		<copy file="${fitnesse.reports}/result_sanitised.html" tofile="${fitnesse.reports}/index.html" />
 	</target>
 		
-	<target name="continuous-integration" depends="full" description="executes the full build then executes the CAT tests against the master branch in github of fitnesse (delegates to build.ci.xml">
+	<target name="continuous-integration" depends="clean, package, fitnesse-deploy" description="executes the full build then executes the CAT tests against the master branch in github of fitnesse (delegates to build.ci.xml">
 		<!-- This target runs a CI with fitnesse directly cloned/pulled from the master github branch -->
 		<ant antfile="build.ci.xml" target="continuous-integration" inheritall="false" inheritrefs="false" />
-		<tstamp>
-		      <format property="build.time" pattern="yyyyMMdd_hhmm" />
-		</tstamp>
-		<zip destfile="build/RestFixture-${version}-${build.time}.zip"
-		     basedir="${dist}"
-		     casesensitive="true"
-		     compress="true"
-		     includes="*.zip" />
 	</target>
 
 	<target name="javadoc">

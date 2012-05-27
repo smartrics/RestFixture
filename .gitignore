@@ -7,6 +7,7 @@ agitar/
 bin/
 build/
 dist/
+ci/
 
 /FitNesseRoot
 junit*.properties

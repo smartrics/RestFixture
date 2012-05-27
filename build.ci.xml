@@ -1,6 +1,6 @@
 <project name="RestFixture-CI" default="continuous-integration">
 
-	<property name="fitnesse-clone-dir" value="build/ci/fitnesse-git-ro" />
+	<property name="fitnesse-clone-dir" value="ci/fitnesse-git-ro" />
 
 	<path id="git.classpath">
 		<fileset dir="lib/ci">
@@ -23,12 +23,17 @@
 		Note: this task requires tools.jar to be avaialble in the classpath for <javac> to work
 		-->
 		<java fork="true"
-		      classpathref="git.classpath"
+		      resultproperty="fitnesse.build.result"
+			  classpathref="git.classpath"
 		      dir="${fitnesse-clone-dir}"
 		      classname="org.apache.tools.ant.launch.Launcher">
 			<jvmarg value="-Dant.home=${basedir}/lib/ant" />
-			<arg value="jar" />
+			<arg value="-lib" />
+			<arg value="antlib" />
+			<arg value="clean" />
+			<arg value="standalone-jar" />
 		</java>
+		<echo message="FitNesse build result: ${fitnesse.build.result}" />
 	</target>
 
 	<target name="pull-remote-fitnesse">
@@ -48,7 +53,7 @@
 
 	<target name="run-cat-tests">
 		<property name="fitnesse.home" value="${fitnesse-clone-dir}/dist" />
-		<property name="fitnesse.jar" value="${fitnesse.home}/fitnesse.jar" />
+		<property name="fitnesse.jar" value="${fitnesse.home}/fitnesse-standalone.jar" />
 		<property name="fitnesse.reports" value="build/reports/fitnesse-ci" />
 		<ant antfile="build.xml" target="fitnesse-test-run" inheritall="true" inheritrefs="true"/>
 	</target>

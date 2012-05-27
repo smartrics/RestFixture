@@ -38,12 +38,17 @@ public class FitnesseResultSanitiser {
 
     public static void main(String[] args) {
         try {
-            if (args.length != 2)
+            if (args.length != 2) {
                 throw new RuntimeException("You need to pass the file to sanitise and the location of the FitNesseRoot wiki root");
+            }
             FitnesseResultSanitiser sanitiser = new FitnesseResultSanitiser();
             String content = sanitiser.readFile(args[0]);
             content = sanitiser.removeNonHtmlGarbage(content);
             content = sanitiser.removeLinksToExternalPages(content);
+            if(content == null) {
+                System.out.println("Invalid content in file (not an html file?): " + args[0]);
+                System.exit(1);
+            }
             String fitnesseRootLocation = args[1];
             content = sanitiser.injectCssAndJs(fitnesseRootLocation, content);
             content = sanitiser.embedPictures(fitnesseRootLocation, content);
@@ -57,6 +62,9 @@ public class FitnesseResultSanitiser {
     }
 
     private String removeLinksToExternalPages(String content) {
+    	if(content == null) {
+    		return null;
+    	}
         content = content.replace("<a style=\"font-size:small;\" href=\"RestFixtureTests?pageHistory\"> [history]</a>", "");
         int pos = content.indexOf("<div id=\"execution-status\">");
         if (pos >= 0) {
@@ -154,7 +162,12 @@ public class FitnesseResultSanitiser {
 
     private String removeNonHtmlGarbage(String content) {
         int pos = content.indexOf("<html>");
-        int endPos = content.indexOf("</html>") + 7;
+        int endPos = content.indexOf("</html>");
+        if(pos > -1 && endPos > -1) {
+        	endPos = endPos + 7;
+        } else {
+        	return null;
+        }
         content = content.substring(pos, endPos);
         return content;
     }
