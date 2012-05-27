@@ -110,4 +110,11 @@ public class Variables {
         Fixture.setSymbol(k, null);
         return Fixture.getSymbol(k).toString();
     }
+
+	public String replaceNull(String s) {
+		if (s == null) {
+			return nullValue;
+		}
+		return s;
+	}
 }

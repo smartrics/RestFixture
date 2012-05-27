@@ -72,6 +72,7 @@ public class VariablesTest {
 
     @Test
     public void variablesContainingNullAreSubWithStringNullByDefault() {
+    	Config.getConfig().clear();
         Variables v1 = new Variables();
         v1.put("ID", null);
         String newText = v1.substitute("null is '%ID%'");
