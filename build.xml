@@ -294,11 +294,11 @@
 	</target>
 
 	<target name="fitnesse-test-remote"
-	        depends="fitnesse-deploy-remote,fitnesse-test-run"
+	        depends="package, fitnesse-deploy-remote,fitnesse-test-run"
 	        if="execute.cat" />
 
 	<target name="fitnesse-test"
-	        depends="fitnesse-deploy,fitnesse-test-run"
+	        depends="package, fitnesse-deploy,fitnesse-test-run"
 	        if="execute.cat" />
 
 	<target name="fitnesse-test-run" depends="fitnesse-exec-test,check.fitnesse.failure,check.fitnesse.report.failure" />
@@ -365,9 +365,21 @@ Fitnesse report exit status: ${fitnesse.report.exit.status} - fitnesse report fa
 		</echo>
 	</target>
 
+	<target name="fast-ci" depends="package">
+		<ant antfile="build.ci.xml" target="continuous-integration" inheritall="false" inheritrefs="false" />
+	</target>
+		
 	<target name="continuous-integration" depends="full">
 		<!-- This target runs a CI with fitnesse directly cloned/pulled from the master github branch -->
-		<ant antfile="build.ci.xml" target="continuous-integration" inheritall="false" inheritrefs="false"/>
+		<ant antfile="build.ci.xml" target="continuous-integration" inheritall="false" inheritrefs="false" />
+		<tstamp>
+		      <format property="build.time" pattern="yyyyMMdd_hhmm" />
+		</tstamp>
+		<zip destfile="build/RestFixture-${version}-${build.time}.zip"
+		     basedir="${dist}"
+		     casesensitive="true"
+		     compress="true"
+		     includes="*.zip" />
 	</target>
 
 	<target name="dist-doc" if="execute.cat">
@@ -375,7 +387,7 @@ Fitnesse report exit status: ${fitnesse.report.exit.status} - fitnesse report fa
 		<property name="docs.html.file"
 		          value="${artifacts}/docs/RestFixture-${version}.html" />
 		<copy tofile="${docs.html.file}"
-		      file="${reports}/fitnesse/result_sanitised.html"
+		      file="${reports}/fitnesse/index.html"
 		      failonerror="false" />
 	</target>
 
