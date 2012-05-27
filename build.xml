@@ -364,7 +364,7 @@ Fitnesse report exit status: ${fitnesse.report.exit.status}
 		<copy file="${fitnesse.reports}/result_sanitised.html" tofile="${fitnesse.reports}/index.html" />
 	</target>
 		
-	<target name="continuous-integration" depends="clean, package, fitnesse-deploy" description="executes the full build then executes the CAT tests against the master branch in github of fitnesse (delegates to build.ci.xml">
+	<target name="continuous-integration" depends="full" description="executes the full build then executes the CAT tests against the master branch in github of fitnesse (delegates to build.ci.xml">
 		<!-- This target runs a CI with fitnesse directly cloned/pulled from the master github branch -->
 		<ant antfile="build.ci.xml" target="continuous-integration" inheritall="false" inheritrefs="false" />
 	</target>
