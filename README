@@ -64,15 +64,21 @@ in the lib/ directory.
 
 For example,
 
-!*****> Classpath Settings
-!path @FITNESSE_TEST_ROOT@/lib/*
-!path @FITNESSE_TEST_ROOT@/lib/log4j.xml
-!path @FITNESSE_HOME@/fitnesse.jar
-****!
+1) Unzip the RestFixture-<ver>.zip
+    let's assume that you have unzipped it in C:\lib\RestFixture
+1) Start FitNesse 
+    let's assume that fitnesse is now running on port 80)
+2) Go to http://localhost/RestFixtureInstallationTest 
+    this will create a new test page
+3) Type the following:
 
-@FITNESSE_TEST_ROOT@/lib is where the dependent jars are
-@FITNESSE_HOME@ is where fitnesse.jar is
+!define TEST_SYSTEM {slim}
 
- Any page which is child of the content.txt page where the !path is defined will be able to
- use the Rest Fixture. For an example look at how the RestFixture CAT tests are setup in
- build/fitnesse/FinNesseRoot/RestFixtureTests
+!path C:/lib/RestFixture/lib/*
+!path C:/lib/RestFixture/RestFixture.jar
+
+|Table:smartrics.rest.fitnesse.fixture.RestFixture | http://localhost |
+| GET | /RestFixtureInstallTest?rss | | | //title[text()='RestFixtureInstallTest']|
+ 
+4) Execute the test
+    If it passes, you have succesfully installed the RestFixture. You'll also know how to reference it's jar and dependencies.

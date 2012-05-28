@@ -1,4 +1,4 @@
-/*  Copyright 2008 Fabrizio Cannizzo
+/*  Copyright 2012 Fabrizio Cannizzo
  *
  *  This file is part of RestFixture.
  *
