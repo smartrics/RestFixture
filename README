@@ -67,8 +67,8 @@ For example,
 1) Unzip the RestFixture-<ver>.zip
     let's assume that you have unzipped it in C:\lib\RestFixture
 1) Start FitNesse 
-    let's assume that fitnesse is now running on port 80)
-2) Go to http://localhost/RestFixtureInstallationTest 
+    let's assume that fitnesse is now running on port 8090)
+2) Go to http://localhost/RestFixtureInstallTest 
     this will create a new test page
 3) Type the following:
 
@@ -77,7 +77,7 @@ For example,
 !path C:/lib/RestFixture/lib/*
 !path C:/lib/RestFixture/RestFixture.jar
 
-|Table:smartrics.rest.fitnesse.fixture.RestFixture | http://localhost |
+|Table:smartrics.rest.fitnesse.fixture.RestFixture | http://localhost:8090 |
 | GET | /RestFixtureInstallTest?rss | | | //title[text()='RestFixtureInstallTest']|
  
 4) Execute the test
