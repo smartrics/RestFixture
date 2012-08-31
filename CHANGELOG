@@ -1,9 +1,14 @@
 version 2.0
+ * response body now is handled according to the charset in the content-type header
+ * added support for absolute URI in resource cell for each HTTP verb
+ * reimplemented RestFixtureWithSeq in pure java, with no external dependencies on OS tools
  * added support for setting custom content-type to adapter map
  * added support for setting bespoke rendering of null value labels via config property 'restfixture.null.value.representation'
  * added 'comment' command row so that it's possible to comment RestFixtures; example |comment| the value of 'replaceme' is %replaceme% |
  * added the ability of specifying absolute URLs as values of the resource cell in a verb row
-  
+ * bug fixes 
+ * improvement of metrics build and ci build
+
 version 2.0.beta.1
  * added support for SLIM
  * added support for expressions in JavaScript for JSON

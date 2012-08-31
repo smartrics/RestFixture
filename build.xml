@@ -406,9 +406,6 @@ Fitnesse report exit status: ${fitnesse.report.exit.status}
 			         includes="**/*.jar"
 			         excludes="ci/**/*.*, test/**/*.jar, fitnesse/**/*.jar, log4j/**/*.jar" />
 		</copy>
-		<copy todir="${artifacts}/etc">
-			<fileset dir="${etc}" includes="restfixture/*.*" />
-		</copy>
 		<copy todir="${artifacts}" file="CHANGELOG" />
 		<copy todir="${artifacts}" file="COPYING" />
 		<copy todir="${artifacts}" file="COPYING.LESSER" />
