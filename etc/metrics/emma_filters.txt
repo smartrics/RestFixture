@@ -1,2 +1,0 @@
--com.dowjones.spike.coverage.validate.*
-+com.dowjones.spike.coverage.*
