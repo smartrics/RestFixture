@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * Builds strategies to handle LET body.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class LetHandlerFactory {

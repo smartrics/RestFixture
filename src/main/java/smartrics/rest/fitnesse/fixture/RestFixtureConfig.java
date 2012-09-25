@@ -22,7 +22,7 @@ package smartrics.rest.fitnesse.fixture;
 
 import java.util.List;
 
-import smartrics.rest.config.Config;
+import smartrics.rest.fitnesse.fixture.support.Config;
 import smartrics.rest.fitnesse.fixture.support.Tools;
 import fit.Fixture;
 import fit.Parse;
@@ -149,15 +149,16 @@ public class RestFixtureConfig extends Fixture {
 				row.set(0,
 						"error:"
 								+ k
-								+ Tools.toHtml("\n\nthis line doesn't conform to NVP format (col 0 for name, col 1 for value) - content skipped"));
+								+ Tools.toHtml("\n\nthis line doesn't conform to NVP format "
+										+ "(col 0 for name, col 1 for value) - content skipped"));
 			}
 		}
 		return rows;
 	}
 
 	/**
-	 * Processes each row in the config fixture table and loads the key/value pairs. 
-	 * The fixture optional first argument is the config name. If not
+	 * Processes each row in the config fixture table and loads the key/value
+	 * pairs. The fixture optional first argument is the config name. If not
 	 * supplied the value is defaulted. See {@link Config.DEFAULT_CONFIG_NAME}.
 	 */
 	@Override

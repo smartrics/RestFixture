@@ -31,7 +31,7 @@ import smartrics.rest.fitnesse.fixture.support.Tools;
 /**
  * Formatter of cells handled by Slim.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class SlimFormatter implements CellFormatter<String> {

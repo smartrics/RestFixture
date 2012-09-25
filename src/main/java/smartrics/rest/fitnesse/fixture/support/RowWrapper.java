@@ -23,7 +23,7 @@ package smartrics.rest.fitnesse.fixture.support;
 /**
  * Wrapper to a table row.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  * @param <E>
  */

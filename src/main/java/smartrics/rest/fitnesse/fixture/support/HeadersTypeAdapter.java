@@ -29,7 +29,7 @@ import smartrics.rest.client.RestData.Header;
 /**
  * Type adapter for HTTP header cell in a RestFixture table.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class HeadersTypeAdapter extends RestDataTypeAdapter {

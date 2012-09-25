@@ -31,7 +31,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import smartrics.rest.config.Config;
+import smartrics.rest.fitnesse.fixture.support.Config;
 
 public class RestFixtureSlimFitTest {
 

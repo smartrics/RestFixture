@@ -29,7 +29,7 @@ import smartrics.rest.fitnesse.fixture.support.RowWrapper;
 /**
  * Wrapper class for a row when running with Slim.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class SlimRow implements RowWrapper<String> {

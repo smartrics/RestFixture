@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Type adapted for cells containing JSON content.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {

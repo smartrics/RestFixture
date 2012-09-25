@@ -26,13 +26,12 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import smartrics.rest.config.Config;
 import fit.Fixture;
 
 /**
  * Facade to FitNesse global symbols map.
  * 
- * @author fabrizio
+ * @author smartrics
  */
 public class Variables {
     public static final Pattern VARIABLES_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");

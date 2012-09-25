@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
 /**
  * Type adapter for body cells with XML content.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class XPathBodyTypeAdapter extends BodyTypeAdapter {

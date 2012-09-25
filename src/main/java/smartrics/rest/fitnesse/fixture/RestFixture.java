@@ -27,17 +27,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestData.Header;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
-import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
+import smartrics.rest.fitnesse.fixture.support.Config;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.JavascriptException;
@@ -51,8 +51,6 @@ import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.Tools;
 import smartrics.rest.fitnesse.fixture.support.Url;
 import smartrics.rest.fitnesse.fixture.support.Variables;
-import fit.ActionFixture;
-import fit.Parse;
 
 /**
  * A fixture that allows to simply test REST APIs with minimal efforts. The core
@@ -173,17 +171,17 @@ import fit.Parse;
  * 
  * @author smartrics
  */
-public class RestFixture extends ActionFixture {
+public class RestFixture {
 
 	/**
 	 * What runner this table is running on.
 	 * 
 	 * Note, the OTHER runner is primarily for testing purposes.
 	 * 
-	 * @author fabrizio
+	 * @author smartrics
 	 * 
 	 */
-	enum Runner {
+	public enum Runner {
 		SLIM, FIT, OTHER;
 	};
 
@@ -191,7 +189,7 @@ public class RestFixture extends ActionFixture {
 
 	private static final String FILE = "file";
 
-	private static final Log LOG = LogFactory.getLog(RestFixture.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RestFixture.class);
 
 	protected Variables GLOBALS;
 
@@ -271,11 +269,7 @@ public class RestFixture extends ActionFixture {
 		this(new PartsFactory(), hostName, configName);
 	}
 
-	RestFixture(PartsFactory partsFactory, String hostName) {
-		this(partsFactory, hostName, Config.DEFAULT_CONFIG_NAME);
-	}
-
-	RestFixture(PartsFactory partsFactory, String hostName, String configName) {
+	public RestFixture(PartsFactory partsFactory, String hostName, String configName) {
 		this.displayActualOnRight = true;
 		this.minLenForCollapseToggle = -1;
 		this.partsFactory = partsFactory;
@@ -309,6 +303,10 @@ public class RestFixture extends ActionFixture {
 		return null;
 	}
 
+	public void setBaseUrl(Url url) {
+		this.baseUrl = url;
+	}
+	
 	/**
 	 * The default headers as defined in the config used to initialise this
 	 * fixture.
@@ -343,52 +341,6 @@ public class RestFixture extends ActionFixture {
 			processSlimRow(res, r);
 		}
 		return res;
-	}
-
-	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void doCells(Parse parse) {
-		config = Config.getConfig(getConfigNameFromArgs());
-		String url = getBaseUrlFromArgs();
-		if (url != null) {
-			baseUrl = new Url(stripTag(url));
-		}
-		initialize(Runner.FIT);
-		getFormatter().setDisplayActual(displayActualOnRight);
-		getFormatter().setMinLenghtForToggleCollapse(minLenForCollapseToggle);
-		((FitFormatter) getFormatter()).setActionFixtureDelegate(this);
-		RowWrapper currentRow = new FitRow(parse);
-		try {
-			processRow(currentRow);
-        } catch (Exception exception) {
-            LOG.error("Exception when processing row " + currentRow.getCell(0).text(), exception);
-            getFormatter().exception(currentRow.getCell(0), exception);
-		}
-	}
-
-	/**
-	 * Process args to extract the optional config name.
-	 * 
-	 * @return
-	 */
-	protected String getConfigNameFromArgs() {
-		if (args.length >= 2) {
-			return args[1];
-		}
-		return null;
-	}
-
-	/**
-	 * Process args ({@see fit.Fixture}) for Fit runner to extract the baseUrl
-	 * of each Rest request, first parameter of each RestFixture table.
-	 * 
-	 * @return
-	 */
-	protected String getBaseUrlFromArgs() {
-		if (args.length > 0) {
-			return args[0];
-		}
-		return null;
 	}
 
 	/**
@@ -686,10 +638,12 @@ public class RestFixture extends ActionFixture {
             if (letHandler != null) {
                 StringTypeAdapter adapter = new StringTypeAdapter();
                 try {
+                	LOG.info("LetHandler of type: " + letHandler.getClass());
                     sValue = letHandler.handle(getLastResponse(), namespaceContext, expr);
                     exprCell.body(getFormatter().gray(exprCell.body()));
                 } catch (RuntimeException e) {
                     getFormatter().exception(exprCell, e.getMessage());
+                    e.printStackTrace();
                 }
                 GLOBALS.put(label, sValue);
                 adapter.set(sValue);
@@ -1003,11 +957,11 @@ public class RestFixture extends ActionFixture {
     }
 
     private Map<String, String> parseHeaders(String str) {
-        return Tools.convertStringToMap(str, ":", LINE_SEPARATOR);
+        return Tools.convertStringToMap(str, ":", LINE_SEPARATOR, true);
     }
 
     private Map<String, String> parseNamespaceContext(String str) {
-        return Tools.convertStringToMap(str, "=", LINE_SEPARATOR);
+        return Tools.convertStringToMap(str, "=", LINE_SEPARATOR, true);
     }
 
     private String stripTag(String somethingWithinATag) {
@@ -1035,6 +989,8 @@ public class RestFixture extends ActionFixture {
         str = config.get("restfixture.xml.namespace.context", "");
         namespaceContext = parseNamespaceContext(str);
 
+        LOG.debug("Using namespaces: " + namespaceContext);
+        
         ContentType.resetDefaultMapping();
         ContentType.config(config);
     }

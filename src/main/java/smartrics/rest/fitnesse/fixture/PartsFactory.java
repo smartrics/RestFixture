@@ -28,18 +28,18 @@ import org.apache.commons.httpclient.URIException;
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestClientImpl;
 import smartrics.rest.client.RestRequest;
-import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.RestFixture.Runner;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory;
 import smartrics.rest.fitnesse.fixture.support.CellFormatter;
+import smartrics.rest.fitnesse.fixture.support.Config;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HttpClientBuilder;
 
 /**
  * Factory of all dependencies the rest fixture needs.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class PartsFactory {

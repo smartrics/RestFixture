@@ -36,7 +36,7 @@ import org.junit.Test;
 
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestRequest;
-import smartrics.rest.config.Config;
+import smartrics.rest.fitnesse.fixture.support.Config;
 
 public class PartsFactoryTest {
 

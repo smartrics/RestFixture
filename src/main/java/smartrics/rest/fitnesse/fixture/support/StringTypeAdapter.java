@@ -23,7 +23,7 @@ package smartrics.rest.fitnesse.fixture.support;
 /**
  * Type adapter for cells containing strings.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class StringTypeAdapter extends RestDataTypeAdapter {

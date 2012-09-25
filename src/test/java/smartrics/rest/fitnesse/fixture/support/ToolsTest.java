@@ -122,20 +122,36 @@ public class ToolsTest {
 
     @Test
     public void shouldConvertAStringIntoAMap() {
-        Map<String, String> map = Tools.convertStringToMap("k1~v1##k2~v2", "~", "##");
+        Map<String, String> map = Tools.convertStringToMap("k1~v1##k2~v2", "~", "##", false);
         assertEquals(2, map.size());
         assertEquals("v2", map.get("k2"));
         assertEquals("v1", map.get("k1"));
 
-        map = Tools.convertStringToMap("k1##k2~v2", "~", "##");
+        map = Tools.convertStringToMap("k1##k2~v2", "~", "##", false);
         assertEquals(2, map.size());
         assertEquals("", map.get("k1"));
         assertEquals("v2", map.get("k2"));
     }
 
     @Test
+    public void shouldConvertAStringIntoAMapAndCleanHtmlTagsFromValues() {
+        Map<String, String> map = Tools.convertStringToMap("k1=v1\nk2=<a href=\"2\">v2</a>", "=", "\n", true);
+        assertEquals(2, map.size());
+        assertEquals("v1", map.get("k1"));
+        assertEquals("v2", map.get("k2"));
+    }
+
+    @Test
     public void shouldConvertAMultilineStringIntoAMap() {
-        Map<String, String> map = Tools.convertStringToMap("!- k1=v1\nk2=v2-!", "=", "\n");
+        Map<String, String> map = Tools.convertStringToMap("!- k1=v1\nk2=v2-!", "=", "\n", false);
+        assertEquals(2, map.size());
+        assertEquals("v2", map.get("k2"));
+        assertEquals("v1", map.get("k1"));
+    }
+
+    @Test
+    public void shouldConvertAMultilineStringIntoAMapWhenEscapeSequenceIsNested() {
+        Map<String, String> map = Tools.convertStringToMap("k1=v1 !-\n -! k2=v2", "=", "\n", false);
         assertEquals(2, map.size());
         assertEquals("v2", map.get("k2"));
         assertEquals("v1", map.get("k1"));
@@ -143,7 +159,7 @@ public class ToolsTest {
 
     @Test
     public void shouldConvertAMultilineStringIntoAMapIgnoresEmptyLines() {
-        Map<String, String> map = Tools.convertStringToMap("!- k1=v1\n\nk2=v2\n-!", "=", "\n");
+        Map<String, String> map = Tools.convertStringToMap("!- k1=v1\n\nk2=v2\n-!", "=", "\n", false);
         assertEquals(2, map.size());
         assertEquals("v2", map.get("k2"));
         assertEquals("v1", map.get("k1"));

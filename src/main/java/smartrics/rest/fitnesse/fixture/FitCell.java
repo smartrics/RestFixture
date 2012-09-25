@@ -26,7 +26,7 @@ import fit.Parse;
 /**
  * Wrapper class to a table cell for the Fit runner.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class FitCell implements CellWrapper<Parse> {

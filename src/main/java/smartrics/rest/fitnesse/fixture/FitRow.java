@@ -30,7 +30,7 @@ import fit.Parse;
 /**
  * Wrapper class for table row for Fit Runner.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class FitRow implements RowWrapper<Parse> {

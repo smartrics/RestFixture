@@ -25,7 +25,7 @@ import smartrics.rest.client.RestResponse;
 /**
  * Strategy to handle LET expressions.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public interface LetHandler {

@@ -44,11 +44,11 @@ import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestRequest.Method;
 import smartrics.rest.client.RestResponse;
-import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.RestFixture.Runner;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
+import smartrics.rest.fitnesse.fixture.support.Config;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.JavascriptException;
@@ -61,7 +61,7 @@ import fit.Fixture;
 /**
  * Tests for the RestFixture class.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class RestFixtureTest {
@@ -103,7 +103,7 @@ public class RestFixtureTest {
         ContentType.resetDefaultMapping();
 
         helper.wireMocks(config, mockPartsFactory, mockRestClient, mockLastRequest, lastResponse, mockCellFormatter, mockBodyTypeAdapter);
-        fixture = new RestFixture(mockPartsFactory, BASE_URL);
+        fixture = new RestFixture(mockPartsFactory, BASE_URL, Config.DEFAULT_CONFIG_NAME);
         fixture.initialize(Runner.OTHER);
     }
 

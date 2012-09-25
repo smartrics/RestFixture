@@ -23,7 +23,7 @@ package smartrics.rest.fitnesse.fixture.support;
 /**
  * Formatter of the content of a cell.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  * @param <E>
  */
