@@ -1,6 +1,0 @@
-
-!1 Rest Fixture Acceptance Test Suite - SLIM Script Fixture
-
-The !-RestScriptFixture-! supports SLIM script and scenario tables. Key to doing BDD style testing.
-
-!contents -g

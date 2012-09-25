@@ -1,8 +1,0 @@
-!3 DELETE
-
-|script|!-smartrics.rest.fitnesse.fixture.RestScriptFixture-!|http://${jettyHost}:${jettyPort}|
-|delete| /resources/0        |
-|check | status code  | 204  |
-|get   | /resources/0        |
-|check | status code  | 404  |
-
