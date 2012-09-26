@@ -310,19 +310,16 @@ public final class Tools {
 			byte[] byteArray = string.getBytes(charset);
 			return new ByteArrayInputStream(byteArray);
 		} catch (UnsupportedEncodingException e) {
-			throw new IllegalArgumentException("Unsupported encoding: "
-					+ charset);
+			throw new IllegalArgumentException("Unsupported encoding: " + charset);
 		}
 	}
 
-	public static String convertMapToString(Map<String, String> map,
-			String nvSep, String entrySep) {
+	public static String convertMapToString(Map<String, String> map, String nvSep, String entrySep) {
 		StringBuffer sb = new StringBuffer();
 		if (map != null) {
 			for (Entry<String, String> entry : map.entrySet()) {
 				String el = entry.getKey();
-				sb.append(convertEntryToString(el, map.get(el), nvSep)).append(
-						entrySep);
+				sb.append(convertEntryToString(el, map.get(el), nvSep)).append(entrySep);
 			}
 		}
 		String repr = sb.toString();
