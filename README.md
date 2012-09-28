@@ -85,7 +85,7 @@ For example, let's assume that you have succesfully built the RestFixture in C:/
 2. Go to http://localhost:8090/RestFixtureInstallTest to create a new test page
 3. Type the following:
 
-<code>
+<pre>
 !define TEST_SYSTEM {slim}
 
 !path C:/RestFixture/target/dependencies/*
@@ -94,7 +94,7 @@ For example, let's assume that you have succesfully built the RestFixture in C:/
 
 |Table:smartrics.rest.fitnesse.fixture.RestFixture | http://localhost:8090 |
 | GET | /RestFixtureInstallTest?rss | | | //title[text()='RestFixtureInstallTest']|
-</code>
+</pre>
  
 4. Execute the test. If it passes, you have succesfully installed the RestFixture. You'll also know how to reference it's jar and dependencies.
  
