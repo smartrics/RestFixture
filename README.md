@@ -15,39 +15,38 @@ And it also works as a living/executable documentation of the API.
 
 Overview:
 
-    * Get Fitnesse With Some Rest
-      (http://smartrics.blogspot.com/2008/08/get-fitnesse-with-some-rest.html)
-    * Rest Fixture, Latest Additions
-      (http://smartrics.blogspot.com/2008/11/restfixture-latest-additions.html)
-    * Rest Fixure with namespaces support
-      (http://smartrics.blogspot.com/2011/01/restfixture-with-namespaces-support.html)
+* Get Fitnesse With Some Rest (http://smartrics.blogspot.com/2008/08/get-fitnesse-with-some-rest.html)
+* Rest Fixture, Latest Additions (http://smartrics.blogspot.com/2008/11/restfixture-latest-additions.html)
+* Rest Fixure with namespaces support (http://smartrics.blogspot.com/2011/01/restfixture-with-namespaces-support.html)
 
 Documentation:
 
-    * http://rest-fixture.googlecode.com/files/RestFixture-docs-<ver>.zip
-    * http://rest-fixture.googlecode.com/files/RestFixture-live-<ver>.html
+* http://rest-fixture.googlecode.com/files/RestFixture-docs-<ver>.zip
+* http://rest-fixture.googlecode.com/files/RestFixture-live-<ver>.html
 
-Build
------
+Build: Releases from 2.1 onwards
+--------------------------------
 
-*Releases from 2.1*
 To build RestFixture install Maven and execute
 
 > mvn clean package
 
 Once the build completes, the directory target contains:
-    * smartrics-RestFixture-<version>.jar : the RestFixture jar
-    * dependencies/ : all the RestFixture dependencies (excluding a Logging framework implementation. See below for details)
-    * smartrics-RestFixture-<version>-jar-with-dependencies.jar : the RestFixture with all dependencies bundled up.
+
+* smartrics-RestFixture-<version>.jar : the RestFixture jar
+* dependencies/ : all the RestFixture dependencies (excluding a Logging framework implementation. See below for details)
+* smartrics-RestFixture-<version>-jar-with-dependencies.jar : the RestFixture with all dependencies bundled up.
 
 If the build fails because smartrics-RestClient can't be found, check the pom.xml file and make sure the repository sonatype-releases-restclient is enabled.
 
-*Releases up to 2.0*
+Build: Releases up to 2.0
+-------------------------
 
 To build RestFixture add a property file in the properties directory named <your.os.username>.properties 
 by copying and customising build.properties if necessary.
 
 Use
+
 > ant
 
 or
@@ -64,8 +63,9 @@ You can also pass a build properties file to ant with
 If it all succeeds a distribution of the RestFixture is available in dist/ alongside with the latest 
 documentation. Reports of tests and metrics are available in build/reports
 
-Note on the (missing!) logger framework dependency
---------------------
+The (missing!) logger framework dependency
+--------------------------------------------------
+
 The RestFixture uses slf4j-api; if no logger implementation is provided slf4j defaults to nop binding. 
 Please download and add to the classpath your binding of choice (and the respective configuration file).
 
@@ -81,15 +81,12 @@ alongside its dependencies. Dependencies are available in the directory target/d
 
 For example, let's assume that you have succesfully built the RestFixture in C:/RestFixture
 
-0) Download a binding logger implementation for slf4j. For example this:
-    http://repo2.maven.org/maven2/org/slf4j/slf4j-simple/1.6.6/slf4j-simple-1.6.6.jar
-    and copy it into C:/slf4j-simple/slf4j-simple-1.6.6.jar
-1) Start FitNesse 
-    let's assume that fitnesse is now running on port 8090)
-2) Go to http://localhost:8090/RestFixtureInstallTest 
-    this will create a new test page
-3) Type the following:
+0. Download a binding logger implementation for slf4j and copy it into C:/slf4j-simple/slf4j-simple-1.6.6.jar. Download it from http://repo2.maven.org/maven2/org/slf4j/slf4j-simple/1.6.6/slf4j-simple-1.6.6.jar
+1. Start FitNesse; let's assume that fitnesse is now running on port 8090)
+2. Go to http://localhost:8090/RestFixtureInstallTest to create a new test page
+3. Type the following:
 
+<pre>
 !define TEST_SYSTEM {slim}
 
 !path C:/RestFixture/target/dependencies/*
@@ -98,7 +95,7 @@ For example, let's assume that you have succesfully built the RestFixture in C:/
 
 |Table:smartrics.rest.fitnesse.fixture.RestFixture | http://localhost:8090 |
 | GET | /RestFixtureInstallTest?rss | | | //title[text()='RestFixtureInstallTest']|
+<pre>
  
-4) Execute the test
-    If it passes, you have succesfully installed the RestFixture. You'll also know how to reference it's jar and dependencies.
+4. Execute the test. If it passes, you have succesfully installed the RestFixture. You'll also know how to reference it's jar and dependencies.
  
