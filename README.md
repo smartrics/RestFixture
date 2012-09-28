@@ -21,8 +21,7 @@ Overview:
 
 Documentation:
 
-* http://rest-fixture.googlecode.com/files/RestFixture-docs-<ver>.zip
-* http://rest-fixture.googlecode.com/files/RestFixture-live-<ver>.html
+http://github.com/smartrics/RestFixtureLiveDoc
 
 Build: Releases from 2.1 onwards
 --------------------------------
@@ -33,10 +32,9 @@ To build RestFixture install Maven and execute
 
 Once the build completes, the directory target contains:
 
-* smartrics-RestFixture-<version>.jar : the RestFixture jar
-* dependencies/ : all the RestFixture dependencies (excluding a Logging framework implementation. See below for details)
-* smartrics-RestFixture-<version>-jar-with-dependencies.jar : the RestFixture with all dependencies bundled up.
-
+* <code>smartrics-RestFixture-&lt;version>.jar</code> : the RestFixture jar
+* <code>dependencies/</code> : all the RestFixture dependencies (excluding a Logging framework implementation. See below for details)
+* <code>smartrics-RestFixture-2.1-bin.zip</code>: a bundle the RestFixture and all dependencies.
 If the build fails because smartrics-RestClient can't be found, check the pom.xml file and make sure the repository sonatype-releases-restclient is enabled.
 
 Build: Releases up to 2.0
