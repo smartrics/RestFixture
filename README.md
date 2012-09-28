@@ -63,7 +63,7 @@ If it all succeeds a distribution of the RestFixture is available in dist/ along
 documentation. Reports of tests and metrics are available in build/reports
 
 The (missing!) logger framework dependency
---------------------------------------------------
+------------------------------------------
 
 The RestFixture uses slf4j-api; if no logger implementation is provided slf4j defaults to nop binding. 
 Please download and add to the classpath your binding of choice (and the respective configuration file).
@@ -85,16 +85,16 @@ For example, let's assume that you have succesfully built the RestFixture in C:/
 2. Go to http://localhost:8090/RestFixtureInstallTest to create a new test page
 3. Type the following:
 
-<pre>
+<code>
 !define TEST_SYSTEM {slim}
 
 !path C:/RestFixture/target/dependencies/*
-!path C:/RestFixture/target/smartrics-RestFixture-<ver>.jar
+!path C:/RestFixture/target/smartrics-RestFixture-&ltver>.jar
 !path C:/slf4j-simple/slf4j-simple-1.6.6.jar
 
 |Table:smartrics.rest.fitnesse.fixture.RestFixture | http://localhost:8090 |
 | GET | /RestFixtureInstallTest?rss | | | //title[text()='RestFixtureInstallTest']|
-<pre>
+</code>
  
 4. Execute the test. If it passes, you have succesfully installed the RestFixture. You'll also know how to reference it's jar and dependencies.
  
