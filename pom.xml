@@ -263,22 +263,17 @@ single line of Java code.
 
 And it also works as a living/executable documentation of the API.
 	</description>
-	<!-- repositories>
+	<repositories>
 		<repository>
 			<releases>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
 				<checksumPolicy>warn</checksumPolicy>
 			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
 			<id>sonatype-releases</id>
-			<name>Codehaus Snapshots</name>
+			<name>Codehaus Snapshots for RestClient</name>
 			<url>https://oss.sonatype.org/content/repositories/central_bundles-222/</url>
 			<layout>default</layout>
 		</repository>
-	</repositories -->
+	</repositories>
 </project>
