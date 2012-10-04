@@ -304,4 +304,24 @@ single line of Java code.
 
 And it also works as a living/executable documentation of the API.
 	</description>
+
+	<repositories>
+		<repository>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+			<id>sonatype-releases</id>
+			<name>OSS releases</name>
+			<url>https://oss.sonatype.org/content/repositories/releases/</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
+
 </project>
