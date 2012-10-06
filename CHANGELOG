@@ -1,4 +1,4 @@
-version 2.1
+version 3.0
  * Migrated build system to Maven and published to Sonatype Nexus
  * Fixed Issue#28 - Multiple variables not expanding in RestFixtureConfig
  * Split RestFixtureExtensions from RestFixture to include all contributed extensions to RestFixture
