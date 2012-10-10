@@ -144,6 +144,53 @@ public class RestFixtureTest {
         assertEquals("", fixture.getHeaders().get("header5"));
     }
 
+    @Test
+    public void mustExpandSymbolsWhenSettingMultilineHeaders() {
+        Fixture.setSymbol("hval1", "one");
+        Fixture.setSymbol("hval2", "two");
+        String multilineHeaders = "!-header1:%hval1% \n header2:%hval2% \nheader3 : with:colon \nheader4 : \n header5 -!";
+        RowWrapper<?> row = helper.createTestRow("setHeaders", multilineHeaders);
+        fixture.processRow(row);
+        assertEquals("one", fixture.getHeaders().get("header1"));
+        assertEquals("two", fixture.getHeaders().get("header2"));
+        assertEquals("with:colon", fixture.getHeaders().get("header3"));
+        assertEquals("", fixture.getHeaders().get("header4"));
+        assertEquals("", fixture.getHeaders().get("header5"));
+    }
+
+    @Test
+    public void mustAllowSettingHeaders() {
+        String header = "header1:one";
+        RowWrapper<?> row = helper.createTestRow("setHeader", header);
+        fixture.processRow(row);
+        assertEquals("one", fixture.getHeaders().get("header1"));
+    }
+
+    @Test
+    public void mustExpandSymbolSetWithLetWhenSettingHeaders() {
+        when(mockLastRequest.getQuery()).thenReturn("");
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        lastResponse.setBody("<body>1234</body>");
+
+        RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", "");
+        fixture.processRow(row);
+        row = helper.createTestRow("let", "headerValue", "body", "/body/text()", "1234");
+        fixture.processRow(row);
+
+        row = helper.createTestRow("setHeader", "header1:%headerValue%");
+        fixture.processRow(row);
+        assertEquals("1234", fixture.getHeaders().get("header1"));
+    }
+    
+    @Test
+    public void mustExpandSymbolWhenSettingHeaders() {
+        Fixture.setSymbol("hval", "one");
+        String header = "headerWithSymbol:%hval%";
+        RowWrapper<?> row = helper.createTestRow("setHeader", header);
+        fixture.processRow(row);
+        assertEquals("one", fixture.getHeaders().get("headerWithSymbol"));
+    }
+
     @Test(expected = RuntimeException.class)
     public void mustNotifyClientIfHTTPVerbInFirstCellIsNotSupported() {
         RowWrapper<?> row = helper.createTestRow("IDONTEXIST", "/uri", "", "", "");
