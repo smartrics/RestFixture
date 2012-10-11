@@ -483,8 +483,12 @@ public class RestFixture {
     
     public void setHeaders(String headers)
     {
-        String header = GLOBALS.substitute(headers);
-        requestHeaders = parseHeaders(header);    	
+        String substitutedHeaders = GLOBALS.substitute(headers);
+        requestHeaders = parseHeaders(substitutedHeaders);   
+		CellWrapper cell = row.getCell(1);
+        if(!substitutedHeaders.equals(headers)) {
+			cell.body(substitutedHeaders);
+        }
     }
 
     /**

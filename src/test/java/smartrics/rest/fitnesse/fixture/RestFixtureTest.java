@@ -191,6 +191,18 @@ public class RestFixtureTest {
         assertEquals("one", fixture.getHeaders().get("headerWithSymbol"));
     }
 
+    @Test
+    public void mustRenderSymbolValueWhenSettingHeaders() {
+        Fixture.setSymbol("hval", "one");
+        String header = "headerWithSymbol:%hval%";
+        RowWrapper<?> row = helper.createTestRow("setHeader", header);
+        fixture.processRow(row);
+        verify(row.getCell(1)).text();
+        verify(row.getCell(1)).body("headerWithSymbol:one");
+        
+        verifyNoMoreInteractions(row.getCell(1));
+    }
+
     @Test(expected = RuntimeException.class)
     public void mustNotifyClientIfHTTPVerbInFirstCellIsNotSupported() {
         RowWrapper<?> row = helper.createTestRow("IDONTEXIST", "/uri", "", "", "");
