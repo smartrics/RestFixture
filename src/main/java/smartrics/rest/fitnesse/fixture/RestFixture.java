@@ -485,9 +485,9 @@ public class RestFixture {
     {
         String substitutedHeaders = GLOBALS.substitute(headers);
         requestHeaders = parseHeaders(substitutedHeaders);   
-		CellWrapper cell = row.getCell(1);
+		CellWrapper<?> cell = row.getCell(1);
         if(!substitutedHeaders.equals(headers)) {
-			cell.body(substitutedHeaders);
+			cell.body(getFormatter().gray(substitutedHeaders));
         }
     }
 
