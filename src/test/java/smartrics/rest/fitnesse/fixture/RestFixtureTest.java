@@ -193,13 +193,13 @@ public class RestFixtureTest {
 
     @Test
     public void mustRenderSymbolValueWhenSettingHeaders() {
+    	when(mockCellFormatter.gray("headerWithSymbol:one")).thenReturn("gray(headerWithSymbol:one)");
         Fixture.setSymbol("hval", "one");
         String header = "headerWithSymbol:%hval%";
         RowWrapper<?> row = helper.createTestRow("setHeader", header);
         fixture.processRow(row);
         verify(row.getCell(1)).text();
-// commented this out because I commented out the matching code in the RestFixture (line 222)
-//        verify(row.getCell(1)).body("headerWithSymbol:one");
+        verify(row.getCell(1)).body("gray(headerWithSymbol:one)");
         
         verifyNoMoreInteractions(row.getCell(1));
     }

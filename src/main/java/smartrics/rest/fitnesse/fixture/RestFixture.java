@@ -489,10 +489,9 @@ public class RestFixture extends Fixture {
     {
         String substitutedHeaders = GLOBALS.substitute(headers);
         requestHeaders = parseHeaders(substitutedHeaders);   
-		CellWrapper cell = row.getCell(1);
+		CellWrapper<?> cell = row.getCell(1);
         if(!substitutedHeaders.equals(headers)) {
-// commented this out because it was causing Fitnesse to consider the cell as "wrong"            
-//			cell.body(substitutedHeaders);
+		cell.body(getFormatter().gray(substitutedHeaders));
         }
     }
 
