@@ -323,7 +323,7 @@ And it also works as a living/executable documentation of the API.
 			</snapshots>
 			<id>sonatype-releases</id>
 			<name>OSS releases</name>
-			<url>https://oss.sonatype.org/content/repositories/releases/</url>
+			<url>http://oss.sonatype.org/content/repositories/releases/</url>
 			<layout>default</layout>
 		</repository>
 	</repositories>
