@@ -198,7 +198,8 @@ public class RestFixtureTest {
         RowWrapper<?> row = helper.createTestRow("setHeader", header);
         fixture.processRow(row);
         verify(row.getCell(1)).text();
-        verify(row.getCell(1)).body("headerWithSymbol:one");
+// commented this out because I commented out the matching code in the RestFixture (line 222)
+//        verify(row.getCell(1)).body("headerWithSymbol:one");
         
         verifyNoMoreInteractions(row.getCell(1));
     }
