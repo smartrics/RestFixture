@@ -57,10 +57,16 @@ public class RestFixtureTestHelper {
 	}
 
     public Parse createSingleRowFitTable(String... cells) {
+        return createFitTable(cells);
+    }
+
+    public Parse createFitTable(String[] ... cellsArray) {
         Parse t = null;
         StringBuffer rBuff = new StringBuffer();
         rBuff.append("<table>");
-        rBuff.append(createFitRow(cells));
+        for(String[] cells : cellsArray) {
+        	rBuff.append(createFitRow(cells));
+        }
         rBuff.append("</table>");
         try {
             t = new Parse(rBuff.toString());

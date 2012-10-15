@@ -39,7 +39,6 @@ public class FitRestFixture extends ActionFixture {
 
 	private RestFixture restFixture;
 	
-	
 	public String toString() {
 		return restFixture.toString();
 	}
@@ -168,14 +167,16 @@ public class FitRestFixture extends ActionFixture {
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void doCells(Parse parse) {
-		restFixture = new RestFixture();
-		restFixture.setConfig(Config.getConfig(getConfigNameFromArgs()));
-		String url = getBaseUrlFromArgs();
-		if (url != null) {
-			restFixture.setBaseUrl(new Url(Tools.fromSimpleTag(url)));
+		if(restFixture == null) {
+			restFixture = new RestFixture();
+			restFixture.setConfig(Config.getConfig(getConfigNameFromArgs()));
+			String url = getBaseUrlFromArgs();
+			if (url != null) {
+				restFixture.setBaseUrl(new Url(Tools.fromSimpleTag(url)));
+			}
+			restFixture.initialize(Runner.FIT);
+			((FitFormatter) restFixture.getFormatter()).setActionFixtureDelegate(this);
 		}
-		restFixture.initialize(Runner.FIT);
-		((FitFormatter) restFixture.getFormatter()).setActionFixtureDelegate(this);
 		RowWrapper currentRow = new FitRow(parse);
 		try {
 			restFixture.processRow(currentRow);
@@ -184,7 +185,6 @@ public class FitRestFixture extends ActionFixture {
             restFixture.getFormatter().exception(currentRow.getCell(0), exception);
 		}
 	}
-
 
 	/**
 	 * Process args to extract the optional config name.

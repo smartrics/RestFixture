@@ -37,6 +37,7 @@ public class RestFixtureFitTest {
     private final Variables variables = new Variables();
     private Config config;
     private Parse emptyParse;
+	private RestFixtureTestHelper helper;
 
     @Before
     public void setUp() {
@@ -49,7 +50,7 @@ public class RestFixtureFitTest {
         };
                 
         variables.clearAll();
-        RestFixtureTestHelper helper = new RestFixtureTestHelper();
+        helper = new RestFixtureTestHelper();
         emptyParse = helper.buildEmptyParse();
     }
 
@@ -89,4 +90,22 @@ public class RestFixtureFitTest {
         fixture.doCells(emptyParse);
         assertEquals("configName", fixture.getConfig().getName());
     }
+    
+
+    @Test
+    public void mustSetBodyOnRequestWhenPosting() {
+        fixture = new FitRestFixture() {
+            {
+                super.args = new String[] { BASE_URL };
+            }
+        };
+        Parse postWithSetBodyParse = helper.createFitTable(
+        		new String[]{ "setBody", "<body>count</body>"}, 
+        		new String[]{"POST", "/resource", "", "", ""});
+
+        fixture.doCells(postWithSetBodyParse);
+
+    }
+    
+    
 }
