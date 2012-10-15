@@ -321,11 +321,25 @@ And it also works as a living/executable documentation of the API.
 				<updatePolicy>never</updatePolicy>
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
-			<id>sonatype-releases</id>
-			<name>OSS releases</name>
-			<url>http://oss.sonatype.org/content/repositories/releases/</url>
-			<layout>default</layout>
+			<id>central</id>
+			<url>http://repo1.maven.org/maven2/</url>
 		</repository>
+                <repository>
+                        <releases>
+                                <enabled>true</enabled>
+                                <updatePolicy>always</updatePolicy>
+                                <checksumPolicy>warn</checksumPolicy>
+                        </releases>
+                        <snapshots>
+                                <enabled>true</enabled>
+                                <updatePolicy>never</updatePolicy>
+                                <checksumPolicy>fail</checksumPolicy>
+                        </snapshots>
+                        <id>sonatype-releases</id>
+                        <name>OSS releases</name>
+                        <url>http://oss.sonatype.org/content/repositories/releases/</url>
+                        <layout>default</layout>
+                </repository>
 	</repositories>
 
 </project>

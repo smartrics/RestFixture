@@ -20,6 +20,8 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
+import fit.Fixture;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -171,7 +173,7 @@ import smartrics.rest.fitnesse.fixture.support.Variables;
  * 
  * @author smartrics
  */
-public class RestFixture {
+public class RestFixture extends Fixture {
 
 	/**
 	 * What runner this table is running on.
@@ -218,6 +220,8 @@ public class RestFixture {
 	private boolean displayActualOnRight;
 
 	private boolean debugMethodCall = false;
+
+	private boolean ignoreReadTimeout = false;
 
 	/**
 	 * the headers passed to each request by default.
@@ -487,7 +491,7 @@ public class RestFixture {
         requestHeaders = parseHeaders(substitutedHeaders);   
 		CellWrapper<?> cell = row.getCell(1);
         if(!substitutedHeaders.equals(headers)) {
-			cell.body(getFormatter().gray(substitutedHeaders));
+		cell.body(getFormatter().gray(substitutedHeaders));
         }
     }
 
@@ -798,8 +802,12 @@ public class RestFixture {
         	doMethod(method, resUrl, rBody);
         	completeHttpMethodExecution();
         } catch (RuntimeException e) {
-        	getFormatter().exception(row.getCell(0), "Execution of " + method + " caused exception '" + e.getMessage() + "'");
-        	e.printStackTrace();
+            if ( ignoreReadTimeout && e.getMessage().contains("Read timed out") ) {
+                completeHttpMethodExecutionWithIgnoredTimeout(method);
+            } else {
+                getFormatter().exception(row.getCell(0), "Execution of " + method + " caused exception '" + e.getMessage() + "'");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -828,6 +836,18 @@ public class RestFixture {
         setLastResponse(response);
     }
 
+    @SuppressWarnings({ "unchecked" })
+    protected void completeHttpMethodExecutionWithIgnoredTimeout( String method) {
+        String uri = getLastRequest().getResource();
+        String query = getLastRequest().getQuery();
+        if (query != null && !"".equals(query.trim())) {
+            uri = uri + "?" + query;
+        }
+        String clientBaseUri = restClient.getBaseUrl();
+        String u = clientBaseUri + uri;
+        getFormatter().asLink(row.getCell(1), u, uri);
+    }
+    
 	private ContentType getContentTypeOfLastResponse() {
 		return ContentType.parse(getLastResponse().getHeader("Content-Type"));
 	}
@@ -993,6 +1013,8 @@ public class RestFixture {
         str = config.get("restfixture.xml.namespace.context", "");
         namespaceContext = parseNamespaceContext(str);
 
+        ignoreReadTimeout = config.getAsBoolean("restfixture.ignore.read.timeout", ignoreReadTimeout);
+        
         LOG.debug("Using namespaces: " + namespaceContext);
         
         ContentType.resetDefaultMapping();
@@ -1044,5 +1066,21 @@ public class RestFixture {
             }
         }
         return rowAsList;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public void sleep() {
+        System.out.println("sleeping");
+        LOG.info("sleeping");
+        debugMethodCallStart();
+        CellWrapper timeCell = row.getCell(1);
+        try {
+            long ms = Long.parseLong(timeCell.text().trim());
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            //ignore
+        } finally {
+            debugMethodCallEnd();
+        }
     }
 }
