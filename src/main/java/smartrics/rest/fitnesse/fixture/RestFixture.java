@@ -647,7 +647,7 @@ public class RestFixture {
                     exprCell.body(getFormatter().gray(exprCell.body()));
                 } catch (RuntimeException e) {
                     getFormatter().exception(exprCell, e.getMessage());
-                    e.printStackTrace();
+                    LOG.error("Exception occurred when processing cell=" + exprCell, e);
                 }
                 GLOBALS.put(label, sValue);
                 adapter.set(sValue);
@@ -799,7 +799,7 @@ public class RestFixture {
         	completeHttpMethodExecution();
         } catch (RuntimeException e) {
         	getFormatter().exception(row.getCell(0), "Execution of " + method + " caused exception '" + e.getMessage() + "'");
-        	e.printStackTrace();
+        	LOG.error("Exception occurred when processing method=" + method, e);
         }
     }
 

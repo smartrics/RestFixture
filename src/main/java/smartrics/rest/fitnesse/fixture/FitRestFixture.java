@@ -32,6 +32,7 @@ import smartrics.rest.fitnesse.fixture.support.RowWrapper;
 import smartrics.rest.fitnesse.fixture.support.Tools;
 import smartrics.rest.fitnesse.fixture.support.Url;
 import fit.ActionFixture;
+import fit.Fixture;
 import fit.Parse;
 
 public class FitRestFixture extends ActionFixture {
