@@ -791,7 +791,7 @@ public class RestFixture {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void doMethod(String body, String method) {
 		CellWrapper urlCell = row.getCell(1);
-		String url = stripTag(urlCell.text());
+		String url = deHtmlify(stripTag(urlCell.text()));
 		String resUrl = GLOBALS.substitute(url);
         String rBody = GLOBALS.substitute(body);
         try {
@@ -803,7 +803,7 @@ public class RestFixture {
         }
     }
 
-    protected void doMethod(String method, String resUrl, String rBody) {
+	protected void doMethod(String method, String resUrl, String rBody) {
         setLastRequest(partsFactory.buildRestRequest());
 		getLastRequest().setMethod(RestRequest.Method.valueOf(method));
 		getLastRequest().addHeaders(getHeaders());
@@ -1045,4 +1045,10 @@ public class RestFixture {
         }
         return rowAsList;
     }
+
+    private String deHtmlify(String someHtml) {
+		return Tools.fromHtml(someHtml);
+	}
+
+
 }

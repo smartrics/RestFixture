@@ -418,7 +418,8 @@ public final class Tools {
 				.replaceAll("<span[^>]*>", "").replaceAll("</span>", "")
 				.replaceAll("<pre>", "").replaceAll("</pre>", "")
 				.replaceAll("&nbsp;", " ").replaceAll("&gt;", ">")
-				.replaceAll("&lt;", "<").replaceAll("&nbsp;", " ");
+				.replaceAll("&amp;", "&").replaceAll("&lt;", "<")
+				.replaceAll("&nbsp;", " ");
 	}
 
 	public static String toHtmlLabel(String string) {
