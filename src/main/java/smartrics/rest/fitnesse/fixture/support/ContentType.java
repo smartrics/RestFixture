@@ -35,7 +35,7 @@ import smartrics.rest.client.RestData.Header;
  */
 public enum ContentType {
 
-    XML, JSON, TEXT, JS;
+    XML, JSON, TEXT, JS, PDF;
 
     private static Map<String, ContentType> contentTypeToEnum = new HashMap<String, ContentType>();
     private static String defaultCharset;
@@ -115,9 +115,11 @@ public enum ContentType {
         contentTypeToEnum.put("application/json", ContentType.JSON);
         contentTypeToEnum.put("text/plain", ContentType.TEXT);
         contentTypeToEnum.put("application/x-javascript", ContentType.JS);
+        contentTypeToEnum.put("application/pdf", ContentType.PDF);
     }
 
     public static ContentType parse(List<Header> contentTypeHeaders) {
+        
         if (contentTypeHeaders.size() != 1 || !"Content-Type".equalsIgnoreCase(contentTypeHeaders.get(0).getName())) {
             return contentTypeToEnum.get("default");
         }
