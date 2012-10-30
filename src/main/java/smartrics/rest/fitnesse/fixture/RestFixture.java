@@ -44,6 +44,7 @@ import smartrics.rest.fitnesse.fixture.support.JavascriptException;
 import smartrics.rest.fitnesse.fixture.support.JavascriptWrapper;
 import smartrics.rest.fitnesse.fixture.support.LetHandler;
 import smartrics.rest.fitnesse.fixture.support.LetHandlerFactory;
+import smartrics.rest.fitnesse.fixture.support.PDFBodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.RowWrapper;
 import smartrics.rest.fitnesse.fixture.support.StatusCodeTypeAdapter;
@@ -861,6 +862,14 @@ public class RestFixture {
 		}
 		bodyCell.body(GLOBALS.substitute(bodyCell.body()));
         BodyTypeAdapter bodyTypeAdapter = createBodyTypeAdapter();
+        
+        //set response charSet for converting byte array to PDF correctly. 
+        if (bodyTypeAdapter instanceof PDFBodyTypeAdapter) {
+            PDFBodyTypeAdapter pdfBodyTypeAdapter = (PDFBodyTypeAdapter) bodyTypeAdapter;
+            String pdfResponseCharset = getLastResponse().getResponseCharset();
+            pdfBodyTypeAdapter.setPDFResponseCharset(pdfResponseCharset);
+        }
+        
         process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
     }
 

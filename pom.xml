@@ -102,6 +102,12 @@
 			<version>1.9.0</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- read pdf -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>1.7.1</version>
+        </dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>

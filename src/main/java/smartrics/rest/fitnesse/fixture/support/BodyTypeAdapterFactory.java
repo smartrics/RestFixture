@@ -40,6 +40,7 @@ public class BodyTypeAdapterFactory {
         contentTypeToBodyTypeAdapter.put(ContentType.JSON, JSONBodyTypeAdapter.class);
         contentTypeToBodyTypeAdapter.put(ContentType.XML, XPathBodyTypeAdapter.class);
         contentTypeToBodyTypeAdapter.put(ContentType.TEXT, TextBodyTypeAdapter.class);
+        contentTypeToBodyTypeAdapter.put(ContentType.PDF, PDFBodyTypeAdapter.class);
     }
 
     private BodyTypeAdapterFactory() {
