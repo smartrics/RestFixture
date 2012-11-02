@@ -53,6 +53,12 @@ public class SlimFormatter implements CellFormatter<String> {
         this.minLenForToggle = minLen;
     }
 
+    @Override
+    public int getMinLenghtForToggleCollapse()
+    {
+        return minLenForToggle;
+    }
+
     public boolean isDisplayActual() {
         return displayActual;
     }
@@ -97,13 +103,25 @@ public class SlimFormatter implements CellFormatter<String> {
     @Override
     public void wrong(CellWrapper<String> expected, RestDataTypeAdapter ta) {
         String expectedContent = expected.body();
-        expected.body(Tools.makeContentForWrongCell(expectedContent, ta, this, minLenForToggle));
+        String body = Tools.makeContentForWrongCell(expectedContent, ta, this, minLenForToggle);
+        wrong(expected, body);
+    }
+
+    @Override
+    public void wrong(CellWrapper<String> expected, String failureMessage) {
+        expected.body(failureMessage);
         expected.body("fail:" + expected.body());
     }
 
     @Override
     public void right(CellWrapper<String> expected, RestDataTypeAdapter typeAdapter) {
-        expected.body("pass:" + Tools.makeContentForRightCell(expected.body(), typeAdapter, this, minLenForToggle));
+        String message = Tools.makeContentForRightCell(expected.body(), typeAdapter, this, minLenForToggle);
+        right(expected, message);
+    }
+
+    @Override
+    public void right(CellWrapper<String> expected, String message) {
+        expected.body("pass:" + message);
     }
 
     @Override

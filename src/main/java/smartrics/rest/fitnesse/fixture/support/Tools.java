@@ -388,12 +388,15 @@ public final class Tools {
     }
 
     public static String makeContentForWrongCell(String expected, RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter, int minLenForToggle) {
+        return makeContentForWrongCell(expected, typeAdapter.toString(), typeAdapter.getErrors(), formatter, minLenForToggle);
+    }
+
+    public static String makeContentForWrongCell(String expected, String actual, List<String> errors, CellFormatter<?> formatter, int minLenForToggle) {
         StringBuffer sb = new StringBuffer();
         sb.append(Tools.toHtml(expected));
         if (formatter.isDisplayActual()) {
             sb.append(toHtml("\n"));
             sb.append(formatter.label("expected"));
-            String actual = typeAdapter.toString();
             sb.append(toHtml("-----"));
             sb.append(toHtml("\n"));
             if (minLenForToggle >= 0 && actual.length() > minLenForToggle) {
@@ -404,7 +407,6 @@ public final class Tools {
             sb.append(toHtml("\n"));
             sb.append(formatter.label("actual"));
         }
-        List<String> errors = typeAdapter.getErrors();
         if (errors.size() > 0) {
             sb.append(toHtml("-----"));
             sb.append(toHtml("\n"));
@@ -418,9 +420,12 @@ public final class Tools {
     }
 
     public static String makeContentForRightCell(String expected, RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter, int minLenForToggle) {
+        return makeContentForRightCell(expected, typeAdapter.toString(), formatter, minLenForToggle);
+    }
+
+    public static String makeContentForRightCell(String expected, String actual, CellFormatter<?> formatter, int minLenForToggle) {
         StringBuffer sb = new StringBuffer();
         sb.append(toHtml(expected));
-        String actual = typeAdapter.toString();
         if (formatter.isDisplayActual() && !expected.equals(actual)) {
             sb.append(toHtml("\n"));
             sb.append(formatter.label("expected"));

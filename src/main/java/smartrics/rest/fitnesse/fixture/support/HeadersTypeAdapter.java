@@ -96,4 +96,13 @@ public class HeadersTypeAdapter extends RestDataTypeAdapter {
         return b.toString().trim();
     }
 
+    /**
+     * @see smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter#isBinaryResponse()
+     */
+    @Override
+    public boolean isBinaryResponse()
+    {
+        return false;
+    }
+
 }

@@ -40,6 +40,19 @@ public abstract class RestDataTypeAdapter extends TypeAdapter implements fitness
 
     private Map<String, String> context;
 
+    /**
+     * @return true if the response body from the server was raw binary data
+     */
+    public abstract boolean isBinaryResponse();
+
+    /**
+     * @return true if the response body from the server was some for of String data
+     */
+    public boolean isTextResponse()
+    {
+        return !isBinaryResponse();
+    }
+
     @Override
     public String toString() {
         return toString(get());
@@ -55,8 +68,10 @@ public abstract class RestDataTypeAdapter extends TypeAdapter implements fitness
         return actual;
     }
 
-    protected void addError(String e) {
-        errors.add(e);
+    public void addError(String e) {
+        if ((e != null) && !e.trim().isEmpty()) {
+            errors.add(e);
+        }
     }
 
     public List<String> getErrors() {
@@ -65,11 +80,11 @@ public abstract class RestDataTypeAdapter extends TypeAdapter implements fitness
 
     /**
      * Used to pass some form of context to the adapter.
-     * 
+     *
      * @param context
      */
-    public void setContext(Map<String, String> c) {
-        this.context = c;
+    public void setContext(Map<String, String> context) {
+        this.context = context;
     }
 
     protected Map<String, String> getContext() {

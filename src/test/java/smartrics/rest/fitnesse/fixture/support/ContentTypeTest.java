@@ -72,13 +72,21 @@ public class ContentTypeTest {
 		headers.add(new RestData.Header("Content-Type",
 				"text/plain; charset=iso-8859-1"));
 
-		assertEquals(ContentType.TEXT, ContentType.parse(headers));
-	}
+        assertEquals(ContentType.TEXT, ContentType.parse(headers));
+    }
 
-	@Test
+    @Test
+    public void shouldReturnCorrectTypeGivenApplicationBinary() {
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new RestData.Header("Content-Type", "application/binary"));
+
+        assertEquals(ContentType.FILE, ContentType.parse(headers));
+    }
+
+    @Test
     public void shouldReturnDefaultGivenAnythingElse() {
-		List<Header> headers = new ArrayList<Header>();
-		headers.add(new RestData.Header("Content-Type", "blah/blah"));
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new RestData.Header("Content-Type", "blah/blah"));
 
         assertEquals(ContentType.typeFor("default"), ContentType.parse(headers));
 	}
@@ -166,6 +174,8 @@ public class ContentTypeTest {
         assertEquals(ContentType.XML, ContentType.parse(headers));
         headers.set(0, new RestData.Header("Content-Type", "text/plain"));
         assertEquals(ContentType.JSON, ContentType.parse(headers));
+        headers.set(0, new RestData.Header("Content-Type", "application/binary"));
+        assertEquals(ContentType.FILE, ContentType.parse(headers));
 
         // overrides "default"
         headers.set(0, new RestData.Header("Content-Type", "unhandled"));
@@ -179,6 +189,7 @@ public class ContentTypeTest {
         configEntry.append("application/xhtml=xml<br/>\n");
         configEntry.append("application/my-app-xml=xml<br/>\n");
         configEntry.append("text/plain=json<br/>\n\n");
+        configEntry.append("application/binary=file<br/>\n\n");
 
         return configEntry.toString();
     }

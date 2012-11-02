@@ -38,7 +38,7 @@ import smartrics.rest.config.Config;
  */
 public enum ContentType {
 
-    XML, JSON, TEXT, JS;
+    XML, JSON, TEXT, JS, FILE;
 
     private static Map<String, ContentType> contentTypeToEnum = new HashMap<String, ContentType>();
     private static String defaultCharset;
@@ -118,6 +118,7 @@ public enum ContentType {
         contentTypeToEnum.put("application/json", ContentType.JSON);
         contentTypeToEnum.put("text/plain", ContentType.TEXT);
         contentTypeToEnum.put("application/x-javascript", ContentType.JS);
+        contentTypeToEnum.put("application/binary", ContentType.FILE);
     }
 
     public static ContentType parse(List<Header> contentTypeHeaders) {

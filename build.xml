@@ -1,434 +1,434 @@
 <project name="RestFixture" default="full" basedir=".">
-	<record name="${basedir}/${ant.project.name}.build.log" loglevel="verbose" />
+    <record name="${basedir}/${ant.project.name}.build.log" loglevel="verbose" />
 
-	<property file="properties/${properties}.properties" />
-	<property file="properties/${user.name}.properties" />
-	<property file="build.properties" />
+    <property file="properties/${properties}.properties" />
+    <property file="properties/${user.name}.properties" />
+    <property file="build.properties" />
 
-	<property name="src.unit" value="${basedir}/src/test/java" />
-	<property name="src.cat.java" value="${basedir}/src/test/fitnesse" />
-	<property name="src.cat.fitnesse" value="${basedir}/src/test/cat" />
-	<property name="src" value="${basedir}/src/main/java" />
-	<property name="etc" value="${basedir}/etc" />
-	<property name="resources" value="${basedir}/src/main/resources" />
-	<property name="build" value="${basedir}/build" />
-	<property name="dist" value="${basedir}/dist" />
-	<property name="lib" value="${basedir}/lib" />
-	<property name="reports" value="${build}/reports" />
-	<property name="fitnesse.reports" value="${reports}/fitnesse" />
-	<property name="fitnesse.reports.resources" value="${etc}/fitnesse" />
-	<property name="artifacts" value="${dist}/artifacts" />
+    <property name="src.unit" value="${basedir}/src/test/java" />
+    <property name="src.cat.java" value="${basedir}/src/test/fitnesse" />
+    <property name="src.cat.fitnesse" value="${basedir}/src/test/cat" />
+    <property name="src" value="${basedir}/src/main/java" />
+    <property name="etc" value="${basedir}/etc" />
+    <property name="resources" value="${basedir}/src/main/resources" />
+    <property name="build" value="${basedir}/build" />
+    <property name="dist" value="${basedir}/dist" />
+    <property name="lib" value="${basedir}/lib" />
+    <property name="reports" value="${build}/reports" />
+    <property name="fitnesse.reports" value="${reports}/fitnesse" />
+    <property name="fitnesse.reports.resources" value="${etc}/fitnesse" />
+    <property name="artifacts" value="${dist}/artifacts" />
 
-	<property name="fitnesse.path" value="${ant.project.name}Tests" />
-	<property name="fitnesse.test.suite" value="${fitnesse.path}" />
-	<property name="fitnesse.root.name" value="FitNesseRoot" />
-	<property name="fitnesse.root"
-	          value="${fitnesse.home}/${fitnesse.root.name}" />
-	<property name="fitnesse.jar" value="${lib}/fitnesse/fitnesse.jar" />
-	<property name="restfixture.jar" value="${build}/${ant.project.name}.jar" />
-	<property name="restfixture.fitnesse.jar"
-	          value="${build}/${ant.project.name}_fitnesse.jar" />
+    <property name="fitnesse.path" value="${ant.project.name}Tests" />
+    <property name="fitnesse.test.suite" value="${fitnesse.path}" />
+    <property name="fitnesse.root.name" value="FitNesseRoot" />
+    <property name="fitnesse.root"
+              value="${fitnesse.home}/${fitnesse.root.name}" />
+    <property name="fitnesse.jar" value="${lib}/fitnesse/fitnesse.jar" />
+    <property name="restfixture.jar" value="${build}/${ant.project.name}.jar" />
+    <property name="restfixture.fitnesse.jar"
+              value="${build}/${ant.project.name}_fitnesse.jar" />
 
-	<property name="build.fitnesse.home" value="${basedir}/build/fitnesse" />
-	<property name="build.fitnesse.root"
-	          value="${build.fitnesse.home}/${fitnesse.root.name}" />
-	<property name="build.fitnesse.test.root"
-	          value="${build.fitnesse.root}/${fitnesse.path}" />
-	<property name="src.cat.temp" value="${build}/src-cat" />
-	<property name="src.cat.temp.root"
-	          value="${build}/src-cat/${fitnesse.root.name}/${fitnesse.test.suite}" />
-	<property name="findbugs.home" value="${lib}/test/metrics/findbugs" />
+    <property name="build.fitnesse.home" value="${basedir}/build/fitnesse" />
+    <property name="build.fitnesse.root"
+              value="${build.fitnesse.home}/${fitnesse.root.name}" />
+    <property name="build.fitnesse.test.root"
+              value="${build.fitnesse.root}/${fitnesse.path}" />
+    <property name="src.cat.temp" value="${build}/src-cat" />
+    <property name="src.cat.temp.root"
+              value="${build}/src-cat/${fitnesse.root.name}/${fitnesse.test.suite}" />
+    <property name="findbugs.home" value="${lib}/test/metrics/findbugs" />
 
-	<path id="project.classpath">
-		<pathelement location="${resources}" />
-		<fileset dir="${lib}">
-			<include name="**/*.jar" />
-			<!-- build.metrics.xml will define this for his own purposes -->
-			<exclude name="**/metrics/**/*.jar" />
-			<exclude name="**/ci/**/*.jar" />
-		</fileset>
-	</path>
+    <path id="project.classpath">
+        <pathelement location="${resources}" />
+        <fileset dir="${lib}">
+            <include name="**/*.jar" />
+            <!-- build.metrics.xml will define this for his own purposes -->
+            <exclude name="**/metrics/**/*.jar" />
+            <exclude name="**/ci/**/*.jar" />
+        </fileset>
+    </path>
 
-	<path id="test.classpath">
-		<path refid="project.classpath" />
-		<!-- this will shadow the ones in classes/main -->
-		<pathelement location="${build}/classes/main" />
-		<pathelement location="${build}/classes/unit" />
-	</path>
+    <path id="test.classpath">
+        <path refid="project.classpath" />
+        <!-- this will shadow the ones in classes/main -->
+        <pathelement location="${build}/classes/main" />
+        <pathelement location="${build}/classes/unit" />
+    </path>
 
-	<target name="full" description="full build target"
-	        depends="clean, test, package, fitnesse-test, metrics, dist" />
+    <target name="full" description="full build target"
+            depends="clean, test, package, fitnesse-test, metrics, dist" />
 
-	<target name="init">
-		<mkdir dir="${build}" />
-		<mkdir dir="${reports}" />
-	</target>
+    <target name="init">
+        <mkdir dir="${build}" />
+        <mkdir dir="${reports}" />
+    </target>
 
-	<target name="clean" description="cleans the build artifacts directory">
-		<delete dir="${build}" />
-		<delete dir="${dist}" />
-		<!-- This comes from the RestFixtureWithSeq hardcoded values -->
-		<delete dir="FitNesseRoot" />
-	</target>
+    <target name="clean" description="cleans the build artifacts directory">
+        <delete dir="${build}" />
+        <delete dir="${dist}" />
+        <!-- This comes from the RestFixtureWithSeq hardcoded values -->
+        <delete dir="FitNesseRoot" />
+    </target>
 
-	<target name="compile" depends="init" description="compiles src code">
-		<mkdir dir="${build}/classes/main" />
-		<javac includes="**/*.java"
-		       debug="${build.debug}"
-		       destdir="${build}/classes/main"
-		       target="${build.target}">
-			<src path="${src}" />
-			<classpath refid="project.classpath" />
-		</javac>
-	</target>
+    <target name="compile" depends="init" description="compiles src code">
+        <mkdir dir="${build}/classes/main" />
+        <javac includes="**/*.java"
+               debug="${build.debug}"
+               destdir="${build}/classes/main"
+               target="${build.target}">
+            <src path="${src}" />
+            <classpath refid="project.classpath" />
+        </javac>
+    </target>
 
-	<target name="compile-unit" depends="compile" description="compiles unit tests">
-		<mkdir dir="${build}/classes/unit" />
-		<mkdir dir="${reports}/unit" />
-		<javac debug="${build.debug}"
-		       destdir="${build}/classes/unit"
-		       target="${build.target}">
-			<classpath refid="test.classpath" />
-			<src path="${src.unit}" />
-			<include name="**/*.java" />
-		</javac>
-	</target>
+    <target name="compile-unit" depends="compile" description="compiles unit tests">
+        <mkdir dir="${build}/classes/unit" />
+        <mkdir dir="${reports}/unit" />
+        <javac debug="${build.debug}"
+               destdir="${build}/classes/unit"
+               target="${build.target}">
+            <classpath refid="test.classpath" />
+            <src path="${src.unit}" />
+            <include name="**/*.java" />
+        </javac>
+    </target>
 
-	<target name="test" depends="compile-unit" description="executes RestFixture unit tests">
-		<delete dir="${reports}/unit" />
-		<mkdir dir="${reports}/unit" />
-		<junit errorproperty="test.failed" fork="false" printsummary="true">
-			<classpath refid="test.classpath" />
-			<formatter type="xml" />
-			<batchtest fork="yes" todir="${reports}/unit">
-				<fileset dir="${src.unit}">
-					<include name="**/*Test.java" />
-				</fileset>
-			</batchtest>
-		</junit>
-		<junitreport todir="${reports}/unit">
-			<fileset dir="${reports}/unit">
-				<include name="TEST-*.xml" />
-			</fileset>
-			<report format="frames" todir="${reports}/unit/html" />
-		</junitreport>
-		<fail if="test.failed" />
-	</target>
+    <target name="test" depends="compile-unit" description="executes RestFixture unit tests">
+        <delete dir="${reports}/unit" />
+        <mkdir dir="${reports}/unit" />
+        <junit errorproperty="test.failed" fork="false" printsummary="true">
+            <classpath refid="test.classpath" />
+            <formatter type="xml" />
+            <batchtest fork="yes" todir="${reports}/unit">
+                <fileset dir="${src.unit}">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+        <junitreport todir="${reports}/unit">
+            <fileset dir="${reports}/unit">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report format="frames" todir="${reports}/unit/html" />
+        </junitreport>
+        <fail if="test.failed" />
+    </target>
 
-	<target name="metrics" description="runs metrics build (delegates to build.metrics.xml)"
-	        depends="compile, compile-unit, compile-cat"
-	        if="calculate.metrics">
-		<property name="inherit.properties" value="true" />
-		<ant antfile="build.metrics.xml"
-		     inheritall="true"
-		     inheritrefs="true"
-		     target="all" />
-	</target>
+    <target name="metrics" description="runs metrics build (delegates to build.metrics.xml)"
+            depends="compile, compile-unit, compile-cat"
+            if="calculate.metrics">
+        <property name="inherit.properties" value="true" />
+        <ant antfile="build.metrics.xml"
+             inheritall="true"
+             inheritrefs="true"
+             target="all" />
+    </target>
 
-	<target name="compile-cat" depends="compile" description="compiles the CAT tests dependencies">
-		<mkdir dir="${build}/classes/cat" />
-		<javac includes="**/*.java"
-		       debug="${build.debug}"
-		       target="${build.target}"
-		       destdir="${build}/classes/cat">
-			<src path="${src.cat.java}" />
-			<classpath refid="test.classpath" />
-		</javac>
-	</target>
+    <target name="compile-cat" depends="compile" description="compiles the CAT tests dependencies">
+        <mkdir dir="${build}/classes/cat" />
+        <javac includes="**/*.java"
+               debug="${build.debug}"
+               target="${build.target}"
+               destdir="${build}/classes/cat">
+            <src path="${src.cat.java}" />
+            <classpath refid="test.classpath" />
+        </javac>
+    </target>
 
-	<target name="package" depends="compile,compile-cat" description="packages the RestFixture and RestFixture.fitnesse jars">
-		<jar destfile="${restfixture.jar}"
-		     basedir="${build}/classes/main"
-		     includes="**/*" />
-		<jar destfile="${restfixture.fitnesse.jar}"
-		     basedir="${build}/classes/cat"
-		     includes="**/*"
-		     excludes="**/*.jar" />
-	</target>
+    <target name="package" depends="compile,compile-cat" description="packages the RestFixture and RestFixture.fitnesse jars">
+        <jar destfile="${restfixture.jar}"
+             basedir="${build}/classes/main"
+             includes="**/*" />
+        <jar destfile="${restfixture.fitnesse.jar}"
+             basedir="${build}/classes/cat"
+             includes="**/*"
+             excludes="**/*.jar" />
+    </target>
 
-	<target name="fitnesse-src-bundle"
-	        description="Takes the RestFixture tests for Fit runner and converts them in tests for Slim">
-		<property name="src.cat.shared" value="${build}/src-cat/shared" />
+    <target name="fitnesse-src-bundle"
+            description="Takes the RestFixture tests for Fit runner and converts them in tests for Slim">
+        <property name="src.cat.shared" value="${build}/src-cat/shared" />
 
-		<delete dir="${src.cat.temp}" failonerror="false" />
-		<mkdir dir="${src.cat.temp}" />
+        <delete dir="${src.cat.temp}" failonerror="false" />
+        <mkdir dir="${src.cat.temp}" />
 
-		<!-- copies all but shared -->
-		<copy todir="${src.cat.temp}" overwrite="true" verbose="${verbose}">
-			<filterset>
-				<filter token="FITNESSE_HOME" value="${fitnesse.home}" />
-				<filter token="FITNESSE_TEST_ROOT"
-				        value="${fitnesse.test.root}" />
-				<filter token="TEMP_DIRECTORY" value="${tmpdir}" />
-			</filterset>
-			<fileset dir="${src.cat.fitnesse}" />
-		</copy>
+        <!-- copies all but shared -->
+        <copy todir="${src.cat.temp}" overwrite="true" verbose="${verbose}">
+            <filterset>
+                <filter token="FITNESSE_HOME" value="${fitnesse.home}" />
+                <filter token="FITNESSE_TEST_ROOT"
+                        value="${fitnesse.test.root}" />
+                <filter token="TEMP_DIRECTORY" value="${tmpdir}" />
+            </filterset>
+            <fileset dir="${src.cat.fitnesse}" />
+        </copy>
 
-		<copy todir="${src.cat.temp.root}/FitTests"
-		      overwrite="true"
-		      verbose="${verbose}">
-			<fileset dir="${src.cat.shared}" />
-		</copy>
-		<copy todir="${src.cat.temp.root}/SlimTests"
-		      overwrite="true"
-		      verbose="${verbose}">
-			<fileset dir="${src.cat.shared}" />
-		</copy>
+        <copy todir="${src.cat.temp.root}/FitTests"
+              overwrite="true"
+              verbose="${verbose}">
+            <fileset dir="${src.cat.shared}" />
+        </copy>
+        <copy todir="${src.cat.temp.root}/SlimTests"
+              overwrite="true"
+              verbose="${verbose}">
+            <fileset dir="${src.cat.shared}" />
+        </copy>
 
-		<fileset id="fitnesse.source.files"
-		         dir="${src.cat.temp.root}/SlimTests">
-			<include name="**/content.txt" />
-		</fileset>
+        <fileset id="fitnesse.source.files"
+                 dir="${src.cat.temp.root}/SlimTests">
+            <include name="**/content.txt" />
+        </fileset>
 
-		<!-- TODO: replace this with an ant task -->
-		<!-- matches and converst fit RestFixtures into Slim ones -->
-		<replaceregexp flags="g">
-			<regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixture\-\![\s]*\|" />
-			<substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixture-! |" />
-			<fileset refid="fitnesse.source.files" />
-		</replaceregexp>
-		<replaceregexp flags="g">
-			<regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixtureWithSeq\-\![\s]*\|" />
-			<substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureWithSeqForSlim-! |" />
-			<fileset refid="fitnesse.source.files" />
-		</replaceregexp>
-		<replaceregexp flags="g">
-			<regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixtureConfig\-\![\s]*\|" />
-			<substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureConfig-!  |" />
-			<fileset refid="fitnesse.source.files" />
-		</replaceregexp>
-		<!-- matches and converst paths to tests -->
-		<replaceregexp flags="g">
-			<regexp pattern="RestFixtureTests\.FitTests" />
-			<substitution expression="RestFixtureTests.SlimTests" />
-			<fileset refid="fitnesse.source.files" />
-		</replaceregexp>
-		<!-- converts ActionFixrures used to support tests in RestFixture CATs -->
-		<replaceregexp flags="g">
-			<regexp pattern="[\!]*\|[\s]*Action\s*Fixture[\.\s]*\|" />
-			<substitution expression="" />
-			<fileset refid="fitnesse.source.files" />
-		</replaceregexp>
-		<replaceregexp flags="g">
-			<regexp pattern="\|[\s]*start[\s]*\|[\s]*\!\-smartrics\.rest\.test\.fitnesse" />
-			<substitution expression="| script |!-smartrics.rest.test.fitnesse" />
-			<fileset refid="fitnesse.source.files" />
-		</replaceregexp>
-		<!-- removes press from fit action fixrure - not needed here -->
-		<replaceregexp flags="g">
-			<regexp pattern="\|[\s]*press[\s]*\|" />
-			<substitution expression="|" />
-			<fileset refid="fitnesse.source.files" />
-		</replaceregexp>
-		<!-- removes enter from fit action fixrure - not needed here -->
-		<replaceregexp flags="g">
-			<regexp pattern="\|[\s]*enter[\s]*\|" />
-			<substitution expression="|" />
-			<fileset refid="fitnesse.source.files" />
-		</replaceregexp>
+        <!-- TODO: replace this with an ant task -->
+        <!-- matches and converst fit RestFixtures into Slim ones -->
+        <replaceregexp flags="g">
+            <regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixture\-\![\s]*\|" />
+            <substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixture-! |" />
+            <fileset refid="fitnesse.source.files" />
+        </replaceregexp>
+        <replaceregexp flags="g">
+            <regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixtureWithSeq\-\![\s]*\|" />
+            <substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureWithSeqForSlim-! |" />
+            <fileset refid="fitnesse.source.files" />
+        </replaceregexp>
+        <replaceregexp flags="g">
+            <regexp pattern="\|[\s]*\!\-smartrics\.rest\.fitnesse\.fixture\.RestFixtureConfig\-\![\s]*\|" />
+            <substitution expression="| !-Table:smartrics.rest.fitnesse.fixture.RestFixtureConfig-!  |" />
+            <fileset refid="fitnesse.source.files" />
+        </replaceregexp>
+        <!-- matches and converst paths to tests -->
+        <replaceregexp flags="g">
+            <regexp pattern="RestFixtureTests\.FitTests" />
+            <substitution expression="RestFixtureTests.SlimTests" />
+            <fileset refid="fitnesse.source.files" />
+        </replaceregexp>
+        <!-- converts ActionFixrures used to support tests in RestFixture CATs -->
+        <replaceregexp flags="g">
+            <regexp pattern="[\!]*\|[\s]*Action\s*Fixture[\.\s]*\|" />
+            <substitution expression="" />
+            <fileset refid="fitnesse.source.files" />
+        </replaceregexp>
+        <replaceregexp flags="g">
+            <regexp pattern="\|[\s]*start[\s]*\|[\s]*\!\-smartrics\.rest\.test\.fitnesse" />
+            <substitution expression="| script |!-smartrics.rest.test.fitnesse" />
+            <fileset refid="fitnesse.source.files" />
+        </replaceregexp>
+        <!-- removes press from fit action fixrure - not needed here -->
+        <replaceregexp flags="g">
+            <regexp pattern="\|[\s]*press[\s]*\|" />
+            <substitution expression="|" />
+            <fileset refid="fitnesse.source.files" />
+        </replaceregexp>
+        <!-- removes enter from fit action fixrure - not needed here -->
+        <replaceregexp flags="g">
+            <regexp pattern="\|[\s]*enter[\s]*\|" />
+            <substitution expression="|" />
+            <fileset refid="fitnesse.source.files" />
+        </replaceregexp>
 
-	</target>
+    </target>
 
-	<target name="fitnesse-copy" depends="package, fitnesse-src-bundle" description="copies fitnesse tests and dependencies into execution directory">
-		<fail unless="fitnesse.test.root"
-		      message="You call this via antcall defining the property fitnesse.test.root" />
-		<echo message="Fitnesse.root=${fitnesse.root}" />
-		<echo message="Fitnesse.test.root=${fitnesse.test.root}" />
-		<delete dir="${fitnesse.test.root}" failonerror="false" />
-		<mkdir dir="${fitnesse.test.root}/lib" />
-		<property name="verbose" value="false" />
-		<copy todir="${fitnesse.test.root}/lib"
-		      flatten="true"
-		      verbose="${verbose}">
-			<fileset dir="build">
-				<include name="*.jar" />
-			</fileset>
-			<fileset dir="lib">
-				<include name="**/*.jar" />
-				<exclude name="${libs.excluded}" />
-			</fileset>
-			<fileset dir="${resources}">
-				<include name="**/*.*" />
-			</fileset>
-		</copy>
-		<copy todir="${fitnesse.test.root}"
-		      overwrite="true"
-		      verbose="${verbose}">
-			<!-- sources being bundled in Fit and Slim formats -->
-			<fileset dir="${src.cat.temp.root}" />
-		</copy>
-	</target>
+    <target name="fitnesse-copy" depends="package, fitnesse-src-bundle" description="copies fitnesse tests and dependencies into execution directory">
+        <fail unless="fitnesse.test.root"
+              message="You call this via antcall defining the property fitnesse.test.root" />
+        <echo message="Fitnesse.root=${fitnesse.root}" />
+        <echo message="Fitnesse.test.root=${fitnesse.test.root}" />
+        <delete dir="${fitnesse.test.root}" failonerror="false" />
+        <mkdir dir="${fitnesse.test.root}/lib" />
+        <property name="verbose" value="false" />
+        <copy todir="${fitnesse.test.root}/lib"
+              flatten="true"
+              verbose="${verbose}">
+            <fileset dir="build">
+                <include name="*.jar" />
+            </fileset>
+            <fileset dir="lib">
+                <include name="**/*.jar" />
+                <exclude name="${libs.excluded}" />
+            </fileset>
+            <fileset dir="${resources}">
+                <include name="**/*.*" />
+            </fileset>
+        </copy>
+        <copy todir="${fitnesse.test.root}"
+              overwrite="true"
+              verbose="${verbose}">
+            <!-- sources being bundled in Fit and Slim formats -->
+            <fileset dir="${src.cat.temp.root}" />
+        </copy>
+    </target>
 
-	<target name="fitnesse-deploy-remote" depends="package" description="deployes fitnesse tests and dependencies into a remote fitnesse installation - available in ${fitnesse.home}">
-		<property name="remote.fitnesse.root" value="${fitnesse.root}" />
-		<antcall target="fitnesse-copy">
-			<param name="fitnesse.root"
-			       value="${fitnesse.home}/${fitnesse.root.name}" />
-			<param name="fitnesse.test.root"
-			       value="${remote.fitnesse.root}/${fitnesse.path}" />
-			<param name="libs.excluded" value="**/fitnesse.jar" />
-			<param name="verbose" value="false" />
-		</antcall>
-	</target>
+    <target name="fitnesse-deploy-remote" depends="package" description="deployes fitnesse tests and dependencies into a remote fitnesse installation - available in ${fitnesse.home}">
+        <property name="remote.fitnesse.root" value="${fitnesse.root}" />
+        <antcall target="fitnesse-copy">
+            <param name="fitnesse.root"
+                   value="${fitnesse.home}/${fitnesse.root.name}" />
+            <param name="fitnesse.test.root"
+                   value="${remote.fitnesse.root}/${fitnesse.path}" />
+            <param name="libs.excluded" value="**/fitnesse.jar" />
+            <param name="verbose" value="false" />
+        </antcall>
+    </target>
 
-	<target name="fitnesse-deploy" depends="package" description="deployes fitnesse tests and dependencies into the local build directory for execution">
-		<antcall target="fitnesse-copy">
-			<param name="fitnesse.root"
-			       value="${build.fitnesse.home}/${fitnesse.root.name}" />
-			<param name="fitnesse.test.root"
-			       value="${build.fitnesse.test.root}" />
-			<param name="libs.excluded" value="" />
-		</antcall>
-		<!-- for local execution with in-process runner we need the fitnesse resources to be available -->
-		<mkdir dir="${build}/fitnesse.extract" />
-		<unzip dest="${build}/fitnesse.extract" src="${fitnesse.jar}">
-			<patternset>
-				<include name="Resources/FitNesseRoot/files/**/*.*" />
-			</patternset>
-		</unzip>
-		<copy todir="${build.fitnesse.home}/${fitnesse.root.name}">
-			<!-- this should reflect the internal fitnesse.jar structure -->
-			<fileset dir="${build}/fitnesse.extract/Resources/FitNesseRoot" />
-		</copy>
-		<delete dir="${build}/fitnesse.extract" />
-	</target>
+    <target name="fitnesse-deploy" depends="package" description="deployes fitnesse tests and dependencies into the local build directory for execution">
+        <antcall target="fitnesse-copy">
+            <param name="fitnesse.root"
+                   value="${build.fitnesse.home}/${fitnesse.root.name}" />
+            <param name="fitnesse.test.root"
+                   value="${build.fitnesse.test.root}" />
+            <param name="libs.excluded" value="" />
+        </antcall>
+        <!-- for local execution with in-process runner we need the fitnesse resources to be available -->
+        <mkdir dir="${build}/fitnesse.extract" />
+        <unzip dest="${build}/fitnesse.extract" src="${fitnesse.jar}">
+            <patternset>
+                <include name="Resources/FitNesseRoot/files/**/*.*" />
+            </patternset>
+        </unzip>
+        <copy todir="${build.fitnesse.home}/${fitnesse.root.name}">
+            <!-- this should reflect the internal fitnesse.jar structure -->
+            <fileset dir="${build}/fitnesse.extract/Resources/FitNesseRoot" />
+        </copy>
+        <delete dir="${build}/fitnesse.extract" />
+    </target>
 
-	<target name="fitnesse-test-remote" description="runs fitnesse tests deployed in a remote fitnesse home"
-	        depends="package, fitnesse-deploy-remote,fitnesse-test-run"
-	        if="execute.cat" />
+    <target name="fitnesse-test-remote" description="runs fitnesse tests deployed in a remote fitnesse home"
+            depends="package, fitnesse-deploy-remote,fitnesse-test-run"
+            if="execute.cat" />
 
-	<target name="fitnesse-test" description="runs fitnesse tests deployed locally in the build area"
-	        depends="package, fitnesse-deploy,fitnesse-test-run"
-	        if="execute.cat" />
+    <target name="fitnesse-test" description="runs fitnesse tests deployed locally in the build area"
+            depends="package, fitnesse-deploy,fitnesse-test-run"
+            if="execute.cat" />
 
-	<target name="fitnesse-test-run" depends="fitnesse-exec-test,check.fitnesse.failure,check.fitnesse.report.failure" />
+    <target name="fitnesse-test-run" depends="fitnesse-exec-test,check.fitnesse.failure,check.fitnesse.report.failure" />
 
-	<target name="check.fitnesse.failure" if="fitnesse.fail">
-		<fail message="FitNesse tests failed (# of failed tests: ${number.of.failed.tests}), see reports in '${fitnesse.reports}/results_sanitised.html' for details." />
-	</target>
+    <target name="check.fitnesse.failure" if="fitnesse.fail">
+        <fail message="FitNesse tests failed (# of failed tests: ${number.of.failed.tests}), see reports in '${fitnesse.reports}/results_sanitised.html' for details." />
+    </target>
 
-	<target name="check.fitnesse.report.failure" if="fitnesse.report.fail">
-		<fail message="FitNesse tests report creation failed (exit status: ${fitnesse.report.exit.status}), see reports in '${fitnesse.reports}/results.html' for a non sanitised version of the report." />
-	</target>
+    <target name="check.fitnesse.report.failure" if="fitnesse.report.fail">
+        <fail message="FitNesse tests report creation failed (exit status: ${fitnesse.report.exit.status}), see reports in '${fitnesse.reports}/results.html' for a non sanitised version of the report." />
+    </target>
 
-	<target name="fitnesse-exec-test" if="execute.cat" description="executes fitnesse tests" >
-		<property name="fitnesse.suite.root" value="${fitnesse.test.suite}" />
-		<mkdir dir="${fitnesse.reports}" />
-		<echo>
+    <target name="fitnesse-exec-test" if="execute.cat" description="executes fitnesse tests" >
+        <property name="fitnesse.suite.root" value="${fitnesse.test.suite}" />
+        <mkdir dir="${fitnesse.reports}" />
+        <echo>
 Executing CAT tests - FitNesse home: '${fitnesse.home}', jar: '${fitnesse.jar}'
-		</echo>
-		<java jar="${fitnesse.jar}"
-		      failonerror="false"
-		      fork="true"
-			  dir="build/fitnesse"
-		      output="${fitnesse.reports}/results.html">
-			<arg value="-c" />
-			<arg value="${fitnesse.suite.root}?suite&amp;format=html" />
-			<arg value="-p" />
-			<arg value="${fitnesse.port}" />
-			<arg value="-r" />
-			<arg value="${fitnesse.root.name}" />
-		</java>
-		<!-- FitNesse doesn't return the number of failed tests in the java exit status -->
-		<java classname="smartrics.rest.support.fitnesse.FitnesseResultVerifier"
-		      failonerror="false"
-		      fork="true"
-		      resultproperty="number.of.failed.tests">
-			<classpath location="${restfixture.fitnesse.jar}" />
-			<classpath refid="project.classpath" />
-			<arg value="${fitnesse.reports}/results.html" />
-		</java>
-		<java classname="smartrics.rest.support.fitnesse.FitnesseResultSanitiser"
-		      failonerror="false"
-		      fork="true"
-		      resultproperty="fitnesse.report.exit.status">
-			<classpath location="${restfixture.fitnesse.jar}" />
-			<classpath refid="project.classpath" />
-			<arg value="${fitnesse.reports}/results.html" />
-			<arg value="${build.fitnesse.root}" />
-		</java>
-		<condition property="fitnesse.fail">
-			<not>
-				<equals arg1="0" arg2="${number.of.failed.tests}" />
-			</not>
-		</condition>
-		<condition property="fitnesse.report.fail">
-			<not>
-				<equals arg1="0" arg2="${fitnesse.report.exit.status}" />
-			</not>
-		</condition>
-		<echo>
-Number of failed tests: ${number.of.failed.tests} 
+        </echo>
+        <java jar="${fitnesse.jar}"
+              failonerror="false"
+              fork="true"
+              dir="build/fitnesse"
+              output="${fitnesse.reports}/results.html">
+            <arg value="-c" />
+            <arg value="${fitnesse.suite.root}?suite&amp;format=html" />
+            <arg value="-p" />
+            <arg value="${fitnesse.port}" />
+            <arg value="-r" />
+            <arg value="${fitnesse.root.name}" />
+        </java>
+        <!-- FitNesse doesn't return the number of failed tests in the java exit status -->
+        <java classname="smartrics.rest.support.fitnesse.FitnesseResultVerifier"
+              failonerror="false"
+              fork="true"
+              resultproperty="number.of.failed.tests">
+            <classpath location="${restfixture.jar}" />
+            <classpath refid="project.classpath" />
+            <arg value="${fitnesse.reports}/results.html" />
+        </java>
+        <java classname="smartrics.rest.support.fitnesse.FitnesseResultSanitiser"
+              failonerror="false"
+              fork="true"
+              resultproperty="fitnesse.report.exit.status">
+            <classpath location="${restfixture.jar}" />
+            <classpath refid="project.classpath" />
+            <arg value="${fitnesse.reports}/results.html" />
+            <arg value="${build.fitnesse.root}" />
+        </java>
+        <condition property="fitnesse.fail">
+            <not>
+                <equals arg1="0" arg2="${number.of.failed.tests}" />
+            </not>
+        </condition>
+        <condition property="fitnesse.report.fail">
+            <not>
+                <equals arg1="0" arg2="${fitnesse.report.exit.status}" />
+            </not>
+        </condition>
+        <echo>
+Number of failed tests: ${number.of.failed.tests}
 Fitnesse report exit status: ${fitnesse.report.exit.status}
-		</echo>
-		<copy file="${fitnesse.reports}/result_sanitised.html" tofile="${fitnesse.reports}/index.html" />
-	</target>
-		
-	<target name="continuous-integration" depends="full" description="executes the full build then executes the CAT tests against the master branch in github of fitnesse (delegates to build.ci.xml">
-		<!-- This target runs a CI with fitnesse directly cloned/pulled from the master github branch -->
-		<ant antfile="build.ci.xml" target="continuous-integration" inheritall="false" inheritrefs="false" />
-	</target>
+        </echo>
+        <copy file="${fitnesse.reports}/result_sanitised.html" tofile="${fitnesse.reports}/index.html" />
+    </target>
 
-	<target name="javadoc">
-		 <javadoc destdir="${build}/docs/api" 
-		 	classpathref="project.classpath"
-		 	author="true" 
-		 	version="true" 
-		 	use="true" 
-		 	windowtitle="RestFixture API">
-		    <fileset dir="${src}" defaultexcludes="yes">
-		      <include name="**"/>
-		    </fileset>
-		    <doctitle><![CDATA[<h1>RestFixture</h1>]]></doctitle>
-		    <bottom><![CDATA[<i>Copyright &#169; 2012 Smartrics. All Rights Reserved.</i>]]></bottom>
-		    <tag name="todo" scope="all" description="To do:"/>
-		    <group title="Packages" packages="smartrics.*"/>
-		  </javadoc>
-	</target>
+    <target name="continuous-integration" depends="full" description="executes the full build then executes the CAT tests against the master branch in github of fitnesse (delegates to build.ci.xml">
+        <!-- This target runs a CI with fitnesse directly cloned/pulled from the master github branch -->
+        <ant antfile="build.ci.xml" target="continuous-integration" inheritall="false" inheritrefs="false" />
+    </target>
 
-	<target name="dist-doc" if="execute.cat" description="creates distributable docs">
-		<!-- distributable docs -->
-		<property name="docs.html.file"
-		          value="${artifacts}/docs/RestFixture-${version}.html" />
-		<copy tofile="${docs.html.file}"
-		      file="${reports}/fitnesse/index.html"
-		      failonerror="false" />
-	</target>
+    <target name="javadoc">
+         <javadoc destdir="${build}/docs/api"
+             classpathref="project.classpath"
+             author="true"
+             version="true"
+             use="true"
+             windowtitle="RestFixture API">
+            <fileset dir="${src}" defaultexcludes="yes">
+              <include name="**"/>
+            </fileset>
+            <doctitle><![CDATA[<h1>RestFixture</h1>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright &#169; 2012 Smartrics. All Rights Reserved.</i>]]></bottom>
+            <tag name="todo" scope="all" description="To do:"/>
+            <group title="Packages" packages="smartrics.*"/>
+          </javadoc>
+    </target>
 
-	<target name="dist" description="creates a distribution">
-		<delete dir="${dist}" />
-		<mkdir dir="${artifacts}" />
-		<copy todir="${artifacts}" file="${build}/${ant.project.name}.jar" />
-		<copy todir="${artifacts}"
-		      file="${build}/${ant.project.name}_fitnesse.jar" />
-		<copy todir="${artifacts}/lib" flatten="true">
-			<fileset dir="lib"
-			         includes="**/*.jar"
-			         excludes="ci/**/*.*, test/**/*.jar, fitnesse/**/*.jar, log4j/**/*.jar" />
-		</copy>
-		<copy todir="${artifacts}" file="CHANGELOG" />
-		<copy todir="${artifacts}" file="COPYING" />
-		<copy todir="${artifacts}" file="COPYING.LESSER" />
-		<copy todir="${artifacts}" file="COPYRIGHT" />
-		<copy todir="${artifacts}" file="README" />
-		<property file="version.properties" />
-		<antcall target="dist-doc" />
-		<zip destfile="dist/RestFixture-nodep-${version}.zip"
-		     basedir="${artifacts}"
-		     casesensitive="true"
-		     compress="true"
-		     includes="**/*"
-		     excludes="lib/**/*.jar" />
-		<zip destfile="dist/RestFixture-${version}.zip"
-		     basedir="${artifacts}"
-		     casesensitive="true"
-		     compress="true"
-		     includes="**/*" />
-		<zip destfile="dist/RestFixture-docs-${version}.zip"
-		     basedir="${artifacts}/docs"
-		     casesensitive="true"
-		     compress="true"
-		     includes="**/*" />
-	</target>
+    <target name="dist-doc" if="execute.cat" description="creates distributable docs">
+        <!-- distributable docs -->
+        <property name="docs.html.file"
+                  value="${artifacts}/docs/RestFixture-${version}.html" />
+        <copy tofile="${docs.html.file}"
+              file="${reports}/fitnesse/index.html"
+              failonerror="false" />
+    </target>
+
+    <target name="dist" description="creates a distribution">
+        <delete dir="${dist}" />
+        <mkdir dir="${artifacts}" />
+        <copy todir="${artifacts}" file="${build}/${ant.project.name}.jar" />
+        <copy todir="${artifacts}"
+              file="${build}/${ant.project.name}_fitnesse.jar" />
+        <copy todir="${artifacts}/lib" flatten="true">
+            <fileset dir="lib"
+                     includes="**/*.jar"
+                     excludes="ci/**/*.*, test/**/*.jar, fitnesse/**/*.jar, log4j/**/*.jar" />
+        </copy>
+        <copy todir="${artifacts}" file="CHANGELOG" />
+        <copy todir="${artifacts}" file="COPYING" />
+        <copy todir="${artifacts}" file="COPYING.LESSER" />
+        <copy todir="${artifacts}" file="COPYRIGHT" />
+        <copy todir="${artifacts}" file="README" />
+        <property file="version.properties" />
+        <antcall target="dist-doc" />
+        <zip destfile="dist/RestFixture-nodep-${version}.zip"
+             basedir="${artifacts}"
+             casesensitive="true"
+             compress="true"
+             includes="**/*"
+             excludes="lib/**/*.jar" />
+        <zip destfile="dist/RestFixture-${version}.zip"
+             basedir="${artifacts}"
+             casesensitive="true"
+             compress="true"
+             includes="**/*" />
+        <zip destfile="dist/RestFixture-docs-${version}.zip"
+             basedir="${artifacts}/docs"
+             casesensitive="true"
+             compress="true"
+             includes="**/*" />
+    </target>
 
 </project>

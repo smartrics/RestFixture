@@ -55,6 +55,20 @@ public class FitFormatter implements CellFormatter<Parse> {
     }
 
     @Override
+    public int getMinLenghtForToggleCollapse()
+    {
+        return minLenForToggle;
+    }
+
+    /**
+     * @param minLenForToggle The minLenForToggle to set.
+     */
+    public void setMinLenForToggle(int minLenForToggle)
+    {
+        this.minLenForToggle = minLenForToggle;
+    }
+
+    @Override
     public void setDisplayActual(boolean d) {
         this.displayActual = d;
     }
@@ -86,14 +100,27 @@ public class FitFormatter implements CellFormatter<Parse> {
     public void wrong(CellWrapper<Parse> expected, RestDataTypeAdapter typeAdapter) {
         String expectedContent = expected.body();
         String body = Tools.makeContentForWrongCell(expectedContent, typeAdapter, this, minLenForToggle);
-        expected.body(body);
+        wrong(expected, body);
+    }
+
+    @Override
+    public void wrong(CellWrapper<Parse> expected, String failureMessage)
+    {
+        expected.body(failureMessage);
         fixture.wrong(expected.getWrapped());
 	}
 
 	@Override
     public void right(CellWrapper<Parse> expected, RestDataTypeAdapter typeAdapter) {
         String expectedContent = expected.body();
-        expected.body(Tools.makeContentForRightCell(expectedContent, typeAdapter, this, minLenForToggle));
+        String message = Tools.makeContentForRightCell(expectedContent, typeAdapter, this, minLenForToggle);
+        right(expected, message);
+    }
+
+    @Override
+    public void right(CellWrapper<Parse> expected, String message)
+    {
+        expected.body(message);
         fixture.right(expected.getWrapped());
 	}
 

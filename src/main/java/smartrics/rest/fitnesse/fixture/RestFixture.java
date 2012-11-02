@@ -903,7 +903,11 @@ public class RestFixture extends ActionFixture {
 		}
 		bodyCell.body(GLOBALS.substitute(bodyCell.body()));
         BodyTypeAdapter bodyTypeAdapter = createBodyTypeAdapter();
-        process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
+        if (bodyTypeAdapter.isTextResponse()) {
+            process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
+        } else {
+            process(bodyCell, getLastResponse().getRawBody(), bodyTypeAdapter);
+        }
     }
 
     // Split out of completeHttpMethodExecution so RestScriptFixture can call this
@@ -922,7 +926,7 @@ public class RestFixture extends ActionFixture {
 	}
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void process(CellWrapper expected, Object actual, RestDataTypeAdapter ta) {
+    protected void process(CellWrapper expected, Object actual, RestDataTypeAdapter ta) {
         if (expected == null) {
             throw new IllegalStateException("You must specify a headers cell");
         }
@@ -934,11 +938,9 @@ public class RestFixture extends ActionFixture {
                 expected.addToBody(getFormatter().gray(actualString));
             }
         } else {
-            boolean success = false;
+            boolean success;
             try {
-                String substitute = GLOBALS.substitute(Tools.fromHtml(expected.text()));
-                Object parse = ta.parse(substitute);
-                success = ta.equals(parse, actual);
+                success = evaluateExpected(expected, actual, ta);
             } catch (Exception e) {
                 getFormatter().exception(expected, e);
                 return;
@@ -951,6 +953,16 @@ public class RestFixture extends ActionFixture {
         }
     }
 
+    @SuppressWarnings("rawtypes")
+    protected boolean evaluateExpected(CellWrapper expected, Object actual, RestDataTypeAdapter ta) throws Exception {
+        Object parse = expected.text();
+        if (ta.isTextResponse()) {
+            String substitute = GLOBALS.substitute(Tools.fromHtml(expected.text()));
+            parse = ta.parse(substitute);
+        }
+        return ta.equals(parse, actual);
+    }
+
     private void debugMethodCallStart() {
         debugMethodCall("=> ");
     }
@@ -959,7 +971,7 @@ public class RestFixture extends ActionFixture {
         debugMethodCall("<= ");
     }
 
-    private void debugMethodCall(String h) {
+    protected void debugMethodCall(String h) {
         if (debugMethodCall) {
             StackTraceElement el = Thread.currentThread().getStackTrace()[4];
             LOG.debug(h + el.getMethodName());
