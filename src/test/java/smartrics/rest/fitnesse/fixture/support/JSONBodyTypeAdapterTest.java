@@ -39,6 +39,7 @@ public class JSONBodyTypeAdapterTest {
     private JSONBodyTypeAdapter adapter;
     private static final String json0 = "{\"a\": { b: [\"12\",\"23\"], \"c\": \"XY\" } }";
     private static final String json1 = "{\"a\": \" 1&\"}";
+    private static final String json2 = "{\"a\": 1, \"b\": 2 }";
     private static final List<String> xPaths = Arrays.asList("/a", "//b");
     private static final String xPathsAsString = "/a<br/>//b";
 
@@ -80,6 +81,12 @@ public class JSONBodyTypeAdapterTest {
         assertEquals(2, adapter.getErrors().size());
         assertEquals("not found: '/a/b[text()='zzz']'", adapter.getErrors().get(0));
         assertEquals("not found: '/a/d[text()='next']'", adapter.getErrors().get(1));
+    }
+
+    @Test
+    public void shouldCorrectlyEvaluateExpressionsWithComparisons() {
+        assertTrue("not found simple expression", adapter.equals("jsonbody.a==1\njsonbody.a<jsonbody.b", json2));
+        assertEquals(0, adapter.getErrors().size());
     }
 
     @Test

@@ -77,7 +77,7 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
                     addError("not found: '" + expr + "'");
                 }
             } catch (Exception e) {
-                throw new IllegalArgumentException("Cannot extract xpath '" + expr + "' from document " + actual.toString(), e);
+                throw new IllegalArgumentException("Cannot evaluate '" + expr + "' in " + actual.toString(), e);
             }
         }
         return getErrors().size() == 0;
@@ -112,10 +112,10 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
             return expectedXPathAsList;
         }
         String expStr = expectedListOfXpathsAsString.trim();
-        if ("no-body".equals(expStr.trim())) {
+        if ("no-body".equals(expStr)) {
             return expectedXPathAsList;
         }
-        if ("".equals(expectedListOfXpathsAsString.trim())) {
+        if ("".equals(expStr)) {
             return expectedXPathAsList;
         }
         expStr = Tools.fromHtml(expStr);
