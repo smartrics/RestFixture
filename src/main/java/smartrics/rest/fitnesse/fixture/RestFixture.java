@@ -642,7 +642,7 @@ public class RestFixture {
             if (letHandler != null) {
                 StringTypeAdapter adapter = new StringTypeAdapter();
                 try {
-                	LOG.info("LetHandler of type: " + letHandler.getClass());
+                	LOG.debug("LetHandler of type: " + letHandler.getClass());
                     sValue = letHandler.handle(getLastResponse(), namespaceContext, expr);
                     exprCell.body(getFormatter().gray(exprCell.body()));
                 } catch (RuntimeException e) {
@@ -679,7 +679,7 @@ public class RestFixture {
 
 	/**
 	 * Evaluates a string using the internal JavaScript engine. Result of the
-	 * last evaluation is set in the lastEvaluation field.
+	 * last evaluation is set in the attribute lastEvaluation.
 	 * 
 	 */
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -778,7 +778,6 @@ public class RestFixture {
     	requestBody = text;
     }
 
-    // added for RestScriptFixture
     protected Map<String, String> getNamespaceContext() {
     	return namespaceContext;
     }
@@ -787,15 +786,15 @@ public class RestFixture {
 		doMethod(null, m);
 	}
     
-    // Split method so RestScriptFixture can feed in the url
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void doMethod(String body, String method) {
 		CellWrapper urlCell = row.getCell(1);
 		String url = deHtmlify(stripTag(urlCell.text()));
 		String resUrl = GLOBALS.substitute(url);
         String rBody = GLOBALS.substitute(body);
+        Map<String, String> rHeaders = substitute(getHeaders());
         try {
-        	doMethod(method, resUrl, rBody);
+        	doMethod(method, resUrl, rHeaders, rBody);
         	completeHttpMethodExecution();
         } catch (RuntimeException e) {
         	getFormatter().exception(row.getCell(0), "Execution of " + method + " caused exception '" + e.getMessage() + "'");
@@ -804,9 +803,13 @@ public class RestFixture {
     }
 
 	protected void doMethod(String method, String resUrl, String rBody) {
+		doMethod(method, resUrl, substitute(getHeaders()), rBody);
+	}
+	
+	protected void doMethod(String method, String resUrl, Map<String, String> headers, String rBody) {
         setLastRequest(partsFactory.buildRestRequest());
 		getLastRequest().setMethod(RestRequest.Method.valueOf(method));
-		getLastRequest().addHeaders(getHeaders());
+		getLastRequest().addHeaders(headers);
 		if (fileName != null) {
 			getLastRequest().setFileName(fileName);
 		}
@@ -827,14 +830,6 @@ public class RestFixture {
         RestResponse response = restClient.execute(getLastRequest());
         setLastResponse(response);
     }
-
-	private ContentType getContentTypeOfLastResponse() {
-		return ContentType.parse(getLastResponse().getHeader("Content-Type"));
-	}
-
-    private String getCharsetOfLastResponse() {
-        return ContentType.parseCharset(getLastResponse().getHeader("Content-Type"));
-	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void completeHttpMethodExecution() {
@@ -923,6 +918,22 @@ public class RestFixture {
             LOG.debug(h + el.getMethodName());
         }
     }
+
+	private ContentType getContentTypeOfLastResponse() {
+		return ContentType.parse(getLastResponse().getHeader("Content-Type"));
+	}
+
+    private String getCharsetOfLastResponse() {
+        return ContentType.parseCharset(getLastResponse().getHeader("Content-Type"));
+	}
+
+	private Map<String, String> substitute(Map<String, String> headers) {
+		Map<String, String> sub = new HashMap<String, String>();
+		for(Map.Entry<String, String> e : headers.entrySet()) {
+			sub.put(e.getKey(), GLOBALS.substitute(e.getValue()));
+		}
+		return sub;
+	}
 
     protected RestResponse getLastResponse() {
         return lastResponse;
