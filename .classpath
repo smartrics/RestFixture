@@ -28,5 +28,6 @@
 	<classpathentry kind="lib" path="lib/rhino/jsr173_1.0_api.jar"/>
 	<classpathentry kind="lib" path="lib/rhino/xbean.jar"/>
 	<classpathentry kind="lib" path="lib/test/mockito/mockito-all-1.7.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j/slf4j-api-1.6.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

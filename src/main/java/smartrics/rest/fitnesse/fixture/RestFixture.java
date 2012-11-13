@@ -55,35 +55,27 @@ import fit.ActionFixture;
 import fit.Parse;
 
 /**
- * A fixture that allows to simply test REST APIs with minimal efforts. The core
- * principles underpinning this fixture are:
+ * A fixture that allows to simply test REST APIs with minimal efforts. The core principles underpinning this fixture
+ * are:
  * <ul>
- * <li>allowing documentation of a REST API by showing how the API looks like.
- * For REST this means
+ * <li>allowing documentation of a REST API by showing how the API looks like. For REST this means
  * <ul>
- * <li>show what the resource URI looks like. For example
- * <code>/resource-a/123/resource-b/234</code>
- * <li>show what HTTP operation is being executed on that resource. Specifically
- * which one fo the main HTTP verbs where under test (GET, POST, PUT, DELETE,
- * HEAD, OPTIONS).
+ * <li>show what the resource URI looks like. For example <code>/resource-a/123/resource-b/234</code>
+ * <li>show what HTTP operation is being executed on that resource. Specifically which one fo the main HTTP verbs where
+ * under test (GET, POST, PUT, DELETE, HEAD, OPTIONS).
  * <li>have the ability to set headers and body in the request
- * <li>check expectations on the return code of the call in order to document
- * the behaviour of the API
- * <li>check expectation on the HTTP headers and body in the response. Again, to
- * document the behaviour
+ * <li>check expectations on the return code of the call in order to document the behaviour of the API
+ * <li>check expectation on the HTTP headers and body in the response. Again, to document the behaviour
  * </ul>
- * <li>should work without the need to write/maintain java code: tests are
- * written in wiki syntax.
+ * <li>should work without the need to write/maintain java code: tests are written in wiki syntax.
  * <li>tests should be easy to write and above all read.
  * </ul>
  * 
  * <b>Configuring RestFixture</b><br/>
- * RestFixture can be configured by using the {@link RestFixtureConfig}. A
- * {@code RestFixtureConfig} can define named maps with configuration key/value
- * pairs. The name of the map is passed as second parameter to the
- * {@code RestFixture}. Using a named configuration is optional: if no name is
- * passed, the default configuration map is used. See {@link RestFixtureConfig}
- * for more details.
+ * RestFixture can be configured by using the {@link RestFixtureConfig}. A {@code RestFixtureConfig} can define named
+ * maps with configuration key/value pairs. The name of the map is passed as second parameter to the {@code RestFixture}
+ * . Using a named configuration is optional: if no name is passed, the default configuration map is used. See
+ * {@link RestFixtureConfig} for more details.
  * <p/>
  * The following list of configuration parameters can are supported.
  * <p/>
@@ -102,55 +94,46 @@ import fit.Parse;
  * </tr>
  * <tr>
  * <td>http.basicauth.username</td>
- * <td><i>username for basic authentication (RestClient proxy configutation)</i>
- * </td>
+ * <td><i>username for basic authentication (RestClient proxy configutation)</i></td>
  * </tr>
  * <tr>
  * <td>http.basicauth.password</td>
- * <td><i>password for basic authentication (RestClient proxy configutation)</i>
- * </td>
+ * <td><i>password for basic authentication (RestClient proxy configutation)</i></td>
  * </tr>
  * <tr>
  * <td>http.client.connection.timeout</td>
- * <td><i>client timeout for http connection (default 3s). (RestClient proxy
- * configutation)</i></td>
+ * <td><i>client timeout for http connection (default 3s). (RestClient proxy configutation)</i></td>
  * </tr>
  * <tr>
  * <td>restfixture.display.actual.on.right</td>
- * <td><i>boolean value. if true, the actual value of the header or body in an
- * expectation cell is displayed even when the expectation is met.</i></td>
+ * <td><i>boolean value. if true, the actual value of the header or body in an expectation cell is displayed even when
+ * the expectation is met.</i></td>
  * </tr>
  * <tr>
  * <td>restfixture.default.headers</td>
- * <td><i>comma separated list of key value pairs representing the default list
- * of headers to be passed for each request. key and values are separated by a
- * colon. Entries are sepatated by \n. {@link RestFixture#setHeader()} will
+ * <td><i>comma separated list of key value pairs representing the default list of headers to be passed for each
+ * request. key and values are separated by a colon. Entries are sepatated by \n. {@link RestFixture#setHeader()} will
  * override this value. </i></td>
  * </tr>
  * <tr>
  * <td>restfixture.xml.namespaces.context</td>
- * <td><i>comma separated list of key value pairs representing namespace
- * declarations. The key is the namespace alias, the value is the namespace URI.
- * alias and URI are separated by a = sign. Entries are sepatated by
- * {@code System.getProperty("line.separator")}. These entries will be used to
- * define the namespace context to be used in xpaths that are evaluated in the
- * results.</i></td>
+ * <td><i>comma separated list of key value pairs representing namespace declarations. The key is the namespace alias,
+ * the value is the namespace URI. alias and URI are separated by a = sign. Entries are sepatated by
+ * {@code System.getProperty("line.separator")}. These entries will be used to define the namespace context to be used
+ * in xpaths that are evaluated in the results.</i></td>
  * </tr>
  * <tr>
  * <td>restfixture.content.handlers.map</td>
- * <td><i>a map of contenty type to type adapters, entries separated by \n, and
- * kye-value separated by '='. Available type adapters are JS, TEXT, JSON, XML
- * (see {@link smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory}
+ * <td><i>a map of contenty type to type adapters, entries separated by \n, and kye-value separated by '='. Available
+ * type adapters are JS, TEXT, JSON, XML (see {@link smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory}
  * ).</i></td>
  * </tr>
  * <tr>
  * <td>restfixture.null.value.representation</td>
- * <td><i>This string is used in replacement of the default string substituted
- * when a null value is set for a symbol. Because now the RestFixture labels
- * support is implemented on top of the Fitnesse symbols, such default value is
- * defined in Fitnesse, and that is the string 'null'. Hence, every substitution
- * that would result in rendering the string 'null' is replaced with the value
- * set for this config key. This value can also be the empty string to replace
+ * <td><i>This string is used in replacement of the default string substituted when a null value is set for a symbol.
+ * Because now the RestFixture labels support is implemented on top of the Fitnesse symbols, such default value is
+ * defined in Fitnesse, and that is the string 'null'. Hence, every substitution that would result in rendering the
+ * string 'null' is replaced with the value set for this config key. This value can also be the empty string to replace
  * null with empty.</i></td>
  * </tr>
  * 
@@ -172,64 +155,66 @@ public class RestFixture extends ActionFixture {
         SLIM, FIT, OTHER;
     };
 
-    private static final String LINE_SEPARATOR = "\n";
+    private static final String LINE_SEPARATOR             = "\n";
 
-    private static final String FILE = "file";
+    private static final String FILE                       = "file";
 
-    private static final Log LOG = LogFactory.getLog(RestFixture.class);
+    private static final Log    LOG                        = LogFactory.getLog(RestFixture.class);
 
-    private Variables GLOBALS;
+    private Variables           GLOBALS;
 
-    private RestResponse lastResponse;
+    private RestResponse        lastResponse;
 
-    private RestRequest lastRequest;
+    private RestRequest         lastRequest;
 
-    private String fileName = null;
+    private String              fileName                   = null;
 
-    private String multipartFileName = null;
+    private String              multipartFileName          = null;
 
-    private String multipartFileParameterName = FILE;
+    private String              multipartFileParameterName = FILE;
 
-    private String requestBody;
+    private String              requestBody;
 
     private Map<String, String> requestHeaders;
 
-    private RestClient restClient;
+    private RestClient          restClient;
 
-    private Config config;
+    private boolean             allowRedirect              = true;
 
-    private boolean displayActualOnRight;
+    private Config              config;
 
-    private boolean debugMethodCall = false;
+    private boolean             displayActualOnRight;
+
+    private final boolean       debugMethodCall            = false;
 
     /**
      * the headers passed to each request by default.
      */
-    private Map<String, String> defaultHeaders = new HashMap<String, String>();
+    private Map<String, String> defaultHeaders             = new HashMap<String, String>();
 
-    private Map<String, String> namespaceContext = new HashMap<String, String>();
+    private Map<String, String> namespaceContext           = new HashMap<String, String>();
 
-    private Url baseUrl;
+    private Url                 baseUrl;
 
     @SuppressWarnings("rawtypes")
-    private RowWrapper row;
+    private RowWrapper          row;
 
-    private CellFormatter<?> formatter;
+    private CellFormatter<?>    formatter;
 
-    private PartsFactory partsFactory;
+    private final PartsFactory  partsFactory;
 
-    private String lastEvaluation;
+    private String              lastEvaluation;
 
-    private int minLenForCollapseToggle;
+    private int                 minLenForCollapseToggle;
 
     /**
      * Constructor for Fit runner.
      */
     public RestFixture() {
         super();
-        this.partsFactory = new PartsFactory();
-        this.displayActualOnRight = true;
-        this.minLenForCollapseToggle = -1;
+        partsFactory = new PartsFactory();
+        displayActualOnRight = true;
+        minLenForCollapseToggle = -1;
     }
 
     /**
@@ -238,7 +223,7 @@ public class RestFixture extends ActionFixture {
      * @param args
      *            the cells following up the first cell in the first row.
      */
-    public RestFixture(String hostName) {
+    public RestFixture(final String hostName) {
         this(hostName, Config.DEFAULT_CONFIG_NAME);
     }
 
@@ -248,20 +233,20 @@ public class RestFixture extends ActionFixture {
      * @param args
      *            the cells following up the first cell in the first row.
      */
-    public RestFixture(String hostName, String configName) {
+    public RestFixture(final String hostName, final String configName) {
         this(new PartsFactory(), hostName, configName);
     }
 
-    RestFixture(PartsFactory partsFactory, String hostName) {
+    RestFixture(final PartsFactory partsFactory, final String hostName) {
         this(partsFactory, hostName, Config.DEFAULT_CONFIG_NAME);
     }
 
-    RestFixture(PartsFactory partsFactory, String hostName, String configName) {
-        this.displayActualOnRight = true;
-        this.minLenForCollapseToggle = -1;
+    RestFixture(final PartsFactory partsFactory, final String hostName, final String configName) {
+        displayActualOnRight = true;
+        minLenForCollapseToggle = -1;
         this.partsFactory = partsFactory;
-        this.config = Config.getConfig(configName);
-        this.baseUrl = new Url(stripTag(hostName));
+        config = Config.getConfig(configName);
+        baseUrl = new Url(stripTag(hostName));
     }
 
     /**
@@ -291,8 +276,7 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
-     * The default headers as defined in the config used to initialise this
-     * fixture.
+     * The default headers as defined in the config used to initialise this fixture.
      * 
      * @return the map of default headers.
      */
@@ -315,12 +299,12 @@ public class RestFixture extends ActionFixture {
      * @param rows
      * @return
      */
-    public List<List<String>> doTable(List<List<String>> rows) {
+    public List<List<String>> doTable(final List<List<String>> rows) {
         initialize(Runner.SLIM);
-        List<List<String>> res = new Vector<List<String>>();
+        final List<List<String>> res = new Vector<List<String>>();
         getFormatter().setDisplayActual(displayActualOnRight);
         getFormatter().setMinLenghtForToggleCollapse(minLenForCollapseToggle);
-        for (List<String> r : rows) {
+        for (final List<String> r : rows) {
             processSlimRow(res, r);
         }
         return res;
@@ -328,9 +312,9 @@ public class RestFixture extends ActionFixture {
 
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void doCells(Parse parse) {
+    public void doCells(final Parse parse) {
         config = Config.getConfig(getConfigNameFromArgs());
-        String url = getBaseUrlFromArgs();
+        final String url = getBaseUrlFromArgs();
         if (url != null) {
             baseUrl = new Url(stripTag(url));
         }
@@ -338,10 +322,10 @@ public class RestFixture extends ActionFixture {
         getFormatter().setDisplayActual(displayActualOnRight);
         getFormatter().setMinLenghtForToggleCollapse(minLenForCollapseToggle);
         ((FitFormatter) getFormatter()).setActionFixtureDelegate(this);
-        RowWrapper currentRow = new FitRow(parse);
+        final RowWrapper currentRow = new FitRow(parse);
         try {
             processRow(currentRow);
-        } catch (Exception exception) {
+        } catch (final Exception exception) {
             getFormatter().exception(currentRow.getCell(0), exception);
         }
     }
@@ -359,8 +343,8 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
-     * Process args ({@see fit.Fixture}) for Fit runner to extract the baseUrl
-     * of each Rest request, first parameter of each RestFixture table.
+     * Process args ({@see fit.Fixture}) for Fit runner to extract the baseUrl of each Rest request, first parameter of
+     * each RestFixture table.
      * 
      * @return
      */
@@ -372,8 +356,8 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
-     * Overrideable method to validate the state of the instance in execution. A
-     * {@link RestFixture} is valid if the baseUrl is not null.
+     * Overrideable method to validate the state of the instance in execution. A {@link RestFixture} is valid if the
+     * baseUrl is not null.
      * 
      * @return true if the state is valid, false otherwise
      */
@@ -381,19 +365,18 @@ public class RestFixture extends ActionFixture {
         return baseUrl != null;
     }
 
-    protected void setConfig(Config c) {
-        this.config = c;
+    protected void setConfig(final Config c) {
+        config = c;
     }
 
     /**
-     * Method invoked to notify that the state of the RestFixture is invalid. It
-     * throws a {@link RuntimeException} with a message displayed in the
-     * FitNesse page.
+     * Method invoked to notify that the state of the RestFixture is invalid. It throws a {@link RuntimeException} with
+     * a message displayed in the FitNesse page.
      * 
      * @param state
      *            as returned by {@link RestFixture#validateState()}
      */
-    protected void notifyInvalidState(boolean state) {
+    protected void notifyInvalidState(final boolean state) {
         if (!state) {
             throw new RuntimeException("You must specify a base url in the |start|, after the fixture to start");
         }
@@ -408,7 +391,7 @@ public class RestFixture extends ActionFixture {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setMultipartFileName() {
-        CellWrapper cell = row.getCell(1);
+        final CellWrapper cell = row.getCell(1);
         if (cell == null) {
             getFormatter().exception(row.getCell(0), "You must pass a multipart file name to set");
         } else {
@@ -430,7 +413,7 @@ public class RestFixture extends ActionFixture {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setFileName() {
-        CellWrapper cell = row.getCell(1);
+        final CellWrapper cell = row.getCell(1);
         if (cell == null) {
             getFormatter().exception(row.getCell(0), "You must pass a file name to set");
         } else {
@@ -444,8 +427,8 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
-     * Sets the parameter to send in the request storing the multi-part file to
-     * upload. If not specified the default is <code>file</code>
+     * Sets the parameter to send in the request storing the multi-part file to upload. If not specified the default is
+     * <code>file</code>
      * <p/>
      * <code>| setMultipartFileParameterName | Name of form parameter for the uploaded file |</code>
      * <p/>
@@ -453,7 +436,7 @@ public class RestFixture extends ActionFixture {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setMultipartFileParameterName() {
-        CellWrapper cell = row.getCell(1);
+        final CellWrapper cell = row.getCell(1);
         if (cell == null) {
             getFormatter().exception(row.getCell(0), "You must pass a parameter name to set");
         } else {
@@ -469,16 +452,15 @@ public class RestFixture extends ActionFixture {
     /**
      * <code>| setBody | body text goes here |</code>
      * <p/>
-     * body text can either be a kvp or a xml. The <code>ClientHelper</code>
-     * will figure it out
+     * body text can either be a kvp or a xml. The <code>ClientHelper</code> will figure it out
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setBody() {
-        CellWrapper cell = row.getCell(1);
+        final CellWrapper cell = row.getCell(1);
         if (cell == null) {
             getFormatter().exception(row.getCell(0), "You must pass a body to set");
         } else {
-            String text = getFormatter().fromRaw(cell.text());
+            final String text = getFormatter().fromRaw(cell.text());
             requestBody = GLOBALS.substitute(text);
             renderReplacement(cell, requestBody);
         }
@@ -487,16 +469,15 @@ public class RestFixture extends ActionFixture {
     /**
      * <code>| setHeader | http headers go here as nvp |</code>
      * <p/>
-     * header text must be nvp. name and value must be separated by ':' and each
-     * header is in its own line
+     * header text must be nvp. name and value must be separated by ':' and each header is in its own line
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setHeader() {
-        CellWrapper cell = row.getCell(1);
+        final CellWrapper cell = row.getCell(1);
         if (cell == null) {
             getFormatter().exception(row.getCell(0), "You must pass a header map to set");
         } else {
-            String header = GLOBALS.substitute(cell.text());
+            final String header = GLOBALS.substitute(cell.text());
             requestHeaders = parseHeaders(header);
         }
     }
@@ -513,16 +494,13 @@ public class RestFixture extends ActionFixture {
     /**
      * <code> | PUT | URL | ?ret | ?headers | ?body |</code>
      * <p/>
-     * executes a PUT on the URL and checks the return (a string representation
-     * the operation return code), the HTTP response headers and the HTTP
-     * response body
+     * executes a PUT on the URL and checks the return (a string representation the operation return code), the HTTP
+     * response headers and the HTTP response body
      * 
-     * URL is resolved by replacing global variables previously defined with
-     * <code>let()</code>
+     * URL is resolved by replacing global variables previously defined with <code>let()</code>
      * 
-     * the HTTP request headers can be set via <code>setHeaders()</code>. If not
-     * set, the list of default headers will be set. See
-     * <code>DEF_REQUEST_HEADERS</code>
+     * the HTTP request headers can be set via <code>setHeaders()</code>. If not set, the list of default headers will
+     * be set. See <code>DEF_REQUEST_HEADERS</code>
      */
     public void PUT() {
         debugMethodCallStart();
@@ -533,16 +511,13 @@ public class RestFixture extends ActionFixture {
     /**
      * <code> | GET | uri | ?ret | ?headers | ?body |</code>
      * <p/>
-     * executes a GET on the uri and checks the return (a string repr the
-     * operation return code), the http response headers and the http response
-     * body
+     * executes a GET on the uri and checks the return (a string repr the operation return code), the http response
+     * headers and the http response body
      * 
-     * uri is resolved by replacing vars previously defined with
-     * <code>let()</code>
+     * uri is resolved by replacing vars previously defined with <code>let()</code>
      * 
-     * the http request headers can be set via <code>setHeaders()</code>. If not
-     * set, the list of default headers will be set. See
-     * <code>DEF_REQUEST_HEADERS</code>
+     * the http request headers can be set via <code>setHeaders()</code>. If not set, the list of default headers will
+     * be set. See <code>DEF_REQUEST_HEADERS</code>
      */
     public void GET() {
         debugMethodCallStart();
@@ -553,16 +528,13 @@ public class RestFixture extends ActionFixture {
     /**
      * <code> | DELETE | uri | ?ret | ?headers | ?body |</code>
      * <p/>
-     * executes a DELETE on the uri and checks the return (a string repr the
-     * operation return code), the http response headers and the http response
-     * body
+     * executes a DELETE on the uri and checks the return (a string repr the operation return code), the http response
+     * headers and the http response body
      * 
-     * uri is resolved by replacing vars previously defined with
-     * <code>let()</code>
+     * uri is resolved by replacing vars previously defined with <code>let()</code>
      * 
-     * the http request headers can be set via <code>setHeaders()</code>. If not
-     * set, the list of default headers will be set. See
-     * <code>DEF_REQUEST_HEADERS</code>
+     * the http request headers can be set via <code>setHeaders()</code>. If not set, the list of default headers will
+     * be set. See <code>DEF_REQUEST_HEADERS</code>
      */
     public void DELETE() {
         debugMethodCallStart();
@@ -573,18 +545,15 @@ public class RestFixture extends ActionFixture {
     /**
      * <code> | POST | uri | ?ret | ?headers | ?body |</code>
      * <p/>
-     * executes a POST on the uri and checks the return (a string repr the
-     * operation return code), the http response headers and the http response
-     * body
+     * executes a POST on the uri and checks the return (a string repr the operation return code), the http response
+     * headers and the http response body
      * 
-     * uri is resolved by replacing vars previously defined with
-     * <code>let()</code>
+     * uri is resolved by replacing vars previously defined with <code>let()</code>
      * 
      * post requires a body that can be set via <code>setBody()</code>.
      * 
-     * the http request headers can be set via <code>setHeaders()</code>. If not
-     * set, the list of default headers will be set. See
-     * <code>DEF_REQUEST_HEADERS</code>
+     * the http request headers can be set via <code>setHeaders()</code>. If not set, the list of default headers will
+     * be set. See <code>DEF_REQUEST_HEADERS</code>
      */
     public void POST() {
         debugMethodCallStart();
@@ -595,42 +564,32 @@ public class RestFixture extends ActionFixture {
     /**
      * <code> | let | label | type | loc | expr |</code>
      * <p/>
-     * allows to associate a value to a label. values are extracted from the
-     * body of the last successful http response.
+     * allows to associate a value to a label. values are extracted from the body of the last successful http response.
      * <ul>
      * <li/><code>label</code> is the label identifier
      * 
-     * <li/><code>type</code> is the type of operation to perform on the last
-     * http response. At the moment only XPaths and Regexes are supported. In
-     * case of regular expressions, the expression must contain only one group
-     * match, if multiple groups are matched the label will be assigned to the
-     * first found <code>type</code> only allowed values are <code>xpath</code>
-     * and <code>regex</code>
+     * <li/><code>type</code> is the type of operation to perform on the last http response. At the moment only XPaths
+     * and Regexes are supported. In case of regular expressions, the expression must contain only one group match, if
+     * multiple groups are matched the label will be assigned to the first found <code>type</code> only allowed values
+     * are <code>xpath</code> and <code>regex</code>
      * 
-     * <li/><code>loc</code> where to apply the <code>expr</code> of the given
-     * <code>type</code>. Currently only <code>header</code> and
-     * <code>body</code> are supported. If type is <code>xpath</code> by default
-     * the expression is matched against the body and the value in loc is
-     * ignored.
+     * <li/><code>loc</code> where to apply the <code>expr</code> of the given <code>type</code>. Currently only
+     * <code>header</code> and <code>body</code> are supported. If type is <code>xpath</code> by default the expression
+     * is matched against the body and the value in loc is ignored.
      * 
-     * <li/><code>expr</code> is the expression of type <code>type</code> to be
-     * executed on the last http response to extract the content to be
-     * associated to the label.
+     * <li/><code>expr</code> is the expression of type <code>type</code> to be executed on the last http response to
+     * extract the content to be associated to the label.
      * </ul>
      * <p/>
-     * <code>label</code>s can be retrieved after they have been defined and
-     * their scope is the fixture instance under execution. They are stored in a
-     * map so multiple calls to <code>let()</code> with the same label will
-     * override the current value of that label.
+     * <code>label</code>s can be retrieved after they have been defined and their scope is the fixture instance under
+     * execution. They are stored in a map so multiple calls to <code>let()</code> with the same label will override the
+     * current value of that label.
      * <p/>
-     * Labels are resolved in <code>uri</code>s, <code>header</code>s and
-     * <code>body</code>es.
+     * Labels are resolved in <code>uri</code>s, <code>header</code>s and <code>body</code>es.
      * <p/>
-     * In order to be resolved a label must be between <code>%</code>, e.g.
-     * <code>%id%</code>.
+     * In order to be resolved a label must be between <code>%</code>, e.g. <code>%id%</code>.
      * <p/>
-     * The test row must have an empy cell at the end that will display the
-     * value extracted and assigned to the label.
+     * The test row must have an empy cell at the end that will display the value extracted and assigned to the label.
      * <p/>
      * Example: <br/>
      * <code>| GET | /services | 200 | | |</code><br/>
@@ -646,24 +605,24 @@ public class RestFixture extends ActionFixture {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void let() {
         debugMethodCallStart();
-        String label = row.getCell(1).text().trim();
-        String loc = row.getCell(2).text();
-        CellWrapper exprCell = row.getCell(3);
+        final String label = row.getCell(1).text().trim();
+        final String loc = row.getCell(2).text();
+        final CellWrapper exprCell = row.getCell(3);
         exprCell.body(GLOBALS.substitute(exprCell.body()));
-        String expr = exprCell.text();
-        CellWrapper valueCell = row.getCell(4);
-        String valueCellText = valueCell.body();
-        String valueCellTextReplaced = GLOBALS.substitute(valueCellText);
+        final String expr = exprCell.text();
+        final CellWrapper valueCell = row.getCell(4);
+        final String valueCellText = valueCell.body();
+        final String valueCellTextReplaced = GLOBALS.substitute(valueCellText);
         valueCell.body(valueCellTextReplaced);
         String sValue = null;
         try {
-            LetHandler letHandler = LetHandlerFactory.getHandlerFor(loc);
+            final LetHandler letHandler = LetHandlerFactory.getHandlerFor(loc);
             if (letHandler != null) {
-                StringTypeAdapter adapter = new StringTypeAdapter();
+                final StringTypeAdapter adapter = new StringTypeAdapter();
                 try {
                     sValue = letHandler.handle(getLastResponse(), namespaceContext, expr);
                     exprCell.body(getFormatter().gray(exprCell.body()));
-                } catch (RuntimeException e) {
+                } catch (final RuntimeException e) {
                     getFormatter().exception(exprCell, e.getMessage());
                 }
                 GLOBALS.put(label, sValue);
@@ -672,7 +631,7 @@ public class RestFixture extends ActionFixture {
             } else {
                 getFormatter().exception(exprCell, "I don't know how to process the expression for '" + loc + "'");
             }
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             getFormatter().exception(exprCell, e);
         } finally {
             debugMethodCallEnd();
@@ -682,12 +641,12 @@ public class RestFixture extends ActionFixture {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void comment() {
         debugMethodCallStart();
-        CellWrapper messageCell = row.getCell(1);
+        final CellWrapper messageCell = row.getCell(1);
         try {
             String message = messageCell.text().trim();
             message = GLOBALS.substitute(message);
             messageCell.body(getFormatter().gray(message));
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             getFormatter().exception(messageCell, e);
         } finally {
             debugMethodCallEnd();
@@ -695,22 +654,22 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
-     * Evaluates a string using the internal JavaScript engine. Result of the
-     * last evaluation is set in the lastEvaluation field.
+     * Evaluates a string using the internal JavaScript engine. Result of the last evaluation is set in the
+     * lastEvaluation field.
      * 
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void evalJs() {
-        CellWrapper jsCell = row.getCell(1);
+        final CellWrapper jsCell = row.getCell(1);
         if (jsCell == null) {
             getFormatter().exception(row.getCell(0), "Missing string to evaluate)");
             return;
         }
-        JavascriptWrapper wrapper = new JavascriptWrapper();
+        final JavascriptWrapper wrapper = new JavascriptWrapper();
         Object result = null;
         try {
             result = wrapper.evaluateExpression(lastResponse, jsCell.body());
-        } catch (JavascriptException e) {
+        } catch (final JavascriptException e) {
             getFormatter().exception(row.getCell(1), e);
             return;
         }
@@ -718,25 +677,24 @@ public class RestFixture extends ActionFixture {
         if (result != null) {
             lastEvaluation = result.toString();
         }
-        StringTypeAdapter adapter = new StringTypeAdapter();
+        final StringTypeAdapter adapter = new StringTypeAdapter();
         adapter.set(lastEvaluation);
         getFormatter().right(row.getCell(1), adapter);
     }
 
     /**
-     * Process the row in input. Abstracts the test runner via the wrapper
-     * interfaces.
+     * Process the row in input. Abstracts the test runner via the wrapper interfaces.
      * 
      * @param currentRow
      */
     @SuppressWarnings("rawtypes")
-    public void processRow(RowWrapper<?> currentRow) {
+    public void processRow(final RowWrapper<?> currentRow) {
         row = currentRow;
-        CellWrapper cell0 = row.getCell(0);
+        final CellWrapper cell0 = row.getCell(0);
         if (cell0 == null) {
             throw new RuntimeException("Current RestFixture row is not parseable (maybe empty or not existent)");
         }
-        String methodName = cell0.text();
+        final String methodName = cell0.text();
         if ("".equals(methodName)) {
             throw new RuntimeException("RestFixture method not specified");
         }
@@ -744,28 +702,30 @@ public class RestFixture extends ActionFixture {
         try {
             method1 = getClass().getMethod(methodName);
             method1.invoke(this);
-        } catch (SecurityException e) {
-            throw new RuntimeException("Not enough permissions to access method " + methodName + " for this class " + this.getClass().getSimpleName(), e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException("Class " + this.getClass().getName() + " doesn't have a callable method named " + methodName, e);
-        } catch (IllegalArgumentException e) {
+        } catch (final SecurityException e) {
+            throw new RuntimeException("Not enough permissions to access method " + methodName + " for this class "
+                    + this.getClass().getSimpleName(), e);
+        } catch (final NoSuchMethodException e) {
+            throw new RuntimeException("Class " + this.getClass().getName() + " doesn't have a callable method named "
+                    + methodName, e);
+        } catch (final IllegalArgumentException e) {
             throw new RuntimeException("Method named " + methodName + " invoked with the wrong argument.", e);
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             throw new RuntimeException("Method named " + methodName + " is not public.", e);
-        } catch (InvocationTargetException e) {
+        } catch (final InvocationTargetException e) {
             throw new RuntimeException("Method named " + methodName + " threw an exception when executing.", e);
         }
     }
 
-    protected void initialize(Runner runner) {
-        boolean state = validateState();
+    protected void initialize(final Runner runner) {
+        final boolean state = validateState();
         notifyInvalidState(state);
         configFormatter(runner);
         configFixture();
         configRestClient();
     }
 
-    private String emptifyBody(String b) {
+    private String emptifyBody(final String b) {
         String body = b;
         if (body == null) {
             body = "";
@@ -783,15 +743,15 @@ public class RestFixture extends ActionFixture {
         return headers;
     }
 
-    private void doMethod(String m) {
+    private void doMethod(final String m) {
         doMethod(null, m);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected void doMethod(String body, String method) {
-        CellWrapper urlCell = row.getCell(1);
-        String url = urlCell.text();
-        String resUrl = GLOBALS.substitute(url);
+    protected void doMethod(final String body, final String method) {
+        final CellWrapper urlCell = row.getCell(1);
+        final String url = urlCell.text();
+        final String resUrl = GLOBALS.substitute(url);
         setLastRequest(partsFactory.buildRestRequest());
         getLastRequest().setMethod(RestRequest.Method.valueOf(method));
         getLastRequest().addHeaders(getHeaders());
@@ -802,21 +762,23 @@ public class RestFixture extends ActionFixture {
             getLastRequest().setMultipartFileName(multipartFileName);
         }
         getLastRequest().setMultipartFileParameterName(multipartFileParameterName);
-        String[] uri = resUrl.split("\\?");
+        final String[] uri = resUrl.split("\\?");
         getLastRequest().setResource(uri[0]);
         if (uri.length == 2) {
             getLastRequest().setQuery(uri[1]);
         }
         if ("Post".equals(method) || "Put".equals(method)) {
-            String rBody = GLOBALS.substitute(body);
+            final String rBody = GLOBALS.substitute(body);
             getLastRequest().setBody(rBody);
         }
         try {
-            RestResponse response = restClient.execute(getLastRequest());
+            restClient.allowRedirect(allowRedirect);
+            final RestResponse response = restClient.execute(getLastRequest());
             setLastResponse(response);
             completeHttpMethodExecution();
-        } catch (RuntimeException e) {
-            getFormatter().exception(row.getCell(0), "Execution of " + method + " caused exception '" + e.getMessage() + "'");
+        } catch (final RuntimeException e) {
+            getFormatter().exception(row.getCell(0),
+                    "Execution of " + method + " caused exception '" + e.getMessage() + "'");
         }
     }
 
@@ -827,42 +789,42 @@ public class RestFixture extends ActionFixture {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void completeHttpMethodExecution() {
         String uri = getLastResponse().getResource();
-        String query = getLastRequest().getQuery();
+        final String query = getLastRequest().getQuery();
         if (query != null && !"".equals(query.trim())) {
             uri = uri + "?" + query;
         }
-        String u = restClient.getBaseUrl() + uri;
-        CellWrapper uriCell = row.getCell(1);
+        final String u = restClient.getBaseUrl() + uri;
+        final CellWrapper uriCell = row.getCell(1);
         getFormatter().asLink(uriCell, u, uri);
-        CellWrapper cellStatusCode = row.getCell(2);
-        Integer lastStatusCode = getLastResponse().getStatusCode();
+        final CellWrapper cellStatusCode = row.getCell(2);
+        final Integer lastStatusCode = getLastResponse().getStatusCode();
         process(cellStatusCode, lastStatusCode.toString(), new StatusCodeTypeAdapter());
-        List<Header> lastHeaders = getLastResponse().getHeaders();
+        final List<Header> lastHeaders = getLastResponse().getHeaders();
         process(row.getCell(3), lastHeaders, new HeadersTypeAdapter());
-        CellWrapper bodyCell = row.getCell(4);
+        final CellWrapper bodyCell = row.getCell(4);
         bodyCell.body(GLOBALS.substitute(bodyCell.body()));
-        ContentType ct = getContentTypeOfLastResponse();
-        BodyTypeAdapter bodyTypeAdapter = partsFactory.buildBodyTypeAdapter(ct);
+        final ContentType ct = getContentTypeOfLastResponse();
+        final BodyTypeAdapter bodyTypeAdapter = partsFactory.buildBodyTypeAdapter(ct);
         bodyTypeAdapter.setContext(namespaceContext);
         process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void process(CellWrapper expected, Object actual, RestDataTypeAdapter ta) {
+    private void process(final CellWrapper expected, final Object actual, final RestDataTypeAdapter ta) {
         ta.set(actual);
-        boolean ignore = "".equals(expected.text().trim());
+        final boolean ignore = "".equals(expected.text().trim());
         if (ignore) {
-            String actualString = ta.toString();
+            final String actualString = ta.toString();
             if (!"".equals(actualString)) {
                 expected.addToBody(getFormatter().gray(actualString));
             }
         } else {
             boolean success = false;
             try {
-                String substitute = GLOBALS.substitute(Tools.fromHtml(expected.text()));
-                Object parse = ta.parse(substitute);
+                final String substitute = GLOBALS.substitute(Tools.fromHtml(expected.text()));
+                final Object parse = ta.parse(substitute);
                 success = ta.equals(parse, actual);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 getFormatter().exception(expected, e);
                 return;
             }
@@ -882,9 +844,9 @@ public class RestFixture extends ActionFixture {
         debugMethodCall("<= ");
     }
 
-    private void debugMethodCall(String h) {
+    private void debugMethodCall(final String h) {
         if (debugMethodCall) {
-            StackTraceElement el = Thread.currentThread().getStackTrace()[4];
+            final StackTraceElement el = Thread.currentThread().getStackTrace()[4];
             LOG.debug(h + el.getMethodName());
         }
     }
@@ -897,27 +859,27 @@ public class RestFixture extends ActionFixture {
         return lastRequest;
     }
 
-    private void setLastResponse(RestResponse lastResponse) {
+    private void setLastResponse(final RestResponse lastResponse) {
         this.lastResponse = lastResponse;
     }
 
-    private void setLastRequest(RestRequest lastRequest) {
+    private void setLastRequest(final RestRequest lastRequest) {
         this.lastRequest = lastRequest;
     }
 
-    private Map<String, String> parseHeaders(String str) {
+    private Map<String, String> parseHeaders(final String str) {
         return Tools.convertStringToMap(str, ":", LINE_SEPARATOR);
     }
 
-    private Map<String, String> parseNamespaceContext(String str) {
+    private Map<String, String> parseNamespaceContext(final String str) {
         return Tools.convertStringToMap(str, "=", LINE_SEPARATOR);
     }
 
-    private String stripTag(String somethingWithinATag) {
+    private String stripTag(final String somethingWithinATag) {
         return Tools.fromSimpleTag(somethingWithinATag);
     }
 
-    private void configFormatter(Runner runner) {
+    private void configFormatter(final Runner runner) {
         formatter = partsFactory.buildCellFormatter(runner);
     }
 
@@ -930,7 +892,8 @@ public class RestFixture extends ActionFixture {
 
         displayActualOnRight = config.getAsBoolean("restfixture.display.actual.on.right", displayActualOnRight);
 
-        minLenForCollapseToggle = config.getAsInteger("restfixture.display.toggle.for.cells.larger.than", minLenForCollapseToggle);
+        minLenForCollapseToggle = config.getAsInteger("restfixture.display.toggle.for.cells.larger.than",
+                minLenForCollapseToggle);
 
         String str = config.get("restfixture.default.headers", "");
         defaultHeaders = parseHeaders(str);
@@ -943,9 +906,8 @@ public class RestFixture extends ActionFixture {
     }
 
     /**
-     * Allows to config the rest client implementation. the method shoudl
-     * configure the instance attribute {@link RestFixture#restClient} created
-     * by the {@link RestFixture#buildRestClient()}.
+     * Allows to config the rest client implementation. the method shoudl configure the instance attribute
+     * {@link RestFixture#restClient} created by the {@link RestFixture#buildRestClient()}.
      */
     private void configRestClient() {
         restClient = partsFactory.buildRestClient(getConfig());
@@ -955,8 +917,8 @@ public class RestFixture extends ActionFixture {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void renderReplacement(CellWrapper cell, String actual) {
-        StringTypeAdapter adapter = new StringTypeAdapter();
+    private void renderReplacement(final CellWrapper cell, final String actual) {
+        final StringTypeAdapter adapter = new StringTypeAdapter();
         adapter.set(actual);
         if (!adapter.equals(actual, cell.body())) {
             // eg - a substitution has occurred
@@ -965,30 +927,41 @@ public class RestFixture extends ActionFixture {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void processSlimRow(List<List<String>> resultTable, List<String> row) {
-        RowWrapper currentRow = new SlimRow(row);
+    private void processSlimRow(final List<List<String>> resultTable, final List<String> row) {
+        final RowWrapper currentRow = new SlimRow(row);
         try {
             processRow(currentRow);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.error("Exception raised when executing method " + row.get(0));
             getFormatter().exception(currentRow.getCell(0), e);
         } finally {
-            List<String> rowAsList = mapSlimRow(row, currentRow);
+            final List<String> rowAsList = mapSlimRow(row, currentRow);
             resultTable.add(rowAsList);
         }
     }
 
     @SuppressWarnings("rawtypes")
-    private List<String> mapSlimRow(List<String> resultRow, RowWrapper currentRow) {
-        List<String> rowAsList = ((SlimRow) currentRow).asList();
+    private List<String> mapSlimRow(final List<String> resultRow, final RowWrapper currentRow) {
+        final List<String> rowAsList = ((SlimRow) currentRow).asList();
         for (int c = 0; c < rowAsList.size(); c++) {
             // HACK: it seems that even if the content is unchanged,
             // Slim renders red cell
-            String v = rowAsList.get(c);
+            final String v = rowAsList.get(c);
             if (v.equals(resultRow.get(c))) {
                 rowAsList.set(c, "");
             }
         }
         return rowAsList;
     }
+
+    /**
+     * <code>| setRedirect | true or false |</code>
+     * <p/>
+     * Allow or not redirect http
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public void setRedirect() {
+        allowRedirect = Boolean.parseBoolean(row.getCell(1).text());
+    }
+
 }
