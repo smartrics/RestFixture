@@ -1,3 +1,10 @@
+version 3.0
+ * Migrated build system to Maven and published to Sonatype Nexus
+ * Fixed Issue#28 - Multiple variables not expanding in RestFixtureConfig
+ * Split RestFixtureExtensions from RestFixture to include all contributed extensions to RestFixture
+ * Split LiveDoc in its own project on github.
+ * Renamed RestFixture class to FitRestFixture for fit runner
+ 
 version 2.0
  * response body now is handled according to the charset in the content-type header
  * added support for absolute URI in resource cell for each HTTP verb

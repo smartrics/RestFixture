@@ -26,7 +26,7 @@ import java.net.URL;
 /**
  * Facade to {@see java.net.URL}.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class Url {

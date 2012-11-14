@@ -34,7 +34,7 @@ import smartrics.rest.client.RestResponse;
 /**
  * Handles body of the last response on behalf of LET in RestFixture.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class LetBodyHandler implements LetHandler {

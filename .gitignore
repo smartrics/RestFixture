@@ -1,13 +1,8 @@
-file.pic
-temp
+bin
+target
+.classpath
+.project
 TODO
-*.log
-crap_build.xml
-agitar/
-bin/
-build/
-dist/
-ci/
+.settings
+.m2
 
-/FitNesseRoot
-junit*.properties

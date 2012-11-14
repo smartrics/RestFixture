@@ -44,11 +44,11 @@ import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestRequest.Method;
 import smartrics.rest.client.RestResponse;
-import smartrics.rest.config.Config;
 import smartrics.rest.fitnesse.fixture.RestFixture.Runner;
 import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
+import smartrics.rest.fitnesse.fixture.support.Config;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.JavascriptException;
@@ -61,7 +61,7 @@ import fit.Fixture;
 /**
  * Tests for the RestFixture class.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class RestFixtureTest {
@@ -105,7 +105,7 @@ public class RestFixtureTest {
         ContentType.resetDefaultMapping();
 
         helper.wireMocks(config, mockPartsFactory, mockRestClient, mockLastRequest, lastResponse, mockCellFormatter, mockBodyTypeAdapter);
-        fixture = new RestFixture(mockPartsFactory, BASE_URL);
+        fixture = new RestFixture(mockPartsFactory, BASE_URL, Config.DEFAULT_CONFIG_NAME);
         fixture.initialize(Runner.OTHER);
     }
 
@@ -144,6 +144,66 @@ public class RestFixtureTest {
         assertEquals("with:colon", fixture.getHeaders().get("header3"));
         assertEquals("", fixture.getHeaders().get("header4"));
         assertEquals("", fixture.getHeaders().get("header5"));
+    }
+
+    @Test
+    public void mustExpandSymbolsWhenSettingMultilineHeaders() {
+        Fixture.setSymbol("hval1", "one");
+        Fixture.setSymbol("hval2", "two");
+        String multilineHeaders = "!-header1:%hval1% \n header2:%hval2% \nheader3 : with:colon \nheader4 : \n header5 -!";
+        RowWrapper<?> row = helper.createTestRow("setHeaders", multilineHeaders);
+        fixture.processRow(row);
+        assertEquals("one", fixture.getHeaders().get("header1"));
+        assertEquals("two", fixture.getHeaders().get("header2"));
+        assertEquals("with:colon", fixture.getHeaders().get("header3"));
+        assertEquals("", fixture.getHeaders().get("header4"));
+        assertEquals("", fixture.getHeaders().get("header5"));
+    }
+
+    @Test
+    public void mustAllowSettingHeaders() {
+        String header = "header1:one";
+        RowWrapper<?> row = helper.createTestRow("setHeader", header);
+        fixture.processRow(row);
+        assertEquals("one", fixture.getHeaders().get("header1"));
+    }
+
+    @Test
+    public void mustExpandSymbolSetWithLetWhenSettingHeaders() {
+        when(mockLastRequest.getQuery()).thenReturn("");
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        lastResponse.setBody("<body>1234</body>");
+
+        RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", "");
+        fixture.processRow(row);
+        row = helper.createTestRow("let", "headerValue", "body", "/body/text()", "1234");
+        fixture.processRow(row);
+
+        row = helper.createTestRow("setHeader", "header1:%headerValue%");
+        fixture.processRow(row);
+        assertEquals("1234", fixture.getHeaders().get("header1"));
+    }
+    
+    @Test
+    public void mustExpandSymbolWhenSettingHeaders() {
+        Fixture.setSymbol("hval", "one");
+        String header = "headerWithSymbol:%hval%";
+        RowWrapper<?> row = helper.createTestRow("setHeader", header);
+        fixture.processRow(row);
+        assertEquals("one", fixture.getHeaders().get("headerWithSymbol"));
+    }
+
+    @Test
+    public void mustRenderSymbolValueWhenSettingHeaders() {
+    	when(mockCellFormatter.gray("headerWithSymbol:one")).thenReturn("gray(headerWithSymbol:one)");
+        Fixture.setSymbol("hval", "one");
+        String header = "headerWithSymbol:%hval%";
+        RowWrapper<?> row = helper.createTestRow("setHeader", header);
+        fixture.processRow(row);
+        verify(row.getCell(1)).text();
+        verify(row.getCell(1)).body("gray(headerWithSymbol:one)");
+        
+        verifyNoMoreInteractions(row.getCell(1));
     }
 
     @Test(expected = RuntimeException.class)

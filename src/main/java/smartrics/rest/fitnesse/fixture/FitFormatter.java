@@ -31,7 +31,7 @@ import fit.exception.FitFailureException;
 /**
  * Cell formatter for the Fit runner.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class FitFormatter implements CellFormatter<Parse> {

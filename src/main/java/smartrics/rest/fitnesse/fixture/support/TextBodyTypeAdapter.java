@@ -29,7 +29,7 @@ import fit.Parse;
 /**
  * Type adapter for body cell containing plain text.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class TextBodyTypeAdapter extends BodyTypeAdapter {

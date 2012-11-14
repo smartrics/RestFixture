@@ -31,7 +31,7 @@ import smartrics.rest.client.RestResponse;
 /**
  * Handles header (a list of Header objects) LET manipulations.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class LetHeaderHandler implements LetHandler {

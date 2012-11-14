@@ -26,25 +26,31 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import smartrics.rest.config.Config;
+import smartrics.rest.fitnesse.fixture.support.Config;
 import smartrics.rest.fitnesse.fixture.support.Variables;
 import fit.Parse;
 
 public class RestFixtureFitTest {
 
     private static final String BASE_URL = "http://localhost:9090";
-    private RestFixture fixture;
+    private FitRestFixture fixture;
     private final Variables variables = new Variables();
     private Config config;
     private Parse emptyParse;
+	private RestFixtureTestHelper helper;
 
     @Before
     public void setUp() {
         config = Config.getConfig();
         // this is created for tests that don't need to verify expectations
-        fixture = new RestFixture(BASE_URL);
+        fixture = new FitRestFixture() {
+            {
+                super.args = new String[] {BASE_URL};
+            }
+        };
+                
         variables.clearAll();
-        RestFixtureTestHelper helper = new RestFixtureTestHelper();
+        helper = new RestFixtureTestHelper();
         emptyParse = helper.buildEmptyParse();
     }
 
@@ -55,7 +61,7 @@ public class RestFixtureFitTest {
 
     @Test(expected = RuntimeException.class)
     public void mustNotifyCallerThatBaseUrlAsFixtureArgIsMandatory() {
-        fixture = new RestFixture() {
+        fixture = new FitRestFixture() {
             {
                 super.args = new String[] {};
             }
@@ -65,7 +71,7 @@ public class RestFixtureFitTest {
 
     @Test
     public void mustSetConfigNameToDefaultWhenNotSpecifiedAsSecondOptionalParameter_FIT() {
-        fixture = new RestFixture() {
+        fixture = new FitRestFixture() {
             {
                 super.args = new String[] { BASE_URL };
             }
@@ -76,7 +82,7 @@ public class RestFixtureFitTest {
 
     @Test
     public void mustSetConfigNameToSpecifiedValueIfOptionalSecondParameterIsSpecified_FIT() {
-        fixture = new RestFixture() {
+        fixture = new FitRestFixture() {
             {
                 super.args = new String[] { BASE_URL, "configName" };
             }
@@ -84,4 +90,22 @@ public class RestFixtureFitTest {
         fixture.doCells(emptyParse);
         assertEquals("configName", fixture.getConfig().getName());
     }
+    
+
+    @Test
+    public void mustSetBodyOnRequestWhenPosting() {
+        fixture = new FitRestFixture() {
+            {
+                super.args = new String[] { BASE_URL };
+            }
+        };
+        Parse postWithSetBodyParse = helper.createFitTable(
+        		new String[]{ "setBody", "<body>count</body>"}, 
+        		new String[]{"POST", "/resource", "", "", ""});
+
+        fixture.doCells(postWithSetBodyParse);
+
+    }
+    
+    
 }

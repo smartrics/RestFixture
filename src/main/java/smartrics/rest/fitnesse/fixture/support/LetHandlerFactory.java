@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * Builds strategies to handle LET body.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class LetHandlerFactory {
@@ -37,6 +37,7 @@ public class LetHandlerFactory {
         strategies.put("body", new LetBodyHandler());
         strategies.put("body:xml", new LetBodyXmlHandler());
         strategies.put("js", new LetBodyJsHandler());
+        strategies.put("const", new LetBodyConstHandler());
     }
 
     private LetHandlerFactory() {

@@ -28,13 +28,12 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HostParams;
 import org.apache.commons.httpclient.params.HttpClientParams;
 
-import smartrics.rest.config.Config;
 
 /**
  * Helper builder class for an apache {@link HttpClient} that uses data in the
  * {@link Config} to configure the object.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class HttpClientBuilder {

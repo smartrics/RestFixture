@@ -25,7 +25,7 @@ import fit.Parse;
 /**
  * Type adapter for handling http status code cell.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class StatusCodeTypeAdapter extends RestDataTypeAdapter {
@@ -40,7 +40,6 @@ public class StatusCodeTypeAdapter extends RestDataTypeAdapter {
             expected = ((Parse) r1).text();
         }
         String actual = (String) r2;
-        System.out.println("StatusCodeTypeAdapter: " + expected + " - " + actual);
         if (!Tools.regex(actual, expected)) {
             addError("not match: " + expected);
         }

@@ -32,7 +32,6 @@ import org.junit.Test;
 
 import smartrics.rest.client.RestData;
 import smartrics.rest.client.RestData.Header;
-import smartrics.rest.config.Config;
 
 public class ContentTypeTest {
 

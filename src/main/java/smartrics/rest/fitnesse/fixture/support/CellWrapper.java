@@ -23,7 +23,7 @@ package smartrics.rest.fitnesse.fixture.support;
 /**
  * Wrapper of a Slim/Fit cell.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  * @param <E>
  */

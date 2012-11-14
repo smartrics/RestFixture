@@ -33,7 +33,7 @@ import smartrics.rest.client.RestResponse;
 /**
  * Test class for the js body handler.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class LetBodyHandlerTest {

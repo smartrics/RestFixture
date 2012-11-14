@@ -20,33 +20,19 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import static org.junit.Assert.assertNull;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import smartrics.rest.client.RestResponse;
 
 /**
- * Test class for the js body handler.
+ * Handles let expressions to assign constant values to symbols.
  * 
  * @author smartrics
  * 
  */
-public class LetBodyJsHandlerTest {
+public class LetBodyConstHandler implements LetHandler {
 
-    private Variables variables;
-
-    @Before
-    public void setUp() {
-        variables = new Variables();
-        variables.clearAll();
+    @Override
+    public String handle(RestResponse response, Object expressionContext, String expression) {
+        return expression;
     }
 
-    @Test
-    public void shouldHandleExpressionsReturningNull() {
-        LetBodyJsHandler h = new LetBodyJsHandler();
-        String r = h.handle(new RestResponse(), null, "null");
-        assertNull(r);
-    }
 }

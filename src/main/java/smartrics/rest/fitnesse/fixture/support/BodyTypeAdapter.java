@@ -27,7 +27,7 @@ import fit.Parse;
 /**
  * Base class for body type adaptors.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public abstract class BodyTypeAdapter extends RestDataTypeAdapter {

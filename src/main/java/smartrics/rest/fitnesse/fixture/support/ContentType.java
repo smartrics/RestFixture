@@ -26,15 +26,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.mortbay.log.Log;
-
 import smartrics.rest.client.RestData.Header;
-import smartrics.rest.config.Config;
 
 /**
  * Supported content types.
  * 
- * @author fabrizio
+ * @author smartrics
  */
 public enum ContentType {
 
@@ -69,7 +66,7 @@ public enum ContentType {
         defaultCharset = config.get("restfixture.content.default.charset", Charset.defaultCharset().name());
         String htmlConfig = config.get("restfixture.content.handlers.map", "");
         String configStr = Tools.fromHtml(htmlConfig);
-        Map<String, String> map = Tools.convertStringToMap(configStr, "=", "\n");
+        Map<String, String> map = Tools.convertStringToMap(configStr, "=", "\n", true);
         for (Map.Entry<String, String> e : map.entrySet()) {
             String value = e.getValue();
             String enumName = value.toUpperCase();
@@ -104,7 +101,7 @@ public enum ContentType {
                         return Charset.forName(s).name();
                     }
                 } catch (RuntimeException e) {
-                    Log.warn("Charset unknown or not possible to parse: " + s);
+                    throw new IllegalArgumentException("Charset unknown or not possible to parse: " + s);
                 }
             }
         }

@@ -26,7 +26,7 @@ import smartrics.rest.client.RestResponse;
  * Handles let expressions on XML content, returning XML string rather than the
  * string with the content within the tags.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class LetBodyJsHandler implements LetHandler {

@@ -30,7 +30,7 @@ import fit.TypeAdapter;
 /**
  * Base class for all Type Adapters used by RestFixture.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public abstract class RestDataTypeAdapter extends TypeAdapter implements fitnesse.slim.Converter {

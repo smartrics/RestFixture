@@ -38,7 +38,7 @@ import smartrics.rest.client.RestResponse;
 /**
  * Wrapper class to all that related to JavaScript.
  * 
- * @author fabrizio
+ * @author smartrics
  * 
  */
 public class JavascriptWrapper {
@@ -151,7 +151,7 @@ public class JavascriptWrapper {
     /**
      * Wrapper class for Response to be embedded in the Rhino Context.
      * 
-     * @author fabrizio
+     * @author smartrics
      * 
      */
     public static class JsResponse extends ScriptableObject {
