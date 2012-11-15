@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -47,9 +48,16 @@ import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
 public class LoopResultsCellFormatterTest
 {
 
+    private static PrintStream originalStandardError = null;
+
     final int collapseLength = 50;
     @Mock CellFormatter<Object> mockFormatter;
     @Mock PrintStream errorOutput;
+
+    @BeforeClass
+    public static void saveStandardError() {
+        originalStandardError = System.err;
+    }
 
     @Before
     public void setUp() throws Exception
@@ -65,7 +73,7 @@ public class LoopResultsCellFormatterTest
     @After
     public void teardown()
     {
-        System.setErr(null);
+        System.setErr(originalStandardError);
     }
 
     @Test
