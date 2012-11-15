@@ -39,15 +39,21 @@ public interface CellFormatter<E> {
 
     void wrong(CellWrapper<E> expected, RestDataTypeAdapter typeAdapter);
 
-	void right(CellWrapper<E> expected, RestDataTypeAdapter typeAdapter);
+    void wrong(CellWrapper<E> expected, String failureMessage);
 
-	String gray(String string);
+    void right(CellWrapper<E> expected, RestDataTypeAdapter typeAdapter);
+
+    void right(CellWrapper<E> expected, String message);
+
+    String gray(String string);
 
     void asLink(CellWrapper<E> cell, String link, String text);
 
     void setDisplayActual(boolean displayActual);
 
     void setMinLenghtForToggleCollapse(int minLen);
+
+    int getMinLenghtForToggleCollapse();
 
     boolean isDisplayActual();
 

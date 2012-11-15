@@ -64,4 +64,13 @@ public class StatusCodeTypeAdapter extends RestDataTypeAdapter {
         }
         return obj.toString();
     }
+
+    /**
+     * @see smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter#isBinaryResponse()
+     */
+    @Override
+    public boolean isBinaryResponse()
+    {
+        return false;
+    }
 }

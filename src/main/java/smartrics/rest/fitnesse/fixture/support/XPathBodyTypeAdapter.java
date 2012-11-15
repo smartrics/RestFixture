@@ -97,7 +97,7 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
 
     /**
      * Parses the expected body in the current test.
-     * 
+     *
      * A body is a String containing XPaths one for each new line. Empty body
      * would result in an empty {@code List<String>}. A body containing the
      * value {@code no-body} is especially treated separately.
@@ -132,4 +132,14 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
     public String toXmlString(String content) {
         return content;
     }
+
+    /**
+     * @see smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter#isBinaryResponse()
+     */
+    @Override
+    public boolean isBinaryResponse()
+    {
+        return false;
+    }
+
 }

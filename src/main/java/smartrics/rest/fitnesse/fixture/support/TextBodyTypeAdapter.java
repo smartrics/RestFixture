@@ -72,4 +72,13 @@ public class TextBodyTypeAdapter extends BodyTypeAdapter {
         return "<text>" + content + "</text>";
     }
 
+    /**
+     * @see smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter#isBinaryResponse()
+     */
+    @Override
+    public boolean isBinaryResponse()
+    {
+        return false;
+    }
+
 }

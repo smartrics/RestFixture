@@ -43,7 +43,11 @@ public class RestDataTypeAdapterTest {
     @Before
     public void setUp() {
         adapter = new RestDataTypeAdapter() {
-
+            @Override
+            public boolean isBinaryResponse()
+            {
+                return false;
+            }
         };
     }
 

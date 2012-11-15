@@ -84,6 +84,8 @@ public class RestFixtureTest {
         helper = new RestFixtureTestHelper();
 
         mockBodyTypeAdapter = mock(BodyTypeAdapter.class);
+        when(mockBodyTypeAdapter.isTextResponse()).thenReturn(true);
+        when(mockBodyTypeAdapter.isBinaryResponse()).thenReturn(false);
         mockCellFormatter = mock(CellFormatter.class);
         mockRestClient = mock(RestClient.class);
         mockLastRequest = mock(RestRequest.class);
@@ -277,6 +279,7 @@ public class RestFixtureTest {
 
         verify(mockBodyTypeAdapter).setContext(isA(Map.class));
         verify(mockBodyTypeAdapter).set("<body />");
+        verify(mockBodyTypeAdapter).isTextResponse();
 
         verifyNoMoreInteractions(mockRestClient);
         verifyNoMoreInteractions(mockCellFormatter);
@@ -316,6 +319,7 @@ public class RestFixtureTest {
 
         verify(mockBodyTypeAdapter).setContext(isA(Map.class));
         verify(mockBodyTypeAdapter).set("<body />");
+        verify(mockBodyTypeAdapter).isTextResponse();
 
         verifyNoMoreInteractions(mockRestClient);
         verifyNoMoreInteractions(mockCellFormatter);
@@ -361,6 +365,7 @@ public class RestFixtureTest {
         verify(mockBodyTypeAdapter).set(body);
         verify(mockBodyTypeAdapter).parse(body);
         verify(mockBodyTypeAdapter).equals(body, body);
+        verify(mockBodyTypeAdapter, times(2)).isTextResponse();
 
         verifyNoMoreInteractions(mockBodyTypeAdapter);
         verifyNoMoreInteractions(mockLastRequest);
@@ -405,6 +410,7 @@ public class RestFixtureTest {
         verify(mockBodyTypeAdapter).set("<body />");
         verify(mockBodyTypeAdapter).parse("//body");
         verify(mockBodyTypeAdapter).equals("//body", "<body />");
+        verify(mockBodyTypeAdapter, times(2)).isTextResponse();
 
         verifyNoMoreInteractions(mockBodyTypeAdapter);
         verifyNoMoreInteractions(mockRestClient);
@@ -450,6 +456,7 @@ public class RestFixtureTest {
         verify(mockBodyTypeAdapter).set("<body />");
         verify(mockBodyTypeAdapter).parse("//count");
         verify(mockBodyTypeAdapter).equals("//count", "<body />");
+        verify(mockBodyTypeAdapter, times(2)).isTextResponse();
 
         verifyNoMoreInteractions(mockBodyTypeAdapter);
         verifyNoMoreInteractions(mockRestClient);
@@ -490,6 +497,7 @@ public class RestFixtureTest {
         verify(mockBodyTypeAdapter).set("");
         verify(mockBodyTypeAdapter).parse("no-body");
         verify(mockBodyTypeAdapter).equals("no-body", "");
+        verify(mockBodyTypeAdapter, times(2)).isTextResponse();
 
         verifyNoMoreInteractions(mockBodyTypeAdapter);
         verifyNoMoreInteractions(mockCellFormatter);
@@ -580,6 +588,7 @@ public class RestFixtureTest {
         verify(mockBodyTypeAdapter).set("<body />");
         verify(mockBodyTypeAdapter).parse("//body");
         verify(mockBodyTypeAdapter).equals("//body", "<body />");
+        verify(mockBodyTypeAdapter, times(2)).isTextResponse();
 
         verifyNoMoreInteractions(mockBodyTypeAdapter);
 
@@ -618,6 +627,7 @@ public class RestFixtureTest {
         verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
         verify(mockCellFormatter).gray("200");
         verify(mockCellFormatter).gray("Content-Type : text/plain");
+        verify(mockBodyTypeAdapter, times(2)).isTextResponse();
 
         verifyNoMoreInteractions(mockBodyTypeAdapter);
         verifyNoMoreInteractions(mockCellFormatter);
@@ -657,6 +667,7 @@ public class RestFixtureTest {
         verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
         verify(mockCellFormatter).gray("200");
         verify(mockCellFormatter).gray("Content-Type : text/plain");
+        verify(mockBodyTypeAdapter, times(2)).isTextResponse();
 
         verifyNoMoreInteractions(mockBodyTypeAdapter);
         verifyNoMoreInteractions(mockCellFormatter);
@@ -760,6 +771,7 @@ public class RestFixtureTest {
 
         verify(mockBodyTypeAdapter).set(xmlString);
         verify(mockBodyTypeAdapter).setContext(isA(Map.class));
+        verify(mockBodyTypeAdapter).isTextResponse();
 
         // correctly builds request
         assertEquals(xmlString, clean(variables.get("content")));
