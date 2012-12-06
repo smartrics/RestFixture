@@ -692,6 +692,29 @@ public class RestFixtureTest {
     }
 
     @Test
+    public void mustExecuteAllHttpVerbSupported() {
+        RowWrapper<?> get = helper.createTestRow("GET", "/uri", "", "", "");
+        fixture.processRow(get);
+        RowWrapper<?> post = helper.createTestRow("POST", "/uri", "", "", "");
+        fixture.processRow(post);
+        RowWrapper<?> put = helper.createTestRow("PUT", "/uri", "", "", "");
+        fixture.processRow(put);
+        RowWrapper<?> del = helper.createTestRow("DELETE", "/uri", "", "", "");
+        fixture.processRow(del);
+        RowWrapper<?> head = helper.createTestRow("HEAD", "/uri", "", "", "");
+        fixture.processRow(head);
+        RowWrapper<?> opt = helper.createTestRow("OPTIONS", "/uri", "", "", "");
+        fixture.processRow(opt);
+    	
+        verify(mockLastRequest).setMethod(Method.Get);
+        verify(mockLastRequest).setMethod(Method.Post);
+        verify(mockLastRequest).setMethod(Method.Put);
+        verify(mockLastRequest).setMethod(Method.Delete);
+        verify(mockLastRequest).setMethod(Method.Head);
+        verify(mockLastRequest).setMethod(Method.Options);
+    }
+    
+    @Test
     public void mustUseValueOnSymbolMapEvenIfNotSetViaVariables() {
         when(mockLastRequest.getQuery()).thenReturn("");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);

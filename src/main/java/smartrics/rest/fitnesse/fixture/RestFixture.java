@@ -536,6 +536,44 @@ public class RestFixture {
 	}
 
 	/**
+	 * <code> | HEAD | uri | ?ret | ?headers |  |</code>
+	 * <p/>
+	 * executes a HEAD on the uri and checks the return (a string repr the
+	 * operation return code) and the http response headers. Head is meant to return no-body.
+	 * 
+	 * uri is resolved by replacing vars previously defined with
+	 * <code>let()</code>
+	 * 
+	 * the http request headers can be set via <code>setHeaders()</code>. If not
+	 * set, the list of default headers will be set. See
+	 * <code>DEF_REQUEST_HEADERS</code>
+	 */
+	public void HEAD() {
+		debugMethodCallStart();
+		doMethod("Head");
+		debugMethodCallEnd();
+	}
+
+	/**
+	 * <code> | OPTIONS | uri | ?ret | ?headers | ?body |</code>
+	 * <p/>
+	 * executes a OPTIONS on the uri and checks the return (a string repr the
+	 * operation return code), the http response headers, the http response body
+	 * 
+	 * uri is resolved by replacing vars previously defined with
+	 * <code>let()</code>
+	 * 
+	 * the http request headers can be set via <code>setHeaders()</code>. If not
+	 * set, the list of default headers will be set. See
+	 * <code>DEF_REQUEST_HEADERS</code>
+	 */
+	public void OPTIONS() {
+		debugMethodCallStart();
+		doMethod("Options");
+		debugMethodCallEnd();
+	}
+
+	/**
 	 * <code> | DELETE | uri | ?ret | ?headers | ?body |</code>
 	 * <p/>
 	 * executes a DELETE on the uri and checks the return (a string repr the
