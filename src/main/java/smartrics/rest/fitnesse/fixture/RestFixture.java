@@ -593,6 +593,12 @@ public class RestFixture {
 		debugMethodCallEnd();
 	}
 
+	public void TRACE() {
+		debugMethodCallStart();
+		doMethod("Trace");
+		debugMethodCallEnd();
+	}
+
 	/**
 	 * <code> | POST | uri | ?ret | ?headers | ?body |</code>
 	 * <p/>
