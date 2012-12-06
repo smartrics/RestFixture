@@ -33,7 +33,7 @@ public class GetMethod extends org.apache.commons.httpclient.methods.GetMethod {
 
 	@SuppressWarnings("deprecation")
 	public URI getURI() throws URIException {
-		return URIBuilder.newURIBuilder(this, super.getHostConfiguration());
+		return URIBuilder.newURI(this, super.getHostConfiguration());
 	}
 
 	public void setURI(URI uri) throws URIException {

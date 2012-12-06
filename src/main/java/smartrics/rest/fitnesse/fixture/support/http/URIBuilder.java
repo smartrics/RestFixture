@@ -71,7 +71,7 @@ class URIBuilder {
 		m.setQueryString(uri.getQuery());
 	}
 
-	public static URI newURIBuilder(HttpMethod m, HostConfiguration conf) throws URIException {
+	public static URI newURI(HttpMethod m, HostConfiguration conf) throws URIException {
 		String scheme = conf.getProtocol().getScheme();
 		String host = conf.getHost();
 		int port = conf.getPort();

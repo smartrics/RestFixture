@@ -32,7 +32,7 @@ import org.apache.commons.httpclient.URIException;
 public class DeleteMethod extends org.apache.commons.httpclient.methods.DeleteMethod {
     @SuppressWarnings("deprecation")
     public URI getURI() throws URIException {
-		return URIBuilder.newURIBuilder(this, super.getHostConfiguration());
+		return URIBuilder.newURI(this, super.getHostConfiguration());
     }
 
     public void setURI(URI uri) throws URIException {
