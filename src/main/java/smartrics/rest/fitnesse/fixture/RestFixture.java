@@ -121,6 +121,10 @@ import smartrics.rest.fitnesse.fixture.support.Variables;
  * false.</i></td>
  * </tr>
  * <tr>
+ * <td>restfixture.requests.follow.redirects</td>
+ * <td><i>If set to true the underlying client is instructed to follow redirects for the requests in the current fixture. Defaults to true.</i></td>
+ * </tr>
+ * <tr>
  * <td>restfixture.resource.uris.are.escaped</td>
  * <td><i>boolean value. if true, RestFixture will assume that the resource uris
  * are already escaped. If false, resource uri will be escaped. Defaults to
@@ -242,6 +246,8 @@ public class RestFixture {
 	private String lastEvaluation;
 
 	private int minLenForCollapseToggle;
+
+	private boolean followRedirects = true;
 
 	/**
 	 * Constructor for Fit runner.
@@ -872,6 +878,7 @@ public class RestFixture {
 		setLastRequest(partsFactory.buildRestRequest());
 		getLastRequest().setMethod(RestRequest.Method.valueOf(method));
 		getLastRequest().addHeaders(headers);
+		getLastRequest().setFollowRedirect(followRedirects);
 		getLastRequest().setResourceUriEscaped(resourceUrisAreEscaped);
 		if (fileName != null) {
 			getLastRequest().setFileName(fileName);
@@ -1067,6 +1074,8 @@ public class RestFixture {
 				"restfixture.display.actual.on.right", displayActualOnRight);
 
 		resourceUrisAreEscaped = config.getAsBoolean("restfixture.resource.uris.are.escaped", resourceUrisAreEscaped);
+		
+		followRedirects = config.getAsBoolean("restfixture.requests.follow.redirects", followRedirects);
 		
 		minLenForCollapseToggle = config.getAsInteger(
 				"restfixture.display.toggle.for.cells.larger.than",

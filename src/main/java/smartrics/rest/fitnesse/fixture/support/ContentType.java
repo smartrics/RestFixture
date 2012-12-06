@@ -62,7 +62,6 @@ public enum ContentType {
     }
 
     public static void config(Config config) {
-        // TODO: set default charset
         defaultCharset = config.get("restfixture.content.default.charset", Charset.defaultCharset().name());
         String htmlConfig = config.get("restfixture.content.handlers.map", "");
         String configStr = Tools.fromHtml(htmlConfig);
