@@ -35,79 +35,66 @@ import fit.ActionFixture;
 import fit.Parse;
 
 public class FitRestFixture extends ActionFixture {
-	private static final Logger LOG = LoggerFactory.getLogger(FitRestFixture.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(FitRestFixture.class);
 
 	private RestFixture restFixture;
-	
+
 	public String toString() {
 		return restFixture.toString();
 	}
-
 
 	public String getLastEvaluation() {
 		return restFixture.getLastEvaluation();
 	}
 
-
 	public String getBaseUrl() {
 		return restFixture.getBaseUrl();
 	}
-
 
 	public void setBaseUrl(Url url) {
 		restFixture.setBaseUrl(url);
 	}
 
-
 	public Map<String, String> getDefaultHeaders() {
 		return restFixture.getDefaultHeaders();
 	}
-
 
 	public CellFormatter<?> getFormatter() {
 		return restFixture.getFormatter();
 	}
 
-
 	public void setMultipartFileName() {
 		restFixture.setMultipartFileName();
 	}
-
 
 	public String getMultipartFileName() {
 		return restFixture.getMultipartFileName();
 	}
 
-
 	public void setFileName() {
 		restFixture.setFileName();
 	}
-
 
 	public String getFileName() {
 		return restFixture.getFileName();
 	}
 
-
 	public void setMultipartFileParameterName() {
 		restFixture.setMultipartFileParameterName();
 	}
-
 
 	public String getMultipartFileParameterName() {
 		return restFixture.getMultipartFileParameterName();
 	}
 
-
 	public void setBody() {
 		restFixture.setBody();
 	}
 
-
 	public void setHeader() {
 		restFixture.setHeader();
 	}
-
 
 	public void setHeaders() {
 		restFixture.setHeaders();
@@ -117,51 +104,50 @@ public class FitRestFixture extends ActionFixture {
 		restFixture.PUT();
 	}
 
-
 	public void GET() {
 		restFixture.GET();
 	}
-
 
 	public void DELETE() {
 		restFixture.DELETE();
 	}
 
-
 	public void POST() {
 		restFixture.POST();
 	}
 
+	public void HEAD() {
+		restFixture.HEAD();
+	}
+
+	public void OPTIONS() {
+		restFixture.OPTIONS();
+	}
 
 	public void let() {
 		restFixture.let();
 	}
 
-
 	public void comment() {
 		restFixture.comment();
 	}
-
 
 	public void evalJs() {
 		restFixture.evalJs();
 	}
 
-
 	public void processRow(RowWrapper<?> currentRow) {
 		restFixture.processRow(currentRow);
 	}
-
 
 	public Map<String, String> getHeaders() {
 		return restFixture.getHeaders();
 	}
 
-
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void doCells(Parse parse) {
-		if(restFixture == null) {
+		if (restFixture == null) {
 			restFixture = new RestFixture();
 			restFixture.setConfig(Config.getConfig(getConfigNameFromArgs()));
 			String url = getBaseUrlFromArgs();
@@ -169,14 +155,17 @@ public class FitRestFixture extends ActionFixture {
 				restFixture.setBaseUrl(new Url(Tools.fromSimpleTag(url)));
 			}
 			restFixture.initialize(Runner.FIT);
-			((FitFormatter) restFixture.getFormatter()).setActionFixtureDelegate(this);
+			((FitFormatter) restFixture.getFormatter())
+					.setActionFixtureDelegate(this);
 		}
 		RowWrapper currentRow = new FitRow(parse);
 		try {
 			restFixture.processRow(currentRow);
-        } catch (Exception exception) {
-            LOG.error("Exception when processing row " + currentRow.getCell(0).text(), exception);
-            restFixture.getFormatter().exception(currentRow.getCell(0), exception);
+		} catch (Exception exception) {
+			LOG.error("Exception when processing row "
+					+ currentRow.getCell(0).text(), exception);
+			restFixture.getFormatter().exception(currentRow.getCell(0),
+					exception);
 		}
 	}
 
@@ -204,7 +193,6 @@ public class FitRestFixture extends ActionFixture {
 		}
 		return null;
 	}
-
 
 	public Config getConfig() {
 		return restFixture.getConfig();
