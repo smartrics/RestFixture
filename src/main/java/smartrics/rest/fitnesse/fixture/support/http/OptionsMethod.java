@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.URIException;
  */
 public class OptionsMethod extends org.apache.commons.httpclient.methods.OptionsMethod {
 
+	@SuppressWarnings("deprecation")
 	public URI getURI() throws URIException {
 		return URIBuilder.newURI(this, super.getHostConfiguration());
 	}

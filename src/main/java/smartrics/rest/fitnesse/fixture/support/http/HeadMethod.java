@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.URIException;
  */
 public class HeadMethod extends org.apache.commons.httpclient.methods.HeadMethod {
 
+	@SuppressWarnings("deprecation")
 	public URI getURI() throws URIException {
 		return URIBuilder.newURI(this, super.getHostConfiguration());
 	}
