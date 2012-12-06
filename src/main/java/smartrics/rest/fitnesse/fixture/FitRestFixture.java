@@ -124,6 +124,10 @@ public class FitRestFixture extends ActionFixture {
 		restFixture.OPTIONS();
 	}
 
+	public void TRACE() {
+		restFixture.TRACE();
+	}
+
 	public void let() {
 		restFixture.let();
 	}
