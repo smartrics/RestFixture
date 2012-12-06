@@ -122,7 +122,9 @@ import smartrics.rest.fitnesse.fixture.support.Variables;
  * </tr>
  * <tr>
  * <td>restfixture.requests.follow.redirects</td>
- * <td><i>If set to true the underlying client is instructed to follow redirects for the requests in the current fixture. Defaults to true.</i></td>
+ * <td><i>If set to true the underlying client is instructed to follow redirects for the requests in the current fixture. 
+ *  This setting is not applied to POST and PUT (for which redirection is set to false)
+ *  Defaults to true.</i></td>
  * </tr>
  * <tr>
  * <td>restfixture.resource.uris.are.escaped</td>
