@@ -49,14 +49,12 @@ public class Variables {
     }
 
     public void put(String label, String val) {
-        String l = fromFitNesseSymbol(label);
-        Fixture.setSymbol(l, val);
+        Fixture.setSymbol(label, val);
     }
 
     public String get(String label) {
-        String l = fromFitNesseSymbol(label);
-        if (Fixture.hasSymbol(l)) {
-            return Fixture.getSymbol(l).toString();
+        if (Fixture.hasSymbol(label)) {
+            return Fixture.getSymbol(label).toString();
         }
         return null;
     }
@@ -92,16 +90,6 @@ public class Variables {
             }
         }
         return newText;
-    }
-
-    private String fromFitNesseSymbol(String label) {
-        String l = label;
-        if (l.startsWith("$")) {
-            // kept for backward compatibility
-            System.err.println("The use of $ to reference labels for storage will be deprecated in the next major version of RestFixture (" + label + ")");
-            l = l.substring(1);
-        }
-        return l;
     }
 
     private static String fitSymbolForNull() {

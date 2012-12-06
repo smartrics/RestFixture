@@ -20,7 +20,6 @@
  */
 package smartrics.rest.fitnesse.fixture.support.http;
 
-import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 
@@ -33,12 +32,7 @@ import org.apache.commons.httpclient.URIException;
 public class PutMethod extends org.apache.commons.httpclient.methods.PutMethod {
 	@SuppressWarnings("deprecation")
 	public URI getURI() throws URIException {
-		HostConfiguration conf = super.getHostConfiguration();
-		String scheme = conf.getProtocol().getScheme();
-		String host = conf.getHost();
-		int port = conf.getPort();
-		return new URIBuilder().getURI(scheme, host, port, getPath(),
-				getQueryString(), getParams());
+		return URIBuilder.newURIBuilder(this, super.getHostConfiguration());
 	}
 
 	public void setURI(URI uri) throws URIException {

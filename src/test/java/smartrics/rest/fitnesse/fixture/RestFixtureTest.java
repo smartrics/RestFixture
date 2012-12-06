@@ -93,7 +93,7 @@ public class RestFixtureTest {
 
         lastResponse = new RestResponse();
         lastResponse.setStatusCode(200);
-        lastResponse.setBody("");
+        lastResponse.setRawBody("".getBytes());
         lastResponse.setResource("/uri");
         lastResponse.setStatusText("OK");
         lastResponse.setTransactionId(0L);
@@ -170,7 +170,7 @@ public class RestFixtureTest {
     public void mustExpandSymbolSetWithLetWhenSettingHeaders() {
         when(mockLastRequest.getQuery()).thenReturn("");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
-        lastResponse.setBody("<body>1234</body>");
+        lastResponse.setRawBody("<body>1234</body>".getBytes());
 
         RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", "");
         fixture.processRow(row);
@@ -346,6 +346,7 @@ public class RestFixtureTest {
         verify(mockLastRequest).setMethod(Method.Post);
         verify(mockLastRequest).setResource("/uri");
         verify(mockLastRequest).setBody("");
+        verify(mockLastRequest).setResourceUriEscaped(false);
         verify(mockLastRequest).setMultipartFileParameterName("file");
 
         verify(mockRestClient).setBaseUrl(fixture.getBaseUrl());
@@ -390,6 +391,7 @@ public class RestFixtureTest {
         verify(mockLastRequest).setResource("/uri");
         verify(mockLastRequest).setQuery("a=b");
         verify(mockLastRequest).setMultipartFileParameterName("file");
+        verify(mockLastRequest).setResourceUriEscaped(false);
         verify(mockLastRequest).getQuery();
         // correctly executes request
         verify(mockRestClient).setBaseUrl(fixture.getBaseUrl());
@@ -435,6 +437,7 @@ public class RestFixtureTest {
         verify(mockLastRequest).setQuery("a=b");
         verify(mockLastRequest).setMultipartFileParameterName("file");
         verify(mockLastRequest).getQuery();
+        verify(mockLastRequest).setResourceUriEscaped(false);
         // correctly executes request
         verify(mockRestClient).setBaseUrl(fixture.getBaseUrl());
         verify(mockRestClient).getBaseUrl();
@@ -473,6 +476,7 @@ public class RestFixtureTest {
         verify(mockLastRequest).setMethod(Method.Delete);
         verify(mockLastRequest).addHeaders(fixture.getHeaders());
         verify(mockLastRequest).setResource("/uri");
+        verify(mockLastRequest).setResourceUriEscaped(false);
         verify(mockLastRequest).setMultipartFileParameterName("file");
         verify(mockLastRequest).getQuery();
         // correctly executes request
@@ -701,7 +705,7 @@ public class RestFixtureTest {
     }
 
     @Test
-    public void mustSetValueOnSymbolMapIfVariableNameStartsWith$() {
+    public void mustNotSetValueOnSymbolMapIfVariableNameStartsWith$() {
         when(mockLastRequest.getQuery()).thenReturn("");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
         lastResponse.setBody("<body>text</body>");
@@ -712,9 +716,9 @@ public class RestFixtureTest {
         fixture.processRow(row);
 
         // correctly builds request
-        assertEquals("text", variables.get("content"));
+        assertEquals(null, variables.get("content"));
         assertEquals("text", variables.get("$content"));
-        assertEquals("text", Fixture.getSymbol("content"));
+        assertEquals(null, Fixture.getSymbol("content"));
     }
 
     @Test
@@ -749,7 +753,7 @@ public class RestFixtureTest {
 
         RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", "");
         fixture.processRow(row);
-        row = helper.createTestRow("let", "$content", "body:xml", "/", "");
+        row = helper.createTestRow("let", "content", "body:xml", "/", "");
         fixture.processRow(row);
 
         verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("http://localhost:9090/uri"), eq("/uri"));
@@ -761,9 +765,8 @@ public class RestFixtureTest {
         verify(mockBodyTypeAdapter).set(xmlString);
         verify(mockBodyTypeAdapter).setContext(isA(Map.class));
 
-        // correctly builds request
         assertEquals(xmlString, clean(variables.get("content")));
-        assertEquals(xmlString, clean(variables.get("$content")));
+        assertEquals(null, clean(variables.get("$content")));
         assertEquals(xmlString, clean(Fixture.getSymbol("content").toString()));
 
         verifyNoMoreInteractions(mockBodyTypeAdapter);
@@ -842,6 +845,9 @@ public class RestFixtureTest {
     }
 
     private String clean(String s) {
+    	if(s == null) {
+    		return null;
+    	}
         return s.trim().replaceAll("\n", "").replaceAll("\r", "");
     }
 
@@ -871,7 +877,7 @@ public class RestFixtureTest {
 
         RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", "");
         fixture.processRow(row);
-        row = helper.createTestRow("let", "$content", "body", "/body/text()", "text");
+        row = helper.createTestRow("let", "content", "body", "/body/text()", "text");
         fixture.processRow(row);
         assertEquals("text", Fixture.getSymbol("content"));
 
@@ -891,7 +897,7 @@ public class RestFixtureTest {
 
         RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", "");
         fixture.processRow(row);
-        row = helper.createTestRow("let", "$count", "body", "count(body)", "1");
+        row = helper.createTestRow("let", "count", "body", "count(body)", "1");
         fixture.processRow(row);
         assertEquals("1", Fixture.getSymbol("count"));
         row = helper.createTestRow("let", "count", "body", "count(body)", "1");

@@ -113,12 +113,6 @@ public class FitRestFixture extends ActionFixture {
 		restFixture.setHeaders();
 	}
 
-
-	public void setHeaders(String headers) {
-		restFixture.setHeaders(headers);
-	}
-
-
 	public void PUT() {
 		restFixture.PUT();
 	}
