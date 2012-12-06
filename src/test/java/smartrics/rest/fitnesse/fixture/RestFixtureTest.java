@@ -705,6 +705,8 @@ public class RestFixtureTest {
         fixture.processRow(head);
         RowWrapper<?> opt = helper.createTestRow("OPTIONS", "/uri", "", "", "");
         fixture.processRow(opt);
+        RowWrapper<?> trace = helper.createTestRow("TRACE", "/uri", "", "", "");
+        fixture.processRow(trace);
     	
         verify(mockLastRequest).setMethod(Method.Get);
         verify(mockLastRequest).setMethod(Method.Post);
@@ -712,6 +714,7 @@ public class RestFixtureTest {
         verify(mockLastRequest).setMethod(Method.Delete);
         verify(mockLastRequest).setMethod(Method.Head);
         verify(mockLastRequest).setMethod(Method.Options);
+        verify(mockLastRequest).setMethod(Method.Trace);
     }
     
     @Test
