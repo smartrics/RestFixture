@@ -139,7 +139,7 @@ public class JavascriptWrapper {
     }
 
     private boolean isJsonResponse(RestResponse r) {
-        if (ContentType.JSON.equals(ContentType.parse(r.getHeader("Content-Type")))) {
+        if (ContentType.JSON.equals(ContentType.parse(r.getContentType()))) {
             return true;
         }
         if (r.getBody() != null && r.getBody().trim().matches("\\{.+\\}")) {

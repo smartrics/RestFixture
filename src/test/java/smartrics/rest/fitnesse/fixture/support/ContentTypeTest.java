@@ -23,116 +23,82 @@ package smartrics.rest.fitnesse.fixture.support;
 import static org.junit.Assert.assertEquals;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import smartrics.rest.client.RestData;
-import smartrics.rest.client.RestData.Header;
+import smartrics.rest.client.RestResponse;
 
 public class ContentTypeTest {
 
     @Before
     @After
     public void resetDefaultContentTypeMap() {
+    	RestData.DEFAULT_ENCODING = "UTF-8";
         ContentType.resetDefaultMapping();
     }
 
 	@Test
 	public void shouldReturnCorrectTypeGivenApplicationXml() {
-		List<Header> headers = new ArrayList<Header>();
-		headers.add(new RestData.Header("Content-Type", "application/xml"));
-
-		assertEquals(ContentType.XML, ContentType.parse(headers));
+		RestData d = new RestResponse();
+		d.addHeader("Content-Type", "application/xml");
+		assertEquals(ContentType.XML, ContentType.parse(d.getContentType()));
 	}
 	
 	@Test
 	public void shouldReturnCorrectTypeGivenApplicationJson() {
-		List<Header> headers = new ArrayList<Header>();
-		headers.add(new RestData.Header("Content-Type", "application/json"));
-
-		assertEquals(ContentType.JSON, ContentType.parse(headers));
+		RestData d = new RestResponse();
+		d.addHeader("Content-Type", "application/json");
+		assertEquals(ContentType.JSON, ContentType.parse(d.getContentType()));
 	}
 
 	@Test
 	public void shouldReturnCorrectTypeGivenApplicationText() {
-		List<Header> headers = new ArrayList<Header>();
-		headers.add(new RestData.Header("Content-Type", "text/plain"));
+		RestData d = new RestResponse();
+		d.addHeader("Content-Type", "text/plain");
 
-		assertEquals(ContentType.TEXT, ContentType.parse(headers));
+		assertEquals(ContentType.TEXT, ContentType.parse(d.getContentType()));
 	}
 
 	@Test
-	public void shouldReturnCorrectTypeGivenApplicationTextWithCharset() {
-		List<Header> headers = new ArrayList<Header>();
-		headers.add(new RestData.Header("Content-Type",
-				"text/plain; charset=iso-8859-1"));
-
-		assertEquals(ContentType.TEXT, ContentType.parse(headers));
+	public void shouldReturnCorrectTypeAndCharsetGivenApplicationTextWithCharset() {
+		RestData d = new RestResponse();
+		d.addHeader("Content-Type", "text/plain; charset= iso-8859-1");
+		assertEquals(ContentType.TEXT, ContentType.parse(d.getContentType()));
+		assertEquals("iso-8859-1", d.getCharset());
 	}
 
 	@Test
     public void shouldReturnDefaultGivenAnythingElse() {
-		List<Header> headers = new ArrayList<Header>();
-		headers.add(new RestData.Header("Content-Type", "blah/blah"));
-
-        assertEquals(ContentType.typeFor("default"), ContentType.parse(headers));
+		RestData d = new RestResponse();
+		d.addHeader("Content-Type", "bla/bla");
+        assertEquals(ContentType.typeFor("default"), ContentType.parse(d.getContentType()));
 	}
 
 	@Test
     public void shouldReturnDefaultGivenEmptyHeaders() {
-		List<Header> headers = new ArrayList<Header>();
-
-        assertEquals(ContentType.typeFor("default"), ContentType.parse(headers));
+		RestData d = new RestResponse();
+        assertEquals(ContentType.typeFor("default"), ContentType.parse(d.getContentType()));
 	}
-
-	@Test
-    public void shouldReturnDefaultGivenMoreThanOneHeaders() {
-		List<Header> headers = new ArrayList<Header>();
-		headers.add(new RestData.Header("Content-Type", "application/json"));
-		headers.add(new RestData.Header("Content-Type", "application/json"));
-
-        assertEquals(ContentType.typeFor("default"), ContentType.parse(headers));
-	}
-
-	@Test
-    public void shouldReturnDefaultGivenOneHeaderThatIsNotContentType() {
-		List<Header> headers = new ArrayList<Header>();
-		headers.add(new RestData.Header("Something-Else", "application/json"));
-
-        assertEquals(ContentType.typeFor("default"), ContentType.parse(headers));
-	}
-
-    @Test
-    public void shouldParseTheCharset() {
-        List<Header> headers = new ArrayList<Header>();
-        headers.add(new RestData.Header("Content-Type", "application/json; charset=UTF-8"));
-        assertEquals(ContentType.parseCharset(headers), "UTF-8");
-    }
 
     @Test
     public void shouldUseDefaultSystemCharsetIfCharsetNotParseableAndDefaultNotSpecifiedViaProperty() {
-        List<Header> headers = new ArrayList<Header>();
-        headers.add(new RestData.Header("Content-Type", "application/json"));
         Config c = Config.getConfig();
         c.add("restfixture.content.handlers.map", confMap());
         c.add("restfixture.content.default.charset", null);
         ContentType.config(c);
-        assertEquals(ContentType.parseCharset(headers), Charset.defaultCharset().name());
+        assertEquals(RestData.DEFAULT_ENCODING, Charset.defaultCharset().name());
     }
 
     @Test
     public void shouldUseSpecifieDefaultCharsetProperty() {
-        List<Header> headers = new ArrayList<Header>();
-        headers.add(new RestData.Header("Content-Type", "application/json"));
         Config c = Config.getConfig();
         c.add("restfixture.content.handlers.map", confMap());
         c.add("restfixture.content.default.charset", "MY-CHARSET");
         ContentType.config(c);
-        assertEquals(ContentType.parseCharset(headers), "MY-CHARSET");
+        assertEquals(RestData.DEFAULT_ENCODING, "MY-CHARSET");
     }
 
     @Test
@@ -154,21 +120,14 @@ public class ContentTypeTest {
         c.add("restfixture.content.default.charset", "MY-CHARSET");
         ContentType.config(c);
 
-        List<Header> headers = new ArrayList<Header>();
-        headers.add(new RestData.Header("Content-Type", "application/json"));
-        assertEquals(ContentType.JSON, ContentType.parse(headers));
-        headers.set(0, new RestData.Header("Content-Type", "application/xml; charset=iso12344"));
-        assertEquals(ContentType.XML, ContentType.parse(headers));
-        headers.set(0, new RestData.Header("Content-Type", "application/xhtml"));
-        assertEquals(ContentType.XML, ContentType.parse(headers));
-        headers.set(0, new RestData.Header("Content-Type", "application/my-app-xml"));
-        assertEquals(ContentType.XML, ContentType.parse(headers));
-        headers.set(0, new RestData.Header("Content-Type", "text/plain"));
-        assertEquals(ContentType.JSON, ContentType.parse(headers));
+        assertEquals(ContentType.JSON, ContentType.parse("application/json"));
+        assertEquals(ContentType.XML, ContentType.parse("application/xml; charset=iso12344"));
+        assertEquals(ContentType.XML, ContentType.parse("application/xhtml"));
+        assertEquals(ContentType.XML, ContentType.parse("application/my-app-xml"));
+        assertEquals(ContentType.JSON, ContentType.parse("text/plain"));
 
         // overrides "default"
-        headers.set(0, new RestData.Header("Content-Type", "unhandled"));
-        assertEquals(ContentType.TEXT, ContentType.parse(headers));
+        assertEquals(ContentType.TEXT, ContentType.parse("unhandled"));
     }
 
     private String confMap() {

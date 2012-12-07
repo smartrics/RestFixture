@@ -936,13 +936,13 @@ public class RestFixture {
 	// Split out of completeHttpMethodExecution so RestScriptFixture can call
 	// this
 	protected BodyTypeAdapter createBodyTypeAdapter() {
-		return createBodyTypeAdapter(getContentTypeOfLastResponse());
+		return createBodyTypeAdapter(ContentType.parse(getLastResponse().getContentType()));
 	}
 
 	// Split out of completeHttpMethodExecution so RestScriptFixture can call
 	// this
 	protected BodyTypeAdapter createBodyTypeAdapter(ContentType ct) {
-		String charset = getCharsetOfLastResponse();
+		String charset = getLastResponse().getCharset();
 		BodyTypeAdapter bodyTypeAdapter = partsFactory.buildBodyTypeAdapter(ct,
 				charset);
 		bodyTypeAdapter.setContext(namespaceContext);
@@ -994,15 +994,6 @@ public class RestFixture {
 			StackTraceElement el = Thread.currentThread().getStackTrace()[4];
 			LOG.debug(h + el.getMethodName());
 		}
-	}
-
-	private ContentType getContentTypeOfLastResponse() {
-		return ContentType.parse(getLastResponse().getHeader("Content-Type"));
-	}
-
-	private String getCharsetOfLastResponse() {
-		return ContentType.parseCharset(getLastResponse().getHeader(
-				"Content-Type"));
 	}
 
 	private Map<String, String> substitute(Map<String, String> headers) {

@@ -20,7 +20,6 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.xpath.XPathConstants;
@@ -28,7 +27,6 @@ import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import smartrics.rest.client.RestData.Header;
 import smartrics.rest.client.RestResponse;
 
 /**
@@ -43,9 +41,9 @@ public class LetBodyHandler implements LetHandler {
     public String handle(RestResponse response, Object expressionContext, String expression) {
         @SuppressWarnings("unchecked")
         Map<String, String> namespaceContext = (Map<String, String>) expressionContext;
-        List<Header> h = response.getHeader("Content-Type");
-        ContentType contentType = ContentType.parse(h);
-        String charset = ContentType.parseCharset(h);
+        String contentTypeString = response.getContentType();
+        String charset = response.getCharset();
+        ContentType contentType = ContentType.parse(contentTypeString);
         BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(contentType, charset);
         String body = bodyTypeAdapter.toXmlString(response.getBody());
         if (body == null) {
