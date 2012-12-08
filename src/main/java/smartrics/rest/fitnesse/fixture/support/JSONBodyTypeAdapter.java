@@ -36,6 +36,9 @@ public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
     private boolean forceJsEvaluation = false;
     private JavascriptWrapper wrapper = new JavascriptWrapper();
 
+    /**
+     * def ctor
+     */
     public JSONBodyTypeAdapter() {
     }
 

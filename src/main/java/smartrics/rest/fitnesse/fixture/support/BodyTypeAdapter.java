@@ -32,68 +32,76 @@ import fit.Parse;
  */
 public abstract class BodyTypeAdapter extends RestDataTypeAdapter {
 
-    private String charset;
+	private String charset;
 
-    /**
-     * Default constructor.
-     */
-    public BodyTypeAdapter() {
-        super();
-    }
+	/**
+	 * Default constructor.
+	 */
+	public BodyTypeAdapter() {
+		super();
+	}
 
-    protected void setCharset(String charset) {
-        this.charset = charset;
-    }
+	protected void setCharset(String charset) {
+		this.charset = charset;
+	}
 
-    public String getCharset() {
-        return charset;
-    }
+	/**
+	 * @return the charset encoding the body response managed by this adapter.
+	 */
+	public String getCharset() {
+		return charset;
+	}
 
-    /**
-     * Checks if body of a cell is "no-body" meaning empty in the context of a
-     * REST call.
-     * 
-     * @param value
-     *            the cell
-     * @return true if no-body
-     */
-    protected boolean checkNoBody(final Object value) {
-        if (value == null) {
-            return true;
-        }
-        if (value instanceof Collection) {
-            return ((Collection<?>) value).size() == 0;
-        }
-        String s = value.toString();
-        if (value instanceof Parse) {
-            s = ((Parse) value).text().trim();
-        }
-        return checkNoBodyForString(s);
-    }
+	/**
+	 * Checks if body of a cell is "no-body" meaning empty in the context of a
+	 * REST call.
+	 * 
+	 * @param value
+	 *            the cell
+	 * @return true if no-body
+	 */
+	protected boolean checkNoBody(final Object value) {
+		if (value == null) {
+			return true;
+		}
+		if (value instanceof Collection) {
+			return ((Collection<?>) value).size() == 0;
+		}
+		String s = value.toString();
+		if (value instanceof Parse) {
+			s = ((Parse) value).text().trim();
+		}
+		return checkNoBodyForString(s);
+	}
 
-    private boolean checkNoBodyForString(final String value) {
-        return "".equals(value.trim()) || "no-body".equals(value.trim());
-    }
+	private boolean checkNoBodyForString(final String value) {
+		return "".equals(value.trim()) || "no-body".equals(value.trim());
+	}
 
-    public abstract String toXmlString(String content);
+	/**
+	 * @param content
+	 *            the content of the body response to be XMLified.
+	 * @return the content as xml.
+	 */
+	public abstract String toXmlString(String content);
 
-    /**
-     * This renders the actual body - expected as a String containing XML - as
-     * HTML to be displayed in the test page.
-     * 
-     * @param obj
-     *            the {@code List<String>} actual body, or an empty/null body
-     *            rendered as HTML
-     * @return the string representation
-     */
-    @Override
-    public String toString(final Object obj) {
-        if (obj == null || obj.toString().trim().equals("")) {
-            return "no-body";
-        }
-        // the actual value is passed as an xml string
-        // TODO: pretty print toString on BodyTypeAdapter
-        return obj.toString();
-    }
+	/**
+	 * This renders the actual body - expected as a String containing XML - as
+	 * HTML to be displayed in the test page.
+	 * 
+	 * @param obj
+	 *            the {@code List<String>} actual body, or an empty/null body
+	 *            rendered as HTML
+	 * @return the string representation
+	 */
+	@Override
+	public String toString(final Object obj) {
+		if (obj == null || obj.toString().trim().equals("")) {
+			return "no-body";
+		}
+		// the actual value is passed as an xml string
+		// TODO: pretty print toString on BodyTypeAdapter
+		return obj.toString();
+	}
 
 }

@@ -122,9 +122,9 @@ import smartrics.rest.fitnesse.fixture.support.Variables;
  * </tr>
  * <tr>
  * <td>restfixture.requests.follow.redirects</td>
- * <td><i>If set to true the underlying client is instructed to follow redirects for the requests in the current fixture. 
- *  This setting is not applied to POST and PUT (for which redirection is set to false)
- *  Defaults to true.</i></td>
+ * <td><i>If set to true the underlying client is instructed to follow redirects
+ * for the requests in the current fixture. This setting is not applied to POST
+ * and PUT (for which redirection is set to false) Defaults to true.</i></td>
  * </tr>
  * <tr>
  * <td>restfixture.resource.uris.are.escaped</td>
@@ -194,14 +194,26 @@ public class RestFixture {
 	 * 
 	 */
 	public enum Runner {
-		SLIM, FIT, OTHER;
+		/**
+		 * the slim runner
+		 */
+		SLIM,
+		/**
+		 * the fit runner
+		 */
+		FIT,
+		/**
+		 * any other runner
+		 */
+		OTHER;
 	};
 
 	private static final String LINE_SEPARATOR = "\n";
 
 	private static final String FILE = "file";
 
-	private static final Logger LOG = LoggerFactory.getLogger(RestFixture.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(RestFixture.class);
 
 	protected Variables GLOBALS;
 
@@ -218,7 +230,7 @@ public class RestFixture {
 	protected String requestBody;
 
 	protected boolean resourceUrisAreEscaped = false;
-	
+
 	protected Map<String, String> requestHeaders;
 
 	private RestClient restClient;
@@ -265,7 +277,7 @@ public class RestFixture {
 	/**
 	 * Constructor for Slim runner.
 	 * 
-	 * @param args
+	 * @param hostName
 	 *            the cells following up the first cell in the first row.
 	 */
 	public RestFixture(String hostName) {
@@ -275,13 +287,21 @@ public class RestFixture {
 	/**
 	 * Constructor for Slim runner.
 	 * 
-	 * @param args
+	 * @param hostName
 	 *            the cells following up the first cell in the first row.
+	 * @param configName
+	 *            the value of cell number 3 in first row of the fixture table.
 	 */
 	public RestFixture(String hostName, String configName) {
 		this(new PartsFactory(), hostName, configName);
 	}
 
+	/**
+	 * @param partsFactory
+	 *            the factory of parts necessary to create the rest fixture
+	 * @param hostName
+	 * @param configName
+	 */
 	public RestFixture(PartsFactory partsFactory, String hostName,
 			String configName) {
 		this.displayActualOnRight = true;
@@ -317,6 +337,11 @@ public class RestFixture {
 		return null;
 	}
 
+	/**
+	 * sets the base url.
+	 * 
+	 * @param url
+	 */
 	public void setBaseUrl(Url url) {
 		this.baseUrl = url;
 	}
@@ -334,7 +359,7 @@ public class RestFixture {
 	/**
 	 * The formatter for this instance of the RestFixture.
 	 * 
-	 * @return
+	 * @return the formatter for the cells
 	 */
 	public CellFormatter<?> getFormatter() {
 		return formatter;
@@ -344,7 +369,7 @@ public class RestFixture {
 	 * Slim Table table hook.
 	 * 
 	 * @param rows
-	 * @return
+	 * @return the rendered content.
 	 */
 	public List<List<String>> doTable(List<List<String>> rows) {
 		initialize(Runner.SLIM);
@@ -405,6 +430,9 @@ public class RestFixture {
 		}
 	}
 
+	/**
+	 * @return the multipart filename
+	 */
 	public String getMultipartFileName() {
 		return multipartFileName;
 	}
@@ -428,6 +456,9 @@ public class RestFixture {
 		}
 	}
 
+	/**
+	 * @return the filename
+	 */
 	public String getFileName() {
 		return fileName;
 	}
@@ -452,6 +483,9 @@ public class RestFixture {
 		}
 	}
 
+	/**
+	 * @return the multipart file parameter name.
+	 */
 	public String getMultipartFileParameterName() {
 		return multipartFileParameterName;
 	}
@@ -547,7 +581,8 @@ public class RestFixture {
 	 * <code> | HEAD | uri | ?ret | ?headers |  |</code>
 	 * <p/>
 	 * executes a HEAD on the uri and checks the return (a string repr the
-	 * operation return code) and the http response headers. Head is meant to return no-body.
+	 * operation return code) and the http response headers. Head is meant to
+	 * return no-body.
 	 * 
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
@@ -601,6 +636,9 @@ public class RestFixture {
 		debugMethodCallEnd();
 	}
 
+	/**
+	 * <code> | TRACE | uri | ?ret | ?headers | ?body |</code>
+	 */
 	public void TRACE() {
 		debugMethodCallStart();
 		doMethod("Trace");
@@ -723,9 +761,14 @@ public class RestFixture {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	/**
+	 * allows to add comments to a rest fixture - basically does nothing except ignoring the text.
+	 * the text is substituted if variables are found.
+	 */
+	@SuppressWarnings("unchecked")
 	public void comment() {
 		debugMethodCallStart();
+		@SuppressWarnings("rawtypes")
 		CellWrapper messageCell = row.getCell(1);
 		try {
 			String message = messageCell.text().trim();
@@ -818,7 +861,6 @@ public class RestFixture {
 		configRestClient();
 	}
 
-	// Made protected for RestScriptFixture
 	protected String emptifyBody(String b) {
 		String body = b;
 		if (body == null) {
@@ -827,6 +869,9 @@ public class RestFixture {
 		return body;
 	}
 
+	/**
+	 * @return the request headers
+	 */
 	public Map<String, String> getHeaders() {
 		Map<String, String> headers = null;
 		if (requestHeaders != null) {
@@ -866,7 +911,10 @@ public class RestFixture {
 			doMethod(method, resUrl, rHeaders, rBody);
 			completeHttpMethodExecution();
 		} catch (RuntimeException e) {
-			getFormatter().exception(row.getCell(0), "Execution of " + method + " caused exception '" + e.getMessage() + "'");
+			getFormatter().exception(
+					row.getCell(0),
+					"Execution of " + method + " caused exception '"
+							+ e.getMessage() + "'");
 			LOG.error("Exception occurred when processing method=" + method, e);
 		}
 	}
@@ -888,7 +936,8 @@ public class RestFixture {
 		if (multipartFileName != null) {
 			getLastRequest().setMultipartFileName(multipartFileName);
 		}
-		getLastRequest().setMultipartFileParameterName(multipartFileParameterName);
+		getLastRequest().setMultipartFileParameterName(
+				multipartFileParameterName);
 		String[] uri = resUrl.split("\\?");
 		String[] thisRequestUrlParts = buildThisRequestUrl(uri[0]);
 		getLastRequest().setResource(thisRequestUrlParts[1]);
@@ -936,7 +985,8 @@ public class RestFixture {
 	// Split out of completeHttpMethodExecution so RestScriptFixture can call
 	// this
 	protected BodyTypeAdapter createBodyTypeAdapter() {
-		return createBodyTypeAdapter(ContentType.parse(getLastResponse().getContentType()));
+		return createBodyTypeAdapter(ContentType.parse(getLastResponse()
+				.getContentType()));
 	}
 
 	// Split out of completeHttpMethodExecution so RestScriptFixture can call
@@ -1066,10 +1116,13 @@ public class RestFixture {
 		displayActualOnRight = config.getAsBoolean(
 				"restfixture.display.actual.on.right", displayActualOnRight);
 
-		resourceUrisAreEscaped = config.getAsBoolean("restfixture.resource.uris.are.escaped", resourceUrisAreEscaped);
-		
-		followRedirects = config.getAsBoolean("restfixture.requests.follow.redirects", followRedirects);
-		
+		resourceUrisAreEscaped = config
+				.getAsBoolean("restfixture.resource.uris.are.escaped",
+						resourceUrisAreEscaped);
+
+		followRedirects = config.getAsBoolean(
+				"restfixture.requests.follow.redirects", followRedirects);
+
 		minLenForCollapseToggle = config.getAsInteger(
 				"restfixture.display.toggle.for.cells.larger.than",
 				minLenForCollapseToggle);

@@ -143,6 +143,9 @@ public class SvgImage extends SymbolType implements Rule, Translation {
 
     private Mode defaultMode = Mode.inline;
 
+    /**
+     * ctor.
+     */
     public SvgImage() {
         super("SVG-Image");
         wikiMatcher(new Matcher().string("!svg"));
@@ -163,6 +166,13 @@ public class SvgImage extends SymbolType implements Rule, Translation {
         return toTarget(translator, target, symbol);
     }
 
+    /**
+     * 
+     * @param translator
+     * @param body
+     * @param args
+     * @return the inlined svg.
+     */
     public String toTarget(Translator translator, String body, Symbol args) {
         Symbol symbol = getPathSymbol(args);
         if (symbol == null) {

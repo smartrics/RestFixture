@@ -37,9 +37,19 @@ import org.apache.commons.httpclient.params.HttpClientParams;
  * 
  */
 public class HttpClientBuilder {
+	/**
+	 * default value of the socket timeout: 3000ms.
+	 */
     public static final Integer DEFAULT_SO_TO = 3000;
+    /**
+     * default value of the proxy port: 80.
+     */
     public static final Integer DEFAULT_PROXY_PORT = 80;
 
+    /**
+     * @param config the {@link Config} containing the client configuration paramteres.
+     * @return an instance of an {@link HttpClient}.
+     */
     public HttpClient createHttpClient(final Config config) {
         HttpClient client = createConfiguredClient(config);
         if (config != null) {

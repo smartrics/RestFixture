@@ -80,23 +80,54 @@ public final class Tools {
 
 	}
 
+	/**
+	 * @param ns
+	 *            the name space
+	 * @param xpathExpression
+	 *            the expression
+	 * @param content
+	 *            the content
+	 * @return the list of nodes matching the supplied XPath.
+	 */
 	public static NodeList extractXPath(Map<String, String> ns,
 			String xpathExpression, String content) {
 		return (NodeList) extractXPath(ns, xpathExpression, content,
 				XPathConstants.NODESET, null);
 	}
 
+	/**
+	 * 
+	 * @param ns
+	 * @param xpathExpression
+	 * @param content
+	 * @param encoding
+	 * @return the list of nodes matching the supplied XPath.
+	 */
 	public static NodeList extractXPath(Map<String, String> ns,
 			String xpathExpression, String content, String encoding) {
 		return (NodeList) extractXPath(ns, xpathExpression, content,
 				XPathConstants.NODESET, encoding);
 	}
 
+	/**
+	 * @param xpathExpression
+	 * @param content
+	 * @param returnType
+	 * @return the list of nodes matching the supplied XPath.
+	 */
 	public static Object extractXPath(String xpathExpression, String content,
 			QName returnType) {
 		return extractXPath(xpathExpression, content, returnType, null);
 	}
 
+	/**
+	 * 
+	 * @param xpathExpression
+	 * @param content
+	 * @param returnType
+	 * @param encoding
+	 * @return the list of nodes mathching the supplied XPath.
+	 */
 	public static Object extractXPath(String xpathExpression, String content,
 			QName returnType, String encoding) {
 		// Use the java Xpath API to return a NodeList to the caller so they can
@@ -105,6 +136,14 @@ public final class Tools {
 				content, returnType, encoding);
 	}
 
+	/**
+	 * 
+	 * @param ns
+	 * @param xpathExpression
+	 * @param content
+	 * @param returnType
+	 * @return the list of nodes mathching the supplied XPath.
+	 */
 	public static Object extractXPath(Map<String, String> ns,
 			String xpathExpression, String content, QName returnType) {
 		return extractXPath(ns, xpathExpression, content, returnType, null);
@@ -114,6 +153,13 @@ public final class Tools {
 	 * extract the XPath from the content. the return value type is passed in
 	 * input using one of the {@link XPathConstants}. See also
 	 * {@link XPathExpression#evaluate(Object item, QName returnType)} ;
+	 * 
+	 * @param ns
+	 * @param xpathExpression
+	 * @param content
+	 * @param returnType
+	 * @param charset
+	 * @return the result
 	 */
 	public static Object extractXPath(Map<String, String> ns,
 			String xpathExpression, String content, QName returnType,
@@ -136,6 +182,10 @@ public final class Tools {
 		}
 	}
 
+	/**
+	 * @param result
+	 * @return the serialised as xml result of an xpath expression evaluation
+	 */
 	public static String xPathResultToXmlString(Object result) {
 		if (result == null) {
 			return null;
@@ -162,6 +212,11 @@ public final class Tools {
 		}
 	}
 
+	/**
+	 * @param ns
+	 * @param xpathExpression
+	 * @return true if the expression is valid
+	 */
 	public static boolean isValidXPath(Map<String, String> ns,
 			String xpathExpression) {
 		try {
@@ -172,6 +227,11 @@ public final class Tools {
 		}
 	}
 
+	/**
+	 * @param ns
+	 * @param xpathExpression
+	 * @return the parsed string as {@link XPathExpression}
+	 */
 	public static XPathExpression toExpression(Map<String, String> ns,
 			String xpathExpression) {
 		try {
@@ -243,6 +303,14 @@ public final class Tools {
 		}
 	}
 
+	/**
+	 * this method uses @link {@link JSONObject} to parse the string and return
+	 * true if parse succeeds.
+	 * 
+	 * @param presumeblyJson
+	 *            string with some json (possibly).
+	 * @return true if json is valid
+	 */
 	public static boolean isValidJson(String presumeblyJson) {
 		Object o = null;
 		try {
@@ -253,6 +321,11 @@ public final class Tools {
 		return o != null;
 	}
 
+	/**
+	 * @param json
+	 *            the json string
+	 * @return the string as xml.
+	 */
 	public static String fromJSONtoXML(String json) {
 		HierarchicalStreamDriver driver = new JettisonMappedXmlDriver();
 		StringReader reader = new StringReader(json);
@@ -273,10 +346,26 @@ public final class Tools {
 		}
 	}
 
+	/**
+	 * Yet another stream 2 string function.
+	 * 
+	 * @param is
+	 *            the stream
+	 * @return the string.
+	 */
 	public static String getStringFromInputStream(InputStream is) {
 		return getStringFromInputStream(is, Charset.defaultCharset().name());
 	}
 
+	/**
+	 * Yet another stream 2 string function.
+	 * 
+	 * @param is
+	 *            the stream
+	 * @param encoding
+	 *            the encoding of the bytes in the stream
+	 * @return the string.
+	 */
 	public static String getStringFromInputStream(InputStream is,
 			String encoding) {
 		String line = null;
@@ -301,25 +390,48 @@ public final class Tools {
 		return sb.toString();
 	}
 
+	/**
+	 * Yet another stream 2 string function.
+	 * 
+	 * @param string
+	 *            the string
+	 * @param encoding
+	 *            the encoding of the bytes in the stream
+	 * @return the input stream.
+	 */
 	public static InputStream getInputStreamFromString(String string,
-			String charset) {
+			String encoding) {
 		if (string == null) {
 			throw new IllegalArgumentException("null input");
 		}
 		try {
-			byte[] byteArray = string.getBytes(charset);
+			byte[] byteArray = string.getBytes(encoding);
 			return new ByteArrayInputStream(byteArray);
 		} catch (UnsupportedEncodingException e) {
-			throw new IllegalArgumentException("Unsupported encoding: " + charset);
+			throw new IllegalArgumentException("Unsupported encoding: "
+					+ encoding);
 		}
 	}
 
-	public static String convertMapToString(Map<String, String> map, String nvSep, String entrySep) {
+	/**
+	 * converts a map to string
+	 * 
+	 * @param map
+	 *            the map to convert
+	 * @param nvSep
+	 *            the nvp separator
+	 * @param entrySep
+	 *            the separator of each entry
+	 * @return the serialised map.
+	 */
+	public static String convertMapToString(Map<String, String> map,
+			String nvSep, String entrySep) {
 		StringBuffer sb = new StringBuffer();
 		if (map != null) {
 			for (Entry<String, String> entry : map.entrySet()) {
 				String el = entry.getKey();
-				sb.append(convertEntryToString(el, map.get(el), nvSep)).append(entrySep);
+				sb.append(convertEntryToString(el, map.get(el), nvSep)).append(
+						entrySep);
 			}
 		}
 		String repr = sb.toString();
@@ -327,8 +439,7 @@ public final class Tools {
 		return repr.substring(0, pos);
 	}
 
-	public static String convertEntryToString(String name, String value,
-			String nvSep) {
+	public static String convertEntryToString(String name, String value, String nvSep) {
 		return String.format("%s%s%s", name, nvSep, value);
 	}
 
@@ -342,7 +453,8 @@ public final class Tools {
 		}
 	}
 
-	public static Map<String, String> convertStringToMap(final String expStr, final String nvSep, final String entrySep, boolean cleanTags) {
+	public static Map<String, String> convertStringToMap(final String expStr,
+			final String nvSep, final String entrySep, boolean cleanTags) {
 		String sanitisedExpStr = expStr.trim();
 		sanitisedExpStr = removeOpenEscape(sanitisedExpStr);
 		sanitisedExpStr = removeCloseEscape(sanitisedExpStr);

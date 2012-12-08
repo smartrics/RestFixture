@@ -40,6 +40,10 @@ public class FitFormatter implements CellFormatter<Parse> {
     private boolean displayActual;
     private int minLenForToggle = -1;
 
+    /**
+     * sets the action fixture delegate to forward formatting messages.
+     * @param f
+     */
     public void setActionFixtureDelegate(ActionFixture f) {
         this.fixture = f;
     }

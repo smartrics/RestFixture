@@ -36,6 +36,9 @@ public class SlimRow implements RowWrapper<String> {
 
 	private final List<CellWrapper<String>> row;
 
+	/**
+	 * @param rawRow a list of string representing the row cells as passed by Slim.
+	 */
     public SlimRow(List<String> rawRow) {
         this.row = new ArrayList<CellWrapper<String>>();
         for (String r : rawRow) {
@@ -57,6 +60,9 @@ public class SlimRow implements RowWrapper<String> {
         return 0;
     }
 
+    /**
+     * @return the row as list of strings.
+     */
     public List<String> asList() {
         List<String> ret = new ArrayList<String>();
         for (CellWrapper<String> w : row) {

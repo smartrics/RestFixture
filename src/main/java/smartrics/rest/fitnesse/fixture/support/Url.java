@@ -24,7 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Facade to {@see java.net.URL}.
+ * Facade to {@link java.net.URL}. Just to offer a REST oriented interface.
  * 
  * @author smartrics
  * 
@@ -33,10 +33,15 @@ public class Url {
 
 	private URL baseUrl;
 
+	/**
+	 * @param url
+	 *            the string representation of url.
+	 */
 	public Url(String url) {
 		try {
 			if (url == null || "".equals(url.trim())) {
-				throw new IllegalArgumentException("Null or empty input: " + url);
+				throw new IllegalArgumentException("Null or empty input: "
+						+ url);
 			}
 			String u = url;
 			if (url.endsWith("/")) {
@@ -52,6 +57,9 @@ public class Url {
 		}
 	}
 
+	/**
+	 * @return the base url
+	 */
 	public URL getUrl() {
 		return baseUrl;
 	}
@@ -61,6 +69,9 @@ public class Url {
 		return getUrl().toExternalForm();
 	}
 
+	/**
+	 * @return the resource
+	 */
 	public String getResource() {
 		String res = getUrl().getPath().trim();
 		if (res.isEmpty()) {
@@ -69,6 +80,10 @@ public class Url {
 		return res;
 	}
 
+	/**
+	 * 
+	 * @return the base url.
+	 */
 	public String getBaseUrl() {
 		String path = getResource().trim();
 		if (path.length() == 0 || path.equals("/")) {
@@ -82,6 +97,13 @@ public class Url {
 		}
 	}
 
+	/**
+	 * builds a url
+	 * 
+	 * @param file
+	 *            the file
+	 * @return the full url.
+	 */
 	public URL buildURL(String file) {
 		try {
 			return new URL(baseUrl, file);

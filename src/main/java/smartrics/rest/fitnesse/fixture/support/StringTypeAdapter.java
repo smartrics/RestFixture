@@ -28,9 +28,6 @@ package smartrics.rest.fitnesse.fixture.support;
  */
 public class StringTypeAdapter extends RestDataTypeAdapter {
 
-	public StringTypeAdapter() {
-	}
-
 	@Override
 	public boolean equals(Object expected, Object actual) {
 		String se = "null";

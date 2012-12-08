@@ -39,10 +39,6 @@ public class SlimFormatter implements CellFormatter<String> {
     private int minLenForToggle = -1;
     private boolean displayActual;
 
-    public SlimFormatter() {
-
-    }
-
     @Override
     public void setDisplayActual(boolean d) {
         this.displayActual = d;

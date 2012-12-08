@@ -45,6 +45,13 @@ public class BodyTypeAdapterFactory {
     private BodyTypeAdapterFactory() {
     }
 
+    /**
+     * Returns a @link {@link BodyTypeAdapter} for the given charset and @link {@link ContentType}.
+     * 
+     * @param content the contentType
+     * @param charset the charset.
+     * @return an instance of {@link BodyTypeAdapter}
+     */
     public static BodyTypeAdapter getBodyTypeAdapter(ContentType content, String charset) {
         @SuppressWarnings("rawtypes")
         Class aClass = contentTypeToBodyTypeAdapter.get(content);

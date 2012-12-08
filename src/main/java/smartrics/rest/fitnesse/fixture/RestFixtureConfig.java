@@ -33,7 +33,7 @@ import fit.Parse;
  * A configuration is a named map that stores key/value pairs. The name of the
  * map is passed as an optional parameter to the fixture. If not passed it's
  * assumed that a default name is used. The default value of the map name is
- * {@link Config.DEFAULT_CONFIG_NAME}.
+ * {@link Config#DEFAULT_CONFIG_NAME}.
  * 
  * The structure of the table of this fixture simply a table that reports
  * key/values. The name of the config is optionally passed to the fixture.
@@ -113,7 +113,6 @@ public class RestFixtureConfig extends Fixture {
 	 * 
 	 * For fixtures with no args.
 	 * 
-	 * @param args
 	 */
 	public RestFixtureConfig() {
 
@@ -133,7 +132,7 @@ public class RestFixtureConfig extends Fixture {
 	 * Support for Slim runner.
 	 * 
 	 * @param rows
-	 * @return
+	 * @return the content as a list (of rows) of lists of strings (the cells).
 	 */
 	public List<List<String>> doTable(List<List<String>> rows) {
 		Config c = getConfig();
@@ -159,7 +158,7 @@ public class RestFixtureConfig extends Fixture {
 	/**
 	 * Processes each row in the config fixture table and loads the key/value
 	 * pairs. The fixture optional first argument is the config name. If not
-	 * supplied the value is defaulted. See {@link Config.DEFAULT_CONFIG_NAME}.
+	 * supplied the value is defaulted. See {@link Config#DEFAULT_CONFIG_NAME}.
 	 */
 	@Override
 	public void doRow(Parse p) {

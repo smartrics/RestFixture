@@ -30,34 +30,38 @@ import smartrics.rest.fitnesse.fixture.support.CellWrapper;
  */
 public class SlimCell implements CellWrapper<String> {
 
-    private String cell;
+	private String cell;
 
+	/** 
+	 * a slim cell.
+	 * @param c the content.
+	 */
 	public SlimCell(String c) {
-        this.cell = c;
+		this.cell = c;
 	}
 
 	@Override
 	public String text() {
-        return cell;
+		return cell;
 	}
 
 	@Override
 	public void body(String string) {
-        cell = string;
+		cell = string;
 	}
 
 	@Override
 	public String body() {
-        return cell;
+		return cell;
 	}
 
 	@Override
 	public void addToBody(String string) {
-        cell = cell + string;
+		cell = cell + string;
 	}
 
 	@Override
-    public String getWrapped() {
+	public String getWrapped() {
 		return cell;
 	}
 

@@ -34,6 +34,13 @@ import smartrics.rest.fitnesse.fixture.support.Url;
 import fit.ActionFixture;
 import fit.Parse;
 
+/**
+ * A {@link RestFixture} implementation for Fit runner. The class is simply an
+ * {@link ActionFixture} implementation that delegates to an instance of
+ * {@link RestFixture}.
+ * 
+ * @author smartrics
+ */
 public class FitRestFixture extends ActionFixture {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(FitRestFixture.class);
@@ -44,106 +51,205 @@ public class FitRestFixture extends ActionFixture {
 		return restFixture.toString();
 	}
 
+	/**
+	 * See {@link RestFixture#getLastEvaluation()}
+	 * 
+	 * @return last JS evaluation
+	 */
 	public String getLastEvaluation() {
 		return restFixture.getLastEvaluation();
 	}
 
+	/**
+	 * @return delegates to {@link RestFixture#getBaseUrl()}
+	 */
 	public String getBaseUrl() {
 		return restFixture.getBaseUrl();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#setBaseUrl(Url)}
+	 * 
+	 * @param url
+	 *            the base url.
+	 */
 	public void setBaseUrl(Url url) {
 		restFixture.setBaseUrl(url);
 	}
 
+	/**
+	 * delegates to {@link RestFixture#getDefaultHeaders()}
+	 * 
+	 * @return the default headers.
+	 */
 	public Map<String, String> getDefaultHeaders() {
 		return restFixture.getDefaultHeaders();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#getFormatter()}
+	 * 
+	 * @return the cell formatter for Fit.
+	 */
 	public CellFormatter<?> getFormatter() {
 		return restFixture.getFormatter();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#setMultipartFileName()}
+	 */
 	public void setMultipartFileName() {
 		restFixture.setMultipartFileName();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#getMultipartFileName()}
+	 * 
+	 * @return the multipart filename to upload.
+	 */
 	public String getMultipartFileName() {
 		return restFixture.getMultipartFileName();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#setFileName()}
+	 */
 	public void setFileName() {
 		restFixture.setFileName();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#getFileName()}
+	 * 
+	 * @return the name of the file to upload
+	 */
 	public String getFileName() {
 		return restFixture.getFileName();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#setMultipartFileParameterName()}
+	 */
 	public void setMultipartFileParameterName() {
 		restFixture.setMultipartFileParameterName();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#getMultipartFileParameterName()}
+	 * 
+	 * @return the name of the parameter containing the multipart file to
+	 *         upload.
+	 */
 	public String getMultipartFileParameterName() {
 		return restFixture.getMultipartFileParameterName();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#setBody()}
+	 */
 	public void setBody() {
 		restFixture.setBody();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#setHeader()}
+	 */
 	public void setHeader() {
 		restFixture.setHeader();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#setHeaders()}
+	 */
 	public void setHeaders() {
 		restFixture.setHeaders();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#PUT()}
+	 */
 	public void PUT() {
 		restFixture.PUT();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#GET()}
+	 */
 	public void GET() {
 		restFixture.GET();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#DELETE()}
+	 */
 	public void DELETE() {
 		restFixture.DELETE();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#POST()}
+	 */
 	public void POST() {
 		restFixture.POST();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#HEAD()}
+	 */
 	public void HEAD() {
 		restFixture.HEAD();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#OPTIONS()}
+	 */
 	public void OPTIONS() {
 		restFixture.OPTIONS();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#TRACE()}
+	 */
 	public void TRACE() {
 		restFixture.TRACE();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#let()}
+	 */
 	public void let() {
 		restFixture.let();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#comment()}
+	 */
 	public void comment() {
 		restFixture.comment();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#evalJs()}
+	 */
 	public void evalJs() {
 		restFixture.evalJs();
 	}
 
+	/**
+	 * delegates to {@link RestFixture#processRow(RowWrapper)}
+	 * 
+	 * @param currentRow
+	 *            the row to process.
+	 */
 	public void processRow(RowWrapper<?> currentRow) {
 		restFixture.processRow(currentRow);
 	}
 
+	/**
+	 * delegates to {@link RestFixture#getHeaders()}
+	 * 
+	 * @return the headers.
+	 */
 	public Map<String, String> getHeaders() {
 		return restFixture.getHeaders();
 	}
@@ -174,9 +280,7 @@ public class FitRestFixture extends ActionFixture {
 	}
 
 	/**
-	 * Process args to extract the optional config name.
-	 * 
-	 * @return
+	 * @return optional config name
 	 */
 	protected String getConfigNameFromArgs() {
 		if (args.length >= 2) {
@@ -186,10 +290,9 @@ public class FitRestFixture extends ActionFixture {
 	}
 
 	/**
-	 * Process args ({@see fit.Fixture}) for Fit runner to extract the baseUrl
-	 * of each Rest request, first parameter of each RestFixture table.
-	 * 
-	 * @return
+	 * @return Process args ({@link fit.Fixture}) for Fit runner to extract the
+	 *         baseUrl of each Rest request, first parameter of each RestFixture
+	 *         table.
 	 */
 	protected String getBaseUrlFromArgs() {
 		if (args.length > 0) {
@@ -198,6 +301,9 @@ public class FitRestFixture extends ActionFixture {
 		return null;
 	}
 
+	/**
+	 * @return the config
+	 */
 	public Config getConfig() {
 		return restFixture.getConfig();
 	}

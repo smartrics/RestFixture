@@ -36,9 +36,6 @@ import smartrics.rest.client.RestResponse;
  */
 public class LetHeaderHandler implements LetHandler {
 
-    public LetHeaderHandler() {
-    }
-
     public String handle(RestResponse response, Object expressionContext, String expression) {
         List<String> content = new ArrayList<String>();
         if (response != null) {

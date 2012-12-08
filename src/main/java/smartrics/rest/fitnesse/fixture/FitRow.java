@@ -39,6 +39,10 @@ public class FitRow implements RowWrapper<Parse> {
 
 	private final List<CellWrapper<Parse>> row;
 
+	/**
+	 * a fit row
+	 * @param parse the parse object representing the row.
+	 */
 	public FitRow(Parse parse) {
 		this.cells = parse;
 		Parse next = cells;
