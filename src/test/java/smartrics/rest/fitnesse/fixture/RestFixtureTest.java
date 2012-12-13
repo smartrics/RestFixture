@@ -867,10 +867,19 @@ public class RestFixtureTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    public void mustReportToTheUserIfLetCellsAreMissing() {
+        RowWrapper<?> row = helper.createTestRow("let", "id", "header", "Location:res(\\d+)");
+        fixture.processRow(row);
+        verify(mockCellFormatter).exception(isA(CellWrapper.class), eq("Not all cells found: | let | label | type | expr | result |"));
+        verifyNoMoreInteractions(mockCellFormatter);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     public void mustReportToTheUserIfLetCantFindTheHandlerToHandleTheDesiredExpression() {
         RowWrapper<?> row = helper.createTestRow("let", "$content", "something_non_handled", "-", "");
         fixture.processRow(row);
-        verify(mockCellFormatter).exception(isA(CellWrapper.class), isA(String.class));
+        verify(mockCellFormatter).exception(isA(CellWrapper.class), eq("I don't know how to process the expression for 'something_non_handled'"));
         verifyNoMoreInteractions(mockCellFormatter);
     }
 

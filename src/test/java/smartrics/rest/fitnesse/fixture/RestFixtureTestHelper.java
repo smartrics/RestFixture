@@ -52,6 +52,7 @@ public class RestFixtureTestHelper {
             when(cell.text()).thenReturn(cells[i], cells[i]);
             when(cell.body()).thenReturn(cells[i], cells[i]);
             when(row.getCell(i)).thenReturn(cell, cell);
+            when(row.size()).thenReturn(cells.length);
         }
 		return row;
 	}

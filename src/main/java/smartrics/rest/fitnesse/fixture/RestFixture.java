@@ -721,17 +721,22 @@ public class RestFixture {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void let() {
 		debugMethodCallStart();
+		if(row.size() != 5) {
+			getFormatter().exception(row.getCell(row.size() - 1), "Not all cells found: | let | label | type | loc | expr |");
+			debugMethodCallEnd();
+			return;
+		}
 		String label = row.getCell(1).text().trim();
 		String loc = row.getCell(2).text();
 		CellWrapper exprCell = row.getCell(3);
-		exprCell.body(GLOBALS.substitute(exprCell.body()));
-		String expr = exprCell.text();
-		CellWrapper valueCell = row.getCell(4);
-		String valueCellText = valueCell.body();
-		String valueCellTextReplaced = GLOBALS.substitute(valueCellText);
-		valueCell.body(valueCellTextReplaced);
-		String sValue = null;
 		try {
+			exprCell.body(GLOBALS.substitute(exprCell.body()));
+			String expr = exprCell.text();
+			CellWrapper valueCell = row.getCell(4);
+			String valueCellText = valueCell.body();
+			String valueCellTextReplaced = GLOBALS.substitute(valueCellText);
+			valueCell.body(valueCellTextReplaced);
+			String sValue = null;
 			LetHandler letHandler = LetHandlerFactory.getHandlerFor(loc);
 			if (letHandler != null) {
 				StringTypeAdapter adapter = new StringTypeAdapter();
