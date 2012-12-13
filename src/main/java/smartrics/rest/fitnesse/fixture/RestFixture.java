@@ -722,7 +722,7 @@ public class RestFixture {
 	public void let() {
 		debugMethodCallStart();
 		if(row.size() != 5) {
-			getFormatter().exception(row.getCell(row.size() - 1), "Not all cells found: | let | label | type | loc | expr |");
+			getFormatter().exception(row.getCell(row.size() - 1), "Not all cells found: | let | label | type | expr | result |");
 			debugMethodCallEnd();
 			return;
 		}
