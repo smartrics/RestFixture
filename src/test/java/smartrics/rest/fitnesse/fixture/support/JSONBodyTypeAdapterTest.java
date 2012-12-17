@@ -59,15 +59,6 @@ public class JSONBodyTypeAdapterTest {
 	}
 
     @Test
-    public void shouldIdentifyAsEqualsIfExpectedObjectIsAListOfXPathsAvailableInActual() {
-        assertTrue("not found simple nodelist xpath", adapter.equals(Arrays.asList("/a/b[text()='12']"), json0));
-        assertTrue("not found two nodelist xpaths", adapter.equals(Arrays.asList("/a/b[text()='12']", "/a/c[text()='XY']"), json0));
-        assertTrue("not found two boolean xpath", adapter.equals(Arrays.asList("count(/a/b)=2", "count(/a/c)=1"), json0));
-        assertTrue("not found two boolean xpath and two nodelist xpaths",
-                adapter.equals(Arrays.asList("count(/a/b)=2", "count(/a/c)=1", "/a/b[text()='12']", "/a/c[text()='XY']"), json0));
-    }
-
-    @Test
     public void shouldIdentifyAsEqualsIfExpectedObjectIsAJavascriptExpressionInActual() {
         assertTrue("not found simple expression", adapter.equals("jsonbody.a.b[0]==12", json0));
         assertTrue("not found simple expression", adapter.equals("jsonbody.a.b[1]==\"23\"", json0));
@@ -75,12 +66,9 @@ public class JSONBodyTypeAdapterTest {
         assertTrue("not found two expressions as list", adapter.equals(Arrays.asList("jsonbody.a.b[0]==\"12\"", "jsonbody.a.c==\"XY\""), json0));
     }
 
-    @Test
-    public void shouldStoreNotFoundMessageForEveryXPathExpressionNotFoundForEqualityCheck() {
-        assertFalse(adapter.equals(Arrays.asList("/a/b[text()='zzz']", "/a/d[text()='next']", "/a/c[text()='XY']"), json0));
-        assertEquals(2, adapter.getErrors().size());
-        assertEquals("not found: '/a/b[text()='zzz']'", adapter.getErrors().get(0));
-        assertEquals("not found: '/a/d[text()='next']'", adapter.getErrors().get(1));
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionIfExpectationsAreValidXPathExpression() {
+        adapter.equals(Arrays.asList("/a/b[text()='zzz']", "/a/d[text()='next']", "/a/c[text()='XY']"), json0);
     }
 
     @Test

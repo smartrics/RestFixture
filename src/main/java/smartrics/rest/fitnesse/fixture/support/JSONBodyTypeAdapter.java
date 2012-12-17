@@ -22,9 +22,6 @@ package smartrics.rest.fitnesse.fixture.support;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Type adapted for cells containing JSON content.
  * 
@@ -32,7 +29,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
-	private static Logger LOG = LoggerFactory.getLogger(JSONBodyTypeAdapter.class);
     private boolean forceJsEvaluation = false;
     private JavascriptWrapper wrapper = new JavascriptWrapper();
 
@@ -46,9 +42,7 @@ public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
     protected boolean eval(String expr, String json) {
         // for backward compatibility we should keep for now xpath expectations
         if (!forceJsEvaluation && Tools.isValidXPath(getContext(), expr) && !wrapper.looksLikeAJsExpression(expr)) {
-            LOG.warn("XPath expectations in JSON content are deprecated. Please use JavaScript expressions.");
-            String xml = Tools.fromJSONtoXML(json);
-            return super.eval(expr, xml);
+            throw new IllegalArgumentException("XPath expectations in JSON content are not supported anymore. Please use JavaScript expressions.");
         }
         Object exprResult = wrapper.evaluateExpression(json, expr);
         if (exprResult == null) {
