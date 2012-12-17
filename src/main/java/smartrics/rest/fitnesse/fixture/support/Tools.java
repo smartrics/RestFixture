@@ -439,10 +439,24 @@ public final class Tools {
 		return repr.substring(0, pos);
 	}
 
+	/**
+	 * @param name
+	 *            the name
+	 * @param value
+	 *            the value
+	 * @param nvSep
+	 *            the separator
+	 * @return the kvp as a string <code>&lt;name>&lt;sep>&lt;value></code>.
+	 */
 	public static String convertEntryToString(String name, String value, String nvSep) {
 		return String.format("%s%s%s", name, nvSep, value);
 	}
 
+	/**
+	 * @param text the text
+	 * @param expr the regex
+	 * @return true if regex matches text.
+	 */
 	public static boolean regex(String text, String expr) {
 		try {
 			Pattern p = Pattern.compile(expr);
@@ -453,6 +467,19 @@ public final class Tools {
 		}
 	}
 
+	/**
+	 * parses a map from a string.
+	 * 
+	 * @param expStr
+	 *            the string with the serialised map.
+	 * @param nvSep
+	 *            the separator for keys and values.
+	 * @param entrySep
+	 *            the separator for entries in the map.
+	 * @param cleanTags
+	 *            if true the value is cleaned from any present html tag.
+	 * @return the parsed map.
+	 */
 	public static Map<String, String> convertStringToMap(final String expStr,
 			final String nvSep, final String entrySep, boolean cleanTags) {
 		String sanitisedExpStr = expStr.trim();
@@ -495,6 +522,14 @@ public final class Tools {
 		return ret;
 	}
 
+	/**
+	 * @param message
+	 *            the message to be included in the collapsable section header.
+	 * @param content
+	 *            the content collapsed.
+	 * @return a string with the html/js code to implement a collapsable section
+	 *         in fitnesse.
+	 */
 	public static String makeToggleCollapseable(String message, String content) {
 		Random random = new Random();
 		String id = Integer.toString(content.hashCode())
@@ -508,6 +543,20 @@ public final class Tools {
 		return sb.toString();
 	}
 
+	/**
+	 * Substitutions:
+	 * <table border="1">
+	 * <tr><td><code>&lt;pre></code> and <code>&lt;/pre></code></td><td><code>""</code></td></tr>
+	 * <tr><td><code>&lt;</code></td><td><code>&amp;lt;</code></td></tr>
+	 * <tr><td><code>\n</code></td><td><code>&lt;br /></code></td></tr>
+	 * <tr><td><code>&nbsp;</code> <i>(space)</i></td><td><code>&amp;nbsp;</code></td></tr>
+	 * <tr><td><code>-----</code> <i>(5 hyphens)</i></td><td><code>&lt;hr /></code></td></tr>
+	 * </table>
+	 * 
+	 * @param text
+	 *            some text.
+	 * @return the html.
+	 */
 	public static String toHtml(String text) {
 		return text.replaceAll("<pre>", "").replaceAll("</pre>", "")
 				.replaceAll("<", "&lt;").replaceAll(">", "&gt;")
@@ -515,15 +564,30 @@ public final class Tools {
 				.replaceAll(" ", "&nbsp;").replaceAll("-----", "<hr/>");
 	}
 
+	/**
+	 * @param c
+	 *            some text
+	 * @return the text within <code>&lt;code></code> tags.
+	 */
 	public static String toCode(String c) {
 		return "<code>" + c + "</code>";
 	}
 
+	/**
+	 * @param somethingWithinATag
+	 *            some text enclosed in some html tag.
+	 * @return the text within the tag.
+	 */ 
 	public static String fromSimpleTag(String somethingWithinATag) {
 		return somethingWithinATag.replaceAll("<[^>]+>", "").replace(
 				"</[^>]+>", "");
 	}
 
+	/**
+	 * @param text some html
+	 * @return the text stripped out of all tags.
+	 * 
+	 */
 	public static String fromHtml(String text) {
 		String ls = "\n";
 		return text.replaceAll("<br[\\s]*/>", ls).replaceAll("<BR[\\s]*/>", ls)
@@ -534,14 +598,37 @@ public final class Tools {
 				.replaceAll("&nbsp;", " ");
 	}
 
+	/**
+	 * @param string a string
+	 * @return the string htmlified as a fitnesse label.
+	 */
 	public static String toHtmlLabel(String string) {
 		return "<i><span class='fit_label'>" + string + "</span></i>";
 	}
 
+	/**
+	 * @param href
+	 *            a string ending up in the anchor href.
+	 * @param text
+	 *            a string within anchors.
+	 * @return the string htmlified as a html link.
+	 */
 	public static String toHtmlLink(String href, String text) {
 		return "<a href='" + href + "'>" + text + "</a>";
 	}
 
+	/**
+	 * @param expected
+	 *            the expected value
+	 * @param typeAdapter
+	 *            the body adapter for the cell
+	 * @param formatter
+	 *            the formatter
+	 * @param minLenForToggle
+	 *            the value determining whether the content should be rendered
+	 *            as a collapseable section.
+	 * @return the formatted content for a cell with a wrong expectation
+	 */
 	public static String makeContentForWrongCell(String expected,
 			RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter,
 			int minLenForToggle) {
@@ -575,6 +662,17 @@ public final class Tools {
 		return sb.toString();
 	}
 
+	/**
+	 * @param expected the expected value
+	 * @param typeAdapter the body type adaptor
+	 * @param formatter the formatter
+	 *            the value determining whether the content should be rendered
+	 *            as a collapseable section.
+	 * @param minLenForToggle 
+	 *            the value determining whether the content should be rendered
+	 *            as a collapseable section.
+	 * @return the formatted content for a cell with a right expectation
+	 */
 	public static String makeContentForRightCell(String expected,
 			RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter,
 			int minLenForToggle) {
