@@ -212,8 +212,7 @@ public class RestFixture {
 
 	private static final String FILE = "file";
 
-	private static final Logger LOG = LoggerFactory
-			.getLogger(RestFixture.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RestFixture.class);
 
 	protected Variables GLOBALS;
 
@@ -741,14 +740,11 @@ public class RestFixture {
 			if (letHandler != null) {
 				StringTypeAdapter adapter = new StringTypeAdapter();
 				try {
-					LOG.debug("LetHandler of type: " + letHandler.getClass());
-					sValue = letHandler.handle(getLastResponse(),
-							namespaceContext, expr);
+					sValue = letHandler.handle(getLastResponse(), namespaceContext, expr);
 					exprCell.body(getFormatter().gray(exprCell.body()));
 				} catch (RuntimeException e) {
 					getFormatter().exception(exprCell, e.getMessage());
-					LOG.error("Exception occurred when processing cell="
-							+ exprCell, e);
+					LOG.error("Exception occurred when processing cell=" + exprCell, e);
 				}
 				GLOBALS.put(label, sValue);
 				adapter.set(sValue);
@@ -1137,8 +1133,6 @@ public class RestFixture {
 
 		str = config.get("restfixture.xml.namespace.context", "");
 		namespaceContext = parseNamespaceContext(str);
-
-		LOG.debug("Using namespaces: " + namespaceContext);
 
 		ContentType.resetDefaultMapping();
 		ContentType.config(config);
