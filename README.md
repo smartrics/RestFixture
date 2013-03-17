@@ -13,6 +13,8 @@ single line of Java code.
 
 And it also works as a living/executable documentation of the API.
 
+The fixture can be used with both Fit (FitRestFixture) and Slim (Table:Rest Fixture) runners.
+
 Overview:
 
 * Get Fitnesse With Some Rest (http://smartrics.blogspot.com/2008/08/get-fitnesse-with-some-rest.html)
