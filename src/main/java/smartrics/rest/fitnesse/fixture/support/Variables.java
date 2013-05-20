@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import fit.Fixture;
+import fitnesse.slim.VariableStore;
 
 /**
  * Facade to FitNesse global symbols map.
@@ -37,10 +38,10 @@ public class Variables {
 	/**
 	 * pattern matching a variable name: {@code \%([a-zA-Z0-9_]+)\%}
 	 */
-	public static final Pattern VARIABLES_PATTERN = Pattern
-			.compile("\\%([a-zA-Z0-9_]+)\\%");
+	public static final Pattern VARIABLES_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");
 	private static final String FIT_NULL_VALUE = fitSymbolForNull();
 	private String nullValue = "null";
+	private VariableStore variableStore;
 
 	/**
 	 * initialises variables with default config. See @link
@@ -59,8 +60,7 @@ public class Variables {
 	 */
 	public Variables(Config c) {
 		if (c != null) {
-			this.nullValue = c.get("restfixture.null.value.representation",
-					"null");
+			this.nullValue = c.get("restfixture.null.value.representation", "null");
 		}
 	}
 

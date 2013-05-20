@@ -206,6 +206,15 @@ public class ToolsTest {
     }
 
     @Test
+    public void shouldExtractXPathsFromXmlDocumentAsNumberWithDefaultNamespace2() {
+        String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?><order xmlns='x:/pcat/1/catalog/order/v5_0'><orderIdentifier><orderSchema>/pcat/1/catalog/order/v5_0</orderSchema><orderNumber>1006LXMH</orderNumber><orderVersion>0</orderVersion><orderURL>/oe-platform-app/Order/Order/Published/1006LXMH?version=1</orderURL><rootOrderNumber>1006LXMH</rootOrderNumber></orderIdentifier><detail><general><proposalNumber>8619</proposalNumber><orderStatus>InProgress</orderStatus><orderVersionStatus>Master</orderVersionStatus><orderType>Install</orderType><orderCategory>Customer</orderCategory><createDate>2013-03-19T14:27:00.744Z</createDate><createBy>l3svc.oePlatform</createBy><sourceSystem>WFOE</sourceSystem><opptyID>313841</opptyID><DiscountedMRC>3963.0146</DiscountedMRC><AmortizedNRC>4000.0000</AmortizedNRC><totalNrc>4000.0000</totalNrc><orderDate><customerSignedDate>2013-03-18T00:00:00</customerSignedDate><installDate>2013-03-19T14:54:34.230Z</installDate></orderDate></general><customer><customerNumber>1-T8BD</customerNumber><customerName>SundayUAT</customerName></customer><billingAccount><billingAccountNumber>1-T8BD</billingAccountNumber></billingAccount></detail></order>";
+        HashMap<String, String> ns = new HashMap<String, String>();
+        ns.put("ns", "x:/pcat/1/catalog/order/v5_0");
+        assertEquals("8619", Tools.extractXPath(ns, "//ns:proposalNumber/text()", xml, XPathConstants.STRING, "UTF-8"));
+    }
+
+    
+    @Test
     public void shouldExtractXPathsFromXmlDocumentAsNumberWithGenericNamespace() {
         String xml = "<?xml version='1.0' ?><a xmlns:ns1='http://ns1.com'><b>test</b><ns1:c>tada</ns1:c></a>";
         HashMap<String, String> ns = new HashMap<String, String>();
