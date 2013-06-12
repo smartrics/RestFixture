@@ -74,7 +74,7 @@ import smartrics.rest.fitnesse.fixture.support.Variables;
  * written in wiki syntax.
  * <li>tests should be easy to write and above all read.
  * </ul>
- * 
+ *
  * <b>Configuring RestFixture</b><br/>
  * RestFixture can be configured by using the {@link RestFixtureConfig}. A
  * {@code RestFixtureConfig} can define named maps with configuration key/value
@@ -92,26 +92,26 @@ import smartrics.rest.fitnesse.fixture.support.Variables;
  * </tr>
  * <tr>
  * <td>http.proxy.host</td>
- * <td><i>http proxy host name (RestClient proxy configutation)</i></td>
+ * <td><i>http proxy host name (RestClient proxy configuration)</i></td>
  * </tr>
  * <tr>
  * <td>http.proxy.port</td>
- * <td><i>http proxy host port (RestClient proxy configutation)</i></td>
+ * <td><i>http proxy host port (RestClient proxy configuration)</i></td>
  * </tr>
  * <tr>
  * <td>http.basicauth.username</td>
- * <td><i>username for basic authentication (RestClient proxy configutation)</i>
+ * <td><i>username for basic authentication (RestClient proxy configuration)</i>
  * </td>
  * </tr>
  * <tr>
  * <td>http.basicauth.password</td>
- * <td><i>password for basic authentication (RestClient proxy configutation)</i>
+ * <td><i>password for basic authentication (RestClient proxy configuration)</i>
  * </td>
  * </tr>
  * <tr>
  * <td>http.client.connection.timeout</td>
  * <td><i>client timeout for http connection (default 3s). (RestClient proxy
- * configutation)</i></td>
+ * configuration)</i></td>
  * </tr>
  * <tr>
  * <tr>
@@ -178,20 +178,20 @@ import smartrics.rest.fitnesse.fixture.support.Variables;
  * set for this config key. This value can also be the empty string to replace
  * null with empty.</i></td>
  * </tr>
- * 
+ *
  * </table>
- * 
+ *
  * @author smartrics
  */
 public class RestFixture {
 
 	/**
 	 * What runner this table is running on.
-	 * 
+	 *
 	 * Note, the OTHER runner is primarily for testing purposes.
-	 * 
+	 *
 	 * @author smartrics
-	 * 
+	 *
 	 */
 	public enum Runner {
 		/**
@@ -275,7 +275,7 @@ public class RestFixture {
 
 	/**
 	 * Constructor for Slim runner.
-	 * 
+	 *
 	 * @param hostName
 	 *            the cells following up the first cell in the first row.
 	 */
@@ -285,7 +285,7 @@ public class RestFixture {
 
 	/**
 	 * Constructor for Slim runner.
-	 * 
+	 *
 	 * @param hostName
 	 *            the cells following up the first cell in the first row.
 	 * @param configName
@@ -326,7 +326,7 @@ public class RestFixture {
 
 	/**
 	 * The base URL as defined by the rest fixture ctor or input args.
-	 * 
+	 *
 	 * @return the base URL as string
 	 */
 	public String getBaseUrl() {
@@ -338,7 +338,7 @@ public class RestFixture {
 
 	/**
 	 * sets the base url.
-	 * 
+	 *
 	 * @param url
 	 */
 	public void setBaseUrl(Url url) {
@@ -348,7 +348,7 @@ public class RestFixture {
 	/**
 	 * The default headers as defined in the config used to initialise this
 	 * fixture.
-	 * 
+	 *
 	 * @return the map of default headers.
 	 */
 	public Map<String, String> getDefaultHeaders() {
@@ -357,7 +357,7 @@ public class RestFixture {
 
 	/**
 	 * The formatter for this instance of the RestFixture.
-	 * 
+	 *
 	 * @return the formatter for the cells
 	 */
 	public CellFormatter<?> getFormatter() {
@@ -366,7 +366,7 @@ public class RestFixture {
 
 	/**
 	 * Slim Table table hook.
-	 * 
+	 *
 	 * @param rows
 	 * @return the rendered content.
 	 */
@@ -384,7 +384,7 @@ public class RestFixture {
 	/**
 	 * Overrideable method to validate the state of the instance in execution. A
 	 * {@link RestFixture} is valid if the baseUrl is not null.
-	 * 
+	 *
 	 * @return true if the state is valid, false otherwise
 	 */
 	protected boolean validateState() {
@@ -399,7 +399,7 @@ public class RestFixture {
 	 * Method invoked to notify that the state of the RestFixture is invalid. It
 	 * throws a {@link RuntimeException} with a message displayed in the
 	 * FitNesse page.
-	 * 
+	 *
 	 * @param state
 	 *            as returned by {@link RestFixture#validateState()}
 	 */
@@ -412,7 +412,7 @@ public class RestFixture {
 
 	/**
 	 * Allows setting of the name of the multi-part file to upload.
-	 * 
+	 *
 	 * <code>| setMultipartFileName | Name of file |</code>
 	 * <p/>
 	 * body text should be location of file which needs to be sent
@@ -438,7 +438,7 @@ public class RestFixture {
 
 	/**
 	 * Allows setting of the name of the file to upload.
-	 * 
+	 *
 	 * <code>| setFileName | Name of file |</code>
 	 * <p/>
 	 * body text should be location of file which needs to be sent
@@ -529,7 +529,7 @@ public class RestFixture {
 
 	/**
 	 * Equivalent to setHeader - syntactic sugar to indicate that you can now.
-	 * 
+	 *
 	 * set multiple headers in a single call
 	 */
 	public void setHeaders() {
@@ -542,10 +542,10 @@ public class RestFixture {
 	 * executes a PUT on the URL and checks the return (a string representation
 	 * the operation return code), the HTTP response headers and the HTTP
 	 * response body
-	 * 
+	 *
 	 * URL is resolved by replacing global variables previously defined with
 	 * <code>let()</code>
-	 * 
+	 *
 	 * the HTTP request headers can be set via <code>setHeaders()</code>. If not
 	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
@@ -562,10 +562,10 @@ public class RestFixture {
 	 * executes a GET on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers and the http response
 	 * body
-	 * 
+	 *
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
-	 * 
+	 *
 	 * the http request headers can be set via <code>setHeaders()</code>. If not
 	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
@@ -582,10 +582,10 @@ public class RestFixture {
 	 * executes a HEAD on the uri and checks the return (a string repr the
 	 * operation return code) and the http response headers. Head is meant to
 	 * return no-body.
-	 * 
+	 *
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
-	 * 
+	 *
 	 * the http request headers can be set via <code>setHeaders()</code>. If not
 	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
@@ -601,10 +601,10 @@ public class RestFixture {
 	 * <p/>
 	 * executes a OPTIONS on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers, the http response body
-	 * 
+	 *
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
-	 * 
+	 *
 	 * the http request headers can be set via <code>setHeaders()</code>. If not
 	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
@@ -621,10 +621,10 @@ public class RestFixture {
 	 * executes a DELETE on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers and the http response
 	 * body
-	 * 
+	 *
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
-	 * 
+	 *
 	 * the http request headers can be set via <code>setHeaders()</code>. If not
 	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
@@ -650,12 +650,12 @@ public class RestFixture {
 	 * executes a POST on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers and the http response
 	 * body
-	 * 
+	 *
 	 * uri is resolved by replacing vars previously defined with
 	 * <code>let()</code>
-	 * 
+	 *
 	 * post requires a body that can be set via <code>setBody()</code>.
-	 * 
+	 *
 	 * the http request headers can be set via <code>setHeaders()</code>. If not
 	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
@@ -673,20 +673,20 @@ public class RestFixture {
 	 * body of the last successful http response.
 	 * <ul>
 	 * <li/><code>label</code> is the label identifier
-	 * 
+	 *
 	 * <li/><code>type</code> is the type of operation to perform on the last
 	 * http response. At the moment only XPaths and Regexes are supported. In
 	 * case of regular expressions, the expression must contain only one group
 	 * match, if multiple groups are matched the label will be assigned to the
 	 * first found <code>type</code> only allowed values are <code>xpath</code>
 	 * and <code>regex</code>
-	 * 
+	 *
 	 * <li/><code>loc</code> where to apply the <code>expr</code> of the given
 	 * <code>type</code>. Currently only <code>header</code> and
 	 * <code>body</code> are supported. If type is <code>xpath</code> by default
 	 * the expression is matched against the body and the value in loc is
 	 * ignored.
-	 * 
+	 *
 	 * <li/><code>expr</code> is the expression of type <code>type</code> to be
 	 * executed on the last http response to extract the content to be
 	 * associated to the label.
@@ -785,7 +785,7 @@ public class RestFixture {
 	/**
 	 * Evaluates a string using the internal JavaScript engine. Result of the
 	 * last evaluation is set in the attribute lastEvaluation.
-	 * 
+	 *
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void evalJs() {
@@ -815,7 +815,7 @@ public class RestFixture {
 	/**
 	 * Process the row in input. Abstracts the test runner via the wrapper
 	 * interfaces.
-	 * 
+	 *
 	 * @param currentRow
 	 */
 	@SuppressWarnings("rawtypes")
