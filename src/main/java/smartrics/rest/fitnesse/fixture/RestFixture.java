@@ -504,8 +504,7 @@ public class RestFixture {
 	public void setBody() {
 		CellWrapper cell = row.getCell(1);
 		if (cell == null) {
-			getFormatter().exception(row.getCell(0),
-					"You must pass a body to set");
+			getFormatter().exception(row.getCell(0), "You must pass a body to set");
 		} else {
 			String text = getFormatter().fromRaw(cell.text());
 			requestBody = GLOBALS.substitute(text);
@@ -1159,6 +1158,7 @@ public class RestFixture {
 		adapter.set(actual);
 		if (!adapter.equals(actual, cell.body())) {
 			// eg - a substitution has occurred
+			cell.body(actual);
 			getFormatter().right(cell, adapter);
 		}
 	}

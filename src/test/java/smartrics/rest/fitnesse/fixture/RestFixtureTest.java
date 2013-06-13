@@ -112,6 +112,17 @@ public class RestFixtureTest {
         config.clear();
     }
 
+    @SuppressWarnings("unchecked")
+	@Test
+    public void setBodyShouldRenderResolvedSymbols() {
+        Fixture.setSymbol("name", "one");
+        RowWrapper<?> row = helper.createTestRow("setBody", "name is %name%");
+        when(mockCellFormatter.fromRaw("name is %name%")).thenReturn("name is %name%");
+        fixture.processRow(row);
+        verify(row.getCell(1)).body("name is one");
+        verify(mockCellFormatter).right(isA(CellWrapper.class), isA(StringTypeAdapter.class));
+    }
+    
     @Test
     public void mustSetConfigNameToDefaultWhenNotSpecifiedAsSecondOptionalParameter_SLIM() {
         fixture = new RestFixture(BASE_URL, "configName");
