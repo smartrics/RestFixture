@@ -22,6 +22,7 @@ package smartrics.rest.fitnesse.fixture;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -102,7 +103,7 @@ public class RestFixtureTestHelper {
         when(pf.buildRestClient(conf)).thenReturn(rc);
         when(pf.buildRestRequest()).thenReturn(req);
         when(rc.execute(req)).thenReturn(resp);
-        when(pf.buildCellFormatter(any(RestFixture.Runner.class))).thenReturn(cf);
+        when(pf.buildCellFormatter(any(boolean.class), any(RestFixture.Runner.class))).thenReturn(cf);
         when(pf.buildBodyTypeAdapter(isA(ContentType.class), isA(String.class))).thenReturn(bta);
     }
 

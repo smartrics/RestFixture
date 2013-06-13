@@ -39,6 +39,7 @@ import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.Config;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
+import smartrics.rest.fitnesse.fixture.support.FitNesseVersionChecker;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.JavascriptException;
 import smartrics.rest.fitnesse.fixture.support.JavascriptWrapper;
@@ -213,6 +214,10 @@ public class RestFixture {
 	private static final String FILE = "file";
 
 	private static final Logger LOG = LoggerFactory.getLogger(RestFixture.class);
+
+	static {
+		LOG.info("RestFixture - FitNesse version [" + FitNesseVersionChecker.version() + "] (pre2013:" + FitNesseVersionChecker.isPre2013() + ")");
+	}
 
 	protected Variables GLOBALS;
 
@@ -857,7 +862,8 @@ public class RestFixture {
 	protected void initialize(Runner runner) {
 		boolean state = validateState();
 		notifyInvalidState(state);
-		configFormatter(runner);
+		boolean printHtml = FitNesseVersionChecker.isPre2013();
+		configFormatter(printHtml, runner);
 		configFixture();
 		configRestClient();
 	}
@@ -1103,8 +1109,8 @@ public class RestFixture {
 		return Tools.fromSimpleTag(somethingWithinATag);
 	}
 
-	private void configFormatter(Runner runner) {
-		formatter = partsFactory.buildCellFormatter(runner);
+	private void configFormatter(boolean printAsHtml, Runner runner) {
+		formatter = partsFactory.buildCellFormatter(printAsHtml, runner);
 	}
 
 	/**

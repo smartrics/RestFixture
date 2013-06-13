@@ -62,7 +62,7 @@ public class ToolsTest {
     @Test
     public void dualityOfToAndFromHtml() {
         String stuff = "<a> \n  </a>";
-        assertEquals(stuff, Tools.fromHtml(Tools.toHtml(stuff)));
+        assertEquals(stuff, Tools.fromHtml(Tools.toHtml(false, stuff)));
     }
 
     @Test
@@ -262,7 +262,12 @@ public class ToolsTest {
 
     @Test
     public void shouldWrapTextInHtmlAnchor() {
-        assertThat(Tools.toHtmlLink("http://localhost:1234", "x"), is(equalTo("<a href='http://localhost:1234'>x</a>")));
+        assertThat(Tools.toHtmlLink(true, "http://localhost:1234", "x"), is(equalTo("<a href='http://localhost:1234'>x</a>")));
+    }
+
+    @Test
+    public void shouldNotWrapTextInHtmlAnchor() {
+        assertThat(Tools.toHtmlLink(false, "http://localhost:1234", "x"), is(equalTo("x (see: http://localhost:1234)")));
     }
 
     @Test
@@ -271,13 +276,22 @@ public class ToolsTest {
     }
 
     @Test
-    public void basicChecksOnMakeCollapsableItem() {
+    public void basicChecksOnMakeCollapsableItemWhenHtml() {
         // not much of a test, I know, but guarantees minimal info on fitnesse
         // stylesheed/js
         int id = "someContent".hashCode();
-        String ret = Tools.makeToggleCollapseable("message", "someContent");
+        String ret = Tools.makeToggleCollapseable(true, "message", "someContent");
         assertTrue(ret.indexOf("javascript:toggleCollapsable('" + id) > 0);
         assertTrue(ret.indexOf("<div class='hidden' id='" + id) > 0);
+    }
+
+    @Test
+    public void basicChecksOnMakeCollapsableItemWhenPlain() {
+        // not much of a test, I know, but guarantees minimal info on fitnesse
+        // stylesheed/js
+        int id = "someContent".hashCode();
+        String ret = Tools.makeToggleCollapseable(false, "message", "someContent");
+        assertTrue(ret.equals("someContent"));
     }
 
     @Test

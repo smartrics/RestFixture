@@ -39,7 +39,12 @@ public class FitFormatter implements CellFormatter<Parse> {
     private ActionFixture fixture;
     private boolean displayActual;
     private int minLenForToggle = -1;
+	private boolean printAsHtml;
 
+    public FitFormatter(boolean printAsHtml) {
+    	this.printAsHtml = printAsHtml;
+    }
+    
     /**
      * sets the action fixture delegate to forward formatting messages.
      * @param f
@@ -77,7 +82,7 @@ public class FitFormatter implements CellFormatter<Parse> {
 
 	@Override
     public void check(CellWrapper<Parse> valueCell, RestDataTypeAdapter adapter) {
-        valueCell.body(Tools.toHtml(valueCell.body()));
+        valueCell.body(Tools.toHtml(printAsHtml, valueCell.body()));
 		fixture.check(valueCell.getWrapped(), adapter);
 	}
 
@@ -89,7 +94,7 @@ public class FitFormatter implements CellFormatter<Parse> {
 	@Override
     public void wrong(CellWrapper<Parse> expected, RestDataTypeAdapter typeAdapter) {
         String expectedContent = expected.body();
-        String body = Tools.makeContentForWrongCell(expectedContent, typeAdapter, this, minLenForToggle);
+        String body = Tools.makeContentForWrongCell(printAsHtml, expectedContent, typeAdapter, this, minLenForToggle);
         expected.body(body);
         fixture.wrong(expected.getWrapped());
 	}
@@ -97,18 +102,18 @@ public class FitFormatter implements CellFormatter<Parse> {
 	@Override
     public void right(CellWrapper<Parse> expected, RestDataTypeAdapter typeAdapter) {
         String expectedContent = expected.body();
-        expected.body(Tools.makeContentForRightCell(expectedContent, typeAdapter, this, minLenForToggle));
+        expected.body(Tools.makeContentForRightCell(printAsHtml, expectedContent, typeAdapter, this, minLenForToggle));
         fixture.right(expected.getWrapped());
 	}
 
 	@Override
 	public String gray(String string) {
-        return ActionFixture.gray(Tools.toHtml(string));
+        return ActionFixture.gray(Tools.toHtml(printAsHtml, string));
 	}
 
     @Override
     public void asLink(CellWrapper<Parse> cell, String link, String text) {
-        cell.body(Tools.toHtmlLink(link, text));
+        cell.body(Tools.toHtmlLink(printAsHtml, link, text));
     }
 
     @Override

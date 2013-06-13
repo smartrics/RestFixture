@@ -90,15 +90,15 @@ public class PartsFactory {
      *            the runner used to execute this RestFixture
      * @return a formatter instance of CellFormatter
      */
-    public CellFormatter<?> buildCellFormatter(Runner runner) {
+    public CellFormatter<?> buildCellFormatter(boolean printAsHtml, Runner runner) {
         if (runner == null) {
             throw new IllegalArgumentException("Runner is null");
         }
         if (Runner.SLIM.equals(runner)) {
-            return new SlimFormatter();
+            return new SlimFormatter(printAsHtml);
         }
         if (Runner.FIT.equals(runner)) {
-            return new FitFormatter();
+            return new FitFormatter(printAsHtml);
         }
         throw new IllegalStateException("Runner " + runner.name() + " not supported");
     }

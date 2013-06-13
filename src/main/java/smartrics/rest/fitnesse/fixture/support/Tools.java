@@ -530,7 +530,10 @@ public final class Tools {
 	 * @return a string with the html/js code to implement a collapsable section
 	 *         in fitnesse.
 	 */
-	public static String makeToggleCollapseable(String message, String content) {
+	public static String makeToggleCollapseable(boolean printAsHtml, String message, String content) {
+		if(!printAsHtml) {
+			return content;
+		}
 		Random random = new Random();
 		String id = Integer.toString(content.hashCode())
 				+ Long.toString(random.nextLong());
@@ -553,15 +556,20 @@ public final class Tools {
 	 * <tr><td><code>-----</code> <i>(5 hyphens)</i></td><td><code>&lt;hr /></code></td></tr>
 	 * </table>
 	 * 
+	 * @param printAsHtml if true, it won't escape to html - set to true for fitnesse versions greater than 20130513
 	 * @param text
 	 *            some text.
 	 * @return the html.
 	 */
-	public static String toHtml(String text) {
-		return text.replaceAll("<pre>", "").replaceAll("</pre>", "")
-				.replaceAll("<", "&lt;").replaceAll(">", "&gt;")
-				.replaceAll("\n", "<br/>").replaceAll("\t", "    ")
-				.replaceAll(" ", "&nbsp;").replaceAll("-----", "<hr/>");
+	public static String toHtml(boolean printAsHtml, String text) {
+		if(printAsHtml) {
+			return text.replaceAll("<pre>", "").replaceAll("</pre>", "")
+					.replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+					.replaceAll("\n", "<br/>").replaceAll("\t", "    ")
+					.replaceAll(" ", "&nbsp;").replaceAll("-----", "<hr/>");
+		} else {
+			return text;
+		}
 	}
 
 	/**
@@ -602,19 +610,28 @@ public final class Tools {
 	 * @param string a string
 	 * @return the string htmlified as a fitnesse label.
 	 */
-	public static String toHtmlLabel(String string) {
-		return "<i><span class='fit_label'>" + string + "</span></i>";
+	public static String toHtmlLabel(boolean printAsHtml, String string) {
+		if(printAsHtml) {
+			return "<i><span class='fit_label'>" + string + "</span></i>";
+		} else {
+			return string;
+		}
 	}
 
 	/**
+	 * @param printAsHtml if true prints the string as html (for compatibility with fitnesse v ? 2o13)
 	 * @param href
 	 *            a string ending up in the anchor href.
 	 * @param text
 	 *            a string within anchors.
 	 * @return the string htmlified as a html link.
 	 */
-	public static String toHtmlLink(String href, String text) {
-		return "<a href='" + href + "'>" + text + "</a>";
+	public static String toHtmlLink(boolean printAsHtml, String href, String text) {
+		if(printAsHtml) {
+			return "<a href='" + href + "'>" + text + "</a>";
+		} else {
+			return text + " (see: " + href + ")";
+		}
 	}
 
 	/**
@@ -629,35 +646,59 @@ public final class Tools {
 	 *            as a collapseable section.
 	 * @return the formatted content for a cell with a wrong expectation
 	 */
-	public static String makeContentForWrongCell(String expected,
+	public static String makeContentForWrongCell(boolean printAsHtml, String expected,
 			RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter,
 			int minLenForToggle) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(Tools.toHtml(expected));
+		sb.append(Tools.toHtml(printAsHtml, expected));
 		if (formatter.isDisplayActual()) {
-			sb.append(toHtml("\n"));
-			sb.append(formatter.label("expected"));
-			String actual = typeAdapter.toString();
-			sb.append(toHtml("-----"));
-			sb.append(toHtml("\n"));
-			if (minLenForToggle >= 0 && actual.length() > minLenForToggle) {
-				sb.append(makeToggleCollapseable("toggle actual",
-						toHtml(actual)));
-			} else {
-				sb.append(toHtml(actual));
+			sb.append(toHtml(printAsHtml, "\n"));
+			if(!printAsHtml) {
+				sb.append("[");
 			}
-			sb.append(toHtml("\n"));
+			sb.append(formatter.label("expected"));
+			if(!printAsHtml) {
+				sb.append("]\n");
+			}
+			String actual = typeAdapter.toString();
+			sb.append(toHtml(printAsHtml, "-----"));
+			if(!printAsHtml) {
+				sb.append("\n");
+			}
+			sb.append(toHtml(printAsHtml, "\n"));
+			if (minLenForToggle >= 0 && actual.length() > minLenForToggle) {
+				sb.append(makeToggleCollapseable(printAsHtml, "toggle actual",
+						toHtml(printAsHtml, actual)));
+			} else {
+				sb.append(toHtml(printAsHtml, actual));
+			}
+			sb.append(toHtml(printAsHtml, "\n"));
+			if(!printAsHtml) {
+				sb.append("\n[");
+			}
 			sb.append(formatter.label("actual"));
+			if(!printAsHtml) {
+				sb.append("]\n");
+			}
 		}
 		List<String> errors = typeAdapter.getErrors();
 		if (errors.size() > 0) {
-			sb.append(toHtml("-----"));
-			sb.append(toHtml("\n"));
-			for (String e : errors) {
-				sb.append(toHtml(e + "\n"));
+			if(!printAsHtml) {
+				sb.append("\n\n");
 			}
-			sb.append(toHtml("\n"));
+			sb.append(toHtml(printAsHtml, "-----"));
+			sb.append(toHtml(printAsHtml, "\n"));
+			for (String e : errors) {
+				sb.append(toHtml(printAsHtml, e + "\n"));
+			}
+			sb.append(toHtml(printAsHtml, "\n"));
+			if(!printAsHtml) {
+				sb.append(toHtml(printAsHtml, "["));
+			}
 			sb.append(formatter.label("errors"));
+			if(!printAsHtml) {
+				sb.append(toHtml(printAsHtml, "]\n"));
+			}
 		}
 		return sb.toString();
 	}
@@ -673,25 +714,38 @@ public final class Tools {
 	 *            as a collapseable section.
 	 * @return the formatted content for a cell with a right expectation
 	 */
-	public static String makeContentForRightCell(String expected,
+	public static String makeContentForRightCell(boolean printAsHtml, String expected,
 			RestDataTypeAdapter typeAdapter, CellFormatter<?> formatter,
 			int minLenForToggle) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(toHtml(expected));
+		sb.append(toHtml(printAsHtml, expected));
 		String actual = typeAdapter.toString();
-		if (formatter.isDisplayActual() && !expected.equals(actual)) {		  
-			sb.append(toHtml("\n"));
-			sb.append(formatter.label("expected"));
-			sb.append(toHtml("-----"));
-			sb.append(toHtml("\n"));
-			if (minLenForToggle >= 0 && actual.length() > minLenForToggle) {
-				sb.append(makeToggleCollapseable("toggle actual",
-						toHtml(actual)));
-			} else {
-				sb.append(toHtml(actual));
+        if (formatter.isDisplayActual() && !expected.equals(actual)) {
+            //sb.append(toHtml("\n"));
+			sb.append(toHtml(printAsHtml, "\n"));
+			if(!printAsHtml) {
+				sb.append(toHtml(printAsHtml, "["));
 			}
-			sb.append(toHtml("\n"));
+			sb.append(formatter.label("expected"));
+			if(!printAsHtml) {
+				sb.append(toHtml(printAsHtml, "]\n\n"));
+			}
+			sb.append(toHtml(printAsHtml, "-----"));
+			sb.append(toHtml(printAsHtml, "\n"));
+			if (minLenForToggle >= 0 && actual.length() > minLenForToggle) {
+				sb.append(makeToggleCollapseable(printAsHtml, "toggle actual",
+						toHtml(printAsHtml, actual)));
+			} else {
+				sb.append(toHtml(printAsHtml, actual));
+			}
+			sb.append(toHtml(printAsHtml, "\n"));
+			if(!printAsHtml) {
+				sb.append(toHtml(printAsHtml, "["));
+			}
 			sb.append(formatter.label("actual"));
+			if(!printAsHtml) {
+				sb.append(toHtml(printAsHtml, "]"));
+			}
 		}
 		return sb.toString();
 	}

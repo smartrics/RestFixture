@@ -1,3 +1,6 @@
+*.iml
+*.ipr
+*.iws
 bin
 target
 .classpath

@@ -52,7 +52,7 @@ public class PartsFactoryTest {
     @Test
     public void cannotBuildACellFormatterForANullRunner() {
         try {
-            f.buildCellFormatter(null);
+            f.buildCellFormatter(false, null);
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), is(equalTo("Runner is null")));
         }
@@ -144,7 +144,7 @@ public class PartsFactoryTest {
     @Test
     public void cantBuildACellFormatterForNonFitOrSlimRunner() {
         try {
-            f.buildCellFormatter(RestFixture.Runner.OTHER);
+            f.buildCellFormatter(false, RestFixture.Runner.OTHER);
         } catch (IllegalStateException e) {
             assertThat(e.getMessage(), is(equalTo("Runner OTHER not supported")));
         }
@@ -152,12 +152,12 @@ public class PartsFactoryTest {
 
     @Test
     public void buildsASlimFormatterForSLIMRunner() {
-        assertThat(f.buildCellFormatter(RestFixture.Runner.SLIM), is(instanceOf(SlimFormatter.class)));
+        assertThat(f.buildCellFormatter(false, RestFixture.Runner.SLIM), is(instanceOf(SlimFormatter.class)));
     }
 
     @Test
     public void buildsASlimFormatterForFITRunner() {
-        assertThat(f.buildCellFormatter(RestFixture.Runner.FIT), is(instanceOf(FitFormatter.class)));
+        assertThat(f.buildCellFormatter(false, RestFixture.Runner.FIT), is(instanceOf(FitFormatter.class)));
     }
 
     private Method getCreateUriMethod(RestClient client) {

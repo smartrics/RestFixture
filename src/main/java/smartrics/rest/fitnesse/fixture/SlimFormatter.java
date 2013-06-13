@@ -38,7 +38,12 @@ public class SlimFormatter implements CellFormatter<String> {
 
     private int minLenForToggle = -1;
     private boolean displayActual;
+	private boolean printAsHtml;
 
+    public SlimFormatter(boolean printAsHtml) {
+    	this.printAsHtml = printAsHtml;
+    }
+    
     @Override
     public void setDisplayActual(boolean d) {
         this.displayActual = d;
@@ -63,8 +68,10 @@ public class SlimFormatter implements CellFormatter<String> {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(out);
         exception.printStackTrace(ps);
-        String m = Tools.toHtml(cell.getWrapped() + "\n-----\n") + Tools.toCode(Tools.toHtml(out.toString()));
+        //String m = Tools.toHtml(cell.getWrapped() + "\n-----\n") + Tools.toCode(Tools.toHtml(out.toString()));
+        String m = Tools.toHtml(printAsHtml, cell.getWrapped() + "\n-----\n") + Tools.toCode(Tools.toHtml(printAsHtml, out.toString()));
         cell.body("error:" + Tools.wrapInDiv(m));
+        //cell.body("error:" + m);
     }
 
     @Override
@@ -87,29 +94,29 @@ public class SlimFormatter implements CellFormatter<String> {
 
     @Override
     public String label(String string) {
-        return Tools.toHtmlLabel(string);
+        return Tools.toHtmlLabel(printAsHtml, string);
     }
 
     @Override
     public void wrong(CellWrapper<String> expected, RestDataTypeAdapter ta) {
         String expectedContent = expected.body();
-        expected.body(Tools.makeContentForWrongCell(expectedContent, ta, this, minLenForToggle));
+        expected.body(Tools.makeContentForWrongCell(printAsHtml, expectedContent, ta, this, minLenForToggle));
         expected.body("fail:" + Tools.wrapInDiv(expected.body()));
     }
 
     @Override
     public void right(CellWrapper<String> expected, RestDataTypeAdapter typeAdapter) {
-        expected.body("pass:" + Tools.wrapInDiv(Tools.makeContentForRightCell(expected.body(), typeAdapter, this, minLenForToggle)));
+        expected.body("pass:" + Tools.wrapInDiv(Tools.makeContentForRightCell(printAsHtml, expected.body(), typeAdapter, this, minLenForToggle)));
     }
 
     @Override
     public String gray(String string) {
-        return "report:" + Tools.wrapInDiv(Tools.toHtml(string));
+        return "report:" + Tools.wrapInDiv(Tools.toHtml(printAsHtml, string));
     }
 
     @Override
     public void asLink(CellWrapper<String> cell, String link, String text) {
-        cell.body("report:" + Tools.wrapInDiv(Tools.toHtmlLink(link, text)));
+        cell.body("report:" + Tools.wrapInDiv(Tools.toHtmlLink(printAsHtml, link, text)));
     }
 
     @Override

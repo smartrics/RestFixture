@@ -73,7 +73,8 @@ public class SlimVariables {
 	 * @param val
 	 */
 	public void put(String label, String val) {
-		variableStore.setSymbol(label, value);
+//		variableStore.setSymbol(label, value);
+		Fixture.setSymbol(label, val);
 	}
 
 	/**
