@@ -55,7 +55,7 @@ public class SlimFormatter implements CellFormatter<String> {
 
     @Override
     public void exception(CellWrapper<String> cell, String exceptionMessage) {
-        cell.body("error:" + exceptionMessage);
+        cell.body("error:" + Tools.wrapInDiv(exceptionMessage));
     }
 
     @Override
@@ -64,7 +64,7 @@ public class SlimFormatter implements CellFormatter<String> {
         PrintStream ps = new PrintStream(out);
         exception.printStackTrace(ps);
         String m = Tools.toHtml(cell.getWrapped() + "\n-----\n") + Tools.toCode(Tools.toHtml(out.toString()));
-        cell.body("error:" + m);
+        cell.body("error:" + Tools.wrapInDiv(m));
     }
 
     @Override
@@ -94,22 +94,22 @@ public class SlimFormatter implements CellFormatter<String> {
     public void wrong(CellWrapper<String> expected, RestDataTypeAdapter ta) {
         String expectedContent = expected.body();
         expected.body(Tools.makeContentForWrongCell(expectedContent, ta, this, minLenForToggle));
-        expected.body("fail:" + expected.body());
+        expected.body("fail:" + Tools.wrapInDiv(expected.body()));
     }
 
     @Override
     public void right(CellWrapper<String> expected, RestDataTypeAdapter typeAdapter) {
-        expected.body("pass:" + Tools.makeContentForRightCell(expected.body(), typeAdapter, this, minLenForToggle));
+        expected.body("pass:" + Tools.wrapInDiv(Tools.makeContentForRightCell(expected.body(), typeAdapter, this, minLenForToggle)));
     }
 
     @Override
     public String gray(String string) {
-        return "report:" + Tools.toHtml(string);
+        return "report:" + Tools.wrapInDiv(Tools.toHtml(string));
     }
 
     @Override
     public void asLink(CellWrapper<String> cell, String link, String text) {
-        cell.body("report:" + Tools.toHtmlLink(link, text));
+        cell.body("report:" + Tools.wrapInDiv(Tools.toHtmlLink(link, text)));
     }
 
     @Override
