@@ -482,6 +482,7 @@ public class RestFixtureTest {
         verify(mockLastRequest).setResourceUriEscaped(false);
         verify(mockLastRequest).setFollowRedirect(true);
         verify(mockLastRequest).setMultipartFileParameterName("file");
+        verify(mockLastRequest).setBody(null);
         verify(mockLastRequest).getQuery();
         // correctly executes request
         verify(mockRestClient).setBaseUrl(fixture.getBaseUrl());
