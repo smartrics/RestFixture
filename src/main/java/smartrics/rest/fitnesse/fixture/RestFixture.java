@@ -945,7 +945,7 @@ public class RestFixture {
 		if (uri.length == 2) {
 			getLastRequest().setQuery(uri[1]);
 		}
-		if ("Post".equals(method) || "Put".equals(method)) {
+		if ("Post".equals(method) || "Put".equals(method) || "Delete".equals(method)) {
 			getLastRequest().setBody(rBody);
 		}
 		restClient.setBaseUrl(thisRequestUrlParts[0]);
