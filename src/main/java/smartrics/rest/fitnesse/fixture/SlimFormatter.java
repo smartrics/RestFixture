@@ -20,13 +20,13 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
 import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.Tools;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 /**
  * Formatter of cells handled by Slim.
@@ -38,10 +38,8 @@ public class SlimFormatter implements CellFormatter<String> {
 
     private int minLenForToggle = -1;
     private boolean displayActual;
-	private boolean printAsHtml;
 
-    public SlimFormatter(boolean printAsHtml) {
-    	this.printAsHtml = printAsHtml;
+    public SlimFormatter() {
     }
     
     @Override
@@ -69,7 +67,7 @@ public class SlimFormatter implements CellFormatter<String> {
         PrintStream ps = new PrintStream(out);
         exception.printStackTrace(ps);
         //String m = Tools.toHtml(cell.getWrapped() + "\n-----\n") + Tools.toCode(Tools.toHtml(out.toString()));
-        String m = Tools.toHtml(printAsHtml, cell.getWrapped() + "\n-----\n") + Tools.toCode(Tools.toHtml(printAsHtml, out.toString()));
+        String m = Tools.toHtml(cell.getWrapped() + "\n-----\n") + Tools.toCode(Tools.toHtml(out.toString()));
         cell.body("error:" + Tools.wrapInDiv(m));
         //cell.body("error:" + m);
     }
@@ -94,29 +92,29 @@ public class SlimFormatter implements CellFormatter<String> {
 
     @Override
     public String label(String string) {
-        return Tools.toHtmlLabel(printAsHtml, string);
+        return Tools.toHtmlLabel(string);
     }
 
     @Override
     public void wrong(CellWrapper<String> expected, RestDataTypeAdapter ta) {
         String expectedContent = expected.body();
-        expected.body(Tools.makeContentForWrongCell(printAsHtml, expectedContent, ta, this, minLenForToggle));
+        expected.body(Tools.makeContentForWrongCell(expectedContent, ta, this, minLenForToggle));
         expected.body("fail:" + Tools.wrapInDiv(expected.body()));
     }
 
     @Override
     public void right(CellWrapper<String> expected, RestDataTypeAdapter typeAdapter) {
-        expected.body("pass:" + Tools.wrapInDiv(Tools.makeContentForRightCell(printAsHtml, expected.body(), typeAdapter, this, minLenForToggle)));
+        expected.body("pass:" + Tools.wrapInDiv(Tools.makeContentForRightCell(expected.body(), typeAdapter, this, minLenForToggle)));
     }
 
     @Override
     public String gray(String string) {
-        return "report:" + Tools.wrapInDiv(Tools.toHtml(printAsHtml, string));
+        return "report:" + Tools.wrapInDiv(Tools.toHtml(string));
     }
 
     @Override
     public void asLink(CellWrapper<String> cell, String link, String text) {
-        cell.body("report:" + Tools.wrapInDiv(Tools.toHtmlLink(printAsHtml, link, text)));
+        cell.body("report:" + Tools.wrapInDiv(Tools.toHtmlLink(link, text)));
     }
 
     @Override

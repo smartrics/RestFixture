@@ -20,38 +20,20 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import smartrics.rest.client.RestClient;
+import smartrics.rest.client.RestData.Header;
+import smartrics.rest.client.RestRequest;
+import smartrics.rest.client.RestResponse;
+import smartrics.rest.fitnesse.fixture.support.*;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import smartrics.rest.client.RestClient;
-import smartrics.rest.client.RestData.Header;
-import smartrics.rest.client.RestRequest;
-import smartrics.rest.client.RestResponse;
-import smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.CellFormatter;
-import smartrics.rest.fitnesse.fixture.support.CellWrapper;
-import smartrics.rest.fitnesse.fixture.support.Config;
-import smartrics.rest.fitnesse.fixture.support.ContentType;
-import smartrics.rest.fitnesse.fixture.support.FitNesseVersionChecker;
-import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.JavascriptException;
-import smartrics.rest.fitnesse.fixture.support.JavascriptWrapper;
-import smartrics.rest.fitnesse.fixture.support.LetHandler;
-import smartrics.rest.fitnesse.fixture.support.LetHandlerFactory;
-import smartrics.rest.fitnesse.fixture.support.RestDataTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.RowWrapper;
-import smartrics.rest.fitnesse.fixture.support.StatusCodeTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.Tools;
-import smartrics.rest.fitnesse.fixture.support.Url;
-import smartrics.rest.fitnesse.fixture.support.Variables;
 
 /**
  * A fixture that allows to simply test REST APIs with minimal efforts. The core
@@ -214,10 +196,6 @@ public class RestFixture {
 	private static final String FILE = "file";
 
 	private static final Logger LOG = LoggerFactory.getLogger(RestFixture.class);
-
-	static {
-		LOG.info("RestFixture - FitNesse version [" + FitNesseVersionChecker.version() + "] (pre2013:" + FitNesseVersionChecker.isPre2013() + ")");
-	}
 
 	protected Variables GLOBALS;
 
@@ -861,8 +839,7 @@ public class RestFixture {
 	protected void initialize(Runner runner) {
 		boolean state = validateState();
 		notifyInvalidState(state);
-		boolean printHtml = FitNesseVersionChecker.isPre2013();
-		configFormatter(printHtml, runner);
+		configFormatter(runner);
 		configFixture();
 		configRestClient();
 	}
@@ -1108,8 +1085,8 @@ public class RestFixture {
 		return Tools.fromSimpleTag(somethingWithinATag);
 	}
 
-	private void configFormatter(boolean printAsHtml, Runner runner) {
-		formatter = partsFactory.buildCellFormatter(printAsHtml, runner);
+	private void configFormatter(Runner runner) {
+		formatter = partsFactory.buildCellFormatter(runner);
 	}
 
 	/**
@@ -1146,7 +1123,7 @@ public class RestFixture {
 	/**
 	 * Allows to config the rest client implementation. the method shoudl
 	 * configure the instance attribute {@link RestFixture#restClient} created
-	 * by the {@link RestFixture#buildRestClient()}.
+	 * by the {@link smartrics.rest.fitnesse.fixture.PartsFactory#buildRestClient(smartrics.rest.fitnesse.fixture.support.Config)}.
 	 */
 	private void configRestClient() {
 		restClient = partsFactory.buildRestClient(getConfig());

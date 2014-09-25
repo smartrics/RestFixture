@@ -53,7 +53,7 @@ public class FitFormatterTest {
     public void setUp() throws FitParseException {
         mockDelegate = mock(ActionFixture.class);
         helper = new RestFixtureTestHelper();
-        formatter = new FitFormatter(true);
+        formatter = new FitFormatter();
         formatter.setActionFixtureDelegate(mockDelegate);
         // unless otherwise indicated this is the default - for simplicity
         formatter.setDisplayActual(false);

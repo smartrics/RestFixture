@@ -20,13 +20,12 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
-import java.util.List;
-
-import smartrics.rest.fitnesse.fixture.support.Config;
-import smartrics.rest.fitnesse.fixture.support.FitNesseVersionChecker;
-import smartrics.rest.fitnesse.fixture.support.Tools;
 import fit.Fixture;
 import fit.Parse;
+import smartrics.rest.fitnesse.fixture.support.Config;
+import smartrics.rest.fitnesse.fixture.support.Tools;
+
+import java.util.List;
 
 /**
  * A simple fixture to store configuration data for the rest fixture.
@@ -108,8 +107,7 @@ import fit.Parse;
 public class RestFixtureConfig extends Fixture {
 
 	private Config config;
-	private boolean printAsHtml = true;
-	
+
 	/**
 	 * Default constructor.
 	 * 
@@ -117,7 +115,6 @@ public class RestFixtureConfig extends Fixture {
 	 * 
 	 */
 	public RestFixtureConfig() {
-		printAsHtml = FitNesseVersionChecker.isPre2013();
 	}
 
 	/**
@@ -145,12 +142,12 @@ public class RestFixtureConfig extends Fixture {
 				String v = row.get(1);
 				c.add(k, v);
 				row.set(0, "");
-				row.set(1, "pass:" + Tools.toHtml(printAsHtml, v));
+				row.set(1, "pass:" + Tools.toHtml(v));
 			} else {
 				row.set(0,
 						"error:"
 								+ k
-								+ Tools.toHtml(printAsHtml, "\n\nthis line doesn't conform to NVP format "
+								+ Tools.toHtml("\n\nthis line doesn't conform to NVP format "
 										+ "(col 0 for name, col 1 for value) - content skipped"));
 			}
 		}
@@ -170,7 +167,7 @@ public class RestFixtureConfig extends Fixture {
 			String value = cells.more.text();
 			Config c = getConfig();
 			c.add(key, value);
-			String fValue = Tools.toHtml(printAsHtml, value);
+			String fValue = Tools.toHtml(value);
 			Parse valueParse = cells.more;
 			valueParse.body = fValue;
 			right(valueParse);

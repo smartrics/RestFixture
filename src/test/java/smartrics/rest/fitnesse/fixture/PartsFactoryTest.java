@@ -20,23 +20,20 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 import org.junit.Before;
 import org.junit.Test;
-
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.fitnesse.fixture.support.Config;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
 
 public class PartsFactoryTest {
 
@@ -52,7 +49,7 @@ public class PartsFactoryTest {
     @Test
     public void cannotBuildACellFormatterForANullRunner() {
         try {
-            f.buildCellFormatter(false, null);
+            f.buildCellFormatter(null);
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), is(equalTo("Runner is null")));
         }
@@ -144,7 +141,7 @@ public class PartsFactoryTest {
     @Test
     public void cantBuildACellFormatterForNonFitOrSlimRunner() {
         try {
-            f.buildCellFormatter(false, RestFixture.Runner.OTHER);
+            f.buildCellFormatter(RestFixture.Runner.OTHER);
         } catch (IllegalStateException e) {
             assertThat(e.getMessage(), is(equalTo("Runner OTHER not supported")));
         }
@@ -152,12 +149,12 @@ public class PartsFactoryTest {
 
     @Test
     public void buildsASlimFormatterForSLIMRunner() {
-        assertThat(f.buildCellFormatter(false, RestFixture.Runner.SLIM), is(instanceOf(SlimFormatter.class)));
+        assertThat(f.buildCellFormatter(RestFixture.Runner.SLIM), is(instanceOf(SlimFormatter.class)));
     }
 
     @Test
     public void buildsASlimFormatterForFITRunner() {
-        assertThat(f.buildCellFormatter(false, RestFixture.Runner.FIT), is(instanceOf(FitFormatter.class)));
+        assertThat(f.buildCellFormatter(RestFixture.Runner.FIT), is(instanceOf(FitFormatter.class)));
     }
 
     private Method getCreateUriMethod(RestClient client) {

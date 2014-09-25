@@ -20,26 +20,21 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.Test;
+import org.w3c.dom.NodeList;
 
+import javax.xml.xpath.XPathConstants;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.xpath.XPathConstants;
-
-import org.junit.Test;
-import org.w3c.dom.NodeList;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ToolsTest {
     private static Map<String, String> DEF_NS_CONTEXT = new HashMap<String, String>();
@@ -62,7 +57,7 @@ public class ToolsTest {
     @Test
     public void dualityOfToAndFromHtml() {
         String stuff = "<a> \n  </a>";
-        assertEquals(stuff, Tools.fromHtml(Tools.toHtml(false, stuff)));
+        assertEquals(stuff, Tools.fromHtml(Tools.toHtml(stuff)));
     }
 
     @Test
@@ -262,12 +257,7 @@ public class ToolsTest {
 
     @Test
     public void shouldWrapTextInHtmlAnchor() {
-        assertThat(Tools.toHtmlLink(true, "http://localhost:1234", "x"), is(equalTo("<a href='http://localhost:1234'>x</a>")));
-    }
-
-    @Test
-    public void shouldNotWrapTextInHtmlAnchor() {
-        assertThat(Tools.toHtmlLink(false, "http://localhost:1234", "x"), is(equalTo("x (see: http://localhost:1234)")));
+        assertThat(Tools.toHtmlLink("http://localhost:1234", "x"), is(equalTo("<a href='http://localhost:1234'>x</a>")));
     }
 
     @Test
@@ -280,7 +270,7 @@ public class ToolsTest {
         // not much of a test, I know, but guarantees minimal info on fitnesse
         // stylesheed/js
         int id = "someContent".hashCode();
-        String ret = Tools.makeToggleCollapseable(true, "message", "someContent");
+        String ret = Tools.makeToggleCollapseable("message", "someContent");
         assertTrue(ret.indexOf("javascript:toggleCollapsable('" + id) > 0);
         assertTrue(ret.indexOf("<div class='hidden' id='" + id) > 0);
     }
@@ -290,8 +280,9 @@ public class ToolsTest {
         // not much of a test, I know, but guarantees minimal info on fitnesse
         // stylesheed/js
         int id = "someContent".hashCode();
-        String ret = Tools.makeToggleCollapseable(false, "message", "someContent");
-        assertTrue(ret.equals("someContent"));
+        String ret = Tools.makeToggleCollapseable("message", "someContent");
+        assertTrue("Ret not containing expected 'someContent': " + ret, ret.contains("someContent"));
+        assertTrue("Ret not containing expected '" + id + "': " + ret, ret.contains(Integer.toString(id)));
     }
 
     @Test

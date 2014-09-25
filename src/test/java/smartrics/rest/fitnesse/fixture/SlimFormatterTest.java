@@ -20,25 +20,24 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import org.junit.Test;
+import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
+import smartrics.rest.fitnesse.fixture.support.TextBodyTypeAdapter;
+import smartrics.rest.fitnesse.fixture.support.Tools;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import org.junit.Test;
-
-import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.TextBodyTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.Tools;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class SlimFormatterTest {
 
     @Test
     public void shouldDisplayGrayedActualOnCheckIfNoExpectedIsSpecified() {
         SlimCell c = new SlimCell("");
-        SlimFormatter formatter = new SlimFormatter(false);
+        SlimFormatter formatter = new SlimFormatter();
         StringTypeAdapter actual = new StringTypeAdapter();
         actual.set("2");
         formatter.check(c, actual);
@@ -48,7 +47,7 @@ public class SlimFormatterTest {
     @Test
     public void shouldDisplayNothingOnCheckIfNoExpectedIsSpecifiedAndActualIsNullOrEmpty() {
         SlimCell c = new SlimCell("");
-        SlimFormatter formatter = new SlimFormatter(false);
+        SlimFormatter formatter = new SlimFormatter();
         StringTypeAdapter actual = new StringTypeAdapter();
         formatter.check(c, actual);
         assertThat(c.body(), is(equalTo("")));
@@ -59,7 +58,7 @@ public class SlimFormatterTest {
     @Test
     public void shouldDisplayPassOnCheckIfExpectedAndActualMatch() {
         SlimCell c = new SlimCell("abc123");
-        SlimFormatter formatter = new SlimFormatter(false);
+        SlimFormatter formatter = new SlimFormatter();
         StringTypeAdapter actual = new StringTypeAdapter();
         actual.set("abc123");
         formatter.check(c, actual);
@@ -69,7 +68,7 @@ public class SlimFormatterTest {
     @Test
     public void shouldDisplayPassOnCheckIfExpectedAndActualMatch_whenDisplayingActual() {
         SlimCell c = new SlimCell("something matching logically abc123");
-        SlimFormatter formatter = new SlimFormatter(true);
+        SlimFormatter formatter = new SlimFormatter();
         formatter.setDisplayActual(true);
         // mockito seems not to be able to correctly allow
         // StringTypeAdapter actual = mock(StringTypeAdapter.class);
@@ -93,7 +92,7 @@ public class SlimFormatterTest {
     @Test
     public void shouldDisplayFailOnCheckIfExpectedAndActualMatch_whenNotDisplayingActual() {
         SlimCell c = new SlimCell("abc123");
-        SlimFormatter formatter = new SlimFormatter(false);
+        SlimFormatter formatter = new SlimFormatter();
         formatter.setDisplayActual(false);
         StringTypeAdapter actual = new StringTypeAdapter();
         actual.set("def345");
@@ -104,7 +103,7 @@ public class SlimFormatterTest {
     @Test
     public void shouldDisplayFailOnCheckIfExpectedAndActualMatch_whenDisplayingActual() {
         SlimCell c = new SlimCell("abc123");
-        SlimFormatter formatter = new SlimFormatter(true);
+        SlimFormatter formatter = new SlimFormatter();
         formatter.setDisplayActual(true);
         StringTypeAdapter actual = new StringTypeAdapter();
         actual.set("def345");
@@ -116,17 +115,17 @@ public class SlimFormatterTest {
     @Test
     public void shouldDisplayXmlDataInActual() {
         SlimCell c = new SlimCell("<xml />");
-        SlimFormatter formatter = new SlimFormatter(false);
+        SlimFormatter formatter = new SlimFormatter();
         formatter.setDisplayActual(true);
         TextBodyTypeAdapter actual = new TextBodyTypeAdapter();
         actual.set("<xml />");
         formatter.check(c, actual);
-        assertThat(c.body(), is(equalTo("pass:<div>" + Tools.toHtml(false, "<xml />") + "</div>")));
+        assertThat(c.body(), is(equalTo("pass:<div>" + Tools.toHtml("<xml />") + "</div>")));
     }
 
     @Test
     public void shouldRenderLinksAsGreyed() {
-        SlimFormatter formatter = new SlimFormatter(true);
+        SlimFormatter formatter = new SlimFormatter();
         SlimCell c = new SlimCell("abc123");
         formatter.asLink(c, "http://localhost", "text");
         assertThat(c.body(), is(equalTo("report:<div><a href='http://localhost'>text</a></div>")));
@@ -134,13 +133,13 @@ public class SlimFormatterTest {
 
     @Test
     public void shouldRenderExceptionsAsSlimErrorCellWithStackTracesInCode() {
-        SlimFormatter formatter = new SlimFormatter(false);
+        SlimFormatter formatter = new SlimFormatter();
         Throwable t = new Throwable();
         SlimCell c = new SlimCell("abc123");
         ByteArrayOutputStream bais = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(bais);
         t.printStackTrace(ps);
-        String trace = Tools.toHtml(false, new String(bais.toByteArray()));
+        String trace = Tools.toHtml(new String(bais.toByteArray()));
 
         formatter.exception(c, t);
         
