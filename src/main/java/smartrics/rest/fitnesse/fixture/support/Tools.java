@@ -679,7 +679,7 @@ public final class Tools {
 		StringBuffer sb = new StringBuffer();
 		sb.append(toHtml(expected));
 		String actual = typeAdapter.toString();
-		if (formatter.isDisplayActual() && !expected.equals(actual)) {
+		if (formatter.isDisplayActual() && !expected.equals(actual)) {		  
 			sb.append(toHtml("\n"));
 			sb.append(formatter.label("expected"));
 			sb.append(toHtml("-----"));
@@ -713,5 +713,9 @@ public final class Tools {
 		}
 		return str;
 	}
+
+  public static String wrapInDiv(String body) {
+    return String.format("<div>%s</div>", body);
+  }
 
 }
