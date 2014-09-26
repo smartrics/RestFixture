@@ -930,6 +930,10 @@ public class RestFixture {
 		if ("Post".equals(method) || "Put".equals(method)) {
 			getLastRequest().setBody(rBody);
 		}
+
+        //sglebs dirty workaround for #96
+        configureCredentials();
+
 		restClient.setBaseUrl(thisRequestUrlParts[0]);
 		RestResponse response = restClient.execute(getLastRequest());
 		setLastResponse(response);
@@ -1173,4 +1177,16 @@ public class RestFixture {
 		return Tools.fromHtml(someHtml);
 	}
 
+    private void configureCredentials() {
+        String username = config.get("http.basicauth.username");
+        String password = config.get("http.basicauth.password");
+        if (username != null && password != null) {
+            String newUsername = GLOBALS.substitute(username);
+            String newPassword = GLOBALS.substitute(password);
+            Config newConfig = getConfig();
+            newConfig.add("http.basicauth.username", newUsername);
+            newConfig.add("http.basicauth.password", newPassword);
+            restClient = partsFactory.buildRestClient(newConfig);
+        }
+    }
 }
