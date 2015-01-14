@@ -46,8 +46,8 @@
 		<url>http://smartrics.blogspot.com</url>
 	</organization>
 	<ciManagement>
-		<system>Fazend Hudson</system>
-		<url>http://jenkins.fazend.com:8080/job/RestFixture</url>
+		<system>Travis-CI</system>
+		<url>https://travis-ci.org/smartrics/RestFixture</url>
 	</ciManagement>
 	<issueManagement>
 		<system>GitHub Issues</system>
