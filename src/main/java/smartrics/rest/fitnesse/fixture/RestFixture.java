@@ -812,7 +812,7 @@ public class RestFixture {
 		if ("".equals(methodName)) {
 			throw new RuntimeException("RestFixture method not specified");
 		}
-		Method method1 = null;
+		Method method1;
 		try {
 			method1 = getClass().getMethod(methodName);
 			method1.invoke(this);
@@ -921,7 +921,7 @@ public class RestFixture {
 		}
 		getLastRequest().setMultipartFileParameterName(
 				multipartFileParameterName);
-		String[] uri = resUrl.split("\\?");
+		String[] uri = resUrl.split("\\?", 2);
 		String[] thisRequestUrlParts = buildThisRequestUrl(uri[0]);
 		getLastRequest().setResource(thisRequestUrlParts[1]);
 		if (uri.length == 2) {

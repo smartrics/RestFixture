@@ -192,7 +192,7 @@ public class RestFixtureTest {
         fixture.processRow(row);
         assertEquals("1234", fixture.getHeaders().get("header1"));
     }
-    
+
     @Test
     public void mustExpandSymbolWhenSettingHeaders() {
         Fixture.setSymbol("hval", "one");
@@ -778,6 +778,19 @@ public class RestFixtureTest {
         verify(row.getCell(4)).body();
         verify(row.getCell(4)).body("text");
         verifyNoMoreInteractions(row.getCell(4));
+    }
+
+    @Test
+    public void mustSplitQueryOnFirstQuestionMark() {
+        String q = "a=http://another.com?zzz=1?zzz=2";
+        when(mockLastRequest.getQuery()).thenReturn(q);
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        lastResponse.setRawBody("<body>1234</body>".getBytes());
+
+        RowWrapper<?> row = helper.createTestRow("GET", "/uri?" + q, "", "", "");
+        fixture.processRow(row);
+
+        verify(mockLastRequest).setQuery(q);
     }
 
     @Test
