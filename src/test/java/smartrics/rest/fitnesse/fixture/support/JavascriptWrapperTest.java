@@ -163,14 +163,14 @@ public class JavascriptWrapperTest {
     }
 
     @Test
-    public void shouldTrapJavascriptErrorAndWrapThemInErrors() {
+    public void shouldTrapJavascriptErrorAndWrapThemInErrors() throws Exception {
         RestResponse response = createResponse();
         JavascriptWrapper h = new JavascriptWrapper();
         try {
             h.evaluateExpression(response, "some erroneous javascript");
             fail("Must throw a Javascript Exception");
         } catch (JavascriptException e) {
-            assertThat(e.getMessage(), is(equalTo("missing ; before statement (unnamed script#1)")));
+            // ignore message assertion as it may be localised (see issue #113)
         }
     }
 
