@@ -22,6 +22,8 @@ package smartrics.rest.fitnesse.fixture.support;
 
 import java.util.List;
 
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
+
 /**
  * Type adapted for cells containing JSON content.
  * 
@@ -30,12 +32,14 @@ import java.util.List;
  */
 public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
     private boolean forceJsEvaluation = false;
-    private JavascriptWrapper wrapper = new JavascriptWrapper();
+    private final JavascriptWrapper wrapper;
 
     /**
      * def ctor
+     * @param variablesProvider 
      */
-    public JSONBodyTypeAdapter() {
+    public JSONBodyTypeAdapter(RunnerVariablesProvider variablesProvider) {
+    	 wrapper = new JavascriptWrapper(variablesProvider);
     }
 
     @Override

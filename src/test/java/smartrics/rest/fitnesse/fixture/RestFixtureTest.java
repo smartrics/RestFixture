@@ -50,12 +50,12 @@ import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.CellWrapper;
 import smartrics.rest.fitnesse.fixture.support.Config;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
+import smartrics.rest.fitnesse.fixture.support.FitVariables;
 import smartrics.rest.fitnesse.fixture.support.HeadersTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.JavascriptException;
 import smartrics.rest.fitnesse.fixture.support.RowWrapper;
 import smartrics.rest.fitnesse.fixture.support.StatusCodeTypeAdapter;
 import smartrics.rest.fitnesse.fixture.support.StringTypeAdapter;
-import smartrics.rest.fitnesse.fixture.support.Variables;
 import fit.Fixture;
 
 /**
@@ -68,7 +68,7 @@ public class RestFixtureTest {
 
     private static final String BASE_URL = "http://localhost:9090";
     private RestFixture fixture;
-    private final Variables variables = new Variables();
+    private final FitVariables variables = new FitVariables();
     private RestFixtureTestHelper helper;
     private PartsFactory mockPartsFactory;
     private RestClient mockRestClient;

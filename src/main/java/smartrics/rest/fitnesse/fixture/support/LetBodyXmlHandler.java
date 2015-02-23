@@ -25,6 +25,7 @@ import java.util.Map;
 import org.w3c.dom.NodeList;
 
 import smartrics.rest.client.RestResponse;
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
 /**
  * Handles let expressions on XML content, returning XML string rather than the
@@ -35,8 +36,9 @@ import smartrics.rest.client.RestResponse;
  */
 public class LetBodyXmlHandler implements LetHandler {
 
-    @Override
-    public String handle(RestResponse response, Object expressionContext, String expression) {
+	@Override
+	public String handle(RunnerVariablesProvider variablesProvider,
+			RestResponse response, Object expressionContext, String expression) {
         @SuppressWarnings("unchecked")
         Map<String, String> namespaceContext = (Map<String, String>) expressionContext;
         NodeList list = Tools.extractXPath(namespaceContext, expression, response.getBody());

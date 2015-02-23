@@ -21,6 +21,7 @@
 package smartrics.rest.fitnesse.fixture.support;
 
 import smartrics.rest.client.RestResponse;
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
 /**
  * Strategy to handle LET expressions.
@@ -32,6 +33,7 @@ public interface LetHandler {
 
 	/**
 	 * 
+	 * @param variablesProvider 
 	 * @param response
 	 *            the http response
 	 * @param expressionContext
@@ -40,7 +42,7 @@ public interface LetHandler {
 	 *            the expression
 	 * @return applies the expression to response within the given context.
 	 */
-	String handle(RestResponse response, Object expressionContext,
-			String expression);
+	String handle(RunnerVariablesProvider variablesProvider,
+			RestResponse response, Object expressionContext, String expression);
 
 }

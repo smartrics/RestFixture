@@ -27,14 +27,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import smartrics.rest.fitnesse.fixture.support.Config;
-import smartrics.rest.fitnesse.fixture.support.Variables;
+import smartrics.rest.fitnesse.fixture.support.FitVariables;
 import fit.Parse;
 
 public class RestFixtureFitTest {
 
     private static final String BASE_URL = "http://localhost:9090";
     private FitRestFixture fixture;
-    private final Variables variables = new Variables();
+    private final FitVariables variables = new FitVariables();
     private Config config;
     private Parse emptyParse;
 	private RestFixtureTestHelper helper;

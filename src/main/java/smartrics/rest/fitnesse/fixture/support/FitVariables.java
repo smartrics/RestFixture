@@ -20,16 +20,22 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import fitnesse.slim.StatementExecutorInterface;
+import fit.Fixture;
 
 /**
- * Facade to FitNesse global symbols map for SliM.
+ * Facade to FitNesse global symbols map for FIT.
  * 
  * @author smartrics
  */
-public class SlimVariables extends Variables {
+public class FitVariables extends Variables {
 
-	private final StatementExecutorInterface executor; // TODO use it!!!
+	/**
+	 * initialises variables with default config. See @link
+	 * {@link #Variables(Config)}
+	 */
+	public FitVariables() {
+		super();
+	}
 
 	/**
 	 * initialises the variables. reade
@@ -37,11 +43,9 @@ public class SlimVariables extends Variables {
 	 * {@code null}s.
 	 * 
 	 * @param c
-	 * @param executor
 	 */
-	public SlimVariables(Config c, StatementExecutorInterface executor) {
+	public FitVariables(Config c) {
 		super(c);
-		this.executor = executor;
 	}
 
 	/**
@@ -50,8 +54,9 @@ public class SlimVariables extends Variables {
 	 * @param label
 	 * @param val
 	 */
+	@Override
 	public void put(String label, String val) {
-		executor.assign(label, val);
+		Fixture.setSymbol(label, val);
 	}
 
 	/**
@@ -60,10 +65,20 @@ public class SlimVariables extends Variables {
 	 * @param label
 	 * @return the value.
 	 */
+	@Override
 	public String get(String label) {
-		String result = executor.getSymbol(label).toString();
-		return result;
+		if (Fixture.hasSymbol(label)) {
+			return Fixture.getSymbol(label).toString();
+		}
+		return null;
+	}
+
+	/**
+	 * crears all variables
+	 * (used for tests only, given the fact that the Fit variables are in fact static)
+	 */
+	public void clearAll() {
+		Fixture.ClearSymbols();
 	}
 
 }
-

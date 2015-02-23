@@ -28,6 +28,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import smartrics.rest.client.RestResponse;
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
 /**
  * Handles body of the last response on behalf of LET in RestFixture.
@@ -38,13 +39,15 @@ import smartrics.rest.client.RestResponse;
 public class LetBodyHandler implements LetHandler {
 
     @Override
-    public String handle(RestResponse response, Object expressionContext, String expression) {
+    public String handle(RunnerVariablesProvider variablesProvider,
+    		RestResponse response, Object expressionContext, String expression) {
         @SuppressWarnings("unchecked")
         Map<String, String> namespaceContext = (Map<String, String>) expressionContext;
         String contentTypeString = response.getContentType();
         String charset = response.getCharset();
         ContentType contentType = ContentType.parse(contentTypeString);
-        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(contentType, charset);
+        BodyTypeAdapter bodyTypeAdapter = new BodyTypeAdapterFactory(variablesProvider)
+        .getBodyTypeAdapter(contentType, charset);
         String body = bodyTypeAdapter.toXmlString(response.getBody());
         if (body == null) {
             return null;

@@ -24,13 +24,22 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
+
 public class BodyTypeAdapterFactoryTest {
     public String charset = "UTF-8";
+    
+    private final BodyTypeAdapterFactory factory = new BodyTypeAdapterFactory(new RunnerVariablesProvider() {
+		@Override
+		public Variables createRunnerVariables() {
+			return null;
+		}
+	});
     
     @Test
     public void jsonContentTypeReturnsJSONBodyTypeAdapter() {
         // act
-        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ContentType.JSON, charset);
+        BodyTypeAdapter bodyTypeAdapter = factory.getBodyTypeAdapter(ContentType.JSON, charset);
         // assert
         assertTrue(bodyTypeAdapter instanceof JSONBodyTypeAdapter);
     }
@@ -38,7 +47,7 @@ public class BodyTypeAdapterFactoryTest {
     @Test
     public void xmlContentTypeReturnsXPathBodyTypeAdapter() {
         // act
-        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ContentType.XML, charset);
+        BodyTypeAdapter bodyTypeAdapter = factory.getBodyTypeAdapter(ContentType.XML, charset);
         // assert
         assertTrue(bodyTypeAdapter instanceof XPathBodyTypeAdapter);
     }
@@ -46,7 +55,7 @@ public class BodyTypeAdapterFactoryTest {
     @Test
     public void textContentTypeReturnsXPathBodyTypeAdapter() {
         // act
-        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ContentType.TEXT, charset);
+        BodyTypeAdapter bodyTypeAdapter = factory.getBodyTypeAdapter(ContentType.TEXT, charset);
         // assert
         assertTrue(bodyTypeAdapter instanceof TextBodyTypeAdapter);
     }
@@ -54,13 +63,13 @@ public class BodyTypeAdapterFactoryTest {
     @Test(expected = IllegalArgumentException.class)
     public void nullContentTypeThrowsException() {
         // act
-        BodyTypeAdapterFactory.getBodyTypeAdapter(null, charset);
+    	factory.getBodyTypeAdapter(null, charset);
     }
 
     @Test
     public void unknownContentTypeReturnsXPathBodyTypeAdapter() {
         // act
-        BodyTypeAdapter bodyTypeAdapter = BodyTypeAdapterFactory.getBodyTypeAdapter(ContentType.typeFor("unknown"), charset);
+        BodyTypeAdapter bodyTypeAdapter = factory.getBodyTypeAdapter(ContentType.typeFor("unknown"), charset);
         // assert
         assertTrue(bodyTypeAdapter instanceof XPathBodyTypeAdapter);
     }
