@@ -21,6 +21,7 @@
 package smartrics.rest.fitnesse.fixture.support;
 
 import smartrics.rest.client.RestResponse;
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
 /**
  * Handles let expressions on XML content, returning XML string rather than the
@@ -32,8 +33,9 @@ import smartrics.rest.client.RestResponse;
 public class LetBodyJsHandler implements LetHandler {
 
     @Override
-    public String handle(RestResponse response, Object expressionContext, String expression) {
-        JavascriptWrapper js = new JavascriptWrapper();
+    public String handle(RunnerVariablesProvider variablesProvider,
+    		RestResponse response, Object expressionContext, String expression) {
+        JavascriptWrapper js = new JavascriptWrapper(variablesProvider);
         Object result = js.evaluateExpression(response, expression);
         if (result == null) {
             return null;

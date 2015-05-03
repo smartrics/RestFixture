@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import smartrics.rest.client.RestData.Header;
 import smartrics.rest.client.RestResponse;
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
 /**
  * Handles header (a list of Header objects) LET manipulations.
@@ -36,7 +37,9 @@ import smartrics.rest.client.RestResponse;
  */
 public class LetHeaderHandler implements LetHandler {
 
-    public String handle(RestResponse response, Object expressionContext, String expression) {
+	@Override
+	public String handle(RunnerVariablesProvider variablesProvider,
+			RestResponse response, Object expressionContext, String expression) {
         List<String> content = new ArrayList<String>();
         if (response != null) {
             for (Header e : response.getHeaders()) {

@@ -21,6 +21,7 @@
 package smartrics.rest.fitnesse.fixture.support;
 
 import smartrics.rest.client.RestResponse;
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
 /**
  * Handles let expressions to assign constant values to symbols.
@@ -30,9 +31,11 @@ import smartrics.rest.client.RestResponse;
  */
 public class LetBodyConstHandler implements LetHandler {
 
-    @Override
-    public String handle(RestResponse response, Object expressionContext, String expression) {
-        return expression;
-    }
-
+	
+	@Override
+	public String handle(RunnerVariablesProvider variablesProvider,
+			RestResponse response, Object expressionContext, String expression) {
+		return expression;
+	}
+	
 }

@@ -34,6 +34,7 @@ import org.mozilla.javascript.ScriptableObject;
 
 import smartrics.rest.client.RestData.Header;
 import smartrics.rest.client.RestResponse;
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
 /**
  * Wrapper class to all that related to JavaScript.
@@ -55,7 +56,13 @@ public class JavascriptWrapper {
 	 * the name of the JS object containing the json body: {@code jsonbody}.
 	 */
 	public static final String JSON_OBJ_NAME = "jsonbody";
+	
+	private RunnerVariablesProvider variablesProvider;
 
+	public JavascriptWrapper(RunnerVariablesProvider variablesProvider) {
+		this.variablesProvider = variablesProvider;
+	}
+	
 	/**
 	 * evaluates a Javascript expression in the given {@link RestResponse}.
 	 * 
@@ -107,7 +114,7 @@ public class JavascriptWrapper {
 	}
 
 	private void injectFitNesseSymbolMap(ScriptableObject scope) {
-		Variables v = new Variables();
+		Variables v = variablesProvider.createRunnerVariables();
 		Object wrappedVariables = Context.javaToJS(v, scope);
 		ScriptableObject.putProperty(scope, SYMBOLS_OBJ_NAME, wrappedVariables);
 	}

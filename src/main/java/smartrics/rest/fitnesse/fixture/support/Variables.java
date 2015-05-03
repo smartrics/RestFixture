@@ -27,27 +27,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import fit.Fixture;
-import fitnesse.slim.VariableStore;
 
 /**
  * Facade to FitNesse global symbols map.
  * 
  * @author smartrics
  */
-public class Variables {
+public abstract class Variables {
 	/**
 	 * pattern matching a variable name: {@code \%([a-zA-Z0-9_]+)\%}
 	 */
 	public static final Pattern VARIABLES_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");
 	private static final String FIT_NULL_VALUE = fitSymbolForNull();
 	private String nullValue = "null";
-	private VariableStore variableStore;
 
 	/**
 	 * initialises variables with default config. See @link
 	 * {@link #Variables(Config)}
 	 */
-	public Variables() {
+	Variables() {
 		this(Config.getConfig());
 	}
 
@@ -58,7 +56,7 @@ public class Variables {
 	 * 
 	 * @param c
 	 */
-	public Variables(Config c) {
+	Variables(Config c) {
 		if (c != null) {
 			this.nullValue = c.get("restfixture.null.value.representation", "null");
 		}
@@ -70,9 +68,7 @@ public class Variables {
 	 * @param label
 	 * @param val
 	 */
-	public void put(String label, String val) {
-		Fixture.setSymbol(label, val);
-	}
+	abstract public void put(String label, String val);
 
 	/**
 	 * gets a value.
@@ -80,26 +76,14 @@ public class Variables {
 	 * @param label
 	 * @return the value.
 	 */
-	public String get(String label) {
-		if (Fixture.hasSymbol(label)) {
-			return Fixture.getSymbol(label).toString();
-		}
-		return null;
-	}
-
-	/**
-	 * crears all variables
-	 */
-	public void clearAll() {
-		Fixture.ClearSymbols();
-	}
+	abstract public String get(String label);
 
 	/**
 	 * replaces a text with variable values.
 	 * @param text
 	 * @return the substituted text.
 	 */
-	public String substitute(String text) {
+	public final String substitute(String text) {
 		if (text == null) {
 			return null;
 		}
@@ -138,7 +122,7 @@ public class Variables {
 	 * @param s
 	 * @return the null representation if the input is null.
 	 */
-	public String replaceNull(String s) {
+	public final String replaceNull(String s) {
 		if (s == null) {
 			return nullValue;
 		}

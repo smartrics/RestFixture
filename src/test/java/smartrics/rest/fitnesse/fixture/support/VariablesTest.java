@@ -31,13 +31,13 @@ public class VariablesTest {
 
 	@Before
 	public void clearVariables(){
-		new Variables().clearAll();
+		new FitVariables().clearAll();
 	}
 
 	@Test
 	public void variablesShoudBeStatic(){
-		Variables v1 = new Variables();
-		Variables v2 = new Variables();
+		Variables v1 = new FitVariables();
+		Variables v2 = new FitVariables();
 		assertNull(v1.get("a"));
 		assertNull(v2.get("a"));
 		v1.put("a", "val");
@@ -47,7 +47,7 @@ public class VariablesTest {
 
 	@Test
 	public void variablesAreSubstitutedWithCurrentValueWhenLabelsAreIdentifiedWithinPercentSymbol(){
-		Variables v1 = new Variables();
+		Variables v1 = new FitVariables();
 		v1.put("ID", "100");
 		String newText = v1.substitute("the current value of ID is %ID%.");
 		assertEquals("the current value of ID is 100.", newText);
@@ -55,7 +55,7 @@ public class VariablesTest {
 
 	@Test
 	public void variablesAreSubstitutedMultipleTimes(){
-		Variables v1 = new Variables();
+		Variables v1 = new FitVariables();
 		v1.put("ID", "100");
 		String newText = v1.substitute("first %ID%. second %ID%.");
 		assertEquals("first 100. second 100.", newText);
@@ -63,7 +63,7 @@ public class VariablesTest {
 
     @Test
     public void nonExistentVariablesAreNotReplaced() {
-        Variables v1 = new Variables();
+        Variables v1 = new FitVariables();
         v1.put("ID", "100");
         String newText = v1.substitute("non existent %XYZ%. it exists %ID%");
         assertEquals("non existent %XYZ%. it exists 100", newText);
@@ -72,7 +72,7 @@ public class VariablesTest {
     @Test
     public void variablesContainingNullAreSubWithStringNullByDefault() {
     	Config.getConfig().clear();
-        Variables v1 = new Variables();
+        Variables v1 = new FitVariables();
         v1.put("ID", null);
         String newText = v1.substitute("null is '%ID%'");
         assertEquals("null is 'null'", newText);
@@ -82,7 +82,7 @@ public class VariablesTest {
     public void variablesContainingNullAreSubWithValueSuppliedViaConfig() {
         Config c = Config.getConfig();
         c.add("restfixture.null.value.representation", "this-is-null-value");
-        Variables v1 = new Variables(c);
+        Variables v1 = new FitVariables(c);
         v1.put("ID", null);
         String newText = v1.substitute("null is '%ID%'");
         assertEquals("null is 'this-is-null-value'", newText);
@@ -92,7 +92,7 @@ public class VariablesTest {
     public void variablesContainingNullAreSubWithEmptyValueSuppliedViaConfig() {
         Config c = Config.getConfig();
         c.add("restfixture.null.value.representation", "");
-        Variables v1 = new Variables(c);
+        Variables v1 = new FitVariables(c);
         v1.put("ID", null);
         String newText = v1.substitute("null is '%ID%'");
         assertEquals("null is ''", newText);

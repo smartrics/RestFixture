@@ -25,9 +25,11 @@ import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 import org.junit.Before;
 import org.junit.Test;
+
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.fitnesse.fixture.support.Config;
+import smartrics.rest.fitnesse.fixture.support.Variables;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -43,7 +45,12 @@ public class PartsFactoryTest {
     public void setUp() {
         Config c = Config.getConfig();
         c.add("http.client.use.new.http.uri.factory", "false");
-        f = new PartsFactory();
+        f = new PartsFactory(new RunnerVariablesProvider() {
+			@Override
+			public Variables createRunnerVariables() {
+				return null;
+			}
+		});
     }
 
     @Test

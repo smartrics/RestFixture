@@ -24,6 +24,8 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
+
 /**
  * Depending on Content-Type passed in, it'll build the appropriate type adapter
  * for parsing/rendering the cell content.
@@ -33,18 +35,37 @@ import java.util.Map;
  */
 public class BodyTypeAdapterFactory {
 
-    @SuppressWarnings("rawtypes")
-    private static Map<ContentType, Class> contentTypeToBodyTypeAdapter = new HashMap<ContentType, Class>();
-    static {
-        contentTypeToBodyTypeAdapter.put(ContentType.JS, JSONBodyTypeAdapter.class);
-        contentTypeToBodyTypeAdapter.put(ContentType.JSON, JSONBodyTypeAdapter.class);
-        contentTypeToBodyTypeAdapter.put(ContentType.XML, XPathBodyTypeAdapter.class);
-        contentTypeToBodyTypeAdapter.put(ContentType.TEXT, TextBodyTypeAdapter.class);
+	private final RunnerVariablesProvider variablesProvider;
+	
+	private Map<ContentType, BodyTypeAdapterCreator> contentTypeToBodyTypeAdapter =
+		new HashMap<ContentType, BodyTypeAdapterCreator>();
+    {
+    	BodyTypeAdapterCreator jsonBodyTypeAdapterCreator = new BodyTypeAdapterCreator() {
+			@Override
+			public BodyTypeAdapter createBodyTypeAdapter() {
+				return new JSONBodyTypeAdapter(variablesProvider);
+			}
+		};
+        contentTypeToBodyTypeAdapter.put(ContentType.JS, jsonBodyTypeAdapterCreator);
+        contentTypeToBodyTypeAdapter.put(ContentType.JSON, jsonBodyTypeAdapterCreator);
+        contentTypeToBodyTypeAdapter.put(ContentType.XML, new BodyTypeAdapterCreator() {
+			@Override
+			public BodyTypeAdapter createBodyTypeAdapter() {
+				return new XPathBodyTypeAdapter();
+			}
+		});
+        contentTypeToBodyTypeAdapter.put(ContentType.TEXT, new BodyTypeAdapterCreator() {
+			@Override
+			public BodyTypeAdapter createBodyTypeAdapter() {
+				return new TextBodyTypeAdapter();
+			}
+        });;
     }
 
-    private BodyTypeAdapterFactory() {
-    }
-
+	public BodyTypeAdapterFactory(final RunnerVariablesProvider variablesProvider) {
+		this.variablesProvider = variablesProvider;
+	}
+	
     /**
      * Returns a @link {@link BodyTypeAdapter} for the given charset and @link {@link ContentType}.
      * 
@@ -52,25 +73,22 @@ public class BodyTypeAdapterFactory {
      * @param charset the charset.
      * @return an instance of {@link BodyTypeAdapter}
      */
-    public static BodyTypeAdapter getBodyTypeAdapter(ContentType content, String charset) {
-        @SuppressWarnings("rawtypes")
-        Class aClass = contentTypeToBodyTypeAdapter.get(content);
-        if (aClass == null) {
+    public BodyTypeAdapter getBodyTypeAdapter(ContentType content, String charset) {
+        final BodyTypeAdapterCreator creator = contentTypeToBodyTypeAdapter.get(content);
+        if (creator == null) {
             throw new IllegalArgumentException("Content-Type is UNKNOWN.  Unable to find a BodyTypeAdapter to instantiate.");
         }
-        BodyTypeAdapter instance = null;
-        try {
-            instance = (BodyTypeAdapter) aClass.newInstance();
-            if (charset != null) {
-                instance.setCharset(charset);
-            } else {
-                instance.setCharset(Charset.defaultCharset().name());
-            }
-        } catch (InstantiationException e) {
-            throw new IllegalStateException("Unable to instantiate a the BodyTypeAdapter for " + content + "(" + aClass.getName() + ")");
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException("Unable access ctor to instantiate a the BodyTypeAdapter for " + content + "(" + aClass.getName() + ")");
+        final BodyTypeAdapter instance = creator.createBodyTypeAdapter();
+        if (charset != null) {
+        	instance.setCharset(charset);
+        } else {
+        	instance.setCharset(Charset.defaultCharset().name());
         }
         return instance;
     }
+    
+    interface BodyTypeAdapterCreator {
+    	BodyTypeAdapter createBodyTypeAdapter();
+    }
+    
 }

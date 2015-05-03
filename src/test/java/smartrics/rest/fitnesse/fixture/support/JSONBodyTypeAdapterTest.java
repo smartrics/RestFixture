@@ -35,6 +35,8 @@ import java.util.Vector;
 import org.junit.Before;
 import org.junit.Test;
 
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
+
 public class JSONBodyTypeAdapterTest {
     private JSONBodyTypeAdapter adapter;
     private static final String json0 = "{\"a\": { b: [\"12\",\"23\"], \"c\": \"XY\" } }";
@@ -42,10 +44,16 @@ public class JSONBodyTypeAdapterTest {
     private static final String json2 = "{\"a\": 1, \"b\": 2 }";
     private static final List<String> xPaths = Arrays.asList("/a", "//b");
     private static final String xPathsAsString = "/a<br/>//b";
+    private final RunnerVariablesProvider variablesProvider = new RunnerVariablesProvider() {
+		@Override
+		public Variables createRunnerVariables() {
+			return null;
+		}        	
+    };
 
     @Before
     public void setUp() {
-        adapter = new JSONBodyTypeAdapter();
+        adapter = new JSONBodyTypeAdapter(variablesProvider);
         adapter.setContext(new HashMap<String, String>());
     }
 
