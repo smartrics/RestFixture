@@ -43,6 +43,13 @@ import smartrics.rest.fitnesse.fixture.support.HttpClientBuilder;
  * 
  */
 public class PartsFactory {
+	
+	private final BodyTypeAdapterFactory bodyTypeAdapterFactory;
+	
+	public PartsFactory(final RunnerVariablesProvider variablesProvider) {
+		this.bodyTypeAdapterFactory = new BodyTypeAdapterFactory(variablesProvider);
+	}
+	
     /**
      * Builds a rest client configured with the given config implementation.
      * 
@@ -115,6 +122,6 @@ public class PartsFactory {
      *         {@link smartrics.rest.fitnesse.fixture.support.BodyTypeAdapter}
      */
     public BodyTypeAdapter buildBodyTypeAdapter(ContentType ct, String charset) {
-        return BodyTypeAdapterFactory.getBodyTypeAdapter(ct, charset);
+        return bodyTypeAdapterFactory.getBodyTypeAdapter(ct, charset);
     }
 }

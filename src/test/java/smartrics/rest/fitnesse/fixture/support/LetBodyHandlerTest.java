@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import smartrics.rest.client.RestResponse;
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
 /**
  * Test class for the js body handler.
@@ -38,18 +39,24 @@ import smartrics.rest.client.RestResponse;
  */
 public class LetBodyHandlerTest {
 
-    private Variables variables;
+    private FitVariables variables;
+    private final RunnerVariablesProvider variablesProvider = new RunnerVariablesProvider() {
+		@Override
+		public Variables createRunnerVariables() {
+			return variables;
+		}        	
+    };
 
     @Before
     public void setUp() {
-        variables = new Variables();
+        variables = new FitVariables();
         variables.clearAll();
     }
 
     @Test
     public void shouldHandleExpressionsReturningNull() {
         LetBodyHandler h = new LetBodyHandler();
-        String r = h.handle(new RestResponse(), null, "null");
+        String r = h.handle(variablesProvider, new RestResponse(), null, "null");
         assertNull(r);
     }
 
@@ -59,7 +66,7 @@ public class LetBodyHandlerTest {
         RestResponse response = new RestResponse();
         response.addHeader("Content-Type", "application/json");
         response.setBody("{\"root\" : {\"accountRef\":\"http://something:8111\",\"label\":\"default\",\"websiteRef\":\"ws1\",\"dispersionRef\":\"http://localhost:8111\"} }");
-        String ret = h.handle(response, null, "/root/dispersionRef/text()");
+        String ret = h.handle(variablesProvider, response, null, "/root/dispersionRef/text()");
         assertThat(ret, is(equalTo("http://localhost:8111")));
     }
 }

@@ -22,6 +22,9 @@ package smartrics.rest.fitnesse.fixture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import fitnesse.slim.StatementExecutorConsumer;
+import fitnesse.slim.StatementExecutorInterface;
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestData.Header;
 import smartrics.rest.client.RestRequest;
@@ -30,6 +33,7 @@ import smartrics.rest.fitnesse.fixture.support.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -166,7 +170,7 @@ import java.util.Vector;
  *
  * @author smartrics
  */
-public class RestFixture {
+public class RestFixture implements StatementExecutorConsumer, RunnerVariablesProvider {
 
 	/**
 	 * What runner this table is running on.
@@ -190,6 +194,22 @@ public class RestFixture {
 		 */
 		OTHER;
 	};
+	
+	/* (non-Javadoc)
+	 * @see smartrics.rest.fitnesse.fixture.RunnerVariablesProvider#createRunnerVariables()
+	 */
+	@Override
+	public Variables createRunnerVariables() {
+		switch (runner) {
+		case SLIM:
+			return new SlimVariables(config, slimStatementExecutor);
+		case FIT:
+			return new FitVariables(config);
+		default:
+			// Use FitVariables for tests
+			return new FitVariables(config);
+		}
+	}
 
 	private static final String LINE_SEPARATOR = "\n";
 
@@ -219,6 +239,8 @@ public class RestFixture {
 
 	private Config config;
 
+	private Runner runner;
+
 	private boolean displayActualOnRight;
 
 	private boolean debugMethodCall = false;
@@ -245,12 +267,14 @@ public class RestFixture {
 
 	private boolean followRedirects = true;
 
+	private StatementExecutorInterface slimStatementExecutor;
+
 	/**
 	 * Constructor for Fit runner.
 	 */
 	public RestFixture() {
 		super();
-		this.partsFactory = new PartsFactory();
+		this.partsFactory = new PartsFactory(this);
 		this.displayActualOnRight = true;
 		this.minLenForCollapseToggle = -1;
 		this.resourceUrisAreEscaped = false;
@@ -275,7 +299,11 @@ public class RestFixture {
 	 *            the value of cell number 3 in first row of the fixture table.
 	 */
 	public RestFixture(String hostName, String configName) {
-		this(new PartsFactory(), hostName, configName);
+		this.displayActualOnRight = true;
+		this.minLenForCollapseToggle = -1;
+		this.partsFactory = new PartsFactory(this);
+		this.config = Config.getConfig(configName);
+		this.baseUrl = new Url(stripTag(hostName));
 	}
 
 	/**
@@ -722,7 +750,7 @@ public class RestFixture {
 			if (letHandler != null) {
 				StringTypeAdapter adapter = new StringTypeAdapter();
 				try {
-					sValue = letHandler.handle(getLastResponse(), namespaceContext, expr);
+					sValue = letHandler.handle(this, getLastResponse(), namespaceContext, expr);
 					exprCell.body(getFormatter().gray(exprCell.body()));
 				} catch (RuntimeException e) {
 					getFormatter().exception(exprCell, e.getMessage());
@@ -777,7 +805,7 @@ public class RestFixture {
 					"Missing string to evaluate)");
 			return;
 		}
-		JavascriptWrapper wrapper = new JavascriptWrapper();
+		JavascriptWrapper wrapper = new JavascriptWrapper(this);
 		Object result = null;
 		try {
 			result = wrapper.evaluateExpression(lastResponse, jsCell.body());
@@ -837,9 +865,10 @@ public class RestFixture {
 	}
 
 	protected void initialize(Runner runner) {
+		this.runner = runner;
 		boolean state = validateState();
 		notifyInvalidState(state);
-		configFormatter(runner);
+		configFormatter();
 		configFixture();
 		configRestClient();
 	}
@@ -922,10 +951,15 @@ public class RestFixture {
 		getLastRequest().setMultipartFileParameterName(
 				multipartFileParameterName);
 		String[] uri = resUrl.split("\\?", 2);
+		
 		String[] thisRequestUrlParts = buildThisRequestUrl(uri[0]);
 		getLastRequest().setResource(thisRequestUrlParts[1]);
-		if (uri.length == 2) {
-			getLastRequest().setQuery(uri[1]);
+		if (uri.length > 1) {
+			String query = uri[1];
+			for (int i=2; i<uri.length; i++) {
+				query += "?" + uri[i]; //TODO: StringBuilder
+			}
+			getLastRequest().setQuery(query);
 		}
 		if ("Post".equals(method) || "Put".equals(method)) {
 			getLastRequest().setBody(rBody);
@@ -1089,7 +1123,7 @@ public class RestFixture {
 		return Tools.fromSimpleTag(somethingWithinATag);
 	}
 
-	private void configFormatter(Runner runner) {
+	private void configFormatter() {
 		formatter = partsFactory.buildCellFormatter(runner);
 	}
 
@@ -1098,7 +1132,7 @@ public class RestFixture {
 	 */
 	private void configFixture() {
 
-		GLOBALS = new Variables(config);
+		GLOBALS = createRunnerVariables();
 
 		displayActualOnRight = config.getAsBoolean(
 				"restfixture.display.actual.on.right", displayActualOnRight);
@@ -1189,4 +1223,9 @@ public class RestFixture {
             restClient = partsFactory.buildRestClient(newConfig);
         }
     }
+
+	@Override
+	public void setStatementExecutor(StatementExecutorInterface arg0) {
+		this.slimStatementExecutor = arg0;
+	}
 }

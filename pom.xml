@@ -14,7 +14,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>smartrics.restfixture</groupId>
 	<artifactId>smartrics-RestFixture</artifactId>
-	<version>3.2</version>
+	<version>4.0</version>
 	<name>RestFixture</name>
 	<url>https://github.com/smartrics/RestFixture</url>
 	<packaging>jar</packaging>
@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>org.fitnesse</groupId>
 			<artifactId>fitnesse</artifactId>
-			<version>20140901</version>
+			<version>20150424</version>
 		</dependency>
 		<dependency>
 			<groupId>smartrics.restfixture</groupId>

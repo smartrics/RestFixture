@@ -29,9 +29,9 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import util.Maybe;
 import fitnesse.html.HtmlTag;
 import fitnesse.wikitext.parser.Matcher;
+import fitnesse.wikitext.parser.Maybe;
 import fitnesse.wikitext.parser.Parser;
 import fitnesse.wikitext.parser.Rule;
 import fitnesse.wikitext.parser.Symbol;

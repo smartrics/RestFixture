@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import smartrics.rest.client.RestResponse;
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
 /**
  * Test class for the js body handler.
@@ -35,18 +36,24 @@ import smartrics.rest.client.RestResponse;
  */
 public class LetBodyJsHandlerTest {
 
-    private Variables variables;
+    private FitVariables variables;
+    private final RunnerVariablesProvider variablesProvider = new RunnerVariablesProvider() {
+		@Override
+		public Variables createRunnerVariables() {
+			return variables;
+		}        	
+    };
 
     @Before
     public void setUp() {
-        variables = new Variables();
+        variables = new FitVariables();
         variables.clearAll();
     }
 
     @Test
     public void shouldHandleExpressionsReturningNull() {
         LetBodyJsHandler h = new LetBodyJsHandler();
-        String r = h.handle(new RestResponse(), null, "null");
+        String r = h.handle(variablesProvider, new RestResponse(), null, "null");
         assertNull(r);
     }
 }
