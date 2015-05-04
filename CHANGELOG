@@ -1,3 +1,15 @@
+version 4.0
+ * Fixed issue #52 "Symbols are not stored in the SlimTestContext"
+ * Fixed issue #112 "Bad URL constucted when embedded question marks"
+
+version 3.1
+ * Fixed bugs and typos
+ * Fixed render of html content in cells
+ * Fixed issue #46 "Failure during PUT"
+ * Fixed issue #58 "typo javadoc configutation -> configuration"
+ * Fixed issue #61 "Symbol in setBody does not resolve in the display"
+ * Fixed issue #96 "RestFixureConfig does not expand variables for authentication"
+
 version 3.0
  * Migrated build system to Maven and published to Sonatype Nexus
  * Fixed Issue#28 - Multiple variables not expanding in RestFixtureConfig

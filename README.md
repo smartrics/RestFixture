@@ -25,6 +25,17 @@ Documentation:
 
 http://github.com/smartrics/RestFixtureLiveDoc
 
+
+Versions and compatibility with FitNesse
+----------------------------------------
+
+RestFixture v3.1 and below are compatible with any release of FitNesse to date
+([v20150424](http://mvnrepository.com/artifact/org.fitnesse/fitnesse/20150424)) and no further support for newer versions
+of FitNesse is guraranteed for these versions of RestFixture.
+
+RestFixture v4.0 is compatible with [FitNesse v20150424](http://mvnrepository.com/artifact/org.fitnesse/fitnesse/20150424)
+and above having implemented proper support of Slim Symbols as described in [Issue #52](https://github.com/smartrics/RestFixture/issues/52).
+
 Build: Releases from 2.1 onwards
 --------------------------------
 
@@ -38,7 +49,8 @@ Once the build completes, the directory target contains:
 * <code>dependencies/</code> : all the RestFixture dependencies (excluding a Logging framework implementation. See below for details)
 * <code>smartrics-RestFixture-&lt;version>-bin.zip</code>: a bundle the RestFixture and all dependencies.
 
-If the build fails because smartrics-RestClient can't be found, check the pom.xml file and make sure the repository sonatype-releases-restclient is enabled.
+If the build fails because smartrics-RestClient can't be found, check the pom.xml file and make sure the repository
+sonatype-releases-restclient is enabled.
 
 Build: Releases up to 2.0
 -------------------------
