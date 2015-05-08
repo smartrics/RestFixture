@@ -37,6 +37,7 @@ public abstract class Variables {
 	/**
 	 * pattern matching a variable name: {@code \%([a-zA-Z0-9_]+)\%}
 	 */
+	public static Pattern SPECIAL_REGEX_CHARS = Pattern.compile("[{}()\\[\\].+*?^$\\\\|]");
 	public static final Pattern VARIABLES_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");
 	private static final String FIT_NULL_VALUE = fitSymbolForNull();
 	private String nullValue = "null";
@@ -106,7 +107,9 @@ public abstract class Variables {
 			String k = en.getKey();
 			String replacement = replacements.get(k);
 			if (replacement != null) {
-				newText = newText.replaceAll(k, replacement);
+				// this fixes issue #118
+				String sanitisedReplacement = SPECIAL_REGEX_CHARS.matcher(replacement).replaceAll("\\\\$0");;
+				newText = newText.replaceAll(k, sanitisedReplacement);
 			}
 		}
 		return newText;

@@ -45,13 +45,21 @@ public class VariablesTest {
 		assertEquals("val", v2.get("a"));
 	}
 
-	@Test
-	public void variablesAreSubstitutedWithCurrentValueWhenLabelsAreIdentifiedWithinPercentSymbol(){
-		Variables v1 = new FitVariables();
-		v1.put("ID", "100");
-		String newText = v1.substitute("the current value of ID is %ID%.");
-		assertEquals("the current value of ID is 100.", newText);
-	}
+    @Test
+    public void variablesAreSubstitutedWithCurrentValueWhenLabelsAreIdentifiedWithinPercentSymbol(){
+        Variables v1 = new FitVariables();
+        v1.put("ID", "100");
+        String newText = v1.substitute("the current value of ID is %ID%.");
+        assertEquals("the current value of ID is 100.", newText);
+    }
+
+    @Test
+    public void substitutingSymbolsContainingRegexSpecialCharsShouldWorkAsExpected_issue118(){
+        Variables v1 = new FitVariables();
+        v1.put("ID", "${ABC}");
+        String newText = v1.substitute("the current value of ID is %ID%.");
+        assertEquals("the current value of ID is ${ABC}.", newText);
+    }
 
 	@Test
 	public void variablesAreSubstitutedMultipleTimes(){
