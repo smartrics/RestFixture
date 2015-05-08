@@ -1,6 +1,8 @@
 RestFixture: A FitNesse fixture for testing REST services
 =========================================================
 
+Master branch build status: ![Build status](https://travis-ci.org/smartrics/RestFixture.svg?branch=master)
+
 The RestFixture is a FitNesse (http://fitnesse.org)  fixture that allows
 developers and/or product owners to write test fixtures for REST services
 with simplicity in mind. The idea is to write tests that are self
