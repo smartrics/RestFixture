@@ -29,7 +29,7 @@ import fitnesse.slim.StatementExecutorInterface;
  */
 public class SlimVariables extends Variables {
 
-	private final StatementExecutorInterface executor; // TODO use it!!!
+	private final StatementExecutorInterface executor;
 
 	/**
 	 * initialises the variables. reade
