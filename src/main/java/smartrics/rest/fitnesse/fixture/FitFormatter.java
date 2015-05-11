@@ -39,12 +39,14 @@ public class FitFormatter implements CellFormatter<Parse> {
     private ActionFixture fixture;
     private boolean displayActual;
     private int minLenForToggle = -1;
+    private boolean displayAbsoluteURLInFull;
 
     public FitFormatter() {
     }
-    
+
     /**
      * sets the action fixture delegate to forward formatting messages.
+     *
      * @param f
      */
     public void setActionFixtureDelegate(ActionFixture f) {
@@ -64,6 +66,11 @@ public class FitFormatter implements CellFormatter<Parse> {
     @Override
     public void setDisplayActual(boolean d) {
         this.displayActual = d;
+    }
+
+    @Override
+    public void setDisplayAbsoluteURLInFull(boolean displayAbsoluteURLInFull){
+        this.displayAbsoluteURLInFull = displayAbsoluteURLInFull;
     }
 
     @Override
@@ -111,7 +118,11 @@ public class FitFormatter implements CellFormatter<Parse> {
 
     @Override
     public void asLink(CellWrapper<Parse> cell, String link, String text) {
-        cell.body(Tools.toHtmlLink(link, text));
+        if(cell.text().startsWith("http") && displayAbsoluteURLInFull) {
+            cell.body(Tools.toHtmlLink(link, cell.text()));
+        } else {
+            cell.body(Tools.toHtmlLink(link, text));
+        }
     }
 
     @Override

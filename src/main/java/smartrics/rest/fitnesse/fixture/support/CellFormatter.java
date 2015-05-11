@@ -119,6 +119,13 @@ public interface CellFormatter<E> {
 	void setDisplayActual(boolean displayActual);
 
 	/**
+	 * sets whether absolute urls are displayed in full
+	 *
+	 * @param displayAbsoluteURLInFull
+	 */
+	void setDisplayAbsoluteURLInFull(boolean displayAbsoluteURLInFull);
+
+	/**
 	 * renders the cell as a toggle area if the content of the cell is over the
 	 * min value set here.
 	 * 
@@ -140,4 +147,5 @@ public interface CellFormatter<E> {
 	 * @return the cleaned text
 	 */
 	String fromRaw(String text);
+
 }

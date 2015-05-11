@@ -132,6 +132,15 @@ public class SlimFormatterTest {
     }
 
     @Test
+    public void shouldRenderLinksAsGreyedInAbsoluteFormat() {
+        SlimFormatter formatter = new SlimFormatter();
+        formatter.setDisplayAbsoluteURLInFull(true);
+        SlimCell c = new SlimCell("http://1234.5678");
+        formatter.asLink(c, "http://localhost", "text");
+        assertThat(c.body(), is(equalTo("report:<div><a href='http://localhost'>http://1234.5678</a></div>")));
+    }
+
+    @Test
     public void shouldRenderExceptionsAsSlimErrorCellWithStackTracesInCode() {
         SlimFormatter formatter = new SlimFormatter();
         Throwable t = new Throwable();

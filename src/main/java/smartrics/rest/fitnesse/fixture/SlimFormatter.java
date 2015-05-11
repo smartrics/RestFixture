@@ -38,6 +38,7 @@ public class SlimFormatter implements CellFormatter<String> {
 
     private int minLenForToggle = -1;
     private boolean displayActual;
+    private boolean displayAbsoluteURLInFull;
 
     public SlimFormatter() {
     }
@@ -46,6 +47,12 @@ public class SlimFormatter implements CellFormatter<String> {
     public void setDisplayActual(boolean d) {
         this.displayActual = d;
     }
+
+    @Override
+    public void setDisplayAbsoluteURLInFull(boolean displayAbsoluteURLInFull) {
+        this.displayAbsoluteURLInFull = displayAbsoluteURLInFull;
+    }
+
 
     @Override
     public void setMinLenghtForToggleCollapse(int minLen) {
@@ -114,7 +121,15 @@ public class SlimFormatter implements CellFormatter<String> {
 
     @Override
     public void asLink(CellWrapper<String> cell, String link, String text) {
-        cell.body("report:" + Tools.wrapInDiv(Tools.toHtmlLink(link, text)));
+        System.out.println("CELL: '" + cell.text() + "' == '" + text + "'");
+        String actualText = text;
+        if(displayAbsoluteURLInFull) {
+            String parsed = Tools.fromSimpleTag(cell.text());
+            if(parsed.startsWith("http")) {
+               actualText = parsed;
+            }
+        }
+        cell.body("report:" + Tools.wrapInDiv(Tools.toHtmlLink(link, actualText)));
     }
 
     @Override

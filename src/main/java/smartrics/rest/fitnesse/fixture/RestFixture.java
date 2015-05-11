@@ -125,6 +125,12 @@ import java.util.Vector;
  * expectation cell is displayed even when the expectation is met.</i></td>
  * </tr>
  * <tr>
+ * <tr>
+ * <td>restfixture.absolute.url.in.full</td>
+ * <td><i>boolean value. if true, absolute URLs in the fixture second column
+ * are rendered in their absolute format rather than relative.</i></td>
+ * </tr>
+ * <tr>
  * <td>restfixture.default.headers</td>
  * <td><i>comma separated list of key value pairs representing the default list
  * of headers to be passed for each request. key and values are separated by a
@@ -243,6 +249,8 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	private boolean displayActualOnRight;
 
+	private boolean displayAbsoluteURLInFull = false;
+
 	private boolean debugMethodCall = false;
 
 	/**
@@ -276,6 +284,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		super();
 		this.partsFactory = new PartsFactory(this);
 		this.displayActualOnRight = true;
+		this.displayAbsoluteURLInFull = false;
 		this.minLenForCollapseToggle = -1;
 		this.resourceUrisAreEscaped = false;
 	}
@@ -300,6 +309,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	 */
 	public RestFixture(String hostName, String configName) {
 		this.displayActualOnRight = true;
+		this.displayAbsoluteURLInFull = false;
 		this.minLenForCollapseToggle = -1;
 		this.partsFactory = new PartsFactory(this);
 		this.config = Config.getConfig(configName);
@@ -312,10 +322,10 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	 * @param hostName
 	 * @param configName
 	 */
-	public RestFixture(PartsFactory partsFactory, String hostName,
-			String configName) {
+	public RestFixture(PartsFactory partsFactory, String hostName, String configName) {
 		this.displayActualOnRight = true;
 		this.minLenForCollapseToggle = -1;
+		this.displayAbsoluteURLInFull = false;
 		this.partsFactory = partsFactory;
 		this.config = Config.getConfig(configName);
 		this.baseUrl = new Url(stripTag(hostName));
@@ -385,6 +395,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		initialize(Runner.SLIM);
 		List<List<String>> res = new Vector<List<String>>();
 		getFormatter().setDisplayActual(displayActualOnRight);
+		getFormatter().setDisplayAbsoluteURLInFull(displayAbsoluteURLInFull);
 		getFormatter().setMinLenghtForToggleCollapse(minLenForCollapseToggle);
 		for (List<String> r : rows) {
 			processSlimRow(res, r);
@@ -915,6 +926,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void doMethod(String body, String method) {
 		CellWrapper urlCell = row.getCell(1);
+
 		String url = deHtmlify(stripTag(urlCell.text()));
 		String resUrl = GLOBALS.substitute(url);
 		String rBody = GLOBALS.substitute(body);
@@ -935,8 +947,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		doMethod(method, resUrl, substitute(getHeaders()), rBody);
 	}
 
-	protected void doMethod(String method, String resUrl,
-			Map<String, String> headers, String rBody) {
+	protected void doMethod(String method, String resUrl, Map<String, String> headers, String rBody) {
 		setLastRequest(partsFactory.buildRestRequest());
 		getLastRequest().setMethod(RestRequest.Method.valueOf(method));
 		getLastRequest().addHeaders(headers);
@@ -1136,6 +1147,9 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 		displayActualOnRight = config.getAsBoolean(
 				"restfixture.display.actual.on.right", displayActualOnRight);
+
+		displayAbsoluteURLInFull = config.getAsBoolean(
+				"restfixture.absolute.url.in.full", displayAbsoluteURLInFull);
 
 		resourceUrisAreEscaped = config
 				.getAsBoolean("restfixture.resource.uris.are.escaped",
