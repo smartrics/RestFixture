@@ -121,14 +121,15 @@ public class SlimFormatter implements CellFormatter<String> {
 
     @Override
     public void asLink(CellWrapper<String> cell, String link, String text) {
-        System.out.println("CELL: '" + cell.text() + "' == '" + text + "'");
         String actualText = text;
+        String parsed = null;
         if(displayAbsoluteURLInFull) {
-            String parsed = Tools.fromSimpleTag(cell.text());
-            if(parsed.startsWith("http")) {
+            parsed = Tools.fromSimpleTag(cell.text());
+            if(parsed.trim().startsWith("http")) {
                actualText = parsed;
             }
         }
+        System.out.println("displayAbsoluteURLInFull: '" + displayAbsoluteURLInFull + "', cellText: '" + cell.text() + "', parsed: '" + parsed + "', actualText: '" + actualText + "'");
         cell.body("report:" + Tools.wrapInDiv(Tools.toHtmlLink(link, actualText)));
     }
 

@@ -121,13 +121,13 @@ import java.util.Vector;
  * </tr>
  * <tr>
  * <td>restfixture.display.actual.on.right</td>
- * <td><i>boolean value. if true, the actual value of the header or body in an
+ * <td><i>boolean value (default=true). if true, the actual value of the header or body in an
  * expectation cell is displayed even when the expectation is met.</i></td>
  * </tr>
  * <tr>
  * <tr>
- * <td>restfixture.absolute.url.in.full</td>
- * <td><i>boolean value. if true, absolute URLs in the fixture second column
+ * <td>restfixture.display.absolute.url.in.full</td>
+ * <td><i>boolean value (default=true). if true, absolute URLs in the fixture second column
  * are rendered in their absolute format rather than relative.</i></td>
  * </tr>
  * <tr>
@@ -247,9 +247,9 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	private Runner runner;
 
-	private boolean displayActualOnRight;
+	private boolean displayActualOnRight = true;
 
-	private boolean displayAbsoluteURLInFull = false;
+	private boolean displayAbsoluteURLInFull = true;
 
 	private boolean debugMethodCall = false;
 
@@ -271,7 +271,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	private String lastEvaluation;
 
-	private int minLenForCollapseToggle;
+	private int minLenForCollapseToggle = -1;
 
 	private boolean followRedirects = true;
 
@@ -283,10 +283,6 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	public RestFixture() {
 		super();
 		this.partsFactory = new PartsFactory(this);
-		this.displayActualOnRight = true;
-		this.displayAbsoluteURLInFull = false;
-		this.minLenForCollapseToggle = -1;
-		this.resourceUrisAreEscaped = false;
 	}
 
 	/**
@@ -308,9 +304,6 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	 *            the value of cell number 3 in first row of the fixture table.
 	 */
 	public RestFixture(String hostName, String configName) {
-		this.displayActualOnRight = true;
-		this.displayAbsoluteURLInFull = false;
-		this.minLenForCollapseToggle = -1;
 		this.partsFactory = new PartsFactory(this);
 		this.config = Config.getConfig(configName);
 		this.baseUrl = new Url(stripTag(hostName));
@@ -323,9 +316,6 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	 * @param configName
 	 */
 	public RestFixture(PartsFactory partsFactory, String hostName, String configName) {
-		this.displayActualOnRight = true;
-		this.minLenForCollapseToggle = -1;
-		this.displayAbsoluteURLInFull = false;
 		this.partsFactory = partsFactory;
 		this.config = Config.getConfig(configName);
 		this.baseUrl = new Url(stripTag(hostName));
@@ -1149,7 +1139,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 				"restfixture.display.actual.on.right", displayActualOnRight);
 
 		displayAbsoluteURLInFull = config.getAsBoolean(
-				"restfixture.absolute.url.in.full", displayAbsoluteURLInFull);
+				"restfixture.display.absolute.url.in.full", displayAbsoluteURLInFull);
 
 		resourceUrisAreEscaped = config
 				.getAsBoolean("restfixture.resource.uris.are.escaped",
