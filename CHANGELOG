@@ -1,6 +1,10 @@
+version 4.1
+ * Fixed issue #118 "Unable to set header using let variable containing text ${aaa.yyyy}"
+ * Implemented issue #120 "Render full URL for REST requests"
+
 version 4.0
  * Fixed issue #52 "Symbols are not stored in the SlimTestContext"
- * Fixed issue #112 "Bad URL constucted when embedded question marks"
+ * Fixed issue #112 "Bad URL constructed when embedded question marks"
 
 version 3.1
  * Fixed bugs and typos
