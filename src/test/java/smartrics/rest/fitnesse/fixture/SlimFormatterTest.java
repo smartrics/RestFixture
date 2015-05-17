@@ -127,7 +127,7 @@ public class SlimFormatterTest {
     public void shouldRenderLinksAsGreyed() {
         SlimFormatter formatter = new SlimFormatter();
         SlimCell c = new SlimCell("abc123");
-        formatter.asLink(c, "http://localhost", "text");
+        formatter.asLink(c, "http://localhost", "http://localhost", "text");
         assertThat(c.body(), is(equalTo("report:<div><a href='http://localhost'>text</a></div>")));
     }
 
@@ -136,7 +136,7 @@ public class SlimFormatterTest {
         SlimFormatter formatter = new SlimFormatter();
         formatter.setDisplayAbsoluteURLInFull(true);
         SlimCell c = new SlimCell("http://1234.5678");
-        formatter.asLink(c, "http://localhost", "text");
+        formatter.asLink(c, "http://1234.5678", "http://localhost", "text");
         assertThat(c.body(), is(equalTo("report:<div><a href='http://localhost'>http://1234.5678</a></div>")));
     }
 

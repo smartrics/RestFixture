@@ -33,7 +33,6 @@ import smartrics.rest.fitnesse.fixture.support.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -386,7 +385,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		List<List<String>> res = new Vector<List<String>>();
 		getFormatter().setDisplayActual(displayActualOnRight);
 		getFormatter().setDisplayAbsoluteURLInFull(displayAbsoluteURLInFull);
-		getFormatter().setMinLenghtForToggleCollapse(minLenForCollapseToggle);
+		getFormatter().setMinLengthForToggleCollapse(minLenForCollapseToggle);
 		for (List<String> r : rows) {
 			processSlimRow(res, r);
 		}
@@ -984,7 +983,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		String clientBaseUri = restClient.getBaseUrl();
 		String u = clientBaseUri + uri;
 		CellWrapper uriCell = row.getCell(1);
-		getFormatter().asLink(uriCell, u, uri);
+		getFormatter().asLink(uriCell, GLOBALS.substitute(uriCell.body()), u, uri);
 		CellWrapper cellStatusCode = row.getCell(2);
 		if (cellStatusCode == null) {
 			throw new IllegalStateException(

@@ -59,7 +59,7 @@ public class FitFormatter implements CellFormatter<Parse> {
     }
 
     @Override
-    public void setMinLenghtForToggleCollapse(int minLen) {
+    public void setMinLengthForToggleCollapse(int minLen) {
         this.minLenForToggle = minLen;
     }
 
@@ -117,12 +117,16 @@ public class FitFormatter implements CellFormatter<Parse> {
 	}
 
     @Override
-    public void asLink(CellWrapper<Parse> cell, String link, String text) {
-        if(cell.text().startsWith("http") && displayAbsoluteURLInFull) {
-            cell.body(Tools.toHtmlLink(link, cell.text()));
-        } else {
-            cell.body(Tools.toHtmlLink(link, text));
+    public void asLink(CellWrapper<Parse> cell, String resolvedUrl, String link, String text) {
+        String actualText = text;
+        String parsed = null;
+        if(displayAbsoluteURLInFull) {
+            parsed = Tools.fromSimpleTag(resolvedUrl);
+            if(parsed.trim().startsWith("http")) {
+                actualText = parsed;
+            }
         }
+        cell.body(Tools.toHtmlLink(link, actualText));
     }
 
     @Override

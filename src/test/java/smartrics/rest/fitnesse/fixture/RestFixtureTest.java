@@ -228,7 +228,7 @@ public class RestFixtureTest {
         RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "");
         fixture.processRow(row);
         verify(mockCellFormatter).exception(any(CellWrapper.class), eq("Execution of Get caused exception 'You must specify a body cell'"));
-        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq("/uri"), eq(BASE_URL + "/uri"), eq("/uri"));
         verify(mockCellFormatter).gray("200");
         verifyNoMoreInteractions(mockCellFormatter);
     }
@@ -240,7 +240,7 @@ public class RestFixtureTest {
         RowWrapper<?> row = helper.createTestRow("GET", "/uri", "");
         fixture.processRow(row);
         verify(mockCellFormatter).exception(any(CellWrapper.class), eq("Execution of Get caused exception 'You must specify a headers cell'"));
-        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq("/uri"), eq(BASE_URL + "/uri"), eq("/uri"));
         verify(mockCellFormatter).gray("200");
         verifyNoMoreInteractions(mockCellFormatter);
     }
@@ -252,7 +252,7 @@ public class RestFixtureTest {
         RowWrapper<?> row = helper.createTestRow("GET", "/uri");
         fixture.processRow(row);
         verify(mockCellFormatter).exception(any(CellWrapper.class), eq("Execution of Get caused exception 'You must specify a status code cell'"));
-        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq("/uri"), eq(BASE_URL + "/uri"), eq("/uri"));
         verifyNoMoreInteractions(mockCellFormatter);
     }
 
@@ -265,7 +265,8 @@ public class RestFixtureTest {
         lastResponse.setResource("/path/to/resource");
         lastResponse.addHeader("Header", "some/thing");
         lastResponse.setBody("<body />");
-        RowWrapper<?> row = helper.createTestRow("GET", "http://some.url/path/to/resource?a=b", "", "", "");
+        final String theUrl = "http://some.url/path/to/resource?a=b";
+        RowWrapper<?> row = helper.createTestRow("GET", theUrl, "", "", "");
 
         fixture.processRow(row);
 
@@ -281,7 +282,7 @@ public class RestFixtureTest {
         verify(mockRestClient).getBaseUrl();
         verify(mockRestClient).execute(mockLastRequest);
 
-        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq("http://some.url/path/to/resource?a=b"), eq("/path/to/resource?a=b"));
+        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(theUrl), eq(theUrl), eq("/path/to/resource?a=b"));
         verify(mockCellFormatter).gray("200");
         verify(mockCellFormatter).gray("Header : some/thing");
         verify(mockCellFormatter).gray("returned <body />");
@@ -320,7 +321,7 @@ public class RestFixtureTest {
         verify(mockRestClient).getBaseUrl();
         verify(mockRestClient).execute(mockLastRequest);
         // correctly formats the response
-        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri?a=b"), eq("/uri?a=b"));
+        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq("/uri?a=b"), eq(BASE_URL + "/uri?a=b"), eq("/uri?a=b"));
         verify(mockCellFormatter).gray("200");
         verify(mockCellFormatter).gray("Header : some/thing");
         verify(mockCellFormatter).gray("returned <body />");
@@ -365,7 +366,7 @@ public class RestFixtureTest {
         verify(mockRestClient).getBaseUrl();
         verify(mockRestClient).execute(mockLastRequest);
 
-        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq("/uri"), eq(BASE_URL + "/uri"), eq("/uri"));
         verify(mockCellFormatter).gray("202");
         verify(mockCellFormatter).right(isA(CellWrapper.class), eq(mockBodyTypeAdapter));
         verify(mockCellFormatter).gray("Content-Type : text/plain; charset=iso-8859-1\nTransfer-Encoding : chunked");
@@ -411,7 +412,7 @@ public class RestFixtureTest {
         verify(mockRestClient).getBaseUrl();
         verify(mockRestClient).execute(mockLastRequest);
         // correctly formats the response
-        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq(BASE_URL + "/uri?a=b"), eq("/uri?a=b"));
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("/uri?a=b"), eq(BASE_URL + "/uri?a=b"), eq("/uri?a=b"));
         // status code cell
         verify(mockCellFormatter).right(isA(CellWrapper.class), isA(StatusCodeTypeAdapter.class));
         verify(mockCellFormatter).right(isA(CellWrapper.class), isA(HeadersTypeAdapter.class));
@@ -457,7 +458,7 @@ public class RestFixtureTest {
         verify(mockRestClient).getBaseUrl();
         verify(mockRestClient).execute(mockLastRequest);
         // correctly formats the response
-        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq(BASE_URL + "/uri?a=b"), eq("/uri?a=b"));
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("/uri?a=b"), eq(BASE_URL + "/uri?a=b"), eq("/uri?a=b"));
         // status code cell
         verify(mockCellFormatter).wrong(isA(CellWrapper.class), isA(StatusCodeTypeAdapter.class));
         verify(mockCellFormatter).wrong(isA(CellWrapper.class), isA(HeadersTypeAdapter.class));
@@ -499,7 +500,7 @@ public class RestFixtureTest {
         verify(mockRestClient).getBaseUrl();
         verify(mockRestClient).execute(mockLastRequest);
         // correctly formats the response
-        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verify(mockCellFormatter).asLink(any(CellWrapper.class), eq("/uri"), eq(BASE_URL + "/uri"), eq("/uri"));
         verify(mockCellFormatter).gray("200");
         // matches no-body and format it with right - first arg should be
         // row.getCell(4) but mockito doesn't like it
@@ -591,7 +592,7 @@ public class RestFixtureTest {
 
         // correctly builds request
         verify(mockCellFormatter).right(isA(CellWrapper.class), eq(mockBodyTypeAdapter));
-        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("http://localhost:9090/uri"), eq("/uri"));
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("/uri"), eq("http://localhost:9090/uri"), eq("/uri"));
         verify(mockCellFormatter).gray("200");
         verify(mockCellFormatter).gray("Content-Type : application/xml");
 
@@ -634,7 +635,7 @@ public class RestFixtureTest {
         verify(mockBodyTypeAdapter).set(content);
         verify(mockBodyTypeAdapter).parse(regex);
         verify(mockBodyTypeAdapter).equals(regex, content);
-        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("/uri"), eq(BASE_URL + "/uri"), eq("/uri"));
         verify(mockCellFormatter).gray("200");
         verify(mockCellFormatter).gray("Content-Type : text/plain");
 
@@ -673,7 +674,7 @@ public class RestFixtureTest {
         verify(mockBodyTypeAdapter).set(content);
         verify(mockBodyTypeAdapter).parse(regex);
         verify(mockBodyTypeAdapter).equals(regex, content);
-        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq(BASE_URL + "/uri"), eq("/uri"));
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("/uri"), eq(BASE_URL + "/uri"), eq("/uri"));
         verify(mockCellFormatter).gray("200");
         verify(mockCellFormatter).gray("Content-Type : text/plain");
 
@@ -810,7 +811,7 @@ public class RestFixtureTest {
         row = helper.createTestRow("let", "content", "body:xml", "/", "");
         fixture.processRow(row);
 
-        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("http://localhost:9090/uri"), eq("/uri"));
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("/uri"), eq("http://localhost:9090/uri"), eq("/uri"));
         verify(mockCellFormatter).gray(eq("200"));
         verify(mockCellFormatter).gray(eq("/"));
         verify(mockCellFormatter).gray(eq(xmlString));
@@ -846,7 +847,7 @@ public class RestFixtureTest {
         row = helper.createTestRow("let", "age", "js", "response.jsonbody.person.age", "");
         fixture.processRow(row);
 
-        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("http://localhost:9090/uri"), eq("/uri"));
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("/uri"), eq("http://localhost:9090/uri"), eq("/uri"));
         verify(mockCellFormatter).gray(eq("200"));
         verify(mockCellFormatter).gray(eq("Content-Type : application/json"));
         verify(mockCellFormatter).gray(eq(jsonString));

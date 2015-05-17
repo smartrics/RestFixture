@@ -103,12 +103,14 @@ public interface CellFormatter<E> {
 	 * 
 	 * @param cell
 	 *            the cell.
+	 * @param resolvedUrl
+	 * 	          the cell content after symbols' substitution.
 	 * @param link
 	 *            the uri in the href.
 	 * @param text
 	 *            the text.
 	 */
-	void asLink(CellWrapper<E> cell, String link, String text);
+	void asLink(CellWrapper<E> cell, String resolvedUrl, String link, String text);
 
 	/**
 	 * sets whether the cell should display the actual value after evaluation.
@@ -132,7 +134,7 @@ public interface CellFormatter<E> {
 	 * @param minLen
 	 *            the min value of the content of a cell.
 	 */
-	void setMinLenghtForToggleCollapse(int minLen);
+	void setMinLengthForToggleCollapse(int minLen);
 
 	/**
 	 * @return true if actual values are rendered.

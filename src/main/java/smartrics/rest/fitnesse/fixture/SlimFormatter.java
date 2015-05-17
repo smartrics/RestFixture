@@ -55,7 +55,7 @@ public class SlimFormatter implements CellFormatter<String> {
 
 
     @Override
-    public void setMinLenghtForToggleCollapse(int minLen) {
+    public void setMinLengthForToggleCollapse(int minLen) {
         this.minLenForToggle = minLen;
     }
 
@@ -120,16 +120,16 @@ public class SlimFormatter implements CellFormatter<String> {
     }
 
     @Override
-    public void asLink(CellWrapper<String> cell, String link, String text) {
+    public void asLink(CellWrapper<String> cell, String resolvedUrl, String link, String text) {
         String actualText = text;
         String parsed = null;
         if(displayAbsoluteURLInFull) {
-            parsed = Tools.fromSimpleTag(cell.text());
+            parsed = Tools.fromSimpleTag(resolvedUrl);
             if(parsed.trim().startsWith("http")) {
                actualText = parsed;
             }
         }
-        System.out.println("displayAbsoluteURLInFull: '" + displayAbsoluteURLInFull + "', cellText: '" + cell.text() + "', parsed: '" + parsed + "', actualText: '" + actualText + "'");
+        System.out.println("displayAbsoluteURLInFull: '" + displayAbsoluteURLInFull + "', cellText: '" + cell.text() + "', resolvedUrl: '" + resolvedUrl + "', parsed: '" + parsed + "', actualText: '" + actualText + "'");
         cell.body("report:" + Tools.wrapInDiv(Tools.toHtmlLink(link, actualText)));
     }
 

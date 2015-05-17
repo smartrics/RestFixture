@@ -184,7 +184,7 @@ public class FitFormatterTest {
     @Test
     public void rendersTextAsHtmlLink() {
         FitCell cell = new FitCell(dummyParse);
-        formatter.asLink(cell, "http://localhost", "linked");
+        formatter.asLink(cell, "http://localhost", "http://localhost", "linked");
         assertThat(cell.body(), is(equalTo("<a href='http://localhost'>linked</a>")));
     }
 
