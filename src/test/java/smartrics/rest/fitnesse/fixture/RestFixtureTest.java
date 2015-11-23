@@ -122,7 +122,19 @@ public class RestFixtureTest {
         verify(row.getCell(1)).body("name is one");
         verify(mockCellFormatter).right(isA(CellWrapper.class), isA(StringTypeAdapter.class));
     }
-    
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void setBodyShouldNotRenderEncodedSymbols() {
+        Fixture.setSymbol("name", "one");
+        RowWrapper<?> row = helper.createTestRow("setBody", "this %name% is encoded %7B%22myvar%22%7D");
+        when(mockCellFormatter.fromRaw("this %name% is encoded %7B%22myvar%22%7D")).thenReturn("this %name% is encoded " +
+          "%7B%22myvar%22%7D");
+        fixture.processRow(row);
+        verify(row.getCell(1)).body("this one is encoded %7B%22myvar%22%7D");
+        verify(mockCellFormatter).right(isA(CellWrapper.class), isA(StringTypeAdapter.class));
+    }
+
     @Test
     public void mustSetConfigNameToDefaultWhenNotSpecifiedAsSecondOptionalParameter_SLIM() {
         fixture = new RestFixture(BASE_URL, "configName");

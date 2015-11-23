@@ -38,7 +38,10 @@ public abstract class Variables {
 	 * pattern matching a variable name: {@code \%([a-zA-Z0-9_]+)\%}
 	 */
 	public static Pattern SPECIAL_REGEX_CHARS = Pattern.compile("[{}()\\[\\].+*?^$\\\\|]");
-	public static final Pattern VARIABLES_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");
+	// exclude 0-9, A-F from the first variable name as those are confused with URL encodings.
+	public static final Pattern VARIABLES_PATTERN = Pattern.compile("\\%([a-zG-Z_][a-zA-Z0-9_]*)\\%");
+	// original regex pattern, allowing all initial characters.
+	//	public static final Pattern VARIABLES_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");
 	private static final String FIT_NULL_VALUE = fitSymbolForNull();
 	private String nullValue = "null";
 

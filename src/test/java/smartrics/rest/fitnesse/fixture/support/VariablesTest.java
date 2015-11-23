@@ -54,6 +54,17 @@ public class VariablesTest {
     }
 
     @Test
+    public void variablesAreSubstitutedWithCurrentValueWhenHexLabelsAreIdentifiedWithinPercentSymbol(){
+        Variables v1 = new FitVariables();
+        v1.put("AHexPrefix", "100");
+        v1.put("aNonHexPrefix", "200");
+        String hexText = v1.substitute("the current value of AHexPrefix is %AHexPrefix%.");
+        assertEquals("the current value of AHexPrefix is %AHexPrefix%.", hexText);
+        String nonHexText = v1.substitute("the current value of aNonHexPrefix is %aNonHexPrefix%.");
+        assertEquals("the current value of aNonHexPrefix is 200.", nonHexText);
+    }
+
+    @Test
     public void substitutingSymbolsContainingRegexSpecialCharsShouldWorkAsExpected_issue118(){
         Variables v1 = new FitVariables();
         v1.put("ID", "${ABC}");
