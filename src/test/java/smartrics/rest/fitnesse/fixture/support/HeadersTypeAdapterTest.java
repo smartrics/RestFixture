@@ -41,9 +41,11 @@ public class HeadersTypeAdapterTest {
 	private final Header h = new Header("n", "v");
 	private final Header h2 = new Header("n1", "v1");
 	private final Header h3 = new Header("n3", "v3");
-    private final Header h4 = new Header("n", "http://something:port/blah:blah");
+	private final Header h4 = new Header("n", "http://something:port/blah:blah");
+	private final Header h5 = new Header("n", "http://something:port/blah/1?blah=1");
     private final Collection<Header> expected = Arrays.asList(h, h2, h3);
-    private final Collection<Header> expectedWithColonsInValues = Arrays.asList(h4, h2);
+	private final Collection<Header> expectedWithColonsInValues = Arrays.asList(h4, h2);
+	private final Collection<Header> expectedWithQStringInValues = Arrays.asList(h5, h2);
     private final Header h5actual = new Header("content-type", "application/my-xml;charset=UTF-8");
     private final Header h5expected = new Header("content-type", "application/my-xml;.+");
     private final Collection<Header> expectedWithSemiColonsInValues = Arrays.asList(h5expected);
@@ -54,6 +56,7 @@ public class HeadersTypeAdapterTest {
 	private final String headersAsHtmlString = " n : v <br/> n1: v1 <br  /> n3 :v3 ";
 	private final String headersAsOutputString = "n : v" + ls + "n1 : v1" + ls + "n3 : v3";
 	private final String headersAsHtmlStringWithColonsInValue = " n : http://something:port/blah:blah <br/> n1: v1 ";
+	private final String headersAsHtmlStringContainingQString = " n : http://something:port/blah/1?blah=1 <br/> n1: v1 ";
 
 	@Test
 	public void shouldIdentifyContentObjectsWithNoBodyAsBeingEqual(){
@@ -84,15 +87,18 @@ public class HeadersTypeAdapterTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void shouldParseHeadersInHtmlFormatWithMultipleColonsAsProperListOfHeaders() {
-		try {
-			Collection<Header> result = (Collection<Header>) adapter
-					.parse(headersAsHtmlStringWithColonsInValue);
-			assertEquals(expectedWithColonsInValues, result);
-		} catch (Exception e) {
-			fail();
-		}
+	public void shouldParseHeadersInHtmlFormatWithMultipleColonsAsProperListOfHeaders() throws Exception {
+		Collection<Header> result = (Collection<Header>) adapter.parse(headersAsHtmlStringWithColonsInValue);
+		assertEquals(expectedWithColonsInValues, result);
 	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void shouldParseHeadersInHtmlFormatWithQuestionMarksAndEqualsInString_ISSUE_129() throws Exception {
+		Collection<Header> result = (Collection<Header>) adapter.parse(headersAsHtmlStringContainingQString);
+		assertEquals(expectedWithQStringInValues, result);
+	}
+
 	@Test(expected=IllegalArgumentException.class)
 	public void shouldNotifyClientOfBadHeaderSyntax(){
 		try {
