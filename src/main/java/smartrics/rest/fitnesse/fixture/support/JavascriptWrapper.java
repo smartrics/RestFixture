@@ -43,6 +43,7 @@ import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
  * 
  */
 public class JavascriptWrapper {
+	private static final long _64K = 65534;
 
 	/**
 	 * the name of the JS object containig the http response: {@code response}.
@@ -77,6 +78,7 @@ public class JavascriptWrapper {
 			return null;
 		}
 		Context context = Context.enter();
+		removeOptimisationForLargeExpressions(expression, context);
 		ScriptableObject scope = context.initStandardObjects();
 		injectFitNesseSymbolMap(scope);
 		injectResponse(context, scope, response);
@@ -307,4 +309,11 @@ public class JavascriptWrapper {
 		}
 
 	}
+
+	private void removeOptimisationForLargeExpressions(String expression, Context context) {
+		if(expression.getBytes().length > _64K) {
+			context.setOptimizationLevel(-1);
+		}
+	}
+
 }
