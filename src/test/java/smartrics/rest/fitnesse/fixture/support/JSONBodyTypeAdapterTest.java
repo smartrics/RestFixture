@@ -122,4 +122,9 @@ public class JSONBodyTypeAdapterTest {
     public void shouldConvertJSONToXML() {
         assertThat(adapter.toXmlString(json1), is(equalTo("<a> 1&amp;</a>")));
     }
+
+    @Test
+    public void returnsFalseWhenJsonbodyDoesntHaveAnArrayButExpressionDoesContainArray(){
+        assertFalse(adapter.equals(Arrays.asList("jsonbody.d instanceof Array && jsonbody.d[0]=='next'"), json0));
+    }
 }
