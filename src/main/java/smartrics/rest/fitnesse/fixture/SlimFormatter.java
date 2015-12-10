@@ -129,7 +129,6 @@ public class SlimFormatter implements CellFormatter<String> {
                actualText = parsed;
             }
         }
-        System.out.println("displayAbsoluteURLInFull: '" + displayAbsoluteURLInFull + "', cellText: '" + cell.text() + "', resolvedUrl: '" + resolvedUrl + "', parsed: '" + parsed + "', actualText: '" + actualText + "'");
         cell.body("report:" + Tools.wrapInDiv(Tools.toHtmlLink(link, actualText)));
     }
 
