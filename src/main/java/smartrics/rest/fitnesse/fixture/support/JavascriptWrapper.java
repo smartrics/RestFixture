@@ -36,11 +36,14 @@ import smartrics.rest.client.RestData.Header;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
+import java.io.InputStreamReader; // fix for #157 - easy json expectations
+import java.io.Reader;            // fix for #157 - easy json expectations
+
 /**
  * Wrapper class to all that related to JavaScript.
- * 
+ *
  * @author smartrics
- * 
+ *
  */
 public class JavascriptWrapper {
 	private static final long _64K = 65534;
@@ -57,16 +60,16 @@ public class JavascriptWrapper {
 	 * the name of the JS object containing the json body: {@code jsonbody}.
 	 */
 	public static final String JSON_OBJ_NAME = "jsonbody";
-	
+
 	private RunnerVariablesProvider variablesProvider;
 
 	public JavascriptWrapper(RunnerVariablesProvider variablesProvider) {
 		this.variablesProvider = variablesProvider;
 	}
-	
+
 	/**
 	 * evaluates a Javascript expression in the given {@link RestResponse}.
-	 * 
+	 *
 	 * @param response
 	 *            the {@link RestResponse}
 	 * @param expression
@@ -82,13 +85,14 @@ public class JavascriptWrapper {
 		ScriptableObject scope = context.initStandardObjects();
 		injectFitNesseSymbolMap(scope);
 		injectResponse(context, scope, response);
+		injectImports(context, scope); // fix for #157 - easy expectations
 		Object result = evaluateExpression(context, scope, expression);
 		return result;
 	}
 
 	/**
 	 * evaluates an expression on a given json object represented as string.
-	 * 
+	 *
 	 * @param json
 	 *            the json object.
 	 * @param expression
@@ -103,6 +107,7 @@ public class JavascriptWrapper {
 		ScriptableObject scope = context.initStandardObjects();
 		injectFitNesseSymbolMap(scope);
 		injectJson(context, scope, json);
+		injectImports(context, scope); // fix for #157 - easy json expectations
 		Object result = evaluateExpression(context, scope, expression);
 		return result;
 	}
@@ -119,6 +124,15 @@ public class JavascriptWrapper {
 		Variables v = variablesProvider.createRunnerVariables();
 		Object wrappedVariables = Context.javaToJS(v, scope);
 		ScriptableObject.putProperty(scope, SYMBOLS_OBJ_NAME, wrappedVariables);
+	}
+
+	private void injectImports(Context context,ScriptableObject scope) { // fix for #157 - easy json expectations
+		Reader libReader = new InputStreamReader(getClass().getResourceAsStream("/jsonpath-0.13.0.js"));
+		try {
+			context.evaluateReader(scope, libReader, "jsonpath-0.13.0.js", 1, null);
+		} catch (java.io.IOException e) {
+			throw new JavascriptException(e.getMessage());
+		}
 	}
 
 	private void injectJson(Context cx, ScriptableObject scope, String json) {
@@ -196,9 +210,9 @@ public class JavascriptWrapper {
 
 	/**
 	 * Wrapper class for Response to be embedded in the Rhino Context.
-	 * 
+	 *
 	 * @author smartrics
-	 * 
+	 *
 	 */
 	public static class JsResponse extends ScriptableObject {
 		private static final long serialVersionUID = 5441026774653915695L;
@@ -225,7 +239,7 @@ public class JavascriptWrapper {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param name
 		 * @param value
 		 */
@@ -239,7 +253,7 @@ public class JavascriptWrapper {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param name
 		 * @param value
 		 */
@@ -250,7 +264,7 @@ public class JavascriptWrapper {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param name
 		 * @return the headers list size
 		 */
@@ -263,7 +277,7 @@ public class JavascriptWrapper {
 		}
 
 		/**
-		 * 
+		 *
 		 * @return the total number of headers in the response.
 		 */
 		public int jsFunction_headersSize() {
