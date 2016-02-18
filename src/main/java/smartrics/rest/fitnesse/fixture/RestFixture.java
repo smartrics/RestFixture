@@ -346,6 +346,15 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		return null;
 	}
 
+	public void setBaseUri(String uri) {   //mqm  - it comes as a string in a scenario.
+		this.setBaseUrl(new Url(uri));
+	}
+
+	/**
+	 * sets the base url.
+	 *
+	 * @param url
+	 */
 	/**
 	 * sets the base url.
 	 *
