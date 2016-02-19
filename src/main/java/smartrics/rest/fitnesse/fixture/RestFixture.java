@@ -534,6 +534,15 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		}
 	}
 
+	// @sglebs - fixes #162. necessary to work with a scenario
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public String setBody(String body) {
+		requestBody = body;
+		if (GLOBALS != null)
+			requestBody = GLOBALS.substitute(body);
+		return requestBody;
+	}
+
 	/**
 	 * <code>| setHeader | http headers go here as nvp |</code>
 	 * <p/>
