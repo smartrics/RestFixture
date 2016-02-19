@@ -567,6 +567,20 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		}
 	}
 
+	// @sglebs - fixes #161. necessary to work with a scenario
+	public Map<String, String> setHeader(String headers) {
+		String substitutedHeaders = headers;
+		if (GLOBALS != null)
+			substitutedHeaders = GLOBALS.substitute(headers);
+		requestHeaders = parseHeaders(substitutedHeaders);
+		return requestHeaders;
+	}
+
+	// @sglebs - fixes #161. necessary to work with a scenario
+	public Map<String, String>  setHeaders(String headers) {
+		return setHeader(headers);
+	}
+
 	/**
 	 * Equivalent to setHeader - syntactic sugar to indicate that you can now.
 	 *
