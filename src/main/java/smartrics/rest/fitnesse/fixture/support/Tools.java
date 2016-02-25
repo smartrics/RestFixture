@@ -154,7 +154,7 @@ public final class Tools {
 		if (ch == null) {
 			ch = Charset.defaultCharset().name();
 		}
-		Document doc = toDocument(content, charset);
+		Document doc = toDocument(content, ch);
 		XPathExpression expr = toExpression(ns, xpathExpression);
 		try {
 			Object o = expr.evaluate(doc, returnType);
