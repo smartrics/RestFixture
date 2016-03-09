@@ -269,20 +269,18 @@ public class ToolsTest {
     public void basicChecksOnMakeCollapsableItemWhenHtml() {
         // not much of a test, I know, but guarantees minimal info on fitnesse
         // stylesheed/js
-        int id = "someContent".hashCode();
         String ret = Tools.makeToggleCollapseable("message", "someContent");
-        assertTrue(ret.indexOf("javascript:toggleCollapsable('" + id) > 0);
-        assertTrue(ret.indexOf("<div class='hidden' id='" + id) > 0);
+        assertTrue(ret.indexOf("collapsible") > 0);
+        assertTrue(ret.indexOf("message") > 0);
+        assertTrue(ret.indexOf("someContent") > 0);
     }
 
     @Test
     public void basicChecksOnMakeCollapsableItemWhenPlain() {
         // not much of a test, I know, but guarantees minimal info on fitnesse
         // stylesheed/js
-        int id = "someContent".hashCode();
         String ret = Tools.makeToggleCollapseable("message", "someContent");
         assertTrue("Ret not containing expected 'someContent': " + ret, ret.contains("someContent"));
-        assertTrue("Ret not containing expected '" + id + "': " + ret, ret.contains(Integer.toString(id)));
     }
 
     @Test

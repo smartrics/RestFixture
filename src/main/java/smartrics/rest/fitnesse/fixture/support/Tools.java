@@ -518,11 +518,11 @@ public final class Tools {
 		String id = Integer.toString(content.hashCode())
 				+ Long.toString(random.nextLong());
 		StringBuffer sb = new StringBuffer();
-		sb.append("<a href=\"javascript:toggleCollapsable('" + id + "');\">");
-		sb.append("<img src='/files/images/collapsableClosed.gif' class='left' id='img"
-				+ id + "'/>" + message + "</a>");
-		sb.append("<div class='hidden' id='" + id + "'>").append(content)
-				.append("</div>");
+		sb.append("<div class='collapsible closed'>");
+		sb.append("<ul><li><a href='#' class='expandall'>Expand</a></li><li><a href='#' class='collapseall'>Collapse</a></li></ul>");
+		sb.append("<p class='title'>").append(message).append("</p>");
+		sb.append("<div>").append(content).append("</div>");
+		sb.append("</div>");
 		return sb.toString();
 	}
 
