@@ -1,4 +1,4 @@
-/*  Copyright 2015 Fabrizio Cannizzo
+/*  Copyright 2008 Fabrizio Cannizzo
  *
  *  This file is part of RestFixture.
  *
@@ -33,7 +33,9 @@ import smartrics.rest.fitnesse.fixture.support.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -120,14 +122,8 @@ import java.util.Vector;
  * </tr>
  * <tr>
  * <td>restfixture.display.actual.on.right</td>
- * <td><i>boolean value (default=true). if true, the actual value of the header or body in an
+ * <td><i>boolean value. if true, the actual value of the header or body in an
  * expectation cell is displayed even when the expectation is met.</i></td>
- * </tr>
- * <tr>
- * <tr>
- * <td>restfixture.display.absolute.url.in.full</td>
- * <td><i>boolean value (default=true). if true, absolute URLs in the fixture second column
- * are rendered in their absolute format rather than relative.</i></td>
  * </tr>
  * <tr>
  * <td>restfixture.default.headers</td>
@@ -238,7 +234,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	protected boolean resourceUrisAreEscaped = false;
 
-	protected Map<String, String> requestHeaders;
+	protected Map<String, String> requestHeaders = new LinkedHashMap<String,String>();
 
 	private RestClient restClient;
 
@@ -246,9 +242,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	private Runner runner;
 
-	private boolean displayActualOnRight = true;
-
-	private boolean displayAbsoluteURLInFull = true;
+	private boolean displayActualOnRight;
 
 	private boolean debugMethodCall = false;
 
@@ -270,7 +264,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	private String lastEvaluation;
 
-	private int minLenForCollapseToggle = -1;
+	private int minLenForCollapseToggle;
 
 	private boolean followRedirects = true;
 
@@ -282,6 +276,9 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	public RestFixture() {
 		super();
 		this.partsFactory = new PartsFactory(this);
+		this.displayActualOnRight = true;
+		this.minLenForCollapseToggle = -1;
+		this.resourceUrisAreEscaped = false;
 	}
 
 	/**
@@ -303,6 +300,8 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	 *            the value of cell number 3 in first row of the fixture table.
 	 */
 	public RestFixture(String hostName, String configName) {
+		this.displayActualOnRight = true;
+		this.minLenForCollapseToggle = -1;
 		this.partsFactory = new PartsFactory(this);
 		this.config = Config.getConfig(configName);
 		this.baseUrl = new Url(stripTag(hostName));
@@ -314,7 +313,10 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	 * @param hostName
 	 * @param configName
 	 */
-	public RestFixture(PartsFactory partsFactory, String hostName, String configName) {
+	public RestFixture(PartsFactory partsFactory, String hostName,
+			String configName) {
+		this.displayActualOnRight = true;
+		this.minLenForCollapseToggle = -1;
 		this.partsFactory = partsFactory;
 		this.config = Config.getConfig(configName);
 		this.baseUrl = new Url(stripTag(hostName));
@@ -384,8 +386,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		initialize(Runner.SLIM);
 		List<List<String>> res = new Vector<List<String>>();
 		getFormatter().setDisplayActual(displayActualOnRight);
-		getFormatter().setDisplayAbsoluteURLInFull(displayAbsoluteURLInFull);
-		getFormatter().setMinLengthForToggleCollapse(minLenForCollapseToggle);
+		getFormatter().setMinLenghtForToggleCollapse(minLenForCollapseToggle);
 		for (List<String> r : rows) {
 			processSlimRow(res, r);
 		}
@@ -531,12 +532,12 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 			getFormatter().exception(row.getCell(0),
 					"You must pass a header map to set");
 		} else {
-			String substitutedHeaders = GLOBALS.substitute(cell.text());
-			requestHeaders = parseHeaders(substitutedHeaders);
+			String substitutedHeaders = GLOBALS.substitute(cell.text());		 
+			requestHeaders.putAll( parseHeaders(substitutedHeaders));
 			cell.body(getFormatter().gray(substitutedHeaders));
 		}
 	}
-
+  
 	/**
 	 * Equivalent to setHeader - syntactic sugar to indicate that you can now.
 	 *
@@ -915,11 +916,11 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void doMethod(String body, String method) {
 		CellWrapper urlCell = row.getCell(1);
-
 		String url = deHtmlify(stripTag(urlCell.text()));
 		String resUrl = GLOBALS.substitute(url);
 		String rBody = GLOBALS.substitute(body);
 		Map<String, String> rHeaders = substitute(getHeaders());
+		
 		try {
 			doMethod(method, resUrl, rHeaders, rBody);
 			completeHttpMethodExecution();
@@ -936,10 +937,11 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		doMethod(method, resUrl, substitute(getHeaders()), rBody);
 	}
 
-	protected void doMethod(String method, String resUrl, Map<String, String> headers, String rBody) {
+	protected void doMethod(String method, String resUrl,
+			Map<String, String> headers, String rBody) {
 		setLastRequest(partsFactory.buildRestRequest());
 		getLastRequest().setMethod(RestRequest.Method.valueOf(method));
-		getLastRequest().addHeaders(headers);
+		getLastRequest().addHeaders(headers);        
 		getLastRequest().setFollowRedirect(followRedirects);
 		getLastRequest().setResourceUriEscaped(resourceUrisAreEscaped);
 		if (fileName != null) {
@@ -983,7 +985,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		String clientBaseUri = restClient.getBaseUrl();
 		String u = clientBaseUri + uri;
 		CellWrapper uriCell = row.getCell(1);
-		getFormatter().asLink(uriCell, GLOBALS.substitute(uriCell.body()), u, uri);
+		getFormatter().asLink(uriCell, u, uri);
 		CellWrapper cellStatusCode = row.getCell(2);
 		if (cellStatusCode == null) {
 			throw new IllegalStateException(
@@ -1000,6 +1002,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		}
 		bodyCell.body(GLOBALS.substitute(bodyCell.body()));
 		BodyTypeAdapter bodyTypeAdapter = createBodyTypeAdapter();
+
 		process(bodyCell, getLastResponse().getBody(), bodyTypeAdapter);
 	}
 
@@ -1136,9 +1139,6 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 		displayActualOnRight = config.getAsBoolean(
 				"restfixture.display.actual.on.right", displayActualOnRight);
-
-		displayAbsoluteURLInFull = config.getAsBoolean(
-				"restfixture.display.absolute.url.in.full", displayAbsoluteURLInFull);
 
 		resourceUrisAreEscaped = config
 				.getAsBoolean("restfixture.resource.uris.are.escaped",
