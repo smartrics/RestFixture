@@ -190,6 +190,25 @@ public class RestFixtureTest {
     }
 
     @Test
+    public void mustAllowAddingMultipleHeaders() {
+        RowWrapper<?> row = helper.createTestRow("addHeader", "header1:one");
+        fixture.processRow(row);
+        row = helper.createTestRow("addHeader", "header2:two");
+        fixture.processRow(row);
+
+        assertEquals("one", fixture.getHeaders().get("header1"));
+        assertEquals("two", fixture.getHeaders().get("header2"));
+    }
+
+    @Test
+    public void mustAllowAddingHeaders() {
+        String header = "header1:one";
+        RowWrapper<?> row = helper.createTestRow("addHeader", header);
+        fixture.processRow(row);
+        assertEquals("one", fixture.getHeaders().get("header1"));
+    }
+
+    @Test
     public void mustExpandSymbolSetWithLetWhenSettingHeaders() {
         when(mockLastRequest.getQuery()).thenReturn("");
         when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
