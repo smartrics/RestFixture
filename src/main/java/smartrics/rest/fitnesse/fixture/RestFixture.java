@@ -371,7 +371,12 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		this.baseUrl = url;
 	}
 
-	/**
+    public void baseUrl(String url) {   //mqm  - it comes as a string in a scenario.
+        this.setBaseUrl(new Url(url));
+    }
+
+
+    /**
 	 * The default headers as defined in the config used to initialise this
 	 * fixture.
 	 *

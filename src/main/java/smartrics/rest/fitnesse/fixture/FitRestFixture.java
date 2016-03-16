@@ -67,8 +67,8 @@ public class FitRestFixture extends ActionFixture {
 		return restFixture.getBaseUrl();
 	}
 
-	public void setBaseUri(String uri) {   //mqm  - it comes as a string in a scenario.
-		this.setBaseUrl(new Url(uri));
+	public void baseUrl(String url) {   //mqm  - it comes as a string in a scenario.
+		this.setBaseUrl(new Url(url));
 	}
 
 	/**
