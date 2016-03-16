@@ -205,9 +205,12 @@ public final class Config {
 	 * @return a map representing the key value.
 	 */
 	public Map<String, String> getAsMap(String key, Map<String, String> def) {
+		Map<String, String> returnMap = new HashMap<String, String>(def);
 		String val = get(key);
 		try {
-			return Tools.convertStringToMap(val, "\n", "=", true);
+			Map<String, String> result = Tools.convertStringToMap(val, "=", "\n", true);
+			returnMap.putAll(result);
+			return returnMap;
 		} catch (RuntimeException e) {
 			return def;
 		}

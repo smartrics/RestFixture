@@ -36,4 +36,8 @@ public class JavascriptException extends RuntimeException {
     public JavascriptException(String message) {
         super(message);
     }
+
+    public JavascriptException(String message, Throwable t) {
+        super(message, t);
+    }
 }

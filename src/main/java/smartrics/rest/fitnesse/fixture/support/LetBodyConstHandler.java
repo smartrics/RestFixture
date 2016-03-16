@@ -33,8 +33,7 @@ public class LetBodyConstHandler implements LetHandler {
 
 	
 	@Override
-	public String handle(RunnerVariablesProvider variablesProvider,
-			RestResponse response, Object expressionContext, String expression) {
+	public String handle(RunnerVariablesProvider variablesProvider, Config cOnfig, RestResponse response, Object expressionContext, String expression) {
 		return expression;
 	}
 	

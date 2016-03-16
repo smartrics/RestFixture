@@ -50,7 +50,7 @@ public class PartsFactoryTest {
 			public Variables createRunnerVariables() {
 				return null;
 			}
-		});
+		}, c);
     }
 
     @Test

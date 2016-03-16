@@ -31,7 +31,7 @@ public class FitVariables extends Variables {
 
 	/**
 	 * initialises variables with default config. See @link
-	 * {@link #Variables(Config)}
+	 * {@link #FitVariables(Config)}
 	 */
 	public FitVariables() {
 		super();

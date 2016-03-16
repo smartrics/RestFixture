@@ -53,7 +53,7 @@ public class LetBodyJsHandlerTest {
     @Test
     public void shouldHandleExpressionsReturningNull() {
         LetBodyJsHandler h = new LetBodyJsHandler();
-        String r = h.handle(variablesProvider, new RestResponse(), null, "null");
+        String r = h.handle(variablesProvider, Config.getConfig(), new RestResponse(), null, "null");
         assertNull(r);
     }
 }

@@ -53,7 +53,7 @@ public class JSONBodyTypeAdapterTest {
 
     @Before
     public void setUp() {
-        adapter = new JSONBodyTypeAdapter(variablesProvider);
+        adapter = new JSONBodyTypeAdapter(variablesProvider, Config.getConfig());
         adapter.setContext(new HashMap<String, String>());
     }
 

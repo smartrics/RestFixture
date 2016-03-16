@@ -40,8 +40,7 @@ public class Url {
 	public Url(String url) {
 		try {
 			if (url == null || "".equals(url.trim())) {
-				throw new IllegalArgumentException("Null or empty input: "
-						+ url);
+				throw new IllegalArgumentException("Null or empty input: " + url);
 			}
 			String u = url;
 			if (url.endsWith("/")) {

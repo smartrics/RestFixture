@@ -36,16 +36,17 @@ import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 public class BodyTypeAdapterFactory {
 
 	private final RunnerVariablesProvider variablesProvider;
-	
-	private Map<ContentType, BodyTypeAdapterCreator> contentTypeToBodyTypeAdapter =
-		new HashMap<ContentType, BodyTypeAdapterCreator>();
+    private final Config config;
+
+    private Map<ContentType, BodyTypeAdapterCreator> contentTypeToBodyTypeAdapter = new HashMap<ContentType, BodyTypeAdapterCreator>();
     {
     	BodyTypeAdapterCreator jsonBodyTypeAdapterCreator = new BodyTypeAdapterCreator() {
 			@Override
 			public BodyTypeAdapter createBodyTypeAdapter() {
-				return new JSONBodyTypeAdapter(variablesProvider);
+				return new JSONBodyTypeAdapter(variablesProvider, config);
 			}
 		};
+
         contentTypeToBodyTypeAdapter.put(ContentType.JS, jsonBodyTypeAdapterCreator);
         contentTypeToBodyTypeAdapter.put(ContentType.JSON, jsonBodyTypeAdapterCreator);
         contentTypeToBodyTypeAdapter.put(ContentType.XML, new BodyTypeAdapterCreator() {
@@ -62,8 +63,9 @@ public class BodyTypeAdapterFactory {
         });;
     }
 
-	public BodyTypeAdapterFactory(final RunnerVariablesProvider variablesProvider) {
+	public BodyTypeAdapterFactory(final RunnerVariablesProvider variablesProvider, Config config) {
 		this.variablesProvider = variablesProvider;
+        this.config = config;
 	}
 	
     /**

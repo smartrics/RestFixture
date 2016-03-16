@@ -20,23 +20,30 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
+import org.slf4j.Logger;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Handles let expressions on XML content, returning XML string rather than the
  * string with the content within the tags.
- * 
+ *
  * @author smartrics
- * 
  */
 public class LetBodyJsHandler implements LetHandler {
 
+    private static final Logger LOG = getLogger(LetBodyJsHandler.class);
+
     @Override
-    public String handle(RunnerVariablesProvider variablesProvider,
-    		RestResponse response, Object expressionContext, String expression) {
+    public String handle(RunnerVariablesProvider variablesProvider, Config config, RestResponse response, Object expressionContext, String expression) {
         JavascriptWrapper js = new JavascriptWrapper(variablesProvider);
-        Object result = js.evaluateExpression(response, expression);
+        final Map<String, String> urlMap = config.getAsMap("restfixture.javascript.imports.map", new HashMap<String, String>());
+        Object result = js.evaluateExpression(response, expression, urlMap);
         if (result == null) {
             return null;
         }

@@ -20,26 +20,30 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import java.util.List;
-
 import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Type adapted for cells containing JSON content.
- * 
+ *
  * @author smartrics
- * 
  */
 public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
-    private boolean forceJsEvaluation = false;
+    private final Map<String, String> imports;
     private final JavascriptWrapper wrapper;
+    private boolean forceJsEvaluation = false;
 
     /**
      * def ctor
-     * @param variablesProvider 
+     *
+     * @param variablesProvider
      */
-    public JSONBodyTypeAdapter(RunnerVariablesProvider variablesProvider) {
-    	 wrapper = new JavascriptWrapper(variablesProvider);
+    public JSONBodyTypeAdapter(RunnerVariablesProvider variablesProvider, Config config) {
+        wrapper = new JavascriptWrapper(variablesProvider);
+        imports = config.getAsMap("restfixture.javascript.imports.map", new HashMap<String, String>());
     }
 
     @Override
@@ -48,7 +52,7 @@ public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
         if (!forceJsEvaluation && Tools.isValidXPath(getContext(), expr) && !wrapper.looksLikeAJsExpression(expr)) {
             throw new IllegalArgumentException("XPath expectations in JSON content are not supported anymore. Please use JavaScript expressions.");
         }
-        Object exprResult = wrapper.evaluateExpression(json, expr);
+        Object exprResult = wrapper.evaluateExpression(json, expr, imports);
         if (exprResult == null) {
             return false;
         }

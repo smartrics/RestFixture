@@ -38,8 +38,7 @@ import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 public class LetHeaderHandler implements LetHandler {
 
 	@Override
-	public String handle(RunnerVariablesProvider variablesProvider,
-			RestResponse response, Object expressionContext, String expression) {
+	public String handle(RunnerVariablesProvider variablesProvider, Config config, RestResponse response, Object expressionContext, String expression) {
         List<String> content = new ArrayList<String>();
         if (response != null) {
             for (Header e : response.getHeaders()) {

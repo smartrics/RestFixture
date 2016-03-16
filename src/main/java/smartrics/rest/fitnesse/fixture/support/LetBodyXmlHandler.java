@@ -37,8 +37,7 @@ import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 public class LetBodyXmlHandler implements LetHandler {
 
 	@Override
-	public String handle(RunnerVariablesProvider variablesProvider,
-			RestResponse response, Object expressionContext, String expression) {
+	public String handle(RunnerVariablesProvider variablesProvider, Config config, RestResponse response, Object expressionContext, String expression) {
         @SuppressWarnings("unchecked")
         Map<String, String> namespaceContext = (Map<String, String>) expressionContext;
         NodeList list = Tools.extractXPath(namespaceContext, expression, response.getBody());

@@ -46,8 +46,8 @@ public class PartsFactory {
 	
 	private final BodyTypeAdapterFactory bodyTypeAdapterFactory;
 	
-	public PartsFactory(final RunnerVariablesProvider variablesProvider) {
-		this.bodyTypeAdapterFactory = new BodyTypeAdapterFactory(variablesProvider);
+	public PartsFactory(final RunnerVariablesProvider variablesProvider, Config config) {
+		this.bodyTypeAdapterFactory = new BodyTypeAdapterFactory(variablesProvider, config);
 	}
 	
     /**

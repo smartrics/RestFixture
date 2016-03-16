@@ -34,7 +34,7 @@ public class BodyTypeAdapterFactoryTest {
 		public Variables createRunnerVariables() {
 			return null;
 		}
-	});
+	},  Config.getConfig());
     
     @Test
     public void jsonContentTypeReturnsJSONBodyTypeAdapter() {

@@ -31,6 +31,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class ConfigTest {
     private Config namedConfig;
@@ -118,6 +121,17 @@ public class ConfigTest {
         assertEquals(Long.valueOf(100), defaultNamedConfig.getAsLong("long", Long.valueOf(10)));
         assertEquals(Long.valueOf(10), defaultNamedConfig.getAsLong("long-not-there", Long.valueOf(10)));
         assertEquals(Long.valueOf(10), defaultNamedConfig.getAsLong("long-x", Long.valueOf(10)));
+    }
+
+    @Test
+    public void mustGetDataParsedAsMap() {
+        defaultNamedConfig.add("prop", "a=1\nb=2\n");
+        final HashMap<String, String> def = new HashMap<String, String>();
+        def.put("c", "3");
+        Map<String, String> res = defaultNamedConfig.getAsMap("prop", def);
+        assertThat(res.get("a"), is("1"));
+        assertThat(res.get("b"), is("2"));
+        assertThat(res.get("c"), is("3"));
     }
 
     @Test

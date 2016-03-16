@@ -42,7 +42,6 @@ public interface LetHandler {
 	 *            the expression
 	 * @return applies the expression to response within the given context.
 	 */
-	String handle(RunnerVariablesProvider variablesProvider,
-			RestResponse response, Object expressionContext, String expression);
+	String handle(RunnerVariablesProvider variablesProvider, Config config, RestResponse response, Object expressionContext, String expression);
 
 }

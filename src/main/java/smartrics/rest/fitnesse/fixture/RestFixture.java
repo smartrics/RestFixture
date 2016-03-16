@@ -156,7 +156,7 @@ import java.util.Vector;
  * </tr>
  * <tr>
  * <td>restfixture.content.handlers.map</td>
- * <td><i>a map of contenty type to type adapters, entries separated by \n, and
+ * <td><i>a map of content type to type adapters, entries separated by \n, and
  * kye-value separated by '='. Available type adapters are JS, TEXT, JSON, XML
  * (see {@link smartrics.rest.fitnesse.fixture.support.BodyTypeAdapterFactory}
  * ).</i></td>
@@ -170,6 +170,14 @@ import java.util.Vector;
  * that would result in rendering the string 'null' is replaced with the value
  * set for this config key. This value can also be the empty string to replace
  * null with empty.</i></td>
+ * </tr>
+ * <tr>
+ * <td>restfixture.javascript.imports.map</td>
+ * <td><i>a map of name to Url/File path. Each entry refers to a url/path to a javascript file that is imported in the
+ * JS context and available for evaluation. Files are checked for existence and access. If not available/not accessible,
+ * an exception is thrown. Urls are tried to be downloaded. A failure in accessing the content causes an error/exception.
+ * The map key is the name of the library - it can be a freeform string that appears in logs for debugging purposes.
+ * </i></td>
  * </tr>
  *
  * </table>
@@ -282,7 +290,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	 */
 	public RestFixture() {
 		super();
-		this.partsFactory = new PartsFactory(this);
+		this.partsFactory = new PartsFactory(this, Config.getConfig(Config.DEFAULT_CONFIG_NAME));
 		this.displayActualOnRight = true;
 		this.minLenForCollapseToggle = -1;
 		this.resourceUrisAreEscaped = false;
@@ -313,19 +321,20 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		this.minLenForCollapseToggle = -1;
 		this.resourceUrisAreEscaped = false;
 		this.displayAbsoluteURLInFull = true;
-		this.partsFactory = new PartsFactory(this);
 		this.config = Config.getConfig(configName);
+        this.partsFactory = new PartsFactory(this, config);
 		this.baseUrl = new Url(stripTag(hostName));
         this.requestHeaders = new LinkedHashMap<String,String>();
 	}
 
 	/**
+     * VisibleForTesting
 	 * @param partsFactory
 	 *            the factory of parts necessary to create the rest fixture
 	 * @param hostName
 	 * @param configName
 	 */
-	public RestFixture(PartsFactory partsFactory, String hostName, String configName) {
+    RestFixture(PartsFactory partsFactory, String hostName, String configName) {
 		this.displayActualOnRight = true;
 		this.minLenForCollapseToggle = -1;
 		this.resourceUrisAreEscaped = false;
@@ -809,7 +818,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 			if (letHandler != null) {
 				StringTypeAdapter adapter = new StringTypeAdapter();
 				try {
-					sValue = letHandler.handle(this, getLastResponse(), namespaceContext, expr);
+					sValue = letHandler.handle(this, config, getLastResponse(), namespaceContext, expr);
 					exprCell.body(getFormatter().gray(exprCell.body()));
 				} catch (RuntimeException e) {
 					getFormatter().exception(exprCell, e.getMessage());

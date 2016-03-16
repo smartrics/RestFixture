@@ -56,7 +56,7 @@ public class LetBodyHandlerTest {
     @Test
     public void shouldHandleExpressionsReturningNull() {
         LetBodyHandler h = new LetBodyHandler();
-        String r = h.handle(variablesProvider, new RestResponse(), null, "null");
+        String r = h.handle(variablesProvider, Config.getConfig(), new RestResponse(), null, "null");
         assertNull(r);
     }
 
@@ -66,7 +66,7 @@ public class LetBodyHandlerTest {
         RestResponse response = new RestResponse();
         response.addHeader("Content-Type", "application/json");
         response.setBody("{\"root\" : {\"accountRef\":\"http://something:8111\",\"label\":\"default\",\"websiteRef\":\"ws1\",\"dispersionRef\":\"http://localhost:8111\"} }");
-        String ret = h.handle(variablesProvider, response, null, "/root/dispersionRef/text()");
+        String ret = h.handle(variablesProvider, Config.getConfig(), response, null, "/root/dispersionRef/text()");
         assertThat(ret, is(equalTo("http://localhost:8111")));
     }
 }
