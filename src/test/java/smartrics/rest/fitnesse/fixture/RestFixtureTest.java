@@ -1149,8 +1149,7 @@ public class RestFixtureTest {
 
     @Test
     public void setsRequestBodyExplicitly() {
-        String uri = "http://localhost:9090";
-        RestFixture f = new RestFixture(uri);
+        RestFixture f = new RestFixture("http://localhost:9090");
         f.setBody("<body />");
         assertThat(f.getRequestBody(), is("<body />"));
     }
@@ -1162,4 +1161,30 @@ public class RestFixtureTest {
         fixture.setBody("<%foo% />");
         assertThat(fixture.getRequestBody(), is("<bar />"));
     }
+
+    @Test
+    public void addHeaderExplicitly() {
+        Map<String, String> map = fixture.addHeader("header1:one");
+        fixture.addHeader("header2:two");
+        assertThat(map.get("header1"), is("one"));
+        assertThat(map.get("header2"), is("two"));
+    }
+
+    @Test
+    public void addHeaderExplicitlyWithSubstitutions() {
+        RowWrapper<?> row = helper.createTestRow("let", "foo", "const", "bar", "");
+        fixture.processRow(row);
+        Map<String, String> map = fixture.addHeader("header1:%foo%");
+        assertThat(map.get("header1"), is("bar"));
+    }
+
+    @Test
+    public void setHeaderExplicitly() {
+        fixture.setHeader("header1:one");
+        Map<String, String> map = fixture.setHeader("header1:two");
+        assertThat(map.get("header1"), is("two"));
+    }
+
+
+
 }
