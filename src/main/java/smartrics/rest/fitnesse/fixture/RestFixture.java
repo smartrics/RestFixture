@@ -362,6 +362,15 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		return null;
 	}
 
+	public void setBaseUri(String uri) {   //mqm  - it comes as a string in a scenario.
+		this.setBaseUrl(new Url(uri));
+	}
+
+	/**
+	 * sets the base url.
+	 *
+	 * @param url
+	 */
 	/**
 	 * sets the base url.
 	 *
@@ -565,6 +574,20 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 			requestHeaders.putAll(parseHeaders(substitutedHeaders));
 			cell.body(getFormatter().gray(substitutedHeaders));
 		}
+	}
+
+	// @sglebs - fixes #161. necessary to work with a scenario
+	public Map<String, String> setHeader(String headers) {
+		String substitutedHeaders = headers;
+		if (GLOBALS != null)
+			substitutedHeaders = GLOBALS.substitute(headers);
+		requestHeaders = parseHeaders(substitutedHeaders);
+		return requestHeaders;
+	}
+
+	// @sglebs - fixes #161. necessary to work with a scenario
+	public Map<String, String>  setHeaders(String headers) {
+		return setHeader(headers);
 	}
 
 	/**
