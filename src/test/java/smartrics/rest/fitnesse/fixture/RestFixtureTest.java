@@ -1185,6 +1185,10 @@ public class RestFixtureTest {
         assertThat(map.get("header1"), is("two"));
     }
 
-
+    @Test
+    public void setBaseUrlExplicitly() {
+        fixture.baseUrl("http://localhost:1234");
+        assertThat(fixture.getBaseUrl().toString(), is("http://localhost:1234"));
+    }
 
 }
