@@ -1147,4 +1147,19 @@ public class RestFixtureTest {
         }
     }
 
+    @Test
+    public void setsRequestBodyExplicitly() {
+        String uri = "http://localhost:9090";
+        RestFixture f = new RestFixture(uri);
+        f.setBody("<body />");
+        assertThat(f.getRequestBody(), is("<body />"));
+    }
+
+    @Test
+    public void setsRequestBodyExplicitlyWithSubstitutions() {
+        RowWrapper<?> row = helper.createTestRow("let", "foo", "const", "bar", "");
+        fixture.processRow(row);
+        fixture.setBody("<%foo% />");
+        assertThat(fixture.getRequestBody(), is("<bar />"));
+    }
 }
