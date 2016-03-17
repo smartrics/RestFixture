@@ -131,6 +131,7 @@ public enum ContentType {
 	/**
 	 * resets the internal cache to default values.
 	 * <table border="1">
+	 * <caption>default mappings</caption>
 	 * <tr>
 	 * <td>{@code default}</td>
 	 * <td>{@link ContentType#XML}</td>
@@ -164,7 +165,7 @@ public enum ContentType {
 
 	/**
 	 * parses a string to a content type.
-	 * @param contentTypeString
+	 * @param contentTypeString the content type
 	 * @return the {@link ContentType}.
 	 */
 	public static ContentType parse(String contentTypeString) {

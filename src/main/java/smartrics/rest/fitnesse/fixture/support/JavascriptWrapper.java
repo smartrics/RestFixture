@@ -129,18 +129,14 @@ public class JavascriptWrapper {
     private Object evaluateExpression(Context context, ScriptableObject scope,
                                       String expression) {
         try {
-            Object result = context.evaluateString(scope, expression, null, 1,
+            return context.evaluateString(scope, expression, null, 1,
                     null);
-            return result;
-        } catch (EvaluatorException e) {
-            throw new JavascriptException(e.getMessage());
-        } catch (EcmaError e) {
+        } catch (EvaluatorException | EcmaError e) {
             throw new JavascriptException(e.getMessage());
         }
     }
 
-    private void injectResponse(Context cx, ScriptableObject scope,
-                                RestResponse r) {
+    private void injectResponse(Context cx, ScriptableObject scope, RestResponse r) {
         try {
             ScriptableObject.defineClass(scope, JsResponse.class);
             Scriptable response = null;
@@ -256,8 +252,8 @@ public class JavascriptWrapper {
         }
 
         /**
-         * @param name
-         * @param value
+         * @param name the header name
+         * @param value the value
          */
         public void jsFunction_addHeader(String name, String value) {
             List<String> vals = headers.get(name);
@@ -269,8 +265,8 @@ public class JavascriptWrapper {
         }
 
         /**
-         * @param name
-         * @param value
+         * @param name the header name
+         * @param value the value
          */
         public void jsFunction_putHeader(String name, String value) {
             List<String> vals = new ArrayList<String>();
@@ -279,7 +275,7 @@ public class JavascriptWrapper {
         }
 
         /**
-         * @param name
+         * @param name the header name
          * @return the headers list size
          */
         public int jsFunction_headerListSize(String name) {
@@ -302,7 +298,7 @@ public class JavascriptWrapper {
         }
 
         /**
-         * @param name
+         * @param name the header name
          * @return the value of the header name in position 0
          */
         public String jsFunction_header0(String name) {
@@ -310,7 +306,7 @@ public class JavascriptWrapper {
         }
 
         /**
-         * @param name
+         * @param name the header name
          * @return all headers with the given name
          */
         public List<String> jsFunction_headers(String name) {
@@ -323,8 +319,8 @@ public class JavascriptWrapper {
         }
 
         /**
-         * @param name
-         * @param pos
+         * @param name the header name
+         * @param pos the pos
          * @return the value of the header with name at pos 0
          */
         public String jsFunction_header(String name, int pos) {

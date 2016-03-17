@@ -26,8 +26,8 @@ import java.util.Map;
 /**
  * Builds strategies to handle LET body.
  * 
- * Supported strategies:
  * <table>
+ * <caption>Supported strategies</caption>
  * <tr>
  * <td>{@code header}</td><td>applies the expression to the response headers</td>
  * </tr>
@@ -64,7 +64,7 @@ public class LetHandlerFactory {
     }
 
     /**
-     * @param part
+     * @param part the part to consider in the let expression
      * @return the handler for the given strategy. null if not found.
      */
     public static LetHandler getHandlerFor(String part) {

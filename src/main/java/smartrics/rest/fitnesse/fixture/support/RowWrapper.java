@@ -25,12 +25,12 @@ package smartrics.rest.fitnesse.fixture.support;
  * 
  * @author smartrics
  * 
- * @param <E>
+ * @param <E> the type of the row cells
  */
 public interface RowWrapper<E> {
 
 	/**
-	 * @param c
+	 * @param c the cell index
 	 * @return the {@link CellWrapper} at a given position
 	 */
 	CellWrapper<E> getCell(int c);
@@ -42,8 +42,8 @@ public interface RowWrapper<E> {
 
 	/**
 	 * removes a cell at a given position.
-	 * 
-	 * @param c
+	 *
+	 * @param c the cell index
 	 * @return the removed cell.
 	 */
 	CellWrapper<E> removeCell(int c);

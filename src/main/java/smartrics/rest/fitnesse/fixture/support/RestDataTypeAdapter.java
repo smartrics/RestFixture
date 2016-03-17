@@ -69,7 +69,7 @@ public abstract class RestDataTypeAdapter extends TypeAdapter implements fitness
     /**
      * Used to pass some form of context to the adapter.
      * 
-     * @param c
+     * @param c the context
      */
     public void setContext(Map<String, String> c) {
         this.context = c;

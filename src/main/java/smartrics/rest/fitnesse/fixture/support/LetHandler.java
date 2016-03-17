@@ -25,23 +25,19 @@ import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
 /**
  * Strategy to handle LET expressions.
- * 
+ *
  * @author smartrics
- * 
  */
 public interface LetHandler {
 
-	/**
-	 * 
-	 * @param variablesProvider 
-	 * @param response
-	 *            the http response
-	 * @param expressionContext
-	 *            the json expression context
-	 * @param expression
-	 *            the expression
-	 * @return applies the expression to response within the given context.
-	 */
-	String handle(RunnerVariablesProvider variablesProvider, Config config, RestResponse response, Object expressionContext, String expression);
+    /**
+     * @param variablesProvider the variables provider for substitutions
+     * @param config            the config
+     * @param response          the http response
+     * @param expressionContext the json expression context
+     * @param expression        the expression
+     * @return applies the expression to response within the given context.
+     */
+    String handle(RunnerVariablesProvider variablesProvider, Config config, RestResponse response, Object expressionContext, String expression);
 
 }

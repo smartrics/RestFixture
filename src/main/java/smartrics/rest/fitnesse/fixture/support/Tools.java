@@ -75,10 +75,10 @@ public final class Tools {
     }
 
     /**
-     * @param ns
-     * @param xpathExpression
-     * @param content
-     * @param encoding
+     * @param ns the namespaces map
+     * @param xpathExpression the xpath
+     * @param content the content
+     * @param encoding the charset
      * @return the list of nodes matching the supplied XPath.
      */
     public static NodeList extractXPath(Map<String, String> ns,
@@ -88,9 +88,9 @@ public final class Tools {
     }
 
     /**
-     * @param xpathExpression
-     * @param content
-     * @param returnType
+     * @param xpathExpression the xpath
+     * @param content the content
+     * @param returnType the result type
      * @return the list of nodes matching the supplied XPath.
      */
     public static Object extractXPath(String xpathExpression, String content,
@@ -99,25 +99,25 @@ public final class Tools {
     }
 
     /**
-     * @param xpathExpression
-     * @param content
-     * @param returnType
-     * @param encoding
+     * @param xpathExpression the xpath
+     * @param content the content
+     * @param returnType the result type
+     * @param encoding the encoding/charset
      * @return the list of nodes mathching the supplied XPath.
      */
     public static Object extractXPath(String xpathExpression, String content,
                                       QName returnType, String encoding) {
         // Use the java Xpath API to return a NodeList to the caller so they can
         // iterate through
-        return extractXPath(new HashMap<String, String>(), xpathExpression,
+        return extractXPath(new HashMap<>(), xpathExpression,
                 content, returnType, encoding);
     }
 
     /**
-     * @param ns
-     * @param xpathExpression
-     * @param content
-     * @param returnType
+     * @param ns              the namespaces map
+     * @param xpathExpression the XPath expression
+     * @param content         the content
+     * @param returnType      the return type
      * @return the list of nodes mathching the supplied XPath.
      */
     public static Object extractXPath(Map<String, String> ns,
@@ -130,18 +130,18 @@ public final class Tools {
      * input using one of the {@link XPathConstants}. See also
      * {@link XPathExpression#evaluate(Object item, QName returnType)} ;
      *
-     * @param ns
-     * @param xpathExpression
-     * @param content
-     * @param returnType
-     * @param charset
+     * @param ns              the namespaces map
+     * @param xpathExpression the XPath expression
+     * @param content         the content
+     * @param returnType      the return type
+     * @param charset         the charset
      * @return the result
      */
     public static Object extractXPath(Map<String, String> ns,
                                       String xpathExpression, String content, QName returnType,
                                       String charset) {
         if (null == ns) {
-            ns = new HashMap<String, String>();
+            ns = new HashMap<>();
         }
         String ch = charset;
         if (ch == null) {
@@ -159,8 +159,10 @@ public final class Tools {
     }
 
     /**
-     * @param result
-     * @return the serialised as xml result of an xpath expression evaluation
+     * If the result is neither a {@link NodeList} or a {@link Node} it will simply return the #toString().
+     *
+     * @param result the result of an XPath expression (a {@link NodeList} or a {@link Node}).
+     * @return the serialised as xml result of an xpath expression evaluation.
      */
     public static String xPathResultToXmlString(Object result) {
         if (result == null) {
@@ -189,8 +191,8 @@ public final class Tools {
     }
 
     /**
-     * @param ns
-     * @param xpathExpression
+     * @param ns the namespaces map
+     * @param xpathExpression the XPath
      * @return true if the expression is valid
      */
     public static boolean isValidXPath(Map<String, String> ns,
@@ -204,8 +206,8 @@ public final class Tools {
     }
 
     /**
-     * @param ns
-     * @param xpathExpression
+     * @param ns the namespaces map
+     * @param xpathExpression the XPath
      * @return the parsed string as {@link XPathExpression}
      */
     public static XPathExpression toExpression(Map<String, String> ns,
@@ -409,7 +411,7 @@ public final class Tools {
      * @param name  the name
      * @param value the value
      * @param nvSep the separator
-     * @return the kvp as a string <code>&lt;name>&lt;sep>&lt;value></code>.
+     * @return the kvp as a string <code>&lt;name&gt;&lt;sep&gt;&lt;value&gt;</code>.
      */
     public static String convertEntryToString(String name, String value, String nvSep) {
         return String.format("%s%s%s", name, nvSep, value);
@@ -501,13 +503,28 @@ public final class Tools {
     }
 
     /**
-     * Substitutions:
      * <table border="1">
-     * <tr><td><code>&lt;pre></code> and <code>&lt;/pre></code></td><td><code>""</code></td></tr>
-     * <tr><td><code>&lt;</code></td><td><code>&amp;lt;</code></td></tr>
-     * <tr><td><code>\n</code></td><td><code>&lt;br /></code></td></tr>
-     * <tr><td><code>&nbsp;</code> <i>(space)</i></td><td><code>&amp;nbsp;</code></td></tr>
-     * <tr><td><code>-----</code> <i>(5 hyphens)</i></td><td><code>&lt;hr /></code></td></tr>
+     * <caption>Substitutions</caption>
+     * <tr>
+     * <td><code>&lt;pre&gt;</code> and <code>&lt;/pre&gt;</code></td>
+     * <td><code>""</code></td>
+     * </tr>
+     * <tr>
+     * <td><code>&lt;</code></td>
+     * <td><code>&amp;lt;</code></td>
+     * </tr>
+     * <tr>
+     * <td><code>\n</code></td>
+     * <td><code>&lt;br /&gt;</code></td>
+     * </tr>
+     * <tr>
+     * <td><code>&nbsp;</code> <i>(space)</i></td>
+     * <td><code>&amp;nbsp;</code></td>
+     * </tr>
+     * <tr>
+     * <td><code>-----</code> <i>(5 hyphens)</i></td>
+     * <td><code>&lt;hr /&gt;</code></td>
+     * </tr>
      * </table>
      *
      * @param text some text.
@@ -522,7 +539,7 @@ public final class Tools {
 
     /**
      * @param c some text
-     * @return the text within <code>&lt;code></code> tags.
+     * @return the text within <code>&lt;code&gt;</code> tags.
      */
     public static String toCode(String c) {
         return "<code>" + c + "</code>";

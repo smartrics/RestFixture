@@ -29,19 +29,20 @@ import java.util.List;
 
 /**
  * A simple fixture to store configuration data for the rest fixture.
- * 
+ * <p>
  * A configuration is a named map that stores key/value pairs. The name of the
  * map is passed as an optional parameter to the fixture. If not passed it's
  * assumed that a default name is used. The default value of the map name is
  * {@link Config#DEFAULT_CONFIG_NAME}.
- * 
+ * <p>
  * The structure of the table of this fixture simply a table that reports
  * key/values. The name of the config is optionally passed to the fixture.
- * 
+ * <p>
  * Example:
- * 
+ * <p>
  * Uses the default config name:
  * <table border="1">
+ * <caption>example</caption>
  * <tr>
  * <td colspan="2">smartrics.rest.fitnesse.fixture.RestFixtureConfig</td>
  * </tr>
@@ -58,9 +59,10 @@ import java.util.List;
  * <td>...</td>
  * </tr>
  * </table>
- * <p/>
+ * <p>
  * Uses the config name <i>confname</i>:
  * <table border="1">
+ * <caption>example</caption>
  * <tr>
  * <td>smartrics.rest.fitnesse.fixture.RestFixtureConfig</td>
  * <td>confname</td>
@@ -78,10 +80,11 @@ import java.util.List;
  * <td>...</td>
  * </tr>
  * </table>
- * <p/>
+ * <p>
  * {@link RestFixture} accesses the config passed by name as second parameter to
  * the fixture or the default if no name is passed:
  * <table border="1">
+ * <caption>example</caption>
  * <tr>
  * <td>smartrics.rest.fitnesse.fixture.RestFixture</td>
  * <td>http://localhost:7070</td>
@@ -90,10 +93,11 @@ import java.util.List;
  * <td colspan="2">...</td>
  * </tr>
  * </table>
- * 
+ *
  * or
- * 
+ *
  * <table border="1">
+ * <caption>example</caption>
  * <tr>
  * <td >smartrics.rest.fitnesse.fixture.RestFixture</td>
  * <td>http://localhost:7070</td>
@@ -121,7 +125,7 @@ public class RestFixtureConfig extends Fixture {
 	 * Constructor with args. Arguments are extracted from the first row of the
 	 * fixture.
 	 * 
-	 * @param args
+	 * @param args the fixture args
 	 */
 	public RestFixtureConfig(String... args) {
 		super.args = args;
@@ -130,7 +134,7 @@ public class RestFixtureConfig extends Fixture {
 	/**
 	 * Support for Slim runner.
 	 * 
-	 * @param rows
+	 * @param rows the rows
 	 * @return the content as a list (of rows) of lists of strings (the cells).
 	 */
 	public List<List<String>> doTable(List<List<String>> rows) {

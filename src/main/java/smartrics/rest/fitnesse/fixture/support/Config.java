@@ -194,7 +194,7 @@ public final class Config {
 	}
 
 	/**
-	 * returns a key/value from a named config, parsed as a Map<String, String>.
+	 * returns a key/value from a named config, parsed as a <code>Map&lt;String, String&gt;</code>.
 	 * Each line (separated by \n) in the value is parsed as {@code name=value}
 	 * and stored in the returned map.
 	 * 

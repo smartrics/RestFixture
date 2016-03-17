@@ -47,7 +47,7 @@ public class FitFormatter implements CellFormatter<Parse> {
     /**
      * sets the action fixture delegate to forward formatting messages.
      *
-     * @param f
+     * @param f the fixture
      */
     public void setActionFixtureDelegate(ActionFixture f) {
         this.fixture = f;

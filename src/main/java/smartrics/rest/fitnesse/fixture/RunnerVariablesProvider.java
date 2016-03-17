@@ -29,9 +29,11 @@ import smartrics.rest.fitnesse.fixture.support.Variables;
  */
 public interface RunnerVariablesProvider {
 
-	/**
-	 * Get a variable store linked to the current runner environment.
-	 */
-	Variables createRunnerVariables();
+    /**
+     * Get a variable store linked to the current runner environment.
+     *
+     * @return the variables
+     */
+    Variables createRunnerVariables();
 
 }

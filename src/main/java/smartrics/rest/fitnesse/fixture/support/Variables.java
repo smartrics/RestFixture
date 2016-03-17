@@ -58,7 +58,7 @@ public abstract class Variables {
 	 * {@code restfixture.null.value.representation} to know how to render
 	 * {@code null}s.
 	 * 
-	 * @param c
+	 * @param c the config
 	 */
 	Variables(Config c) {
 		if (c != null) {
@@ -69,22 +69,22 @@ public abstract class Variables {
 	/**
 	 * puts a value.
 	 * 
-	 * @param label
-	 * @param val
+	 * @param label the symbol
+	 * @param val the value
 	 */
 	abstract public void put(String label, String val);
 
 	/**
 	 * gets a value.
-	 * 
-	 * @param label
+	 *
+	 * @param label the symbol
 	 * @return the value.
 	 */
 	abstract public String get(String label);
 
 	/**
 	 * replaces a text with variable values.
-	 * @param text
+	 * @param text the text to process
 	 * @return the substituted text.
 	 */
 	public final String substitute(String text) {
@@ -125,7 +125,7 @@ public abstract class Variables {
 	}
 
 	/**
-	 * @param s
+	 * @param s the string to process
 	 * @return the null representation if the input is null.
 	 */
 	public final String replaceNull(String s) {

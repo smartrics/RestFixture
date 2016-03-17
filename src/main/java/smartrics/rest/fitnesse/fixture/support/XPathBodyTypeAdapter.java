@@ -20,12 +20,11 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathConstants;
-
-import org.w3c.dom.NodeList;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Type adapter for body cells with XML content.
@@ -97,12 +96,12 @@ public class XPathBodyTypeAdapter extends BodyTypeAdapter {
 
 	/**
 	 * Parses the expected body in the current test.
-	 * 
+	 * <p>
 	 * A body is a String containing XPaths one for each new line. Empty body
 	 * would result in an empty {@code List<String>}. A body containing the
 	 * value {@code no-body} is especially treated separately.
-	 * 
-	 * @param expectedListOfXpathsAsString
+	 *
+	 * @param expectedListOfXpathsAsString expected list of xpaths as string
 	 */
 	@Override
 	public Object parse(String expectedListOfXpathsAsString) throws Exception {

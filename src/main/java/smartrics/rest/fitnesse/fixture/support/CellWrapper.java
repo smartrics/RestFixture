@@ -25,7 +25,7 @@ package smartrics.rest.fitnesse.fixture.support;
  * 
  * @author smartrics
  * 
- * @param <E>
+ * @param <E> the type of the cell content
  */
 public interface CellWrapper<E> {
 

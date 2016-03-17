@@ -50,7 +50,7 @@ import fitnesse.wikitext.parser.Translator;
  * <code>java -classpath <i>path_to</i>/RestFixture.jar -jar fitnesse.jar</code>
  * ) and add to the plugins.properties file the following property:
  * <code>SymbolTypes=smartrics.rest.fitnesse.fixture.SvgImage</code>. See <a
- * href="link to blog where fitnesse symbols are explained">this</a> for more
+ * href="http://fitnesse.org/FitNesse.UserGuide.FixtureGallery.ImportantConcepts.FixtureSymbols">this</a> for more
  * details.
  * 
  * To use the symbol, is sufficient to specify in a line in the test page the
@@ -61,29 +61,30 @@ import fitnesse.wikitext.parser.Translator;
  * The <code><i>rendering_mode</i></code> is one of the following:
  * 
  * <table border="1">
+ * <caption>modes</caption>
  * <tr>
  * <td>inline</td>
- * <td>the image is included as is, hence using the &lt;svg> tag</td>
+ * <td>the image is included as is, hence using the &lt;svg&gt; tag</td>
  * </tr>
  * <tr>
  * <td>embed</td>
- * <td>the image is rendered using the &lt;embed> tag</td>
+ * <td>the image is rendered using the &lt;embed&gt; tag</td>
  * </tr>
  * <tr>
  * <td>object</td>
- * <td>the image is rendered using the &lt;object> tag</td>
+ * <td>the image is rendered using the &lt;object&gt; tag</td>
  * </tr>
  * <tr>
  * <td>img</td>
- * <td>the image is rendered using the &lt;img> tag</td>
+ * <td>the image is rendered using the &lt;img&gt; tag</td>
  * </tr>
  * <tr>
  * <td>iframe</td>
- * <td>the image is rendered using the &lt;iframe> tag</td>
+ * <td>the image is rendered using the &lt;iframe&gt; tag</td>
  * </tr>
  * <tr>
  * <td>anchor</td>
- * <td>the image is rendered using the &lt;a> tag</td>
+ * <td>the image is rendered using the &lt;a&gt; tag</td>
  * </tr>
  * </table>
  * Each mode (except <code>inline</code>) will point to the file in the fitnesse
@@ -167,10 +168,9 @@ public class SvgImage extends SymbolType implements Rule, Translation {
     }
 
     /**
-     * 
-     * @param translator
-     * @param body
-     * @param args
+     * @param translator the translator
+     * @param body the body
+     * @param args the args
      * @return the inlined svg.
      */
     public String toTarget(Translator translator, String body, Symbol args) {

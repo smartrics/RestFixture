@@ -36,8 +36,8 @@ public class SlimVariables extends Variables {
 	 * {@code restfixture.null.value.representation} to know how to render
 	 * {@code null}s.
 	 * 
-	 * @param c
-	 * @param executor
+	 * @param c the config object
+	 * @param executor the executor
 	 */
 	public SlimVariables(Config c, StatementExecutorInterface executor) {
 		super(c);
@@ -47,8 +47,8 @@ public class SlimVariables extends Variables {
 	/**
 	 * puts a value.
 	 * 
-	 * @param label
-	 * @param val
+	 * @param label the symbol
+	 * @param val the value to store
 	 */
 	public void put(String label, String val) {
 		executor.assign(label, val);
@@ -57,12 +57,11 @@ public class SlimVariables extends Variables {
 	/**
 	 * gets a value.
 	 * 
-	 * @param label
+	 * @param label the symbol
 	 * @return the value.
 	 */
 	public String get(String label) {
-		String result = executor.getSymbol(label).toString();
-		return result;
+		return executor.getSymbol(label).toString();
 	}
 
 }

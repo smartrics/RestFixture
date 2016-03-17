@@ -25,7 +25,7 @@ package smartrics.rest.fitnesse.fixture.support;
  * 
  * @author smartrics
  * 
- * @param <E>
+ * @param <E> the type of the cell
  */
 public interface CellFormatter<E> {
 
@@ -123,7 +123,7 @@ public interface CellFormatter<E> {
 	/**
 	 * sets whether absolute urls are displayed in full
 	 *
-	 * @param displayAbsoluteURLInFull
+	 * @param displayAbsoluteURLInFull the value to set
 	 */
 	void setDisplayAbsoluteURLInFull(boolean displayAbsoluteURLInFull);
 

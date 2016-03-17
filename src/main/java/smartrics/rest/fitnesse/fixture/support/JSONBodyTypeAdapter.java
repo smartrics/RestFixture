@@ -39,7 +39,8 @@ public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
     /**
      * def ctor
      *
-     * @param variablesProvider
+     * @param variablesProvider used for substitutions
+     * @param config            the config
      */
     public JSONBodyTypeAdapter(RunnerVariablesProvider variablesProvider, Config config) {
         wrapper = new JavascriptWrapper(variablesProvider);
@@ -61,13 +62,12 @@ public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
 
     @Override
     public Object parse(String possibleJsContent) throws Exception {
-        if (possibleJsContent == null || possibleJsContent.trim().indexOf("/* javascript */") < 0) {
+        if (possibleJsContent == null || !possibleJsContent.trim().contains("/* javascript */")) {
             forceJsEvaluation = false;
             return super.parse(possibleJsContent);
         }
         forceJsEvaluation = true;
-        String content = Tools.fromHtml(possibleJsContent.trim());
-        return content;
+        return Tools.fromHtml(possibleJsContent.trim());
     }
 
     @Override

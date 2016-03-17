@@ -20,11 +20,10 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fitnesse.slim.StatementExecutorConsumer;
 import fitnesse.slim.StatementExecutorInterface;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestData.Header;
 import smartrics.rest.client.RestRequest;
@@ -33,11 +32,7 @@ import smartrics.rest.fitnesse.fixture.support.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * A fixture that allows to simply test REST APIs with minimal efforts. The core
@@ -61,18 +56,18 @@ import java.util.Vector;
  * written in wiki syntax.
  * <li>tests should be easy to write and above all read.
  * </ul>
- *
- * <b>Configuring RestFixture</b><br/>
+ * <p>
+ * <b>Configuring RestFixture</b><br>
  * RestFixture can be configured by using the {@link RestFixtureConfig}. A
  * {@code RestFixtureConfig} can define named maps with configuration key/value
  * pairs. The name of the map is passed as second parameter to the
  * {@code RestFixture}. Using a named configuration is optional: if no name is
  * passed, the default configuration map is used. See {@link RestFixtureConfig}
  * for more details.
- * <p/>
+ * <p>
  * The following list of configuration parameters can are supported.
- * <p/>
  * <table border="1">
+ * <caption>supported configuration parameters</caption>
  * <tr>
  * <td>smartrics.rest.fitnesse.fixture.RestFixtureConfig</td>
  * <td><i>optional named config</i></td>
@@ -179,7 +174,6 @@ import java.util.Vector;
  * The map key is the name of the library - it can be a freeform string that appears in logs for debugging purposes.
  * </i></td>
  * </tr>
- *
  * </table>
  *
  * @author smartrics
@@ -374,7 +368,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	/**
 	 * sets the base url.
 	 *
-	 * @param url
+	 * @param url the url
 	 */
 	public void setBaseUrl(Url url) {
 		this.baseUrl = url;
@@ -407,7 +401,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	/**
 	 * Slim Table table hook.
 	 *
-	 * @param rows
+	 * @param rows the rows to process
 	 * @return the rendered content.
 	 */
 	public List<List<String>> doTable(List<List<String>> rows) {
@@ -453,9 +447,9 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	/**
 	 * Allows setting of the name of the multi-part file to upload.
-	 *
+	 * <p>
 	 * <code>| setMultipartFileName | Name of file |</code>
-	 * <p/>
+	 * <p>
 	 * body text should be location of file which needs to be sent
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -479,9 +473,9 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	/**
 	 * Allows setting of the name of the file to upload.
-	 *
+	 * <p>
 	 * <code>| setFileName | Name of file |</code>
-	 * <p/>
+	 * <p>
 	 * body text should be location of file which needs to be sent
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -506,9 +500,9 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	/**
 	 * Sets the parameter to send in the request storing the multi-part file to
 	 * upload. If not specified the default is <code>file</code>
-	 * <p/>
+	 * <p>
 	 * <code>| setMultipartFileParameterName | Name of form parameter for the uploaded file |</code>
-	 * <p/>
+	 * <p>
 	 * body text should be the name of the form parameter, defaults to 'file'
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -532,7 +526,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	/**
 	 * <code>| setBody | body text goes here |</code>
-	 * <p/>
+	 * <p>
 	 * body text can either be a kvp or a xml. The <code>ClientHelper</code>
 	 * will figure it out
 	 */
@@ -548,7 +542,11 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		}
 	}
 
-	// @sglebs - fixes #162. necessary to work with a scenario
+	/**
+	 * \@sglebs - fixes #162. necessary to work with a scenario
+     * @param body the body to set
+     * @return the body after substitution
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public String setBody(String body) {
 		requestBody = body;
@@ -559,7 +557,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	/**
 	 * <code>| setHeader | http headers go here as nvp |</code>
-	 * <p/>
+	 * <p>
 	 * header text must be nvp. name and value must be separated by ':' and each
 	 * header is in its own line
 	 */
@@ -581,8 +579,12 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		}
 	}
 
-    // @sglebs - fixes #161. necessary to work with a scenario
-    public Map<String, String> addHeader(String headers) {
+	/**
+	 * \@sglebs - fixes #161. necessary to work with a scenario
+     * @param headers the headers string to set
+     * @return the headers map
+	 */
+	public Map<String, String> addHeader(String headers) {
         String substitutedHeaders = headers;
         if (GLOBALS != null)
             substitutedHeaders = GLOBALS.substitute(headers);
@@ -590,20 +592,28 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
         return requestHeaders;
     }
 
-    // @sglebs - fixes #161. necessary to work with a scenario
+	/**
+	 * \@sglebs - fixes #161. necessary to work with a scenario
+     * @param headers the headers string to set
+     * @return the headers map
+	 */
     public Map<String, String> setHeader(String headers) {
         requestHeaders = new LinkedHashMap<String, String>();
         return addHeader(headers);
     }
 
-	// @sglebs - fixes #161. necessary to work with a scenario
+	/**
+	 * \@sglebs - fixes #161. necessary to work with a scenario
+     * @param headers the headers string to set
+     * @return the headers map
+	 */
 	public Map<String, String>  setHeaders(String headers) {
 		return setHeader(headers);
 	}
 
 	/**
 	 * Equivalent to setHeader - syntactic sugar to indicate that you can now.
-	 *
+	 * <p>
 	 * set multiple headers in a single call
 	 */
 	public void setHeaders() {
@@ -616,14 +626,14 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	/**
 	 * <code> | PUT | URL | ?ret | ?headers | ?body |</code>
-	 * <p/>
+	 * <p>
 	 * executes a PUT on the URL and checks the return (a string representation
 	 * the operation return code), the HTTP response headers and the HTTP
 	 * response body
-	 *
+	 * <p>
 	 * URL is resolved by replacing global variables previously defined with
 	 * <code>let()</code>
-	 *
+	 * <p>
 	 * the HTTP request headers can be set via <code>setHeaders()</code>. If not
 	 * set, the list of default headers will be set. See
 	 * <code>DEF_REQUEST_HEADERS</code>
@@ -636,7 +646,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	/**
 	 * <code> | GET | uri | ?ret | ?headers | ?body |</code>
-	 * <p/>
+	 * <p>
 	 * executes a GET on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers and the http response
 	 * body
@@ -656,7 +666,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	/**
 	 * <code> | HEAD | uri | ?ret | ?headers |  |</code>
-	 * <p/>
+	 * <p>
 	 * executes a HEAD on the uri and checks the return (a string repr the
 	 * operation return code) and the http response headers. Head is meant to
 	 * return no-body.
@@ -676,7 +686,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	/**
 	 * <code> | OPTIONS | uri | ?ret | ?headers | ?body |</code>
-	 * <p/>
+	 * <p>
 	 * executes a OPTIONS on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers, the http response body
 	 *
@@ -695,7 +705,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	/**
 	 * <code> | DELETE | uri | ?ret | ?headers | ?body |</code>
-	 * <p/>
+	 * <p>
 	 * executes a DELETE on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers and the http response
 	 * body
@@ -724,7 +734,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	/**
 	 * <code> | POST | uri | ?ret | ?headers | ?body |</code>
-	 * <p/>
+	 * <p>
 	 * executes a POST on the uri and checks the return (a string repr the
 	 * operation return code), the http response headers and the http response
 	 * body
@@ -746,53 +756,53 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 
 	/**
 	 * <code> | let | label | type | loc | expr |</code>
-	 * <p/>
+	 * <p>
 	 * allows to associate a value to a label. values are extracted from the
 	 * body of the last successful http response.
 	 * <ul>
-	 * <li/><code>label</code> is the label identifier
+	 * <li><code>label</code> is the label identifier
 	 *
-	 * <li/><code>type</code> is the type of operation to perform on the last
+	 * <li><code>type</code> is the type of operation to perform on the last
 	 * http response. At the moment only XPaths and Regexes are supported. In
 	 * case of regular expressions, the expression must contain only one group
 	 * match, if multiple groups are matched the label will be assigned to the
 	 * first found <code>type</code> only allowed values are <code>xpath</code>
 	 * and <code>regex</code>
 	 *
-	 * <li/><code>loc</code> where to apply the <code>expr</code> of the given
+	 * <li><code>loc</code> where to apply the <code>expr</code> of the given
 	 * <code>type</code>. Currently only <code>header</code> and
 	 * <code>body</code> are supported. If type is <code>xpath</code> by default
 	 * the expression is matched against the body and the value in loc is
 	 * ignored.
 	 *
-	 * <li/><code>expr</code> is the expression of type <code>type</code> to be
+	 * <li><code>expr</code> is the expression of type <code>type</code> to be
 	 * executed on the last http response to extract the content to be
 	 * associated to the label.
 	 * </ul>
-	 * <p/>
+	 * <p>
 	 * <code>label</code>s can be retrieved after they have been defined and
 	 * their scope is the fixture instance under execution. They are stored in a
 	 * map so multiple calls to <code>let()</code> with the same label will
 	 * override the current value of that label.
-	 * <p/>
+	 * <p>
 	 * Labels are resolved in <code>uri</code>s, <code>header</code>s and
 	 * <code>body</code>es.
-	 * <p/>
+	 * <p>
 	 * In order to be resolved a label must be between <code>%</code>, e.g.
 	 * <code>%id%</code>.
-	 * <p/>
+	 * <p>
 	 * The test row must have an empy cell at the end that will display the
 	 * value extracted and assigned to the label.
-	 * <p/>
-	 * Example: <br/>
-	 * <code>| GET | /services | 200 | | |</code><br/>
-	 * <code>| let | id |  body | /services/id[0]/text() | |</code><br/>
+	 * <p>
+	 * Example: <br>
+	 * <code>| GET | /services | 200 | | |</code><br>
+	 * <code>| let | id |  body | /services/id[0]/text() | |</code><br>
 	 * <code>| GET | /services/%id% | 200 | | |</code>
-	 * <p/>
+	 * <p>
 	 * or
-	 * <p/>
-	 * <code>| POST | /services | 201 | | |</code><br/>
-	 * <code>| let  | id | header | /services/([.]+) | |</code><br/>
+	 * <p>
+	 * <code>| POST | /services | 201 | | |</code><br>
+	 * <code>| let  | id | header | /services/([.]+) | |</code><br>
 	 * <code>| GET  | /services/%id% | 200 | | |</code>
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -894,7 +904,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	 * Process the row in input. Abstracts the test runner via the wrapper
 	 * interfaces.
 	 *
-	 * @param currentRow
+	 * @param currentRow the current row
 	 */
 	@SuppressWarnings("rawtypes")
 	public void processRow(RowWrapper<?> currentRow) {

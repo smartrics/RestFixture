@@ -42,7 +42,7 @@ public class FitVariables extends Variables {
 	 * {@code restfixture.null.value.representation} to know how to render
 	 * {@code null}s.
 	 * 
-	 * @param c
+	 * @param c the config
 	 */
 	public FitVariables(Config c) {
 		super(c);
@@ -51,8 +51,8 @@ public class FitVariables extends Variables {
 	/**
 	 * puts a value.
 	 * 
-	 * @param label
-	 * @param val
+	 * @param label the symbol
+	 * @param val the value
 	 */
 	@Override
 	public void put(String label, String val) {
@@ -61,8 +61,8 @@ public class FitVariables extends Variables {
 
 	/**
 	 * gets a value.
-	 * 
-	 * @param label
+	 *
+	 * @param label the symbol
 	 * @return the value.
 	 */
 	@Override
