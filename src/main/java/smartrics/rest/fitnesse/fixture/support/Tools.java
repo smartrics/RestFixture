@@ -93,8 +93,7 @@ public final class Tools {
      * @param returnType the result type
      * @return the list of nodes matching the supplied XPath.
      */
-    public static Object extractXPath(String xpathExpression, String content,
-                                      QName returnType) {
+    public static Object extractXPath(String xpathExpression, String content, QName returnType) {
         return extractXPath(xpathExpression, content, returnType, null);
     }
 
@@ -109,8 +108,7 @@ public final class Tools {
                                       QName returnType, String encoding) {
         // Use the java Xpath API to return a NodeList to the caller so they can
         // iterate through
-        return extractXPath(new HashMap<>(), xpathExpression,
-                content, returnType, encoding);
+        return extractXPath(new HashMap<String, String>(), xpathExpression, content, returnType, encoding);
     }
 
     /**
@@ -120,8 +118,7 @@ public final class Tools {
      * @param returnType      the return type
      * @return the list of nodes mathching the supplied XPath.
      */
-    public static Object extractXPath(Map<String, String> ns,
-                                      String xpathExpression, String content, QName returnType) {
+    public static Object extractXPath(Map<String, String> ns, String xpathExpression, String content, QName returnType) {
         return extractXPath(ns, xpathExpression, content, returnType, null);
     }
 
