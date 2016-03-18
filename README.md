@@ -38,6 +38,13 @@ of FitNesse is guraranteed for these versions of RestFixture.
 RestFixture v4.0 is compatible with [FitNesse v20150424](http://mvnrepository.com/artifact/org.fitnesse/fitnesse/20150424)
 and above having implemented proper support of Slim Symbols as described in [Issue #52](https://github.com/smartrics/RestFixture/issues/52).
 
+Test with the latest FitNesse version
+-------------------------------------
+
+The profile `latest-fitnesse` configures the Versions plugin to fetch the latest FitNesse version. Tests can be executed to verify regression with:
+
+> mvn clean versions:use-latest-releases test -P latest-fitnesse
+
 Build: Released from 4.2 onwards
 --------------------------------
 

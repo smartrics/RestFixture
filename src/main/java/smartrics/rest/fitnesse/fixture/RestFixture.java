@@ -20,6 +20,7 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
+import fitnesse.FitNesseVersion;
 import fitnesse.slim.StatementExecutorConsumer;
 import fitnesse.slim.StatementExecutorInterface;
 import org.slf4j.Logger;
@@ -278,6 +279,11 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	private boolean followRedirects = true;
 
 	private StatementExecutorInterface slimStatementExecutor;
+
+
+    static {
+        LOG.info("############ Detected FitNesse version: {} ###########", new FitNesseVersion().toString());
+    }
 
 	/**
 	 * Constructor for Fit runner.

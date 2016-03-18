@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>org.fitnesse</groupId>
 			<artifactId>fitnesse</artifactId>
-			<version>20150424</version>
+			<version>20151230</version>
 		</dependency>
 		<dependency>
 			<groupId>smartrics.restfixture</groupId>
@@ -228,6 +228,23 @@ And it also works as a living/executable documentation of the API.
 		</repository>
 	</repositories>
 	<profiles>
+        <profile>
+            <id>latest-fitnesse</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>versions-maven-plugin</artifactId>
+                        <version>2.2</version>
+                        <configuration>
+                            <includesList>org.fitnesse</includesList>
+                            <generateBackupPoms>false</generateBackupPoms>
+                            <allowSnapshots>false</allowSnapshots>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>bundle</id>
             <build>
