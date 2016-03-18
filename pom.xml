@@ -20,6 +20,7 @@
 	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version-org.slf4j>1.7.13</version-org.slf4j>
 	</properties>
 	<licenses>
 		<license>
@@ -57,7 +58,7 @@
 		<dependency>
 			<groupId>org.fitnesse</groupId>
 			<artifactId>fitnesse</artifactId>
-			<version>20150424</version>
+			<version>20151230</version>
 		</dependency>
 		<dependency>
 			<groupId>smartrics.restfixture</groupId>
@@ -82,7 +83,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.6.6</version>
+            <version>${version-org.slf4j}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -229,6 +230,16 @@ And it also works as a living/executable documentation of the API.
 	</repositories>
 	<profiles>
         <profile>
+            <id>logging</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                    <version>${version-org.slf4j}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>latest-fitnesse</id>
             <build>
                 <plugins>
@@ -240,6 +251,7 @@ And it also works as a living/executable documentation of the API.
                             <includesList>org.fitnesse</includesList>
                             <generateBackupPoms>false</generateBackupPoms>
                             <allowSnapshots>false</allowSnapshots>
+                            <verbose>true</verbose>
                         </configuration>
                     </plugin>
                 </plugins>
