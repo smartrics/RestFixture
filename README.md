@@ -38,8 +38,34 @@ of FitNesse is guraranteed for these versions of RestFixture.
 RestFixture v4.0 is compatible with [FitNesse v20150424](http://mvnrepository.com/artifact/org.fitnesse/fitnesse/20150424)
 and above having implemented proper support of Slim Symbols as described in [Issue #52](https://github.com/smartrics/RestFixture/issues/52).
 
-Build: Releases from 2.1 onwards
+Build: Released from 4.2 onwards
 --------------------------------
+
+Two new profiles are available: 'bundle' and 'release' 
+
+### Build the RestFixture jar ###### 
+
+> mvn clean package
+
+Once the build completes, the directory target contains:
+
+* <code>smartrics-RestFixture-&lt;version>.jar</code> : the RestFixture jar
+
+### Build the RestFixture bundle ###### 
+
+> mvn clean package -P bundle 
+
+Once the build completes, the directory target contains:
+
+* <code>smartrics-RestFixture-&lt;version>.jar</code> : the RestFixture jar
+* <code>smartrics-RestFixture-&lt;version>-sources.jar</code> : the RestFixture sources jar
+* <code>smartrics-RestFixture-&lt;version>-javadoc.jar</code> : the RestFixture javadoc jar
+* <code>smartrics-RestFixture-&lt;version>-bin.zip</code>: a bundle the RestFixture and all dependencies.
+* <code>dependencies/</code> : all the RestFixture dependencies (excluding a Logging framework implementation. See below for details)
+
+
+Build: Releases from 2.1 to 4.1
+-------------------------------
 
 To build RestFixture install Maven and execute
 
