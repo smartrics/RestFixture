@@ -964,7 +964,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	 */
 	public Map<String, String> getHeaders() {
 		Map<String, String> headers = null;
-		if (requestHeaders != null) {
+		if (requestHeaders != null && !requestHeaders.isEmpty()) {
 			headers = requestHeaders;
 		} else {
 			headers = defaultHeaders;

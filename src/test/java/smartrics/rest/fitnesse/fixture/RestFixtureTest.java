@@ -40,6 +40,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.mockito.ArgumentCaptor;
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestRequest.Method;
@@ -102,6 +103,8 @@ public class RestFixtureTest {
 
         ContentType.resetDefaultMapping();
 
+        config.add("restfixture.default.headers", "added1 : 1" + System.getProperty("line.separator") + "added2 : 2");
+
         helper.wireMocks(config, mockPartsFactory, mockRestClient, mockLastRequest, lastResponse, mockCellFormatter, mockBodyTypeAdapter);
         fixture = new RestFixture(mockPartsFactory, BASE_URL, Config.DEFAULT_CONFIG_NAME);
         fixture.initialize(Runner.OTHER);
@@ -149,10 +152,15 @@ public class RestFixtureTest {
 
     @Test
     public void mustUseDefaultHeadersIfDefinedOnNamedConfig() {
-        config.add("restfixture.default.headers", "added1 : 1" + System.getProperty("line.separator") + "added2 : 2");
         RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", "");
+        ArgumentCaptor<Map> argument = ArgumentCaptor.forClass(Map.class);
         fixture.processRow(row);
-        verify(mockLastRequest).addHeaders(fixture.getDefaultHeaders());
+        verify(mockLastRequest).addHeaders(argument.capture());
+
+        Map<String, String> captured = argument.getValue();
+
+        assertThat(captured.containsKey("added1"), is(true));
+        assertThat(captured.containsKey("added2"), is(true));
     }
 
     @Test
