@@ -75,7 +75,7 @@ public class JavascriptWrapper {
             return null;
         }
         Context context = Context.enter();
-        removeOptimisationForLargeExpressions(expression, context);
+        removeOptimisationForLargeExpressions(response, expression, context);
         ScriptableObject scope = context.initStandardObjects();
         injectImports(context, scope, imports);
         injectFitNesseSymbolMap(scope);
@@ -189,8 +189,9 @@ public class JavascriptWrapper {
         return false;
     }
 
-    private void removeOptimisationForLargeExpressions(String expression, Context context) {
-        if (expression.getBytes().length > _64K) {
+    private void removeOptimisationForLargeExpressions(RestResponse response, String expression, Context context) {
+        final String body = response == null ? null : response.getBody();
+        if ((body != null && body.getBytes().length > _64K) || expression.getBytes().length > _64K) {
             context.setOptimizationLevel(-1);
         }
     }
@@ -211,7 +212,7 @@ public class JavascriptWrapper {
         } catch (Exception e) {
             throw new JavascriptException("Invalid url: " + importUrl + " for '" + name + "'", e);
         } finally {
-            if(is != null) {
+            if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
@@ -220,6 +221,31 @@ public class JavascriptWrapper {
             }
         }
 
+    }
+
+    private InputStream parseImport(String name) {
+        try {
+            return new URL(name).openStream();
+        } catch (Exception e1) {
+            File f = new File(name);
+            if (f.exists()) {
+                if (f.isFile() && f.canRead()) {
+                    try {
+                        return new FileInputStream(f);
+                    } catch (Exception e2) {
+                        throw new IllegalArgumentException("Invalid import file: " + name + ", path: " + f.getAbsolutePath());
+                    }
+                } else {
+                    throw new IllegalArgumentException("Import file not accessible: " + name + ", path: " + f.getAbsolutePath());
+                }
+            } else {
+                try {
+                    return Thread.currentThread().getContextClassLoader().getResource(name).openStream();
+                } catch (Exception e3) {
+                    throw new IllegalArgumentException("Import resource not valid: " + name);
+                }
+            }
+        }
     }
 
     /**
@@ -252,7 +278,7 @@ public class JavascriptWrapper {
         }
 
         /**
-         * @param name the header name
+         * @param name  the header name
          * @param value the value
          */
         public void jsFunction_addHeader(String name, String value) {
@@ -265,7 +291,7 @@ public class JavascriptWrapper {
         }
 
         /**
-         * @param name the header name
+         * @param name  the header name
          * @param value the value
          */
         public void jsFunction_putHeader(String name, String value) {
@@ -320,7 +346,7 @@ public class JavascriptWrapper {
 
         /**
          * @param name the header name
-         * @param pos the pos
+         * @param pos  the pos
          * @return the value of the header with name at pos 0
          */
         public String jsFunction_header(String name, int pos) {
@@ -331,31 +357,6 @@ public class JavascriptWrapper {
             }
         }
 
-    }
-
-    private InputStream parseImport(String name) {
-        try {
-            return new URL(name).openStream();
-        } catch (Exception e1) {
-            File f = new File(name);
-            if (f.exists()) {
-                if(f.isFile() && f.canRead()) {
-                    try {
-                        return new FileInputStream(f);
-                    } catch (Exception e2) {
-                        throw new IllegalArgumentException("Invalid import file: " + name + ", path: " + f.getAbsolutePath());
-                    }
-                } else {
-                    throw new IllegalArgumentException("Import file not accessible: " + name + ", path: " + f.getAbsolutePath());
-                }
-            } else {
-                try {
-                    return Thread.currentThread().getContextClassLoader().getResource(name).openStream();
-                } catch (Exception e3) {
-                    throw new IllegalArgumentException("Import resource not valid: " + name);
-                }
-            }
-        }
     }
 
 }

@@ -90,6 +90,20 @@ public class JavascriptWrapperTest {
     }
 
     @Test
+    public void shouldEvalExpressionsForLargeContentJson() {
+        StringBuffer sb = new StringBuffer("{ \"content\" : \"");
+        final int size = 1024 * 1024 * 10;
+        for(int i = 0; i < size; i++) {
+            sb.append("A");
+        }
+        sb.append("\"}");
+        RestResponse response = createResponse(ContentType.JSON, sb.toString());
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        Object res = h.evaluateExpression(response, "response.jsonbody.content.length");
+        assertThat(res.toString(), is(equalTo(Integer.toString(size))));
+    }
+
+    @Test
     public void shouldNotProvideLastResponseBodyInJsContextIfResponseIsNull() {
         JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
         Object res = h.evaluateExpression((RestResponse) null, "'response is null: ' + (response == null)");
