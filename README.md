@@ -124,26 +124,4 @@ Check http://www.slf4j.org/ for more details.
 Install
 -------
 
-To use the RestFixture, simply add RestFixture-<ver>.jar to your FitNesse tests classpath,
-alongside its dependencies. Dependencies are available in the directory target/dependencies.
-
-For example, let's assume that you have succesfully built the RestFixture in C:/RestFixture
-
-0. Download a binding logger implementation for slf4j and copy it into C:/slf4j-simple/slf4j-simple-1.6.6.jar. Download it from http://repo2.maven.org/maven2/org/slf4j/slf4j-simple/1.6.6/slf4j-simple-1.6.6.jar
-1. Start FitNesse; let's assume that fitnesse is now running on port 8090)
-2. Go to http://localhost:8090/RestFixtureInstallTest to create a new test page
-3. Type the following:
-
-<pre>
-!define TEST_SYSTEM {slim}
-
-!path C:/RestFixture/target/dependencies/*
-!path C:/RestFixture/target/smartrics-RestFixture-&ltver>.jar
-!path C:/slf4j-simple/slf4j-simple-1.6.6.jar
-
-|Table:smartrics.rest.fitnesse.fixture.RestFixture | http://localhost:8090 |
-| GET | /RestFixtureInstallTest?rss | | | //title[text()='RestFixtureInstallTest']|
-</pre>
- 
-4. Execute the test. If it passes, you have succesfully installed the RestFixture. You'll also know how to reference it's jar and dependencies.
- 
+http://stackoverflow.com/questions/35753103/workflow-of-creating-tests-using-restfixture
