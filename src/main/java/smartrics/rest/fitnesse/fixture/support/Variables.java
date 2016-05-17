@@ -43,7 +43,7 @@ public abstract class Variables {
 	// original regex pattern, allowing all initial characters.
 	//	public static final Pattern VARIABLES_PATTERN = Pattern.compile("\\%([a-zA-Z0-9_]+)\\%");
 	private static final String FIT_NULL_VALUE = fitSymbolForNull();
-	private String nullValue = "null";
+	protected String nullValue = "null";
 
 	/**
 	 * initialises variables with default config. See @link
