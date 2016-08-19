@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestData.Header;
+import smartrics.rest.client.RestMultipart;
 import smartrics.rest.client.RestRequest;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.fitnesse.fixture.support.*;
@@ -237,6 +238,8 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	protected String multipartFileName = null;
 
 	protected String multipartFileParameterName = FILE;
+
+	protected Map<String,RestMultipart> multiFileNameByParamName = new LinkedHashMap<>();
 
 	protected String requestBody;
 
@@ -467,6 +470,57 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		} else {
 			multipartFileName = GLOBALS.substitute(cell.text());
 			renderReplacement(cell, multipartFileName);
+		}
+	}
+
+	/**
+	 * Allows setting of the name of the multi-part file to upload.
+	 * <p>
+	 * <code>| setMultipartFileName | Name of file | Name of form parameter for the uploaded file | ContentType of file | CharSet of file |</code>
+	 * <p>
+	 * body text should be location of file which needs to be sent
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void addMultipartFileName() {
+		CellWrapper cellFileName = row.getCell(1);
+		CellWrapper cellParamName = row.getCell(2);
+		CellWrapper cellContentType = row.getCell(3);
+		CellWrapper cellCharset = row.getCell(4);
+		if (cellFileName == null) {
+			getFormatter().exception(row.getCell(0),
+					"You must pass a multipart file name to set");
+		} else {
+			// Param Name
+			String multipartParamName = FILE;
+			if (cellParamName !=null ) {
+				multipartParamName = GLOBALS.substitute(cellParamName.text());
+			}
+			// FileName
+			String multipartFileName = GLOBALS.substitute(cellFileName.text());
+			// ContentType
+			String multipartContentType = null;
+			if (cellContentType !=null ) {
+				multipartContentType = GLOBALS.substitute(cellContentType.text());
+			}
+			// Charset
+			String multipartCharSet = null;
+			if (cellCharset !=null ) {
+				multipartCharSet = GLOBALS.substitute(cellCharset.text());
+			}
+			// Register Multipart
+			RestMultipart restMultipart = new RestMultipart(multipartFileName, multipartContentType, multipartCharSet);
+			multiFileNameByParamName.put(multipartParamName, restMultipart);
+			// Display Replacement
+			renderReplacement(cellFileName, multipartFileName);
+			if (cellParamName!=null) {
+				renderReplacement(cellParamName, multipartParamName);
+			}
+			if (cellContentType!=null) {
+				renderReplacement(cellContentType, multipartContentType);
+			}
+			if (cellCharset!=null) {
+				renderReplacement(cellCharset, multipartCharSet);
+			}
 		}
 	}
 
@@ -1023,11 +1077,24 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		if (fileName != null) {
 			getLastRequest().setFileName(fileName);
 		}
+
+		// Set multiFileName
 		if (multipartFileName != null) {
-			getLastRequest().setMultipartFileName(multipartFileName);
+			RestMultipart restMultipart = new RestMultipart(multipartFileName );
+			getLastRequest().addMultipartFile( multipartFileParameterName , restMultipart);
+//			getLastRequest().setMultipartFileName(multipartFileName);
+//			getLastRequest().setMultipartFileParameterName(multipartFileParameterName);
+
 		}
-		getLastRequest().setMultipartFileParameterName(
-				multipartFileParameterName);
+
+		// Add multiFileName
+		if (!multiFileNameByParamName.isEmpty()) {
+			for (Map.Entry<String,RestMultipart> entryMultipart : multiFileNameByParamName.entrySet()) {
+				getLastRequest().addMultipartFile( entryMultipart.getKey(), entryMultipart.getValue());
+				LOG.info(" addMultipartFileName : paramName = {} , fileName = {}", entryMultipart.getKey(), entryMultipart.getValue());
+			}
+		}
+
 		String[] uri = resUrl.split("\\?", 2);
 		
 		String[] thisRequestUrlParts = buildThisRequestUrl(uri[0]);

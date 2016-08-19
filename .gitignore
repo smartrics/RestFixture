@@ -8,4 +8,5 @@ target
 TODO
 .settings
 .m2
-
+*.iml
+.idea
