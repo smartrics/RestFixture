@@ -1112,13 +1112,12 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 			getLastRequest().addMultipart( multipartFileParameterName , restMultipart);
 //			getLastRequest().setMultipartFileName(multipartFileName);
 		}
-		getLastRequest().setMultipartFileParameterName(multipartFileParameterName);
 
 		// Add multiFileName
 		if (!multiFileNameByParamName.isEmpty()) {
 			for (Map.Entry<String,RestMultipart> entryMultipart : multiFileNameByParamName.entrySet()) {
 				getLastRequest().addMultipart( entryMultipart.getKey(), entryMultipart.getValue());
-				LOG.info(" addMultipart : paramName = {} , value = {}", entryMultipart.getKey(), entryMultipart.getValue());
+				LOG.debug(" addMultipart : paramName = {} , value = {}", entryMultipart.getKey(), entryMultipart.getValue());
 			}
 		}
 
