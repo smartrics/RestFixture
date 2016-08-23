@@ -475,7 +475,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	}
 
 	/**
-	 * Allows setting of the name of the multi-part file to upload.
+	 * Allows setting of the the multi-part file to upload.
 	 * <p>
 	 * <code>| addMultipartFile | Name of file | Name of form parameter for the uploaded file | ContentType of file | CharSet of file |</code>
 	 * <p>
@@ -496,9 +496,9 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	}
 
 	/**
-	 * Allows setting of the name of the multi-part file to upload.
+	 * Allows setting of the multi-part String.
 	 * <p>
-	 * <code>| addMultipartString | Name of file | Name of form parameter for the uploaded file | ContentType of file | CharSet of file |</code>
+	 * <code>| addMultipartString | String content | Name of form parameter  | ContentType of String | CharSet of String |</code>
 	 * <p>
 	 * body text should be location of file which needs to be sent
 	 */
