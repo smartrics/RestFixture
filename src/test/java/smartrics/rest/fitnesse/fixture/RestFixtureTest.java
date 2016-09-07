@@ -314,7 +314,6 @@ public class RestFixtureTest {
         verify(mockLastRequest).setMethod(Method.Get);
         verify(mockLastRequest).setResource("/path/to/resource");
         verify(mockLastRequest).setQuery("a=b");
-        verify(mockLastRequest).setMultipartFileParameterName("file");
         verify(mockLastRequest).getQuery();
         // correctly executes request
         verify(mockRestClient).setBaseUrl("http://some.url");
@@ -353,7 +352,6 @@ public class RestFixtureTest {
         verify(mockLastRequest).setMethod(Method.Get);
         verify(mockLastRequest).setResource("/uri");
         verify(mockLastRequest).setQuery("a=b");
-        verify(mockLastRequest).setMultipartFileParameterName("file");
         verify(mockLastRequest).getQuery();
         // correctly executes request
         verify(mockRestClient).setBaseUrl(fixture.getBaseUrl());
@@ -399,7 +397,7 @@ public class RestFixtureTest {
         verify(mockLastRequest).setBody("");
         verify(mockLastRequest).setResourceUriEscaped(false);
         verify(mockLastRequest).setFollowRedirect(true);
-        verify(mockLastRequest).setMultipartFileParameterName("file");
+
 
         verify(mockRestClient).setBaseUrl(fixture.getBaseUrl());
         verify(mockRestClient).getBaseUrl();
@@ -442,7 +440,6 @@ public class RestFixtureTest {
         verify(mockLastRequest).setMethod(Method.Get);
         verify(mockLastRequest).setResource("/uri");
         verify(mockLastRequest).setQuery("a=b");
-        verify(mockLastRequest).setMultipartFileParameterName("file");
         verify(mockLastRequest).setResourceUriEscaped(false);
         verify(mockLastRequest).setFollowRedirect(true);
         verify(mockLastRequest).getQuery();
@@ -488,7 +485,6 @@ public class RestFixtureTest {
         verify(mockLastRequest).setMethod(Method.Get);
         verify(mockLastRequest).setResource("/uri");
         verify(mockLastRequest).setQuery("a=b");
-        verify(mockLastRequest).setMultipartFileParameterName("file");
         verify(mockLastRequest).getQuery();
         verify(mockLastRequest).setFollowRedirect(true);
         verify(mockLastRequest).setResourceUriEscaped(false);
@@ -532,7 +528,6 @@ public class RestFixtureTest {
         verify(mockLastRequest).setResource("/uri");
         verify(mockLastRequest).setResourceUriEscaped(false);
         verify(mockLastRequest).setFollowRedirect(true);
-        verify(mockLastRequest).setMultipartFileParameterName("file");
         verify(mockLastRequest).getQuery();
         // correctly executes request
         verify(mockRestClient).setBaseUrl(fixture.getBaseUrl());
