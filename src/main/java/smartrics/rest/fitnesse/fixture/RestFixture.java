@@ -1110,7 +1110,6 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		if (multipartFileName != null) {
 			RestMultipart restMultipart = new RestMultipart(RestMultipart.RestMultipartType.FILE, multipartFileName );
 			getLastRequest().addMultipart( multipartFileParameterName , restMultipart);
-//			getLastRequest().setMultipartFileName(multipartFileName);
 		}
 
 		// Add multiFileName
