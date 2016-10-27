@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * Builds strategies to handle LET body.
- * 
+ *
  * <table>
  * <caption>Supported strategies</caption>
  * <tr>
@@ -43,13 +43,16 @@ import java.util.Map;
  * <tr>
  * <td>{@code const}</td><td>it's actually  a shortcut to allow setting of const labels</td>
  * </tr>
+ * <tr>
+ * <td>{@code body:plain}</td><td>returns the plain result body.</td>
+ * </tr>
  * </table>
- * 
+ *
  * @author smartrics
- * 
+ *
  */
 public class LetHandlerFactory {
-    private static Map<String, LetHandler> strategies = new HashMap<String, LetHandler>();
+    private static Map<String, LetHandler> strategies = new HashMap<>();
 
     static {
         strategies.put("header", new LetHeaderHandler());
@@ -57,6 +60,7 @@ public class LetHandlerFactory {
         strategies.put("body:xml", new LetBodyXmlHandler());
         strategies.put("js", new LetBodyJsHandler());
         strategies.put("const", new LetBodyConstHandler());
+        strategies.put("body:plain", new LetBodyPlainHandler());
     }
 
     private LetHandlerFactory() {
