@@ -75,7 +75,8 @@ public class JavascriptWrapper {
             return null;
         }
         Context context = Context.enter();
-        removeOptimisationForLargeExpressions(response, expression, context);
+        final String body = response == null ? null : response.getBody();
+        removeOptimisationForLargeExpressions(body, expression, context);
         ScriptableObject scope = context.initStandardObjects();
         injectImports(context, scope, imports);
         injectFitNesseSymbolMap(scope);
@@ -100,6 +101,7 @@ public class JavascriptWrapper {
             return null;
         }
         Context context = Context.enter();
+        removeOptimisationForLargeExpressions(json, expression, context);
         ScriptableObject scope = context.initStandardObjects();
         injectImports(context, scope, imports);
         injectFitNesseSymbolMap(scope);
@@ -189,9 +191,8 @@ public class JavascriptWrapper {
         return false;
     }
 
-    private void removeOptimisationForLargeExpressions(RestResponse response, String expression, Context context) {
-        final String body = response == null ? null : response.getBody();
-        if ((body != null && body.getBytes().length > _64K) || expression.getBytes().length > _64K) {
+    private void removeOptimisationForLargeExpressions(String responseBody, String expression, Context context) {
+        if ((responseBody != null && responseBody.getBytes().length > _64K) || expression.getBytes().length > _64K) {
             context.setOptimizationLevel(-1);
         }
     }
