@@ -896,6 +896,36 @@ public class RestFixtureTest {
         verifyNoMoreInteractions(mockCellFormatter);
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void mustSetValueOnSymbolMapAsPlainBodyIfSourceIsPlainBody() throws Exception {
+        String jsonString = "{ \"person\" : { \"name\" : \"fred\", \"age\" : \"20\"} }";
+        when(mockBodyTypeAdapter.toString()).thenReturn(jsonString);
+        when(mockBodyTypeAdapter.parse(jsonString)).thenReturn(jsonString);
+
+        when(mockLastRequest.getQuery()).thenReturn("");
+        when(mockRestClient.getBaseUrl()).thenReturn(BASE_URL);
+        lastResponse.setBody(jsonString);
+        lastResponse.addHeader("Content-Type", ContentType.JSON.toMime().get(0));
+
+        RowWrapper<?> row = helper.createTestRow("GET", "/uri", "", "", "");
+        fixture.processRow(row);
+        row = helper.createTestRow("let", "response", "body:plain", "", "");
+        fixture.processRow(row);
+
+        verify(mockCellFormatter).asLink(isA(CellWrapper.class), eq("/uri"), eq("http://localhost:9090/uri"), eq("/uri"));
+        verify(mockCellFormatter).gray(eq("200"));
+        verify(mockCellFormatter).gray(eq("Content-Type : application/json"));
+        verify(mockCellFormatter).gray(eq(""));
+        verify(mockCellFormatter).gray(eq(jsonString));
+        verify(mockCellFormatter).check(isA(CellWrapper.class), isA(StringTypeAdapter.class));
+
+        // correctly builds request
+        assertEquals(jsonString, variables.get("response"));
+
+        verifyNoMoreInteractions(mockCellFormatter);
+    }
+
     public void mustRenderCommentMessagesWithSubstitutedLabels() {
 
         RowWrapper<?> row = helper.createTestRow("let", "seven", "js", "3 + 4");
