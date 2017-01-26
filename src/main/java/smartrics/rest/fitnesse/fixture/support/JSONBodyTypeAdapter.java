@@ -43,7 +43,7 @@ public class JSONBodyTypeAdapter extends XPathBodyTypeAdapter {
      * @param config            the config
      */
     public JSONBodyTypeAdapter(RunnerVariablesProvider variablesProvider, Config config) {
-        wrapper = new JavascriptWrapper(variablesProvider);
+        wrapper = new JavascriptWrapper(variablesProvider, config);
         imports = config.getAsMap("restfixture.javascript.imports.map", new HashMap<String, String>());
     }
 

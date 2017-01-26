@@ -32,7 +32,7 @@ public class LetBodyPlainHandler implements LetHandler {
 
 
     @Override
-    public String handle(RunnerVariablesProvider variablesProvider, Config cOnfig, RestResponse response, Object expressionContext, String expression) {
+    public String handle(RunnerVariablesProvider variablesProvider, Config config, RestResponse response, Object expressionContext, String expression) {
         return response.getBody();
     }
 

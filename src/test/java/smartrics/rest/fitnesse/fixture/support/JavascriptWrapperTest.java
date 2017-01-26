@@ -20,17 +20,14 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Test class for the js body handler.
@@ -40,7 +37,10 @@ import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
  */
 public class JavascriptWrapperTest {
 
+    private static final String CONFIG_NAME = "configName";
     private FitVariables variables;
+    private Config config;
+
     private final RunnerVariablesProvider variablesProvider = new RunnerVariablesProvider() {
 		@Override
 		public Variables createRunnerVariables() {
@@ -52,13 +52,14 @@ public class JavascriptWrapperTest {
     public void setUp() {
         variables = new FitVariables();
         variables.clearAll();
+        config = Config.getConfig();
     }
 
     @Test
     public void shouldProvideSymbolMapInJsContext() {
         variables.put("my_sym", "98");
         RestResponse response = new RestResponse();
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         Object res = h.evaluateExpression(response, "'my sym is: ' + symbols.get('my_sym')");
         assertThat(res.toString(), is(equalTo("my sym is: 98")));
     }
@@ -66,7 +67,7 @@ public class JavascriptWrapperTest {
     @Test
     public void shouldProvideLastResponseBodyInJsContext() {
         RestResponse response = createResponse();
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         Object res = h.evaluateExpression(response, "'my last response body is: ' + response.body");
         assertThat(res.toString(), is(equalTo("my last response body is: <xml />")));
     }
@@ -75,7 +76,7 @@ public class JavascriptWrapperTest {
     public void shouldProvideLastResponseBodyAsJsonForJsonContentTypeInJsContext() {
         String json = "{ \"person\" : { \"name\" : \"Rokko\", \"age\" : \"30\" } }";
         RestResponse response = createResponse(ContentType.JSON, json);
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         Object res = h.evaluateExpression(response, "'My friend ' + response.jsonbody.person.name + ' is ' + response.jsonbody.person.age + ' years old.'");
         assertThat(res.toString(), is(equalTo("My friend Rokko is 30 years old.")));
     }
@@ -84,7 +85,7 @@ public class JavascriptWrapperTest {
     public void shouldProvideLastResponseBodyAsJsonForContentThatLooksLikeJsonInJsContext() {
         String json = "{ \"person\" : { \"name\" : \"Rokko\", \"age\" : \"30\" } }";
         RestResponse response = createResponse(ContentType.TEXT, json);
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         Object res = h.evaluateExpression(response, "'My friend ' + response.jsonbody.person.name + ' is ' + response.jsonbody.person.age + ' years old.'");
         assertThat(res.toString(), is(equalTo("My friend Rokko is 30 years old.")));
     }
@@ -98,28 +99,28 @@ public class JavascriptWrapperTest {
         }
         sb.append("\"}");
         RestResponse response = createResponse(ContentType.JSON, sb.toString());
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         Object res = h.evaluateExpression(response, "response.jsonbody.content.length");
         assertThat(res.toString(), is(equalTo(Integer.toString(size))));
     }
 
     @Test
     public void shouldNotProvideLastResponseBodyInJsContextIfResponseIsNull() {
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         Object res = h.evaluateExpression((RestResponse) null, "'response is null: ' + (response == null)");
         assertThat(res.toString(), is(equalTo("response is null: true")));
     }
 
     @Test
     public void shouldHandleNullReturnedByJsEvaluation() {
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         Object res = h.evaluateExpression((RestResponse) null, "null");
         assertThat(res, is(nullValue()));
     }
 
     @Test
     public void shouldHandleNullReturnedByStringJsEvaluation() {
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         Object res = h.evaluateExpression((String) null, "null");
         assertThat(res, is(nullValue()));
     }
@@ -127,7 +128,7 @@ public class JavascriptWrapperTest {
     @Test
     public void shouldProvideLastResponseResourceInJsContext() {
         RestResponse response = createResponse();
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         Object res = h.evaluateExpression(response, "'my last response resource is: ' + response.resource");
         assertThat(res.toString(), is(equalTo("my last response resource is: /resources")));
     }
@@ -135,7 +136,7 @@ public class JavascriptWrapperTest {
     @Test
     public void shouldProvideLastResponseStatusTextInJsContext() {
         RestResponse response = createResponse();
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         Object res = h.evaluateExpression(response, "'my last response statusText is: ' + response.statusText");
         assertThat(res.toString(), is(equalTo("my last response statusText is: OK")));
     }
@@ -143,7 +144,7 @@ public class JavascriptWrapperTest {
     @Test
     public void shouldProvideLastResponseTxIdInJsContext() {
         RestResponse response = createResponse();
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         Object res = h.evaluateExpression(response, "'my last response transactionId is: ' + response.transactionId");
         assertThat(res.toString(), is(equalTo("my last response transactionId is: 123456789")));
     }
@@ -151,7 +152,7 @@ public class JavascriptWrapperTest {
     @Test
     public void shouldProvideLastResponseStatusCodeInJsContext() {
         RestResponse response = createResponse();
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         Object res = h.evaluateExpression(response, "'my last response statusCode is: ' + response.statusCode");
         assertThat(res.toString(), is(equalTo("my last response statusCode is: 200")));
     }
@@ -159,7 +160,7 @@ public class JavascriptWrapperTest {
     @Test
     public void shouldProvideLastResponseHeadersInJsContext() {
         RestResponse response = createResponse();
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
 
         Object res = h.evaluateExpression(response, "'my last response Content-Type is: ' + response.header('Content-Type')");
         assertThat(res.toString(), is(equalTo("my last response Content-Type is: application/xml")));
@@ -186,7 +187,7 @@ public class JavascriptWrapperTest {
     @Test
     public void shouldTrapJavascriptErrorAndWrapThemInErrors() throws Exception {
         RestResponse response = createResponse();
-        JavascriptWrapper h = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper h = new JavascriptWrapper(variablesProvider, config);
         try {
             h.evaluateExpression(response, "some erroneous javascript");
             fail("Must throw a Javascript Exception");

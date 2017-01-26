@@ -20,28 +20,18 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.mozilla.javascript.*;
+import smartrics.rest.client.RestData.Header;
+import smartrics.rest.client.RestResponse;
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
+
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.EcmaError;
-import org.mozilla.javascript.EvaluatorException;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
-
-import smartrics.rest.client.RestData.Header;
-import smartrics.rest.client.RestResponse;
-import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
 /**
  * Wrapper class to all that related to JavaScript.
@@ -62,11 +52,13 @@ public class JavascriptWrapper {
      * the name of the JS object containing the json body: {@code jsonbody}.
      */
     public static final String JSON_OBJ_NAME = "jsonbody";
-	private static final long _32K = 32768;
+	private static final long _64K = 65535;
     private RunnerVariablesProvider variablesProvider;
+    private Config config;
 
-    public JavascriptWrapper(RunnerVariablesProvider variablesProvider) {
+    public JavascriptWrapper(RunnerVariablesProvider variablesProvider, Config config) {
         this.variablesProvider = variablesProvider;
+        this.config = config;
     }
 
     /**
@@ -202,7 +194,8 @@ public class JavascriptWrapper {
     }
 
     private void removeOptimisationForLargeExpressions(String responseBody, String expression, Context context) {
-		if ((responseBody != null && responseBody.getBytes().length > _32K) || expression.getBytes().length > _32K) {
+        final Long thresholdLimit = config.getAsLong("restfixture.response.optimisation.threshold", _64K);
+		if ((responseBody != null && responseBody.getBytes().length > thresholdLimit) || expression.getBytes().length > thresholdLimit) {
             context.setOptimizationLevel(-1);
         }
     }
