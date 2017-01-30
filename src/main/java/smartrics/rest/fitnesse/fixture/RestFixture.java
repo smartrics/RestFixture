@@ -971,7 +971,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 					"Missing string to evaluate)");
 			return;
 		}
-		JavascriptWrapper wrapper = new JavascriptWrapper(this);
+		JavascriptWrapper wrapper = new JavascriptWrapper(this, config);
 		Object result = null;
 		try {
 			result = wrapper.evaluateExpression(lastResponse, jsCell.body());

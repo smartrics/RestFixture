@@ -52,11 +52,13 @@ public class JavascriptWrapper {
      * the name of the JS object containing the json body: {@code jsonbody}.
      */
     public static final String JSON_OBJ_NAME = "jsonbody";
-    private static final long _64K = 65534;
+	private static final long _64K = 65535;
     private RunnerVariablesProvider variablesProvider;
+    private Config config;
 
-    public JavascriptWrapper(RunnerVariablesProvider variablesProvider) {
+    public JavascriptWrapper(RunnerVariablesProvider variablesProvider, Config config) {
         this.variablesProvider = variablesProvider;
+        this.config = config;
     }
 
     /**
@@ -101,7 +103,7 @@ public class JavascriptWrapper {
             return null;
         }
         Context context = Context.enter();
-        removeOptimisationForLargeExpressions(json, expression, context);
+		removeOptimisationForLargeExpressions(json, expression, context);
         ScriptableObject scope = context.initStandardObjects();
         injectImports(context, scope, imports);
         injectFitNesseSymbolMap(scope);
@@ -192,7 +194,8 @@ public class JavascriptWrapper {
     }
 
     private void removeOptimisationForLargeExpressions(String responseBody, String expression, Context context) {
-        if ((responseBody != null && responseBody.getBytes().length > _64K) || expression.getBytes().length > _64K) {
+        final Long thresholdLimit = config.getAsLong("restfixture.response.optimisation.threshold", _64K);
+		if ((responseBody != null && responseBody.getBytes().length > thresholdLimit) || expression.getBytes().length > thresholdLimit) {
             context.setOptimizationLevel(-1);
         }
     }

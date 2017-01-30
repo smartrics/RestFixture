@@ -20,14 +20,11 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import org.slf4j.Logger;
-import smartrics.rest.client.RestResponse;
-import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import smartrics.rest.client.RestResponse;
+import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
 /**
  * Handles let expressions on XML content, returning XML string rather than the
@@ -37,11 +34,9 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class LetBodyJsHandler implements LetHandler {
 
-    private static final Logger LOG = getLogger(LetBodyJsHandler.class);
-
     @Override
     public String handle(RunnerVariablesProvider variablesProvider, Config config, RestResponse response, Object expressionContext, String expression) {
-        JavascriptWrapper js = new JavascriptWrapper(variablesProvider);
+        JavascriptWrapper js = new JavascriptWrapper(variablesProvider, config);
         final Map<String, String> urlMap = config.getAsMap("restfixture.javascript.imports.map", new HashMap<String, String>());
         Object result = js.evaluateExpression(response, expression, urlMap);
         if (result == null) {
