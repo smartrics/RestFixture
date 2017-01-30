@@ -21,6 +21,7 @@
 package smartrics.rest.fitnesse.fixture.support;
 
 import org.mozilla.javascript.*;
+import org.slf4j.Logger;
 import smartrics.rest.client.RestData.Header;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
@@ -33,13 +34,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * Wrapper class to all that related to JavaScript.
  *
  * @author smartrics
  */
 public class JavascriptWrapper {
-
     /**
      * the name of the JS object containig the http response: {@code response}.
      */
@@ -52,13 +54,15 @@ public class JavascriptWrapper {
      * the name of the JS object containing the json body: {@code jsonbody}.
      */
     public static final String JSON_OBJ_NAME = "jsonbody";
-	private static final long _64K = 65535;
+    public static final String THRESHOLD_PROP_NAME = "restfixture.response.optimisation.threshold";
+    private static final Logger LOG = getLogger(JavascriptWrapper.class);
+    private static final Long _64K = 65535L;
+    private Long thresholdLimit;
     private RunnerVariablesProvider variablesProvider;
-    private Config config;
 
     public JavascriptWrapper(RunnerVariablesProvider variablesProvider, Config config) {
         this.variablesProvider = variablesProvider;
-        this.config = config;
+        setOptimisationThresholdValue(config);
     }
 
     /**
@@ -103,7 +107,7 @@ public class JavascriptWrapper {
             return null;
         }
         Context context = Context.enter();
-		removeOptimisationForLargeExpressions(json, expression, context);
+        removeOptimisationForLargeExpressions(json, expression, context);
         ScriptableObject scope = context.initStandardObjects();
         injectImports(context, scope, imports);
         injectFitNesseSymbolMap(scope);
@@ -193,11 +197,14 @@ public class JavascriptWrapper {
         return false;
     }
 
-    private void removeOptimisationForLargeExpressions(String responseBody, String expression, Context context) {
-        final Long thresholdLimit = config.getAsLong("restfixture.response.optimisation.threshold", _64K);
-		if ((responseBody != null && responseBody.getBytes().length > thresholdLimit) || expression.getBytes().length > thresholdLimit) {
+    void removeOptimisationForLargeExpressions(String responseBody, String expression, Context context) {
+        if (shouldNotOptimise(responseBody) || shouldNotOptimise(expression)) {
             context.setOptimizationLevel(-1);
         }
+    }
+
+    private boolean shouldNotOptimise(String s) {
+        return s != null && s.getBytes().length >= thresholdLimit;
     }
 
     private void injectImports(Context context, ScriptableObject scope, Map<String, String> imports) {
@@ -249,6 +256,23 @@ public class JavascriptWrapper {
                     throw new IllegalArgumentException("Import resource not valid: " + name);
                 }
             }
+        }
+    }
+
+    Long getThresholdLimit() {
+        return thresholdLimit;
+    }
+
+    void setOptimisationThresholdValue(Config config) {
+        try {
+            thresholdLimit = config.getAsLong(THRESHOLD_PROP_NAME, _64K);
+            if (thresholdLimit < 0) {
+                thresholdLimit = 0L;
+                LOG.warn("Invalid property 'restfixture.response.optimisation.threshold'. Negative number. Setting threshold to 0 [value={}]", config.get(THRESHOLD_PROP_NAME));
+            }
+        } catch (Exception e) {
+            LOG.warn("Invalid property 'restfixture.response.optimisation.threshold'. Not a number? [value={}]", config.get(THRESHOLD_PROP_NAME));
+            thresholdLimit = _64K;
         }
     }
 
@@ -362,5 +386,4 @@ public class JavascriptWrapper {
         }
 
     }
-
 }

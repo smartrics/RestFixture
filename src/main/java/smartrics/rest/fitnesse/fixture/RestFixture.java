@@ -169,6 +169,15 @@ import java.util.*;
  * null with empty.</i></td>
  * </tr>
  * <tr>
+ * <td>restfixture.response.optimisation.threshold</td>
+ * <td><i>a numeric value fixing a threshold for the response length to disable optimisation of javascript body.
+ * Default value is 65535.
+ * See {@see https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/Optimization} for details.
+ * If a JSON response or a JavaScript expression is larger than this threshold, then the optimisation
+ * level is set to -1. Otherwise set to 0 by default.
+ * </i></td>
+ * </tr>
+ * <tr>
  * <td>restfixture.javascript.imports.map</td>
  * <td><i>a map of name to Url/File path. Each entry refers to a url/path to a javascript file that is imported in the
  * JS context and available for evaluation. Files are checked for existence and access. If not available/not accessible,
