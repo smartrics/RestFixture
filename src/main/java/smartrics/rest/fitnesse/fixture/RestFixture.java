@@ -172,7 +172,7 @@ import java.util.*;
  * <td>restfixture.response.optimisation.threshold</td>
  * <td><i>a numeric value fixing a threshold for the response length to disable optimisation of javascript body.
  * Default value is 65535.
- * See {@see https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/Optimization} for details.
+ * See https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/Optimization for details.
  * If a JSON response or a JavaScript expression is larger than this threshold, then the optimisation
  * level is set to -1. Otherwise set to 0 by default.
  * </i></td>
