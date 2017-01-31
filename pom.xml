@@ -15,7 +15,7 @@
     <groupId>smartrics.restfixture</groupId>
     <artifactId>smartrics-RestFixture</artifactId>
     <name>RestFixture</name>
-    <version>4.4-SNAPSHOT</version>
+    <version>4.4</version>
     <url>https://github.com/smartrics/RestFixture</url>
     <packaging>jar</packaging>
     <properties>

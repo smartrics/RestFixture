@@ -1,4 +1,7 @@
 version 4.3
+ * merged pull request #216 - Added new property to disable optimisation: "restfixture.response.optimisation.threshold". Fix for #74 from PR #214 wasn't complete.
+
+version 4.3
  * merged pull request #205 - Added plain body handler
  * merged pull request #214 - Fix for #74 when json response is greater than 64k bytes
 
