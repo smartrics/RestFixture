@@ -33,7 +33,7 @@ Versions and compatibility with FitNesse
 
 RestFixture v3.1 and below are compatible with any release of FitNesse to date
 ([v20150424](http://mvnrepository.com/artifact/org.fitnesse/fitnesse/20150424)) and no further support for newer versions
-of FitNesse is guraranteed for these versions of RestFixture.
+of FitNesse is guaranteed for these versions of RestFixture.
 
 RestFixture v4.0 is compatible with [FitNesse v20150424](http://mvnrepository.com/artifact/org.fitnesse/fitnesse/20150424)
 and above having implemented proper support of Slim Symbols as described in [Issue #52](https://github.com/smartrics/RestFixture/issues/52).
