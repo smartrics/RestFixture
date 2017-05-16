@@ -131,14 +131,14 @@ import java.util.*;
  * <td>restfixture.default.headers</td>
  * <td><i>comma separated list of key value pairs representing the default list
  * of headers to be passed for each request. key and values are separated by a
- * colon. Entries are sepatated by \n. {@link RestFixture#setHeader()} will
+ * colon. Entries are separated by \n. {@link RestFixture#setHeader()} will
  * override this value. </i></td>
  * </tr>
  * <tr>
  * <td>restfixture.xml.namespaces.context</td>
  * <td><i>comma separated list of key value pairs representing namespace
  * declarations. The key is the namespace alias, the value is the namespace URI.
- * alias and URI are separated by a = sign. Entries are sepatated by
+ * alias and URI are separated by a = sign. Entries are separated by
  * {@code System.getProperty("line.separator")}. These entries will be used to
  * define the namespace context to be used in xpaths that are evaluated in the
  * results.</i></td>
