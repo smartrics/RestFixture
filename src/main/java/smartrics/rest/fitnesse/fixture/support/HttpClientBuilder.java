@@ -87,5 +87,11 @@ public class HttpClientBuilder {
             Credentials defaultcreds = new UsernamePasswordCredentials(username, password);
             client.getState().setCredentials(AuthScope.ANY, defaultcreds);
         }
+        String proxyUsername = config.get("http.proxy.username");
+        String proxyPassword = config.get("http.proxy.password");
+        if (proxyUsername != null && proxyPassword != null) {
+            Credentials defaultcreds = new UsernamePasswordCredentials(proxyUsername, proxyPassword);
+            client.getState().setProxyCredentials(AuthScope.ANY, defaultcreds);
+        }
     }
 }
