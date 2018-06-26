@@ -640,19 +640,6 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	}
 
 	/**
-	 * \@sglebs - fixes #162. necessary to work with a scenario
-     * @param body the body to set
-     * @return the body after substitution
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public String setBody(String body) {
-		requestBody = body;
-		if (GLOBALS != null)
-			requestBody = GLOBALS.substitute(body);
-		return requestBody;
-	}
-
-	/**
 	 * <code>| setHeader | http headers go here as nvp |</code>
 	 * <p>
 	 * header text must be nvp. name and value must be separated by ':' and each
@@ -689,24 +676,6 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
         return requestHeaders;
     }
 
-	/**
-	 * \@sglebs - fixes #161. necessary to work with a scenario
-     * @param headers the headers string to set
-     * @return the headers map
-	 */
-    public Map<String, String> setHeader(String headers) {
-        requestHeaders = new LinkedHashMap<String, String>();
-        return addHeader(headers);
-    }
-
-	/**
-	 * \@sglebs - fixes #161. necessary to work with a scenario
-     * @param headers the headers string to set
-     * @return the headers map
-	 */
-	public Map<String, String>  setHeaders(String headers) {
-		return setHeader(headers);
-	}
 
 	/**
 	 * Equivalent to setHeader - syntactic sugar to indicate that you can now.
