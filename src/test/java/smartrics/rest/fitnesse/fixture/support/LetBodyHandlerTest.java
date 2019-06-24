@@ -31,6 +31,9 @@ import org.junit.Test;
 import smartrics.rest.client.RestResponse;
 import smartrics.rest.fitnesse.fixture.RunnerVariablesProvider;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Test class for the js body handler.
  * 
@@ -69,4 +72,18 @@ public class LetBodyHandlerTest {
         String ret = h.handle(variablesProvider, Config.getConfig(), response, null, "/root/dispersionRef/text()");
         assertThat(ret, is(equalTo("http://localhost:8111")));
     }
+
+    @Test
+    public void shouldExecXPaths() {
+        LetBodyHandler h = new LetBodyHandler();
+        RestResponse response = new RestResponse();
+        response.addHeader("Content-Type", "application/xml");
+        response.setBody("<Order xmlns='foobar'><Tag1><Tag2>azz</Tag2></Tag1></Order>");
+        Config config = Config.getConfig();
+        Map<String, String> c = new HashMap();
+        c.put("defns", "foobar");
+        String ret = h.handle(variablesProvider, config, response, c, "/defns:Order/defns:Tag1/defns:Tag2/text()");
+        assertThat(ret, is(equalTo("azz")));
+    }
+
 }
