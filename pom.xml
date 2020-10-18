@@ -224,7 +224,7 @@
             </snapshots>
             <id>ossrh</id>
             <name>OSS releases</name>
-            <url>http://oss.sonatype.org/content/repositories/releases/</url>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
             <layout>default</layout>
         </repository>
     </repositories>
