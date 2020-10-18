@@ -78,7 +78,7 @@
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>1.4.2</version>
+            <version>1.4.10-java7</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -224,7 +224,7 @@
             </snapshots>
             <id>ossrh</id>
             <name>OSS releases</name>
-            <url>http://oss.sonatype.org/content/repositories/releases/</url>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
             <layout>default</layout>
         </repository>
     </repositories>

@@ -854,7 +854,8 @@ public class RestFixtureTest {
         verify(mockBodyTypeAdapter).set(xmlString);
         verify(mockBodyTypeAdapter).setContext(isA(Map.class));
 
-        assertEquals(xmlString, clean(variables.get("content")));
+        String content = variables.get("content");
+        assertEquals(xmlString, clean(content));
         assertEquals(null, clean(variables.get("$content")));
         assertEquals(xmlString, clean(Fixture.getSymbol("content").toString()));
 
@@ -976,7 +977,7 @@ public class RestFixtureTest {
     	if(s == null) {
     		return null;
     	}
-        return s.trim().replaceAll("\n", "").replaceAll("\r", "");
+        return s.trim().replaceAll("\n", "").replaceAll("\r", "").replaceAll(" ", "");
     }
 
     @Test
