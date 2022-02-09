@@ -25,6 +25,7 @@ import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 
+import org.apache.http.client.HttpClient;
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestClientImpl;
 import smartrics.rest.client.RestRequest;
