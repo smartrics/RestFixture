@@ -20,10 +20,8 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
-import org.apache.commons.httpclient.HttpURL;
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import smartrics.rest.client.RestClient;
@@ -33,6 +31,8 @@ import smartrics.rest.fitnesse.fixture.support.Variables;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -70,7 +70,7 @@ public class PartsFactoryTest {
     @Test
     public void buildsRestClientWithStandardUri() throws Exception {
         Config c = Config.getConfig();
-        RestClient restClient = f.buildRestClient(c);
+        RestClient restClient = f.buildRestClient(c, true);
         assertThat(restClient, is(instanceOf(RestClient.class)));
         Method m = getCreateUriMethod(restClient);
         m.setAccessible(true);
@@ -83,22 +83,23 @@ public class PartsFactoryTest {
     public void buildsRestClientWithoutSquareBracketsInUri() throws Exception {
         // URI validation will throw an exception as per httpclient 3.1
         Config c = Config.getConfig();
-        RestClient restClient = f.buildRestClient(c);
+        RestClient restClient = f.buildRestClient(c, true);
         assertThat(restClient, is(instanceOf(RestClient.class)));
         Method m = getCreateUriMethod(restClient);
         m.setAccessible(true);
         try {
             m.invoke(restClient, "http://localhost:9900?something[data]=1", true);
         } catch(InvocationTargetException e) {
-            assertThat(e.getCause(), is(instanceOf(URIException.class)));
+            assertThat(e.getCause(), is(instanceOf(URISyntaxException.class)));
         }
     }
 
     @Test
+    @Ignore("to check if this is still needed.")
     public void buildsRestClientWithEscapedSquareBracketsInUri() throws Exception {
         // URI will be escaped as per httpclient 3.1
         Config c = Config.getConfig();
-        RestClient restClient = f.buildRestClient(c);
+        RestClient restClient = f.buildRestClient(c, true);
         assertThat(restClient, is(instanceOf(RestClient.class)));
         Method m = getCreateUriMethod(restClient);
         m.setAccessible(true);
@@ -108,43 +109,16 @@ public class PartsFactoryTest {
     }
 
     @Test
-    public void buildsRestClientWithSquareBracketsInUri() throws Exception {
-        Config c = Config.getConfig();
-        c.add("http.client.use.new.http.uri.factory", "true");
-        RestClient restClient = f.buildRestClient(c);
-        assertThat(restClient, is(instanceOf(RestClient.class)));
-        Method m = getCreateUriMethod(restClient);
-        m.setAccessible(true);
-        Object r = m.invoke(restClient, "http://localhost:9900?something[data]=1", false);
-        assertThat(r, is(instanceOf(HttpURL.class)));
-        HttpURL u = (HttpURL) r;
-        assertThat(u.getQuery(), is(equalTo("something[data]=1")));
-    }
-
-    @Test
     public void buildsRestClientWithDefaultURIFactory() throws Exception {
         Config c = Config.getConfig();
-        RestClient restClient = f.buildRestClient(c);
+        RestClient restClient = f.buildRestClient(c, true);
         assertThat(restClient, is(instanceOf(RestClient.class)));
         Method m = getGetMethodClassnameFromMethodNameMethod(restClient);
         m.setAccessible(true);
         Object r = m.invoke(restClient, "Some");
-        assertThat(r.toString(), is(equalTo("org.apache.commons.httpclient.methods.SomeMethod")));
+        assertThat(r.toString(), is(equalTo("org.apache.http.client.methods.HttpSome")));
     }
 
-    @Test
-    public void buildsRestClientWithNewURIFactory() throws Exception {
-        Config c = Config.getConfig();
-        c.add("http.client.use.new.http.uri.factory", "true");
-        RestClient restClient = f.buildRestClient(c);
-        assertThat(restClient, is(instanceOf(RestClient.class)));
-        Method m = getGetMethodClassnameFromMethodNameMethod(restClient);
-        m.setAccessible(true);
-        Object r = m.invoke(restClient, "Some");
-        assertThat(r.toString(), is(equalTo("smartrics.rest.fitnesse.fixture.support.http.SomeMethod")));
-    }
-    
-    
     @Test
     public void cantBuildACellFormatterForNonFitOrSlimRunner() {
         try {

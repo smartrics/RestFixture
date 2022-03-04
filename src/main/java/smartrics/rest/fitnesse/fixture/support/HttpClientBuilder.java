@@ -20,21 +20,23 @@
  */
 package smartrics.rest.fitnesse.fixture.support;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.params.HostParams;
-import org.apache.commons.httpclient.params.HttpClientParams;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
+
+import java.util.concurrent.TimeUnit;
 
 
 /**
  * Helper builder class for an apache {@link HttpClient} that uses data in the
  * {@link Config} to configure the object.
- * 
+ *
  * @author smartrics
- * 
+ *
  */
 public class HttpClientBuilder {
 	/**
@@ -48,50 +50,36 @@ public class HttpClientBuilder {
 
     /**
      * @param config the {@link Config} containing the client configuration paramteres.
+     * @param followRedirects
      * @return an instance of an {@link HttpClient}.
      */
-    public HttpClient createHttpClient(final Config config) {
-        HttpClient client = createConfiguredClient(config);
-        if (config != null) {
-            configureHost(config, client);
-            configureCredentials(config, client);
+    public HttpClient createHttpClient(final Config config, boolean followRedirects) {
+        int timeout = config == null ? DEFAULT_SO_TO  : config.getAsInteger("http.client.connection.timeout", DEFAULT_SO_TO);
+        org.apache.http.impl.client.HttpClientBuilder builder = org.apache.http.impl.client.HttpClientBuilder.create()
+                .setConnectionTimeToLive(timeout, TimeUnit.MILLISECONDS);
+        if (followRedirects) {
+            builder.setRedirectStrategy(new DefaultRedirectStrategy());
+        } else {
+            builder.disableRedirectHandling();
         }
-        return client;
-    }
-
-    private HttpClient createConfiguredClient(final Config config) {
-        HttpClientParams params = new HttpClientParams();
-        params.setSoTimeout(DEFAULT_SO_TO);
-        if (config != null) {
-            params.setSoTimeout(config.getAsInteger("http.client.connection.timeout", DEFAULT_SO_TO));
-        }
-        HttpClient client = new HttpClient(params);
-        return client;
-    }
-
-    private void configureHost(final Config config, HttpClient client) {
-        HostConfiguration hostConfiguration = client.getHostConfiguration();
         String proxyHost = config.get("http.proxy.host");
         if (proxyHost != null) {
             int proxyPort = config.getAsInteger("http.proxy.port", DEFAULT_PROXY_PORT);
-            hostConfiguration.setProxy(proxyHost, proxyPort);
+            HttpHost proxy = new HttpHost(proxyHost, proxyPort);
+            builder.setProxy(proxy);
+            configureProxyCredentials(config, builder, proxyHost, proxyPort);
         }
-        HostParams hostParams = new HostParams();
-        hostConfiguration.setParams(hostParams);
+        return builder.build();
     }
 
-    private void configureCredentials(final Config config, HttpClient client) {
+    private void configureProxyCredentials(Config config, org.apache.http.impl.client.HttpClientBuilder builder, String proxyHost, int proxyPort) {
         String username = config.get("http.basicauth.username");
         String password = config.get("http.basicauth.password");
         if (username != null && password != null) {
-            Credentials defaultcreds = new UsernamePasswordCredentials(username, password);
-            client.getState().setCredentials(AuthScope.ANY, defaultcreds);
-        }
-        String proxyUsername = config.get("http.proxy.username");
-        String proxyPassword = config.get("http.proxy.password");
-        if (proxyUsername != null && proxyPassword != null) {
-            Credentials defaultcreds = new UsernamePasswordCredentials(proxyUsername, proxyPassword);
-            client.getState().setProxyCredentials(AuthScope.ANY, defaultcreds);
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(new AuthScope(proxyHost, proxyPort), new UsernamePasswordCredentials(username, password));
+            builder.setDefaultCredentialsProvider(credentialsProvider);
         }
     }
+
 }

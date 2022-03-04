@@ -177,6 +177,12 @@ public class FitRestFixture extends ActionFixture {
 	}
 
 	/**
+	 * delegates to {@link RestFixture#PATCH()}
+	 */
+	public void PATCH() {
+		restFixture.PATCH();
+	}
+	/**
 	 * delegates to {@link RestFixture#GET()}
 	 */
 	public void GET() {

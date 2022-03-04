@@ -94,7 +94,7 @@ public class RestFixtureTestHelper {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void wireMocks(Config conf, PartsFactory pf, RestClient rc, RestRequest req, RestResponse resp, CellFormatter cf, BodyTypeAdapter bta) {
-        when(pf.buildRestClient(conf)).thenReturn(rc);
+        when(pf.buildRestClient(conf, true)).thenReturn(rc);
         when(pf.buildRestRequest()).thenReturn(req);
         when(rc.execute(req)).thenReturn(resp);
         when(pf.buildCellFormatter(any(RestFixture.Runner.class))).thenReturn(cf);
