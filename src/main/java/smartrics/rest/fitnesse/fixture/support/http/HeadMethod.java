@@ -20,8 +20,7 @@
  */
 package smartrics.rest.fitnesse.fixture.support.http;
 
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
+import org.apache.http.client.methods.HttpHead;
 
 /**
  * Head method, enhanced with support of query parameters.
@@ -29,15 +28,6 @@ import org.apache.commons.httpclient.URIException;
  * @author smartrics
  * 
  */
-public class HeadMethod extends org.apache.commons.httpclient.methods.HeadMethod {
-
-	@SuppressWarnings("deprecation")
-	public URI getURI() throws URIException {
-		return URIBuilder.newURI(this, super.getHostConfiguration());
-	}
-
-	public void setURI(URI uri) throws URIException {
-		super.setURI(uri);
-	}
+public class HeadMethod extends HttpHead {
 
 }

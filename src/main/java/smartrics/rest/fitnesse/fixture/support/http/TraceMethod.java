@@ -20,9 +20,8 @@
  */
 package smartrics.rest.fitnesse.fixture.support.http;
 
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
 
+import org.apache.http.client.methods.HttpTrace;
 import smartrics.rest.client.RestClient;
 
 /**
@@ -31,22 +30,6 @@ import smartrics.rest.client.RestClient;
  * @author smartrics
  * 
  */
-public class TraceMethod extends org.apache.commons.httpclient.methods.TraceMethod {
-
-	/**
-	 * A no args constructor to allow creation. The Uri will be set later for the {@link RestClient} implementation.
-	 */
-	public TraceMethod() {
-		super("http://dummy.com");
-	}
-	
-	@SuppressWarnings("deprecation")
-	public URI getURI() throws URIException {
-		return URIBuilder.newURI(this, super.getHostConfiguration());
-	}
-
-	public void setURI(URI uri) throws URIException {
-		new URIBuilder().setURI(this, uri);
-	}
+public class TraceMethod extends HttpTrace {
 
 }

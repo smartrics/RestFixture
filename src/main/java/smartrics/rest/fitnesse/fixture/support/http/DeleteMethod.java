@@ -20,8 +20,6 @@
  */
 package smartrics.rest.fitnesse.fixture.support.http;
 
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
 import org.apache.http.client.methods.HttpDelete;
 
 import java.net.URI;
@@ -33,12 +31,4 @@ import java.net.URI;
  * 
  */
 public class DeleteMethod extends HttpDelete {
-    @SuppressWarnings("deprecation")
-    public URI getURI()  {
-		return URIBuilder.newURI(this, super.getHostConfiguration());
-    }
-
-    public void setURI(URI uri) throws URIException {
-        new URIBuilder().setURI(this, uri);
-    }
 }

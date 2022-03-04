@@ -20,8 +20,8 @@
  */
 package smartrics.rest.fitnesse.fixture.support.http;
 
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
+
+import org.apache.http.client.methods.HttpPut;
 
 /**
  * Put method, enhanced with support of query parameters.
@@ -29,14 +29,6 @@ import org.apache.commons.httpclient.URIException;
  * @author smartrics
  * 
  */
-public class PutMethod extends org.apache.commons.httpclient.methods.PutMethod {
-	@SuppressWarnings("deprecation")
-	public URI getURI() throws URIException {
-		return URIBuilder.newURI(this, super.getHostConfiguration());
-	}
-
-	public void setURI(URI uri) throws URIException {
-		new URIBuilder().setURI(this, uri);
-	}
+public class PutMethod extends HttpPut {
 
 }

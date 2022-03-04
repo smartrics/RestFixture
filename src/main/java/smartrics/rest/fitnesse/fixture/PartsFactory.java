@@ -20,11 +20,6 @@
  */
 package smartrics.rest.fitnesse.fixture;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpURL;
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
-
 import org.apache.http.client.HttpClient;
 import smartrics.rest.client.RestClient;
 import smartrics.rest.client.RestClientImpl;
@@ -36,6 +31,10 @@ import smartrics.rest.fitnesse.fixture.support.CellFormatter;
 import smartrics.rest.fitnesse.fixture.support.Config;
 import smartrics.rest.fitnesse.fixture.support.ContentType;
 import smartrics.rest.fitnesse.fixture.support.HttpClientBuilder;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Factory of all dependencies the rest fixture needs.
@@ -56,20 +55,18 @@ public class PartsFactory {
      * 
      * @param config
      *            the configuration for the rest client to build
+     * @param followRedirects
      * @return the rest client
      */
-    public RestClient buildRestClient(final Config config) {
-        HttpClient httpClient = new HttpClientBuilder().createHttpClient(config);
+    public RestClient buildRestClient(final Config config, boolean followRedirects) {
+        HttpClient httpClient = new HttpClientBuilder().createHttpClient(config, followRedirects);
         return new RestClientImpl(httpClient) {
+
             @Override
-            protected URI createUri(String uriString, boolean escaped) throws URIException {
-                boolean useNewHttpUriFactory = config.getAsBoolean("http.client.use.new.http.uri.factory", false);
-                if (useNewHttpUriFactory) {
-                    return new HttpURL(uriString);
-                }
+            protected URI createUri(String uriString, boolean escaped) throws URISyntaxException, UnsupportedEncodingException {
                 return super.createUri(uriString, escaped);
             }
-            
+
             @Override
             public String getMethodClassnameFromMethodName(String mName) {
                 boolean useOverriddenHttpMethodImpl = config.getAsBoolean("http.client.use.new.http.uri.factory", false);

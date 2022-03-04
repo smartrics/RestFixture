@@ -223,7 +223,6 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 		case SLIM:
 			return new SlimVariables(config, slimStatementExecutor);
 		case FIT:
-			return new FitVariables(config);
 		default:
 			// Use FitVariables for tests
 			return new FitVariables(config);
@@ -707,6 +706,26 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	public void PUT() {
 		debugMethodCallStart();
 		doMethod(emptifyBody(requestBody), "Put");
+		debugMethodCallEnd();
+	}
+
+	/**
+	 * <code> | PATCH | URL | ?ret | ?headers | ?body |</code>
+	 * <p>
+	 * executes a PATCH on the URL and checks the return (a string representation
+	 * the operation return code), the HTTP response headers and the HTTP
+	 * response body
+	 * <p>
+	 * URL is resolved by replacing global variables previously defined with
+	 * <code>let()</code>
+	 * <p>
+	 * the HTTP request headers can be set via <code>setHeaders()</code>. If not
+	 * set, the list of default headers will be set. See
+	 * <code>DEF_REQUEST_HEADERS</code>
+	 */
+	public void PATCH() {
+		debugMethodCallStart();
+		doMethod(emptifyBody(requestBody), "Patch");
 		debugMethodCallEnd();
 	}
 
@@ -1312,10 +1331,10 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
 	/**
 	 * Allows to config the rest client implementation. the method shoudl
 	 * configure the instance attribute {@link RestFixture#restClient} created
-	 * by the {@link smartrics.rest.fitnesse.fixture.PartsFactory#buildRestClient(smartrics.rest.fitnesse.fixture.support.Config)}.
+	 * by the {@link PartsFactory#buildRestClient(Config, boolean)}.
 	 */
 	private void configRestClient() {
-		restClient = partsFactory.buildRestClient(getConfig());
+		restClient = partsFactory.buildRestClient(getConfig(), followRedirects);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -1371,7 +1390,7 @@ public class RestFixture implements StatementExecutorConsumer, RunnerVariablesPr
             Config newConfig = getConfig();
             newConfig.add("http.basicauth.username", newUsername);
             newConfig.add("http.basicauth.password", newPassword);
-            restClient = partsFactory.buildRestClient(newConfig);
+            restClient = partsFactory.buildRestClient(newConfig, followRedirects);
         }
     }
 

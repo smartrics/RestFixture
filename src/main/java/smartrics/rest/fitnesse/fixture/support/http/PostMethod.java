@@ -20,8 +20,8 @@
  */
 package smartrics.rest.fitnesse.fixture.support.http;
 
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
+
+import org.apache.http.client.methods.HttpPost;
 
 /**
  * Post method, enhanced with support of query parameters.
@@ -29,14 +29,5 @@ import org.apache.commons.httpclient.URIException;
  * @author smartrics
  * 
  */
-public class PostMethod extends org.apache.commons.httpclient.methods.PostMethod {
-
-	@SuppressWarnings("deprecation")
-	public URI getURI() throws URIException {
-		return URIBuilder.newURI(this, super.getHostConfiguration());
-	}
-
-	public void setURI(URI uri) throws URIException {
-		new URIBuilder().setURI(this, uri);
-	}
+public class PostMethod extends HttpPost {
 }

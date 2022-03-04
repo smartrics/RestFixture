@@ -20,14 +20,6 @@
  */
 package smartrics.rest.fitnesse.fixture.support.http;
 
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpHost;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpURL;
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.params.HttpMethodParams;
-
 /**
  * Builds URIs with query strings.
  * 
@@ -35,9 +27,10 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
  * 
  */
 class URIBuilder {
+/*
 
 	public URI getURI(String scheme, String host, int port, String path,
-			String queryString, HttpMethodParams params) throws URIException {
+					  String queryString, HttpMethodParams params) throws URIException {
 		HttpHost httphost = new HttpHost(host, port);
 		StringBuffer buffer = new StringBuffer();
 		if (httphost != null) {
@@ -58,7 +51,9 @@ class URIBuilder {
 		String charset = params.getUriCharset();
 		return new HttpURL(buffer.toString(), charset);
 	}
+*/
 
+/*
 	@SuppressWarnings("deprecation")
 	public void setURI(org.apache.commons.httpclient.HttpMethodBase m, URI uri)
 			throws URIException {
@@ -71,11 +66,12 @@ class URIBuilder {
 		m.setQueryString(uri.getQuery());
 	}
 
-	public static URI newURI(HttpMethod m, HostConfiguration conf) throws URIException {
+	public static URI newURI(HttpRequestBase m, HostConfiguration conf) throws URIException {
 		String scheme = conf.getProtocol().getScheme();
 		String host = conf.getHost();
 		int port = conf.getPort();
 		return new URIBuilder().getURI(scheme, host, port, m.getPath(),
 				m.getQueryString(), m.getParams());
 	}
+*/
 }
